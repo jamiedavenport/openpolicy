@@ -7,7 +7,7 @@ author: "OpenPolicy Team"
 
 Most Astro sites need a privacy policy and terms of service before they launch. The usual approach: grab a template from the internet, paste it into a static page, and forget about it until a lawyer asks why it still says "Company Name Here."
 
-OpenPolicy treats your policies like code. You define them as TypeScript objects, and the Vite plugin compiles them to HTML or Markdown at build time — in sync with every deploy.
+OpenPolicy treats your policies like code. You define them as TypeScript objects, and the Vite plugin compiles them to Markdown at build time — in sync with every deploy.
 
 ## Install
 
@@ -31,8 +31,8 @@ export default defineConfig({
           "privacy.config.ts",
           { config: "terms.config.ts", type: "terms" },
         ],
-        formats: ["html"],
-        outDir: "public/policies",
+        formats: ["markdown"],
+        outDir: "src/generated/policies",
       }),
     ],
   },
@@ -135,32 +135,44 @@ export default defineTermsOfService({
 After the next build (or on save in dev), the plugin writes:
 
 ```
-public/
-  policies/
-    privacy-policy.html
-    terms-of-service.html
+src/generated/policies/
+  privacy-policy.md
+  terms-of-service.md
 ```
 
-These are served as static files, so you can link to them from your footer:
+Because the files land inside `src/`, Astro can import them directly as Markdown components.
 
-```astro
----
-// src/components/footer.astro
----
-<footer>
-  <a href="/policies/privacy-policy.html">Privacy Policy</a>
-  <a href="/policies/terms-of-service.html">Terms of Service</a>
-</footer>
-```
-
-Or render them inline on a dedicated page using an `<iframe>` or `set:html`:
+## Render on a dedicated page
 
 ```astro
 ---
 // src/pages/privacy.astro
-import policy from "../../public/policies/privacy-policy.html?raw";
+import { Content } from "../../generated/policies/privacy-policy.md";
 ---
-<article set:html={policy} />
+<div class="prose prose-gray max-w-none">
+  <Content />
+</div>
+```
+
+Astro compiles the Markdown to HTML at build time, so there's no client-side rendering overhead. The `prose` class (from Tailwind Typography) handles all the heading, list, and paragraph styles.
+
+Do the same for terms:
+
+```astro
+---
+// src/pages/terms.astro
+import { Content } from "../../generated/policies/terms-of-service.md";
+---
+<div class="prose prose-gray max-w-none">
+  <Content />
+</div>
+```
+
+Add `.gitignore` entries so the generated files aren't checked in:
+
+```
+# .gitignore
+src/generated/
 ```
 
 ## Why this is better than a static page
@@ -170,4 +182,4 @@ import policy from "../../public/policies/privacy-policy.html?raw";
 - **Version-controlled.** The config lives in your repo. `git blame` shows you when and why anything changed.
 - **Jurisdiction-aware.** Set `jurisdictions: ["eu"]` and GDPR-required sections (right to erasure, data transfers, DPA contact) are included automatically.
 
-The generated HTML includes all required sections for the jurisdictions you specify. You own the config; OpenPolicy handles the legal structure.
+The generated Markdown includes all required sections for the jurisdictions you specify. You own the config; OpenPolicy handles the legal structure.
