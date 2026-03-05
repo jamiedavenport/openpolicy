@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/cli",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"type": "module",
 	"description": "CLI for generating and validating OpenPolicy privacy policy documents",
 	"license": "MIT",
