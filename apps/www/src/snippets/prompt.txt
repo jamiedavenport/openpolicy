@@ -1,0 +1,12 @@
+Read this codebase carefully, then generate a policy.ts using the OpenPolicy SDK.
+
+SDK reference: https://openpolicy.sh/llms.txt
+
+Your output should capture:
+- Every category of data collected and why
+- All third-party services integrated and their purpose
+- The applicable jurisdiction (US, EU, UK, etc.)
+- Legal basis for processing
+- User rights supported
+
+Output only a single policy.ts using definePrivacyPolicy(). No explanations.

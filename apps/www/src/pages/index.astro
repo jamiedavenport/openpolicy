@@ -1,308 +1,152 @@
 ---
-import "../styles/global.css";
-
-import { Font } from "astro:assets";
 import { Code } from "astro:components";
-import Footer from "../components/footer.astro";
-import Header from "../components/header.astro";
-import Nav from "../components/nav.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 
 import Lucid from "../assets/lucid.svg";
 import virentis from "../assets/virentis.png";
 
-const installCmd = `bunx @openpolicy/cli@latest init`;
-
-const policyTs = `import { definePrivacyPolicy } from '@openpolicy/sdk'
-
-export default definePrivacyPolicy({
-    effectiveDate: '2026-01-01',
-	company: {
-		name: 'Acme Inc.',
-		legalName: 'Acme Incorporated',
-		address: '123 Market St, San Francisco, CA 94105',
-		contact: 'privacy@acme.com',
-	},
-	dataCollected: {
-		account: ['email', 'name', 'password'],
-		usage: ['ip_address', 'browser', 'pages_visited'],
-		payment: ['billing_address', 'last_4_digits'],
-	},
-	legalBasis: 'legitimate_interest',
-	retention: {
-		account: '3 years after account closure',
-		logs: '90 days',
-	},
-	cookies: {
-		essential: true,
-		analytics: true,
-		marketing: false,
-	},
-	thirdParties: [
-		{ name: 'Stripe', purpose: 'payment processing' },
-		{ name: 'PostHog', purpose: 'product analytics' },
-	],
-	userRights: ['access', 'rectification', 'erasure', 'portability'],
-	jurisdictions: ['us'],
-})`;
-
-const viteConfig = `import { defineConfig } from 'vite'
-import { openPolicy } from '@openpolicy/vite'
-
-export default defineConfig({
-  plugins: [
-    openPolicy({
-		formats: ['markdown', 'html'],
-	}),
-  ],
-})`;
-
-const privacyRoute = `---
-import policy from '../../public/policies/privacy-policy.html?raw'
+import installCmd from "../snippets/install.sh?raw";
+import policyTs from "../snippets/policy.ts?raw";
+import viteConfig from "../snippets/vite.config.ts?raw";
+import privacyRoute from "../snippets/privacy-policy.astro?raw";
+import llmPrompt from "../snippets/prompt.txt?raw";
 ---
 
-<div set:html={policy} />
-`;
-
-const llmPrompt = `Read this codebase carefully, then generate a policy.ts using the OpenPolicy SDK.
-
-SDK reference: https://openpolicy.sh/llms.txt
-
-Your output should capture:
-- Every category of data collected and why
-- All third-party services integrated and their purpose
-- The applicable jurisdiction (US, EU, UK, etc.)
-- Legal basis for processing
-- User rights supported
-
-Output only a single policy.ts using definePrivacyPolicy(). No explanations.`;
----
-
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>OpenPolicy</title>
-    <meta
-      name="description"
-      content="The first policy-as-code framework for developers. Generate privacy policies, terms of service, and legal agreements directly from TypeScript."
+<BaseLayout
+  title="OpenPolicy"
+  description="The first policy-as-code framework for developers. Generate privacy policies, terms of service, and legal agreements directly from TypeScript."
+  ogUrl="https://openpolicy.sh"
+>
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
+      README.md
+    </h2>
+    <p class="mb-4">
+      Create legal policies the way developers build software. Our
+      platform lets you generate privacy policies, terms of service, and
+      other legal agreements directly from code—making them fast,
+      accurate, and easy to maintain.
+    </p>
+    <Code
+      code={installCmd}
+      lang="bash"
+      theme="github-light"
+      class="p-4 text-sm border border-gray-200 bg-gray-100"
     />
+  </section>
 
-    <meta property="og:title" content="OpenPolicy" />
-    <meta
-      property="og:description"
-      content="The first policy-as-code framework for developers. Generate privacy policies, terms of service, and legal agreements directly from TypeScript."
-    />
-    <meta property="og:image" content="https://openpolicy.sh/og.png" />
-    <meta property="og:url" content="https://openpolicy.sh" />
-    <meta property="og:type" content="website" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="OpenPolicy" />
-    <meta
-      name="twitter:description"
-      content="The first policy-as-code framework for developers. Generate privacy policies, terms of service, and legal agreements directly from TypeScript."
-    />
-    <meta name="twitter:image" content="https://openpolicy.sh/og.png" />
-
-    <Font cssVariable="--font-geist-mono" preload />
-  </head>
-  <body class="bg-gray-50">
-    <div class="grid md:grid-cols-3 md:h-svh md:overflow-hidden">
-      <div
-        class="md:col-span-1 border-b md:border-b-0 md:border-r p-10 md:p-14 lg:p-20 flex flex-col gap-10 border-gray-200"
-      >
-        <Header />
-        <div class="flex-1 flex flex-col justify-center items-start">
-          <p class="font-mono font-medium text-xs text-gray-500 mb-2">
-            POLICY-AS-CODE
-          </p>
-          <p class="text-xl font-medium mb-4">
-            The First Policy Framework for Busy Founders and Developers
-          </p>
-          <a
-            href="https://docs.openpolicy.sh"
-            target="_blank"
-            class="px-4 py-2.5 bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors duration-200"
-            >Documentation</a
-          >
-        </div>
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
+      FEATURES.md
+    </h2>
+    <div class="grid grid-cols-3 gap-px bg-gray-200 border border-gray-200">
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">TypeScript-first</p>
+        <p class="text-xs text-gray-500">Define policies in the language you already know.</p>
       </div>
-      <div
-        class="md:col-span-2 overflow-y-auto bg-white "
-      >
-      <Nav />
-
-      <div class="flex flex-col gap-10 md:gap-20 p-10 md:p-14 lg:p-20">
-        <section>
-          <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
-            README.md
-          </h2>
-          <p class="mb-4">
-            Create legal policies the way developers build software. Our
-            platform lets you generate privacy policies, terms of service, and
-            other legal agreements directly from code—making them fast,
-            accurate, and easy to maintain.
-          </p>
-          <Code 
-            code={installCmd}
-            lang="bash"
-            theme="github-light"
-            class="p-4 text-sm border border-gray-200 bg-gray-100"
-          />
-        </section>
-
-        <section>
-          <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
-            FEATURES.md
-          </h2>
-          <div class="grid grid-cols-3 gap-px bg-gray-200 border border-gray-200">
-            <div class="bg-white p-4">
-              <p class="font-mono font-medium text-xs mb-1">TypeScript-first</p>
-              <p class="text-xs text-gray-500">Define policies in the language you already know.</p>
-            </div>
-            <div class="bg-white p-4">
-              <p class="font-mono font-medium text-xs mb-1">Multi-format output</p>
-              <p class="text-xs text-gray-500">Generate HTML, PDF, and Markdown at build time.</p>
-            </div>
-            <div class="bg-white p-4">
-              <p class="font-mono font-medium text-xs mb-1">Vite integration</p>
-              <p class="text-xs text-gray-500">Drop into your existing build pipeline in minutes.</p>
-            </div>
-            <div class="bg-white p-4">
-              <p class="font-mono font-medium text-xs mb-1">GDPR & CCPA ready</p>
-              <p class="text-xs text-gray-500">Built-in templates for the regulations that matter.</p>
-            </div>
-            <div class="bg-white p-4">
-              <p class="font-mono font-medium text-xs mb-1">Version controlled</p>
-              <p class="text-xs text-gray-500">Policies live in your repo and ship with your code.</p>
-            </div>
-            <div class="bg-white p-4">
-              <p class="font-mono font-medium text-xs mb-1">Always in sync</p>
-              <p class="text-xs text-gray-500">Regenerated on every build — never out of date.</p>
-            </div>
-            <div class="bg-white p-4">
-              <p class="font-mono font-medium text-xs mb-1">Multi-jurisdiction</p>
-              <p class="text-xs text-gray-500">US, EU, UK and more supported out of the box.</p>
-            </div>
-            <div class="bg-white p-4">
-              <p class="font-mono font-medium text-xs mb-1">Audit trail</p>
-              <p class="text-xs text-gray-500">Every policy change is tracked in git, reviewable in PRs.</p>
-            </div>
-            <div class="bg-white p-4">
-              <p class="font-mono font-medium text-xs mb-1">Framework agnostic</p>
-              <p class="text-xs text-gray-500">Works with React, Vue, Svelte, or plain HTML.</p>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
-            GETTING-STARTED.md
-          </h2>
-          <p class="mb-4">
-            Define your policies in TypeScript, then let the Vite plugin
-            generate compliant HTML and PDF documents at build time. No lawyers,
-            no templates—just code.
-          </p>
-
-          <div class="border border-gray-200 mb-4 bg-gray-100">
-            <div class="flex border-b border-gray-200">
-              <div
-                class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200"
-              >
-                policy.ts
-              </div>
-            </div>
-            <Code
-              code={policyTs}
-              lang="ts"
-              theme="github-light"
-              class="p-4 text-sm"
-            />
-          </div>
-
-          <div class="border border-gray-200 mb-4 bg-gray-100">
-            <div class="flex border-b border-gray-200">
-              <div
-                class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200"
-              >
-                vite.config.ts
-              </div>
-            </div>
-            <Code
-              code={viteConfig}
-              lang="ts"
-              theme="github-light"
-              class="p-4 text-sm"
-            />
-          </div>
-
-          <div class="border border-gray-200 bg-gray-100">
-            <div class="flex border-b border-gray-200">
-              <div
-                class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200"
-              >
-                pages/privacy-policy.astro
-              </div>
-            </div>
-            <Code
-              code={privacyRoute}
-              lang="astro"
-              theme="github-light"
-              class="p-4 text-sm"
-            />
-          </div>
-        </section>
-
-        <section>
-          <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
-            LLMS.md
-          </h2>
-          <p class="mb-4">
-            OpenPolicy ships an <code>llms.txt</code> so AI coding assistants — Claude, Cursor, Copilot — understand the SDK. Paste this prompt into your assistant to generate a <code>policy.ts</code> from your existing codebase:
-          </p>
-          <div class="border border-gray-200 bg-gray-100">
-            <div class="flex items-center justify-between border-b border-gray-200">
-              <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
-                prompt.txt
-              </div>
-            </div>
-            <Code
-              code={llmPrompt}
-              lang="text"
-              theme="github-light"
-              class="p-4 text-sm"
-            />
-          </div>
-        </section>
-
-        <section>
-          <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
-            SHOWCASE.md
-          </h2>
-          <p class="mb-4">These teams are using OpenPolicy to generate their legal documentation and streamline their development process</p>
-          <div class="grid grid-cols-3 gap-px bg-gray-200 border border-gray-200">
-            <a href="https://lucid.jxd.dev" class="bg-white p-4 hover:bg-gray-50 transition-colors flex items-center justify-center" target="_blank">
-              <Lucid class="h-5" />
-            </a>
-            <a href="https://www.virentis.uk/" class="bg-white p-4 hover:bg-gray-50 transition-colors flex items-center justify-center" target="_blank">
-              <img src={virentis.src} alt="Virentis" class="h-8" />
-            </a>
-            <div class="bg-white p-4"></div>
-        </section>
-
-        <Footer />
-        </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Multi-format output</p>
+        <p class="text-xs text-gray-500">Generate HTML, PDF, and Markdown at build time.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Vite integration</p>
+        <p class="text-xs text-gray-500">Drop into your existing build pipeline in minutes.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">GDPR & CCPA ready</p>
+        <p class="text-xs text-gray-500">Built-in templates for the regulations that matter.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Version controlled</p>
+        <p class="text-xs text-gray-500">Policies live in your repo and ship with your code.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Always in sync</p>
+        <p class="text-xs text-gray-500">Regenerated on every build — never out of date.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Multi-jurisdiction</p>
+        <p class="text-xs text-gray-500">US, EU, UK and more supported out of the box.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Audit trail</p>
+        <p class="text-xs text-gray-500">Every policy change is tracked in git, reviewable in PRs.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Framework agnostic</p>
+        <p class="text-xs text-gray-500">Works with React, Vue, Svelte, or plain HTML.</p>
       </div>
     </div>
+  </section>
 
-    <script
-      is:inline
-      src="https://cdn.databuddy.cc/databuddy.js"
-      data-client-id="9d48456b-788b-4d22-9f49-a7f31a6424b5"
-      crossorigin="anonymous"
-      async></script>
-  </body>
-</html>
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
+      GETTING-STARTED.md
+    </h2>
+    <p class="mb-4">
+      Define your policies in TypeScript, then let the Vite plugin
+      generate compliant HTML and PDF documents at build time. No lawyers,
+      no templates—just code.
+    </p>
+
+    <div class="border border-gray-200 mb-4 bg-gray-100">
+      <div class="flex border-b border-gray-200">
+        <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
+          policy.ts
+        </div>
+      </div>
+      <Code code={policyTs} lang="ts" theme="github-light" class="p-4 text-sm" />
+    </div>
+
+    <div class="border border-gray-200 mb-4 bg-gray-100">
+      <div class="flex border-b border-gray-200">
+        <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
+          vite.config.ts
+        </div>
+      </div>
+      <Code code={viteConfig} lang="ts" theme="github-light" class="p-4 text-sm" />
+    </div>
+
+    <div class="border border-gray-200 bg-gray-100">
+      <div class="flex border-b border-gray-200">
+        <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
+          pages/privacy-policy.astro
+        </div>
+      </div>
+      <Code code={privacyRoute} lang="astro" theme="github-light" class="p-4 text-sm" />
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
+      LLMS.md
+    </h2>
+    <p class="mb-4">
+      OpenPolicy ships an <code>llms.txt</code> so AI coding assistants — Claude, Cursor, Copilot — understand the SDK. Paste this prompt into your assistant to generate a <code>policy.ts</code> from your existing codebase:
+    </p>
+    <div class="border border-gray-200 bg-gray-100">
+      <div class="flex items-center justify-between border-b border-gray-200">
+        <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
+          prompt.txt
+        </div>
+      </div>
+      <Code code={llmPrompt} lang="text" theme="github-light" class="p-4 text-sm" />
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
+      SHOWCASE.md
+    </h2>
+    <p class="mb-4">These teams are using OpenPolicy to generate their legal documentation and streamline their development process</p>
+    <div class="grid grid-cols-3 gap-px bg-gray-200 border border-gray-200">
+      <a href="https://lucid.jxd.dev" class="bg-white p-4 hover:bg-gray-50 transition-colors flex items-center justify-center" target="_blank">
+        <Lucid class="h-5" />
+      </a>
+      <a href="https://www.virentis.uk/" class="bg-white p-4 hover:bg-gray-50 transition-colors flex items-center justify-center" target="_blank">
+        <img src={virentis.src} alt="Virentis" class="h-8" />
+      </a>
+      <div class="bg-white p-4"></div>
+    </div>
+  </section>
+</BaseLayout>
