@@ -1,41 +1,44 @@
 ---
 title: "Ship a Privacy Policy and Terms of Service with Your Astro Site"
-description: "Use the OpenPolicy Vite plugin to generate legally-structured policy documents at build time — no Google Docs, no copy-paste."
+description: "Use the OpenPolicy Astro integration to generate legally-structured policy documents at build time — no Google Docs, no copy-paste."
 pubDate: 2026-03-05
 author: "OpenPolicy Team"
 ---
 
 Most Astro sites need a privacy policy and terms of service before they launch. The usual approach: grab a template from the internet, paste it into a static page, and forget about it until a lawyer asks why it still says "Company Name Here."
 
-OpenPolicy treats your policies like code. You define them as TypeScript objects, and the Vite plugin compiles them to Markdown at build time — in sync with every deploy.
+OpenPolicy treats your policies like code. You define them as TypeScript objects, and the Astro integration compiles them to Markdown at build time — in sync with every deploy.
 
 ## Install
 
 ```sh
+npx astro add @openpolicy/astro
 bun add @openpolicy/sdk
-bun add -D @openpolicy/vite
 ```
 
-## Add the plugin to `astro.config.mjs`
+`astro add` installs the package and automatically updates `astro.config.mjs`. If you prefer to wire it up manually:
+
+```sh
+bun add -D @openpolicy/astro @openpolicy/vite
+```
+
+## Add the integration to `astro.config.mjs`
 
 ```js
 import { defineConfig } from "astro/config";
-import { openPolicy } from "@openpolicy/vite";
+import { openPolicy } from "@openpolicy/astro";
 
 export default defineConfig({
-  integrations: [],
-  vite: {
-    plugins: [
-      openPolicy({
-        configs: [
-          "privacy.config.ts",
-          { config: "terms.config.ts", type: "terms" },
-        ],
-        formats: ["markdown"],
-        outDir: "src/generated/policies",
-      }),
-    ],
-  },
+  integrations: [
+    openPolicy({
+      configs: [
+        "privacy.config.ts",
+        { config: "terms.config.ts", type: "terms" },
+      ],
+      formats: ["markdown"],
+      outDir: "src/generated/policies",
+    }),
+  ],
 });
 ```
 

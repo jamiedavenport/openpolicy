@@ -1,5 +1,13 @@
 # @openpolicy/core
 
+## 0.0.9
+
+### Patch Changes
+
+- Fixes bundling and peer deps
+
+## 0.0.8
+
 ## 0.0.7
 
 ## 0.0.6

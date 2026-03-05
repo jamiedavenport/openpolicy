@@ -3,7 +3,7 @@
 import sitemap from "@astrojs/sitemap";
 
 import vercel from "@astrojs/vercel";
-import { openPolicy } from "@openpolicy/vite";
+import { openPolicy } from "@openpolicy/astro";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
 import icon from "astro-icon";
@@ -12,7 +12,15 @@ import icon from "astro-icon";
 export default defineConfig({
 	site: "https://openpolicy.sh",
 	adapter: vercel(),
-	integrations: [icon(), sitemap()],
+	integrations: [
+		openPolicy({
+			configs: ["privacy.config.ts", "terms.config.ts"],
+			formats: ["markdown"],
+			outDir: "./src/policies",
+		}),
+		icon(),
+		sitemap(),
+	],
 
 	experimental: {
 		fonts: [
@@ -25,13 +33,6 @@ export default defineConfig({
 	},
 
 	vite: {
-		plugins: [
-			tailwindcss(),
-			openPolicy({
-				configs: ["privacy.config.ts", "terms.config.ts"],
-				formats: ["markdown"],
-				outDir: "./src/policies",
-			}),
-		],
+		plugins: [tailwindcss()],
 	},
 });

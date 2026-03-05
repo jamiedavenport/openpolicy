@@ -5,7 +5,6 @@ export default defineConfig({
 	input: "./src/index.ts",
 	plugins: [dts()],
 	platform: "node",
-	external: (id) =>
-		id !== "@openpolicy/core" && (/^node:/.test(id) || /^[^./]/.test(id)),
+	external: [/^node:/, /^[^./]/],
 	output: { format: "esm", dir: "dist" },
 });

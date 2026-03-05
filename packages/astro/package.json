@@ -1,16 +1,18 @@
 {
-	"name": "@openpolicy/vite",
+	"name": "@openpolicy/astro",
 	"version": "0.0.9",
 	"type": "module",
-	"description": "Vite plugin for compiling OpenPolicy privacy policy documents at build time",
+	"description": "Astro integration for compiling OpenPolicy documents at build time",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/jamiedavenport/openpolicy",
-		"directory": "packages/vite"
+		"directory": "packages/astro"
 	},
 	"keywords": [
-		"vite-plugin"
+		"astro-integration",
+		"openpolicy",
+		"privacy-policy"
 	],
 	"files": [
 		"dist",
@@ -29,11 +31,14 @@
 		"test": "bun test"
 	},
 	"peerDependencies": {
-		"vite": ">=4.0.0"
+		"astro": ">=4.0.0",
+		"@openpolicy/vite": ">=0.0.9",
+		"@openpolicy/sdk": ">=0.0.9",
+		"@openpolicy/core": ">=0.0.9"
 	},
 	"devDependencies": {
-		"@openpolicy/core": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
-		"vite": "^5.0.0"
+		"@openpolicy/vite": "workspace:*",
+		"astro": "^5.0.0"
 	}
 }

@@ -7,7 +7,8 @@
 			"@openpolicy/sdk",
 			"@openpolicy/core",
 			"@openpolicy/vite",
-			"@openpolicy/cli"
+			"@openpolicy/cli",
+			"@openpolicy/astro"
 		]
 	],
 	"linked": [],
