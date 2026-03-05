@@ -18,6 +18,7 @@
 		"tailwindcss": "^4.2.1"
 	},
 	"devDependencies": {
+		"@openpolicy/astro": "workspace:*",
 		"@openpolicy/cli": "workspace:*",
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/sdk": "workspace:*",

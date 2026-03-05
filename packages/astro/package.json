@@ -1,0 +1,42 @@
+{
+	"name": "@openpolicy/astro",
+	"version": "0.0.1",
+	"type": "module",
+	"description": "Astro integration for compiling OpenPolicy documents at build time",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jamiedavenport/openpolicy",
+		"directory": "packages/astro"
+	},
+	"keywords": [
+		"astro-integration",
+		"openpolicy",
+		"privacy-policy"
+	],
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"scripts": {
+		"dev": "rolldown -c --watch",
+		"build": "rolldown -c",
+		"check-types": "tsc --noEmit",
+		"test": "bun test"
+	},
+	"peerDependencies": {
+		"astro": ">=4.0.0",
+		"@openpolicy/vite": ">=0.0.7"
+	},
+	"devDependencies": {
+		"@openpolicy/tooling": "workspace:*",
+		"@openpolicy/vite": "workspace:*",
+		"astro": "^5.0.0"
+	}
+}

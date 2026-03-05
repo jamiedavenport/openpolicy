@@ -61,25 +61,7 @@ Errors during regeneration are logged to the console but don't crash the dev ser
 
 ## Astro
 
-The same `vite.plugins` option works in Astro via `astro.config.mjs`:
-
-```js
-// astro.config.mjs
-import { defineConfig } from "astro/config";
-import { openPolicy } from "@openpolicy/vite";
-
-export default defineConfig({
-  vite: {
-    plugins: [
-      openPolicy({
-        configs: ["policy.config.ts", "terms.config.ts"],
-        formats: ["markdown", "html"],
-        outDir: "src/policies",
-      }),
-    ],
-  },
-});
-```
+For Astro projects, use the dedicated [`@openpolicy/astro`](/docs/getting-started/astro) integration instead. It wraps this Vite plugin and plugs into Astro's first-class integration API.
 
 ## Output
 
