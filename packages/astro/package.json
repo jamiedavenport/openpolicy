@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/astro",
-	"version": "0.0.1",
+	"version": "0.0.8",
 	"type": "module",
 	"description": "Astro integration for compiling OpenPolicy documents at build time",
 	"license": "MIT",
@@ -32,7 +32,8 @@
 	},
 	"peerDependencies": {
 		"astro": ">=4.0.0",
-		"@openpolicy/vite": ">=0.0.7"
+		"@openpolicy/vite": ">=0.0.8",
+		"@openpolicy/sdk": ">=0.0.8"
 	},
 	"devDependencies": {
 		"@openpolicy/tooling": "workspace:*",
