@@ -4,7 +4,7 @@ import { dts } from "rolldown-plugin-dts";
 export default defineConfig([
 	{
 		input: "./src/index.ts",
-		external: /^[^./]/,
+		external: (id) => id !== "@openpolicy/core" && /^[^./]/.test(id),
 		output: { format: "esm", dir: "dist" },
 	},
 	{
