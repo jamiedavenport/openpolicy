@@ -9,6 +9,9 @@
 		"url": "https://github.com/openpolicy/openpolicy",
 		"directory": "packages/vite"
 	},
+	"keywords": [
+		"vite-plugin"
+	],
 	"files": [
 		"dist",
 		"README.md"
