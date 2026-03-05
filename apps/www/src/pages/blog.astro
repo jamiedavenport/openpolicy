@@ -1,0 +1,31 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<BaseLayout
+  title="Blog — OpenPolicy"
+  description="Articles on policy-as-code, compliance, and developer tooling from the OpenPolicy team."
+  ogUrl="https://openpolicy.sh/blog"
+>
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">BLOG.md</h2>
+    <ul class="flex flex-col divide-y divide-gray-200">
+      {posts.map((post) => (
+        <li>
+          <a href={`/blog/${post.slug}`} class="block py-4 hover:bg-gray-50 transition-colors -mx-4 px-4">
+            <p class="font-medium mb-1">{post.data.title}</p>
+            <p class="text-sm text-gray-500 mb-2">{post.data.description}</p>
+            <p class="font-mono text-xs text-gray-400">
+              {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+            </p>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

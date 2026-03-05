@@ -1,0 +1,27 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BaseLayout
+  title={`${post.data.title} — OpenPolicy`}
+  description={post.data.description}
+  ogUrl={`https://openpolicy.sh/blog/${post.slug}`}
+>
+  <section>
+    <p class="font-mono font-medium text-xs text-gray-500 mb-2">
+      {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+    </p>
+    <article class="prose prose-gray max-w-none">
+      <Content />
+    </article>
+  </section>
+</BaseLayout>

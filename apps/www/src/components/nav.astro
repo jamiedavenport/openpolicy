@@ -1,5 +1,29 @@
+---
+let stars: number | null = null;
+try {
+  const res = await fetch("https://api.github.com/repos/jamiedavenport/openpolicy", {
+    headers: { Accept: "application/vnd.github+json" },
+  });
+  if (res.ok) {
+    const data = await res.json();
+    stars = data.stargazers_count;
+  }
+} catch {}
+---
+
 <nav class="border-b border-gray-200 flex items-stretch text-sm font-mono divide-x divide-gray-200">
+    <a href="/blog" target="_blank" class="h-14 flex-1 flex items-center justify-center hover:bg-gray-50 transition-colors">Blog</a>
     <a href="https://docs.openpolicy.sh" target="_blank" class="h-14 flex-1 flex items-center justify-center hover:bg-gray-50 transition-colors">Docs</a>
-    <a href="https://github.com/jamiedavenport/openpolicy" target="_blank" class="h-14 flex-1 flex items-center justify-center hover:bg-gray-50 transition-colors">Github</a>
+    <a href="https://github.com/jamiedavenport/openpolicy" target="_blank" class="h-14 flex-1 flex items-center justify-center hover:bg-gray-50 transition-colors gap-2">
+        Github
+        {stars !== null && (
+          <span class="flex items-center gap-1 text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#eab308" stroke="#eab308" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            {stars.toLocaleString()}
+          </span>
+        )}
+    </a>
     <a href="https://www.npmjs.com/package/@openpolicy/sdk" target="_blank" class="h-14 flex-1 flex items-center justify-center hover:bg-gray-50 transition-colors">NPM</a>
 </nav>
