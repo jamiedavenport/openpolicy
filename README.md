@@ -2,6 +2,8 @@
 
 Policy-as-code framework for generating legal agreements from TypeScript.
 
+> **Early alpha.** OpenPolicy is under active development and the API may change. We're actively looking for feedback, contributors, maintainers, and sponsors. If you're using it, [open an issue](https://github.com/jamiedavenport/openpolicy/issues) to share what's working, what's broken, or what you'd like to see. If you'd like to sponsor the project, reach out via GitHub.
+
 Define privacy policies, terms of service, and other compliance documents in code — then compile them to HTML, PDF, Markdown, and React components at build time.
 
 ## Packages
