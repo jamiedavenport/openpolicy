@@ -1,5 +1,11 @@
 # @openpolicy/vite
 
+## 0.0.7
+
+### Patch Changes
+
+- Update package.json
+
 ## 0.0.6
 
 ### Patch Changes
