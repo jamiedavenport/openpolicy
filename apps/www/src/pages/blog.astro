@@ -1,0 +1,63 @@
+---
+import "../styles/global.css";
+import { Font } from "astro:assets";
+import { getCollection } from "astro:content";
+import Footer from "../components/footer.astro";
+import Header from "../components/header.astro";
+import Nav from "../components/nav.astro";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Blog — OpenPolicy</title>
+    <meta name="description" content="Articles on policy-as-code, compliance, and developer tooling from the OpenPolicy team." />
+    <Font cssVariable="--font-geist-mono" preload />
+  </head>
+  <body class="bg-gray-50">
+    <div class="grid md:grid-cols-3 md:h-svh md:overflow-hidden">
+      <div class="md:col-span-1 border-b md:border-b-0 md:border-r p-10 md:p-14 lg:p-20 flex flex-col gap-10 border-gray-200">
+        <Header />
+        <div class="flex-1 flex flex-col justify-center items-start">
+          <p class="font-mono font-medium text-xs text-gray-500 mb-2">POLICY-AS-CODE</p>
+          <p class="text-xl font-medium mb-4">The First Policy Framework for Busy Founders and Developers</p>
+          <a href="https://docs.openpolicy.sh" target="_blank"
+            class="px-4 py-2.5 bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors duration-200">
+            Documentation
+          </a>
+        </div>
+      </div>
+      <div class="md:col-span-2 overflow-y-auto bg-white">
+        <Nav />
+        <div class="flex flex-col gap-10 md:gap-20 p-10 md:p-14 lg:p-20">
+          <section>
+            <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">BLOG.md</h2>
+            <ul class="flex flex-col divide-y divide-gray-200">
+              {posts.map((post) => (
+                <li>
+                  <a href={`/blog/${post.slug}`} class="block py-4 hover:bg-gray-50 transition-colors -mx-4 px-4">
+                    <p class="font-medium mb-1">{post.data.title}</p>
+                    <p class="text-sm text-gray-500 mb-2">{post.data.description}</p>
+                    <p class="font-mono text-xs text-gray-400">
+                      {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                    </p>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+          <Footer />
+        </div>
+      </div>
+    </div>
+    <script is:inline src="https://cdn.databuddy.cc/databuddy.js"
+      data-client-id="9d48456b-788b-4d22-9f49-a7f31a6424b5" crossorigin="anonymous" async></script>
+  </body>
+</html>
