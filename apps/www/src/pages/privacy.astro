@@ -1,0 +1,86 @@
+---
+import "../styles/global.css";
+
+import { Font } from "astro:assets";
+import Footer from "../components/footer.astro";
+import Header from "../components/header.astro";
+import { Content } from "../policies/privacy-policy.md";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Privacy Policy — OpenPolicy</title>
+    <meta
+      name="description"
+      content="How OpenPolicy collects, uses, and protects your data. Policy-as-code framework for developers."
+    />
+
+    <meta property="og:title" content="Privacy Policy — OpenPolicy" />
+    <meta
+      property="og:description"
+      content="How OpenPolicy collects, uses, and protects your data. Policy-as-code framework for developers."
+    />
+    <meta property="og:image" content="https://openpolicy.sh/og.png" />
+    <meta property="og:url" content="https://openpolicy.sh/privacy" />
+    <meta property="og:type" content="website" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Privacy Policy — OpenPolicy" />
+    <meta
+      name="twitter:description"
+      content="How OpenPolicy collects, uses, and protects your data. Policy-as-code framework for developers."
+    />
+    <meta name="twitter:image" content="https://openpolicy.sh/og.png" />
+
+    <Font cssVariable="--font-geist-mono" preload />
+  </head>
+  <body class="bg-gray-50">
+    <div class="grid md:grid-cols-3 md:h-svh md:overflow-hidden">
+      <div
+        class="md:col-span-1 border-b md:border-b-0 md:border-r p-10 md:p-14 lg:p-20 flex flex-col gap-10 border-gray-200"
+      >
+        <Header />
+        <div class="flex-1 flex flex-col justify-center items-start">
+          <p class="font-mono font-medium text-xs text-gray-500 mb-2">
+            POLICY-AS-CODE
+          </p>
+          <p class="text-xl font-medium mb-4">
+            The First Policy Framework for Busy Founders and Developers
+          </p>
+          <a
+            href="https://tally.so/r/obAx2V"
+            target="_blank"
+            class="px-4 py-2.5 bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors duration-200"
+            >Register Interest</a
+          >
+        </div>
+      </div>
+      <div
+        class="md:col-span-2 overflow-y-auto p-10 md:p-14 lg:p-20 bg-white flex flex-col gap-10 md:gap-20"
+      >
+        <section>
+          <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
+            PRIVACY.md
+          </h2>
+
+          <article class="prose prose-gray max-w-none">
+            <Content />
+          </article>
+        </section>
+
+        <Footer />
+      </div>
+    </div>
+
+    <script
+      is:inline
+      src="https://cdn.databuddy.cc/databuddy.js"
+      data-client-id="9d48456b-788b-4d22-9f49-a7f31a6424b5"
+      crossorigin="anonymous"
+      async></script>
+  </body>
+</html>

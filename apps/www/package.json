@@ -1,0 +1,27 @@
+{
+	"name": "www",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro"
+	},
+	"dependencies": {
+		"@astrojs/sitemap": "^3.7.0",
+		"@astrojs/vercel": "^9.0.4",
+		"@iconify-json/simple-icons": "^1.2.72",
+		"@tailwindcss/vite": "^4.2.1",
+		"astro": "^5.17.1",
+		"astro-icon": "^1.1.5",
+		"tailwindcss": "^4.2.1"
+	},
+	"devDependencies": {
+		"@openpolicy/cli": "workspace:*",
+		"@openpolicy/core": "workspace:*",
+		"@openpolicy/sdk": "workspace:*",
+		"@openpolicy/vite": "workspace:*",
+		"@tailwindcss/typography": "^0.5.19"
+	}
+}

@@ -1,0 +1,33 @@
+{
+	"name": "@openpolicy/cli",
+	"version": "0.0.6",
+	"type": "module",
+	"description": "CLI for generating and validating OpenPolicy privacy policy documents",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jamiedavenport/openpolicy",
+		"directory": "packages/cli"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"bin": {
+		"openpolicy": "./dist/cli.js"
+	},
+	"scripts": {
+		"dev": "rolldown -c --watch",
+		"build": "rolldown -c && chmod +x dist/cli.js",
+		"check-types": "tsc --noEmit",
+		"test": "bun test"
+	},
+	"dependencies": {
+		"citty": "^0.1.6",
+		"consola": "^3.4.2"
+	},
+	"devDependencies": {
+		"@openpolicy/core": "workspace:*",
+		"@openpolicy/tooling": "workspace:*"
+	}
+}

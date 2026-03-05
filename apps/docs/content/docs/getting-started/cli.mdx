@@ -1,0 +1,134 @@
+---
+title: CLI
+description: Using OpenPolicy with the CLI
+---
+
+The `@openpolicy/cli` package provides the `openpolicy` command for generating and validating policy documents (privacy policies and terms of service) without a build tool.
+
+## Installation
+
+```sh
+bun add -D @openpolicy/cli
+```
+
+Or install globally:
+
+```sh
+bun add -g @openpolicy/cli
+```
+
+## Init
+
+The `init` command runs an interactive wizard and writes a ready-to-use config file. Use `--type` to choose which kind of policy to scaffold (default: `privacy`).
+
+```sh
+# Privacy policy wizard (default)
+openpolicy init
+
+# Terms of service wizard
+openpolicy init --type terms
+```
+
+**Privacy policy wizard** prompts for:
+- Company name and legal entity name
+- Company address and privacy contact email
+- Jurisdiction (GDPR, CCPA, or both)
+- Data categories collected
+- Whether your app uses cookies
+
+**Terms of service wizard** prompts for:
+- Company name and legal entity name
+- Company address and legal contact email
+- Governing law jurisdiction
+
+The output path defaults to `./privacy.config.ts` or `./terms.config.ts` based on `--type`. Override with `--out`:
+
+```sh
+openpolicy init --type terms --out ./src/terms.config.ts
+```
+
+## Generate
+
+Compile a config file to one or more output formats:
+
+```sh
+openpolicy generate ./privacy.config.ts --format markdown,html --out ./src/policies
+openpolicy generate ./terms.config.ts --format markdown,html --out ./src/policies
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `config` | `./policy.config.ts` | Path to the policy config (positional) |
+| `--format` | `markdown` | Comma-separated list of output formats: `markdown`, `html` |
+| `--out` | `./output` | Output directory |
+| `--type` | _(auto-detected)_ | `"privacy"` or `"terms"` — inferred from the filename if omitted |
+
+The output filename is determined by the policy type:
+
+| Type | Output filename |
+|---|---|
+| `privacy` | `privacy-policy.md` / `privacy-policy.html` |
+| `terms` | `terms-of-service.md` / `terms-of-service.html` |
+
+**Type auto-detection:** if the config filename contains `"terms"`, the CLI treats it as a terms of service config. Use `--type` to override explicitly.
+
+### Example
+
+```sh
+# Privacy policy — markdown only (auto-detected)
+openpolicy generate ./privacy.config.ts
+
+# Terms of service — both formats (auto-detected from filename)
+openpolicy generate ./terms.config.ts --format markdown,html --out ./src/policies
+
+# Explicit type override
+openpolicy generate ./my.config.ts --type terms --format markdown
+```
+
+## Validate
+
+Check a config for compliance issues without generating output:
+
+```sh
+openpolicy validate ./privacy.config.ts
+openpolicy validate ./terms.config.ts
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `config` | `./policy.config.ts` | Path to the policy config (positional) |
+| `--jurisdiction` | `all` | Jurisdiction to validate against: `gdpr`, `ccpa`, or `all` (privacy only) |
+| `--type` | _(auto-detected)_ | `"privacy"` or `"terms"` — inferred from the filename if omitted |
+
+**Privacy policy** validation checks:
+- Required fields: `effectiveDate`, `company.*`, `dataCollected`
+- GDPR: `legalBasis` required; recommended user rights (`access`, `rectification`, `erasure`, `portability`, `restriction`, `objection`)
+- CCPA: recommended user rights (`access`, `erasure`, `opt_out_sale`, `non_discrimination`)
+
+**Terms of service** validation checks:
+- Required fields: `effectiveDate`, `company.*`, `governingLaw.jurisdiction`
+- Warnings if `disclaimers` or `limitationOfLiability` are missing
+- Warning if `acceptance.methods` is empty
+
+Errors cause a non-zero exit code. Warnings are printed but do not fail the process.
+
+```sh
+# Check GDPR compliance only
+openpolicy validate ./privacy.config.ts --jurisdiction gdpr
+
+# Validate terms of service (auto-detected from filename)
+openpolicy validate ./terms.config.ts
+```
+
+## package.json scripts
+
+A common pattern is to add a `generate:policy` script that runs before your build:
+
+```json
+{
+  "scripts": {
+    "generate:policy": "openpolicy generate ./policy.config.ts --format markdown,html --out ./src/policies",
+    "build": "bun run generate:policy && vite build"
+  }
+}
+```

@@ -1,0 +1,38 @@
+{
+	"name": "@openpolicy/vite",
+	"version": "0.0.6",
+	"type": "module",
+	"description": "Vite plugin for compiling OpenPolicy privacy policy documents at build time",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/openpolicy/openpolicy",
+		"directory": "packages/vite"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"scripts": {
+		"dev": "rolldown -c --watch",
+		"build": "rolldown -c",
+		"check-types": "tsc --noEmit",
+		"test": "bun test"
+	},
+	"dependencies": {
+		"@openpolicy/core": "workspace:*"
+	},
+	"peerDependencies": {
+		"vite": ">=4.0.0"
+	},
+	"devDependencies": {
+		"@openpolicy/tooling": "workspace:*",
+		"vite": "^5.0.0"
+	}
+}

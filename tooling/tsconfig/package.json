@@ -1,0 +1,7 @@
+{
+	"name": "@openpolicy/tooling",
+	"private": true,
+	"exports": {
+		"./base": "./base.json"
+	}
+}

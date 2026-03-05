@@ -1,0 +1,208 @@
+---
+title: policy.config.ts
+description: Reference for the PrivacyPolicyConfig type
+---
+
+A policy config file exports a `definePrivacyPolicy()` call as its default export. The function is a typed identity — it returns the config unchanged, but TypeScript uses it to validate the shape and provide autocomplete.
+
+```ts
+// policy.config.ts
+import { definePrivacyPolicy } from "@openpolicy/sdk";
+
+export default definePrivacyPolicy({ ... });
+```
+
+## PrivacyPolicyConfig
+
+```ts
+type PrivacyPolicyConfig = {
+  effectiveDate: string;
+  company: {
+    name: string;
+    legalName: string;
+    address: string;
+    contact: string;
+  };
+  dataCollected: Record<string, string[]>;
+  legalBasis: string;
+  retention: Record<string, string>;
+  cookies: {
+    essential: boolean;
+    analytics: boolean;
+    marketing: boolean;
+  };
+  thirdParties: { name: string; purpose: string }[];
+  userRights: string[];
+  jurisdictions: Jurisdiction[];
+};
+```
+
+---
+
+## Fields
+
+### `effectiveDate`
+
+**Type:** `string`
+**Required**
+
+ISO 8601 date string for when this policy version takes effect.
+
+```ts
+effectiveDate: "2026-01-01"
+```
+
+---
+
+### `company`
+
+**Type:** `object`
+**Required**
+
+Your organization's details as they'll appear in the generated document.
+
+| Field | Description |
+|---|---|
+| `name` | Display name (e.g. `"Acme Inc."`) |
+| `legalName` | Full legal entity name (e.g. `"Acme Corporation"`) |
+| `address` | Registered business address |
+| `contact` | Privacy contact email address |
+
+```ts
+company: {
+  name: "Acme Inc.",
+  legalName: "Acme Corporation",
+  address: "123 Main St, Springfield, USA",
+  contact: "privacy@acme.com",
+}
+```
+
+---
+
+### `dataCollected`
+
+**Type:** `Record<string, string[]>`
+**Required — must have at least one entry**
+
+A map of data category names to arrays of specific data items collected within that category.
+
+```ts
+dataCollected: {
+  "Account Information": ["Name", "Email address"],
+  "Usage Data": ["Pages visited", "Browser type", "IP address"],
+  "Payment Data": ["Payment card details"],
+}
+```
+
+---
+
+### `legalBasis`
+
+**Type:** `string`
+
+The legal basis under which you process personal data. Required when `jurisdictions` includes `"eu"` (GDPR).
+
+```ts
+legalBasis: "Legitimate interests and consent"
+```
+
+Common values: `"Consent"`, `"Legitimate interests"`, `"Contract performance"`, `"Legal obligation"`.
+
+---
+
+### `retention`
+
+**Type:** `Record<string, string>`
+
+A map of data category or type names to human-readable retention periods.
+
+```ts
+retention: {
+  "Account data": "Until account deletion",
+  "Usage logs": "90 days",
+  "Payment records": "7 years (legal requirement)",
+}
+```
+
+---
+
+### `cookies`
+
+**Type:** `{ essential: boolean; analytics: boolean; marketing: boolean }`
+
+Declares which cookie categories your app uses. These appear in the cookie section of the generated policy.
+
+```ts
+cookies: {
+  essential: true,    // required for the site to function
+  analytics: true,    // e.g. page view tracking
+  marketing: false,   // e.g. ad targeting
+}
+```
+
+---
+
+### `thirdParties`
+
+**Type:** `{ name: string; purpose: string }[]`
+
+A list of third-party services that receive or process user data on your behalf. Pass an empty array if none.
+
+```ts
+thirdParties: [
+  { name: "Stripe", purpose: "Payment processing" },
+  { name: "SendGrid", purpose: "Transactional email" },
+]
+```
+
+---
+
+### `userRights`
+
+**Type:** `string[]`
+
+The data subject rights you honor. String values are rendered directly in the document.
+
+```ts
+userRights: ["access", "erasure", "rectification", "portability"]
+```
+
+Common values:
+
+| Value | Description |
+|---|---|
+| `"access"` | Right to access their data |
+| `"erasure"` | Right to deletion |
+| `"rectification"` | Right to correct inaccurate data |
+| `"portability"` | Right to receive data in a portable format |
+| `"restriction"` | Right to restrict processing |
+| `"objection"` | Right to object to processing |
+| `"opt_out_sale"` | CCPA right to opt out of data sale |
+| `"non_discrimination"` | CCPA right to non-discriminatory treatment |
+
+The `openpolicy init` wizard and the Vite plugin scaffold populate this array automatically based on the selected jurisdictions.
+
+---
+
+### `jurisdictions`
+
+**Type:** `Jurisdiction[]`
+
+Controls which jurisdiction-specific sections are included in the generated policy.
+
+```ts
+type Jurisdiction = "us" | "eu" | "ca" | "au" | "nz" | "other";
+```
+
+| Value | Jurisdiction | Effect |
+|---|---|---|
+| `"us"` | United States | Base US policy |
+| `"eu"` | European Union (GDPR) | Adds GDPR supplement; requires `legalBasis` |
+| `"ca"` | California (CCPA) | Adds CCPA supplement |
+| `"au"` | Australia | Planned |
+| `"nz"` | New Zealand | Planned |
+| `"other"` | Generic | No jurisdiction-specific sections |
+
+```ts
+jurisdictions: ["us", "eu"]  // GDPR-compliant US policy
+```

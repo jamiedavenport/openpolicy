@@ -1,0 +1,133 @@
+---
+title: Vite
+description: Using OpenPolicy with the Vite plugin
+---
+
+The `@openpolicy/vite` package provides a Vite plugin that compiles your policy config automatically — at build time and in dev mode with hot-reload.
+
+## Installation
+
+```sh
+bun add -D @openpolicy/vite
+```
+
+## Setup
+
+Add `openPolicy()` to the `plugins` array in your Vite config:
+
+```ts
+// vite.config.ts
+import { defineConfig } from "vite";
+import { openPolicy } from "@openpolicy/vite";
+
+export default defineConfig({
+  plugins: [
+    openPolicy({
+      configs: ["privacy.config.ts", "terms.config.ts"],
+      formats: ["markdown", "html"],
+      outDir: "public/policies",
+    }),
+  ],
+});
+```
+
+## Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `configs` | `PolicyConfigEntry[]` | — | One or more policy configs to compile. Policy type is auto-detected from the filename (`"terms"` → terms of service, otherwise privacy). Each entry is a filename string or `{ config: string; type?: "privacy" \| "terms" }` for an explicit override. |
+| `formats` | `OutputFormat[]` | `["markdown"]` | Output formats: `"markdown"` \| `"html"` |
+| `outDir` | `string` | `"public/policies"` | Output directory, relative to the Vite root |
+| `config` | `string` | `"privacy.config.ts"` / `"terms.config.ts"` | _(Legacy)_ Single config path. Use `configs` instead. |
+| `type` | `"privacy" \| "terms"` | `"privacy"` | _(Legacy)_ Policy type for the single `config` option. |
+
+## Scaffold
+
+If a config file doesn't exist when Vite starts, the plugin creates a starter config at that path with placeholder content. The scaffold template matches the detected type — `definePrivacyPolicy()` for privacy, `defineTermsOfService()` for terms. Edit the file and restart Vite to generate your first policy.
+
+## Build mode
+
+During `vite build`, the plugin runs `buildStart` and writes all policy files to `outDir` before Vite processes other assets. Files in `public/` are copied to `dist/` automatically by Vite.
+
+## Dev mode
+
+During `vite dev`, the plugin:
+
+1. Compiles all configs on startup
+2. Watches every config file for changes (using Vite's built-in Chokidar watcher)
+3. Regenerates the affected policy file on every save without restarting the dev server
+
+Errors during regeneration are logged to the console but don't crash the dev server.
+
+## Astro
+
+The same `vite.plugins` option works in Astro via `astro.config.mjs`:
+
+```js
+// astro.config.mjs
+import { defineConfig } from "astro/config";
+import { openPolicy } from "@openpolicy/vite";
+
+export default defineConfig({
+  vite: {
+    plugins: [
+      openPolicy({
+        configs: ["policy.config.ts", "terms.config.ts"],
+        formats: ["markdown", "html"],
+        outDir: "src/policies",
+      }),
+    ],
+  },
+});
+```
+
+## Output
+
+Output filenames are determined by the detected policy type:
+
+| Policy type | Output filenames |
+|---|---|
+| `"privacy"` | `privacy-policy.md`, `privacy-policy.html` |
+| `"terms"` | `terms-of-service.md`, `terms-of-service.html` |
+
+Given `configs: ["privacy.config.ts", "terms.config.ts"]`, `formats: ["markdown", "html"]`, and `outDir: "public/policies"`, the plugin writes:
+
+```
+public/policies/
+  privacy-policy.md
+  privacy-policy.html
+  terms-of-service.md
+  terms-of-service.html
+```
+
+## Generating both policy types
+
+Pass both configs to a single `openPolicy()` call via the `configs` array. Policy type is auto-detected from each filename:
+
+```ts
+// vite.config.ts
+export default defineConfig({
+  plugins: [
+    openPolicy({
+      configs: ["privacy.config.ts", "terms.config.ts"],
+      formats: ["markdown", "html"],
+      outDir: "src/policies",
+    }),
+  ],
+});
+```
+
+This writes `privacy-policy.md`, `privacy-policy.html`, `terms-of-service.md`, and `terms-of-service.html` to `src/policies/`.
+
+If a filename doesn't follow the convention, pass an explicit `type`:
+
+```ts
+openPolicy({
+  configs: [
+    "privacy.config.ts",
+    { config: "legal.config.ts", type: "terms" },
+  ],
+  formats: ["markdown", "html"],
+  outDir: "src/policies",
+});
+```

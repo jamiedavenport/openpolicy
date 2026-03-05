@@ -1,0 +1,50 @@
+---
+title: cookie.config.ts
+description: Cookie policy configuration reference
+---
+
+Cookie policy support is currently part of `PrivacyPolicyConfig` via the `cookies` field. A dedicated `cookie.config.ts` for standalone cookie consent banners and cookie policies is planned.
+
+## Current: cookies field in policy.config.ts
+
+The `cookies` field in your privacy policy config declares which cookie categories your app uses:
+
+```ts
+// policy.config.ts
+import { definePrivacyPolicy } from "@openpolicy/sdk";
+
+export default definePrivacyPolicy({
+  // ...
+  cookies: {
+    essential: true,    // session cookies, CSRF tokens, auth
+    analytics: true,    // e.g. page view tracking
+    marketing: false,   // e.g. ad retargeting pixels
+  },
+  // ...
+});
+```
+
+This generates a cookie section in your privacy policy that:
+- Lists which cookie categories are in use
+- Explains the purpose of each enabled category
+- Notes that essential cookies cannot be disabled
+
+## Cookie categories
+
+| Field | Description |
+|---|---|
+| `essential` | Cookies required for the site to function (login sessions, CSRF, preferences). Cannot be opted out of. |
+| `analytics` | Cookies used to measure traffic and usage patterns (e.g. page views, session duration). |
+| `marketing` | Cookies used for advertising, retargeting, or tracking across sites. |
+
+## Example output
+
+For a config with `{ essential: true, analytics: true, marketing: false }`, the generated policy includes a section covering:
+
+- That essential cookies are always active
+- That analytics cookies are used to understand how visitors use the site
+- That marketing cookies are not used
+
+## Planned: standalone cookie config
+
+A future `defineCookiePolicy()` API will support generating standalone cookie policy documents and consent banner configurations, independent of the full privacy policy.

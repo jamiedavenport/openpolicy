@@ -1,0 +1,34 @@
+{
+	"name": "@openpolicy/core",
+	"version": "0.0.6",
+	"type": "module",
+	"description": "Core package for OpenPolicy",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/openpolicy/openpolicy",
+		"directory": "packages/core"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"scripts": {
+		"dev": "rolldown -c --watch",
+		"build": "rolldown -c",
+		"check-types": "tsc --noEmit",
+		"test": "bun test"
+	},
+	"devDependencies": {
+		"@openpolicy/tooling": "workspace:*"
+	},
+	"dependencies": {
+		"marked": "^17.0.4"
+	}
+}

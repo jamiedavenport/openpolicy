@@ -1,0 +1,32 @@
+{
+  "projectName": "openpolicy",
+  "projectOwner": "jamiedavenport",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "none",
+  "contributors": [
+    {
+      "login": "jamiedavenport",
+      "name": "Jamie Davenport",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1329874?v=4",
+      "profile": "https://www.jxd.dev/",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributionTypes": [
+    "bug",
+    "code",
+    "doc",
+    "ideas",
+    "maintenance",
+    "review",
+    "test"
+  ]
+}
