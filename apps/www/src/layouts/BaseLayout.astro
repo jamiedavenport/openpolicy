@@ -11,7 +11,6 @@ interface Props {
   ogUrl?: string;
   ctaHref?: string;
   ctaText?: string;
-  showNav?: boolean;
 }
 
 const {
@@ -20,7 +19,6 @@ const {
   ogUrl = "https://openpolicy.sh",
   ctaHref = "https://docs.openpolicy.sh",
   ctaText = "Documentation",
-  showNav = true,
 } = Astro.props;
 ---
 
@@ -64,7 +62,7 @@ const {
         </div>
       </div>
       <div class="md:col-span-2 overflow-y-auto bg-white">
-        {showNav && <Nav />}
+        <Nav />
         <div class="flex flex-col gap-10 md:gap-20 p-10 md:p-14 lg:p-20">
           <slot />
           <Footer />
