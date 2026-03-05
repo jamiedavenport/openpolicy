@@ -2,7 +2,7 @@ import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 
 export const gitConfig = {
 	user: "jamiedavenport",
-	repo: "openpolicy.sh",
+	repo: "openpolicy",
 	branch: "main",
 };
 

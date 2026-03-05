@@ -4,8 +4,6 @@
 
 Stop copying privacy policies from random generators. Stop paying lawyers to update boilerplate every time you add a new third-party integration. OpenPolicy lets you define your privacy policy, terms of service, and other legal agreements in TypeScript—then generate compliant, always-up-to-date documents at build time.
 
-→ **[openpolicy.sh](https://openpolicy.sh)** — register your interest
-
 ---
 
 ## Why policy-as-code?

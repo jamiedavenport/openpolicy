@@ -6,7 +6,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/openpolicy/openpolicy",
+		"url": "https://github.com/jamiedavenport/openpolicy",
 		"directory": "packages/core"
 	},
 	"files": [
