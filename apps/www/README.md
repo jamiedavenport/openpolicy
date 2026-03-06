@@ -116,10 +116,6 @@ Your output should capture:
 Output only a single policy.ts using definePrivacyPolicy(). No explanations.
 ```
 
-## Status
-
-OpenPolicy is currently in early development. [Register your interest](https://tally.so/r/obAx2V) to get notified when it launches and to help shape what gets built.
-
 ## Author
 
 Built by [@jamiedavenport](https://jxd.dev)
