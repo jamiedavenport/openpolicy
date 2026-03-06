@@ -7,14 +7,14 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"@openpolicy/sdk": "workspace:*",
-		"@openpolicy/vite": "workspace:*",
 		"@tanstack/react-router": "^1.166.2",
 		"@tanstack/react-start": "^1.166.2",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"
 	},
 	"devDependencies": {
+		"@openpolicy/sdk": "workspace:*",
+		"@openpolicy/vite": "workspace:*",
 		"@types/node": "^25.3.5",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
