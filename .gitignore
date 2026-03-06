@@ -35,3 +35,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Turbo
 .turbo
+
+# Generated policy files
+examples/tanstack/src/policies/

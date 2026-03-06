@@ -1,3 +1,4 @@
+import { openPolicy } from "@openpolicy/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
@@ -9,6 +10,11 @@ export default defineConfig({
 	},
 	plugins: [
 		tsConfigPaths(),
+		openPolicy({
+			configs: ["policy.config.ts", "terms.config.ts"],
+			formats: ["html"],
+			outDir: "src/policies",
+		}),
 		tanstackStart(),
 		// react's vite plugin must come after start's vite plugin
 		viteReact(),

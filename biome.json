@@ -28,7 +28,8 @@
 		}
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": ["**", "!**/dist", "!**/*.generated.js", "!**/*.gen.ts"]
 	},
 	"formatter": {
 		"enabled": true,
