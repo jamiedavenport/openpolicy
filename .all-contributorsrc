@@ -18,6 +18,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "jimbobware",
+      "name": "James",
+      "avatar_url": "https://avatars.githubusercontent.com/u/121758727?v=4",
+      "profile": "https://github.com/jimbobware",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributionTypes": [
@@ -28,5 +37,7 @@
     "maintenance",
     "review",
     "test"
-  ]
+  ],
+  "commitType": "docs",
+  "contributorsPerLine": 7
 }
