@@ -25,4 +25,6 @@ export default definePrivacyPolicy({
 	thirdParties: [],
 	userRights: ["access", "erasure"],
 	jurisdictions: ["us", "eu"],
+	// @ts-expect-error new children field
+	children: { underAge: 16, noticeUrl: "https://acme.com/parental-notice" },
 });

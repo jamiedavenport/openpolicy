@@ -73,6 +73,7 @@ export default definePrivacyPolicy({
   thirdParties: [],
   userRights: ["access", "erasure"],
   jurisdictions: ["us"],
+  children: { underAge: 13, noticeUrl: "https://example.com/parental" },
 });
 `;
 

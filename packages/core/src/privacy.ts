@@ -1,6 +1,7 @@
 import { renderHTML } from "./renderers/html";
 import { renderMarkdown } from "./renderers/markdown";
 import { buildCcpaSupplement } from "./templates/privacy/ccpa-supplement";
+import { buildChildrenPrivacy } from "./templates/privacy/children-privacy";
 import { buildContact } from "./templates/privacy/contact";
 import { buildCookies } from "./templates/privacy/cookies";
 import { buildDataCollected } from "./templates/privacy/data-collected";
@@ -21,6 +22,7 @@ const SECTION_BUILDERS: ((
 	config: PrivacyPolicyConfig,
 ) => PolicySection | null)[] = [
 	buildIntroduction,
+	buildChildrenPrivacy,
 	buildDataCollected,
 	buildLegalBasis,
 	buildDataRetention,
