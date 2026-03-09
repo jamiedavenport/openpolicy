@@ -2,6 +2,10 @@
 	"extends": "@openpolicy/tooling/base",
 	"include": ["src"],
 	"compilerOptions": {
-		"outDir": "dist"
+		"outDir": "dist",
+		"baseUrl": ".",
+		"paths": {
+			"@openpolicy/core": ["../core/src/index.ts"]
+		}
 	}
 }
