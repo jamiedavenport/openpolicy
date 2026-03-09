@@ -2,17 +2,22 @@
 	"name": "nextjs",
 	"version": "0.1.0",
 	"private": true,
+	"type": "module",
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
-		"start": "next start"
+		"start": "next start",
+		"generate:policies": "openpolicy generate ./policy.config.ts,./terms.config.ts --format html --out ./public/policies",
+		"prebuild": "bun run generate:policies"
 	},
 	"dependencies": {
+		"@openpolicy/sdk": "workspace:*",
 		"next": "16.1.6",
 		"react": "19.2.3",
 		"react-dom": "19.2.3"
 	},
 	"devDependencies": {
+		"@openpolicy/cli": "workspace:*",
 		"@types/node": "^20",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",

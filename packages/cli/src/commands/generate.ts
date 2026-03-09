@@ -1,3 +1,4 @@
+import { access, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type {
 	OutputFormat,
@@ -18,8 +19,8 @@ export const generateCommand = defineCommand({
 	args: {
 		config: {
 			type: "positional",
-			description: "Path to policy config file",
-			default: "./policy.config.ts",
+			description: "Path(s) to policy config file(s), comma-separated",
+			default: "./policy.config.ts,./terms.config.ts",
 		},
 		format: {
 			type: "string",
@@ -45,30 +46,52 @@ export const generateCommand = defineCommand({
 			.filter(Boolean) as OutputFormat[];
 
 		const outDir = args.out ?? "./output";
-		const configPath = args.config ?? "./policy.config.ts";
-		const policyType = detectType(args.type || undefined, configPath);
 
-		consola.start(
-			`Generating ${policyType} policy from ${configPath} → formats: ${formats.join(", ")}`,
-		);
+		const configPaths = (args.config ?? "./policy.config.ts,./terms.config.ts")
+			.split(",")
+			.map((p) => p.trim())
+			.filter(Boolean);
 
-		const config = await loadConfig(configPath);
+		const isMulti = configPaths.length > 1;
 
-		const outputFilename =
-			policyType === "terms" ? "terms-of-service" : "privacy-policy";
+		for (const configPath of configPaths) {
+			const exists = await access(configPath)
+				.then(() => true)
+				.catch(() => false);
 
-		const results = compilePolicy(
-			policyType === "terms"
-				? { type: "terms", ...(config as TermsOfServiceConfig) }
-				: { type: "privacy", ...(config as PrivacyPolicyConfig) },
-			{ formats },
-		);
+			if (!exists) {
+				if (isMulti) {
+					consola.warn(`Config not found, skipping: ${configPath}`);
+					continue;
+				}
+				throw new Error(`Config not found: ${configPath}`);
+			}
 
-		for (const result of results) {
-			const ext = result.format === "markdown" ? "md" : result.format;
-			const outPath = join(outDir, `${outputFilename}.${ext}`);
-			await Bun.write(outPath, result.content);
-			consola.success(`Written: ${outPath}`);
+			const policyType = detectType(args.type || undefined, configPath);
+
+			consola.start(
+				`Generating ${policyType} policy from ${configPath} → formats: ${formats.join(", ")}`,
+			);
+
+			const config = await loadConfig(configPath);
+
+			const outputFilename =
+				policyType === "terms" ? "terms-of-service" : "privacy-policy";
+
+			const results = compilePolicy(
+				policyType === "terms"
+					? { type: "terms", ...(config as TermsOfServiceConfig) }
+					: { type: "privacy", ...(config as PrivacyPolicyConfig) },
+				{ formats },
+			);
+
+			await mkdir(outDir, { recursive: true });
+			for (const result of results) {
+				const ext = result.format === "markdown" ? "md" : result.format;
+				const outPath = join(outDir, `${outputFilename}.${ext}`);
+				await writeFile(outPath, result.content, "utf-8");
+				consola.success(`Written: ${outPath}`);
+			}
 		}
 
 		consola.success(`Policy generation complete → ${outDir}`);
