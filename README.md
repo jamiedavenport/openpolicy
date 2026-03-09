@@ -240,3 +240,7 @@ This repo uses [Changesets](https://github.com/changesets/changesets). To cut a 
 ## AI Integration
 
 OpenPolicy ships an `llms.txt` reference. AI assistants (Claude, Cursor, Copilot) can read your codebase and auto-generate policy configurations that reflect your actual data flows and third-party integrations.
+
+## Stargazers
+
+[![RepoStars](https://repostars.dev/api/embed?repo=jamiedavenport%2Fopenpolicy&theme=light)](https://repostars.dev/?repos=jamiedavenport%2Fopenpolicy&theme=light)
