@@ -1,5 +1,11 @@
 # @openpolicy/cli
 
+## 0.0.10
+
+### Patch Changes
+
+- Adds support for multiple input files
+
 ## 0.0.9
 
 ### Patch Changes
