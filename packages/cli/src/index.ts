@@ -1,9 +1,11 @@
+import pkgJson from '../package.json'
 import { defineCommand } from "citty";
+
 
 export const mainCommand = defineCommand({
 	meta: {
 		name: "openpolicy",
-		version: "0.0.1",
+		version: pkgJson.version,
 		description: "Generate and validate privacy policy documents",
 	},
 	subCommands: {
