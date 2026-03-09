@@ -4,6 +4,7 @@ import { Font } from "astro:assets";
 import Footer from "../components/footer.astro";
 import Header from "../components/header.astro";
 import Nav from "../components/nav.astro";
+import { Icon } from "astro-icon/components";
 
 interface Props {
   title: string;
@@ -48,7 +49,7 @@ const {
   <body class="bg-gray-50">
     <div class="grid md:grid-cols-3 md:h-svh md:overflow-hidden">
       <div
-        class="md:col-span-1 border-b md:border-b-0 md:border-r p-10 md:p-14 lg:p-20 flex flex-col gap-10 border-gray-200"
+        class="md:col-span-1 border-b md:border-b-0 md:border-r p-10 lg:p-14 flex flex-col gap-10 border-gray-200"
       >
         <Header />
         <div class="flex-1 flex flex-col justify-center items-start">
@@ -75,6 +76,32 @@ const {
             class="px-4 py-2.5 bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors duration-200"
           >
             {ctaText}
+          </a>
+        </div>
+        <div class="flex items-center gap-4">
+          <a
+            href="https://github.com/jamiedavenport/openpolicy"
+            target="_blank"
+            aria-label="GitHub"
+            class="text-gray-400 hover:text-gray-700 transition-colors"
+          >
+            <Icon name="simple-icons:github" class="w-4 h-4" />
+          </a>
+          <a
+            href="https://x.com/jamiedavenport"
+            target="_blank"
+            aria-label="X"
+            class="text-gray-400 hover:text-gray-700 transition-colors"
+          >
+            <Icon name="simple-icons:x" class="w-4 h-4" />
+          </a>
+          <a
+            href="https://bsky.app/profile/jamiedavenport.bsky.social"
+            target="_blank"
+            aria-label="Bluesky"
+            class="text-gray-400 hover:text-gray-700 transition-colors"
+          >
+            <Icon name="simple-icons:bluesky" class="w-4 h-4" />
           </a>
         </div>
       </div>

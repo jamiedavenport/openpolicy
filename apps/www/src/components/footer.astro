@@ -1,50 +1,26 @@
 ---
-import { Icon } from "astro-icon/components";
+
 ---
 
-<footer class="flex flex-col text-xs text-gray-500 gap-4">
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    <div class="flex flex-col md:flex-row md:items-center gap-4">
-      <p>Copyright © 2026 OpenPolicy</p>
-      <a
-        href="/terms"
-        class="text-gray-500 hover:text-gray-700 transition-colors">Terms</a
-      >
-      <a
-        href="/privacy"
-        class="text-gray-500 hover:text-gray-700 transition-colors">Privacy</a
-      >
-    </div>
-    <div class="flex items-center gap-4">
-      <a
-        href="https://github.com/jamiedavenport/openpolicy"
-        target="_blank"
-        aria-label="GitHub"
-        class="text-gray-400 hover:text-gray-700 transition-colors"
-      >
-        <Icon name="simple-icons:github" class="w-4 h-4" />
-      </a>
-      <a
-        href="https://x.com/jamiedavenport"
-        target="_blank"
-        aria-label="X"
-        class="text-gray-400 hover:text-gray-700 transition-colors"
-      >
-        <Icon name="simple-icons:x" class="w-4 h-4" />
-      </a>
-      <a
-        href="https://bsky.app/profile/jamiedavenport.bsky.social"
-        target="_blank"
-        aria-label="Bluesky"
-        class="text-gray-400 hover:text-gray-700 transition-colors"
-      >
-        <Icon name="simple-icons:bluesky" class="w-4 h-4" />
-      </a>
-    </div>
-  </div>
-  <div>
-    <a href="https://jxd.dev" target="_blank" class="flex items-center gap-1">
-      Built with <svg class="size-3 inline-block fill-red-500" xmlns="http://www.w3.org/2000/svg" fill="#000000" viewBox="0 0 256 256"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"></path></svg> by Jamie Davenport
-    </a>
-  </div>
+<footer class="flex flex-col text-xs text-gray-500 gap-5">
+  <div class="flex items-center gap-2">
+  <p class="mr-auto">Copyright © 2026 OpenPolicy</p>
+  <a href="/terms" class="text-gray-500 hover:text-gray-700 transition-colors"
+    >Terms</a
+  >
+  <a href="/privacy" class="text-gray-500 hover:text-gray-700 transition-colors"
+    >Privacy</a
+  >
+</div>
+  <a href="https://jxd.dev" target="_blank" class="flex items-center gap-1">
+    Built with <svg
+      class="size-3 inline-block fill-red-500"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="#000000"
+      viewBox="0 0 256 256"
+      ><path
+        d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"
+      ></path></svg
+    > by Jamie Davenport
+  </a>
 </footer>
