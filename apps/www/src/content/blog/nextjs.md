@@ -110,7 +110,7 @@ export default defineTermsOfService({
 ```json
 {
   "scripts": {
-    "generate:policies": "openpolicy generate ./policy.config.ts,./terms.config.ts --format html --out ./public/policies",
+    "generate:policies": "openpolicy generate --format html --out ./public/policies",
     "prebuild": "bun run generate:policies"
   }
 }
