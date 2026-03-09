@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/sdk",
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"type": "module",
 	"description": "Public API for defining privacy policies with OpenPolicy",
 	"license": "MIT",
