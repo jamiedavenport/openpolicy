@@ -229,6 +229,7 @@ This repo uses [Changesets](https://github.com/changesets/changesets). To cut a 
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://www.jxd.dev/"><img src="https://avatars.githubusercontent.com/u/1329874?v=4?s=100" width="100px;" alt="Jamie Davenport"/><br /><sub><b>Jamie Davenport</b></sub></a><br /><a href="https://github.com/jamiedavenport/openpolicy/commits?author=jamiedavenport" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jimbobware"><img src="https://avatars.githubusercontent.com/u/121758727?v=4?s=100" width="100px;" alt="James"/><br /><sub><b>James</b></sub></a><br /><a href="https://github.com/jamiedavenport/openpolicy/commits?author=jimbobware" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.vishvish.com/"><img src="https://avatars.githubusercontent.com/u/184423?v=4?s=100" width="100px;" alt="Vish"/><br /><sub><b>Vish</b></sub></a><br /><a href="https://github.com/jamiedavenport/openpolicy/commits?author=vishvish" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
