@@ -17,3 +17,7 @@ test("generateCommand has format arg", () => {
 test("generateCommand has out arg", () => {
 	expect((generateCommand.args as ArgsDef)?.out?.type).toBe("string");
 });
+
+test("generateCommand has watch arg", () => {
+	expect((generateCommand.args as ArgsDef)?.watch?.type).toBe("boolean");
+});

@@ -2,7 +2,10 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import consola from "consola";
 
-export async function loadConfig(configPath: string): Promise<unknown> {
+export async function loadConfig(
+	configPath: string,
+	bustCache = false,
+): Promise<unknown> {
 	const absPath = resolve(configPath);
 
 	if (!existsSync(absPath)) {
@@ -10,9 +13,11 @@ export async function loadConfig(configPath: string): Promise<unknown> {
 		process.exit(1);
 	}
 
+	const importPath = bustCache ? `${absPath}?t=${Date.now()}` : absPath;
+
 	let mod: unknown;
 	try {
-		mod = await import(absPath);
+		mod = await import(importPath);
 	} catch (err) {
 		consola.error(`Failed to load config: ${absPath}`);
 		consola.error(err);
