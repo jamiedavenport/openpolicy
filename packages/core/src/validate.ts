@@ -63,5 +63,15 @@ export function validatePrivacyPolicy(
 		}
 	}
 
+	// children config sanity
+	if (config.children) {
+		if (config.children.underAge <= 0) {
+			issues.push({
+				level: "error",
+				message: "children.underAge must be a positive number",
+			});
+		}
+	}
+
 	return issues;
 }

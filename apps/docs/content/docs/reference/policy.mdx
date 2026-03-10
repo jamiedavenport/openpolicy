@@ -184,6 +184,18 @@ The `openpolicy init` wizard and the Vite plugin scaffold populate this array au
 
 ---
 
+### `children`
+
+**Type:** `{ underAge: number; noticeUrl?: string }`
+
+Optional configuration for a children’s privacy section. If supplied, a new
+"Children’s Privacy" section will appear in the generated document
+mentioning the minimum age and (optionally) a URL to a parental notice.
+
+```ts
+children: { underAge: 13, noticeUrl: "https://example.com/coppanotice" }
+```
+
 ### `jurisdictions`
 
 **Type:** `Jurisdiction[]`

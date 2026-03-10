@@ -25,6 +25,11 @@ export type PrivacyPolicyConfig = {
 	thirdParties: { name: string; purpose: string }[];
 	userRights: string[];
 	jurisdictions: Jurisdiction[];
+	// optional children-specific policy
+	children?: {
+		underAge: number;
+		noticeUrl?: string;
+	};
 };
 
 export type DisputeResolutionMethod =

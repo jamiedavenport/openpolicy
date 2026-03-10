@@ -8,6 +8,12 @@ If you have questions about this policy, please contact us at privacy@acme.com.
 
 ---
 
+## Children’s Privacy
+
+Our service is not directed at children under 16 years old. See our notice for parents and guardians: https://acme.com/parental-notice
+
+---
+
 ## Information We Collect
 
 We collect the following categories of information:

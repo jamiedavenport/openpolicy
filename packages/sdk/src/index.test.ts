@@ -23,6 +23,7 @@ const fixture: PrivacyPolicyConfig = {
 	thirdParties: [{ name: "Stripe", purpose: "Payment processing" }],
 	userRights: ["access", "erasure", "portability"],
 	jurisdictions: ["us"],
+	children: { underAge: 16, noticeUrl: "https://example.com/parental" },
 };
 
 test("definePrivacyPolicy returns config unchanged", () => {
