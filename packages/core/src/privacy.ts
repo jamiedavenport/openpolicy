@@ -1,16 +1,18 @@
 import { renderHTML } from "./renderers/html";
 import { renderMarkdown } from "./renderers/markdown";
-import { buildCcpaSupplement } from "./templates/privacy/ccpa-supplement";
-import { buildChildrenPrivacy } from "./templates/privacy/children-privacy";
-import { buildContact } from "./templates/privacy/contact";
-import { buildCookies } from "./templates/privacy/cookies";
-import { buildDataCollected } from "./templates/privacy/data-collected";
-import { buildDataRetention } from "./templates/privacy/data-retention";
-import { buildGdprSupplement } from "./templates/privacy/gdpr-supplement";
-import { buildIntroduction } from "./templates/privacy/introduction";
-import { buildLegalBasis } from "./templates/privacy/legal-basis";
-import { buildThirdParties } from "./templates/privacy/third-parties";
-import { buildUserRights } from "./templates/privacy/user-rights";
+import {
+	buildCcpaSupplement,
+	buildChildrenPrivacy,
+	buildContact,
+	buildCookies,
+	buildDataCollected,
+	buildDataRetention,
+	buildGdprSupplement,
+	buildIntroduction,
+	buildLegalBasis,
+	buildThirdParties,
+	buildUserRights,
+} from "./templates/privacy";
 import type {
 	CompileOptions,
 	OutputFormat,

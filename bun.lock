@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "openpolicy",
@@ -72,7 +73,6 @@
     },
     "examples/nextjs": {
       "name": "nextjs",
-      "version": "0.1.0",
       "dependencies": {
         "@openpolicy/sdk": "workspace:*",
         "next": "16.1.6",
@@ -108,22 +108,22 @@
     },
     "packages/astro": {
       "name": "@openpolicy/astro",
-      "version": "0.0.9",
+      "version": "0.0.10",
       "devDependencies": {
         "@openpolicy/tooling": "workspace:*",
         "@openpolicy/vite": "workspace:*",
         "astro": "^5.0.0",
       },
       "peerDependencies": {
-        "@openpolicy/core": ">=0.0.9",
-        "@openpolicy/sdk": ">=0.0.9",
-        "@openpolicy/vite": ">=0.0.9",
+        "@openpolicy/core": ">=0.0.10",
+        "@openpolicy/sdk": ">=0.0.10",
+        "@openpolicy/vite": ">=0.0.10",
         "astro": ">=4.0.0",
       },
     },
     "packages/cli": {
       "name": "@openpolicy/cli",
-      "version": "0.0.9",
+      "version": "0.0.10",
       "bin": {
         "openpolicy": "./dist/cli.js",
       },
@@ -138,7 +138,7 @@
     },
     "packages/core": {
       "name": "@openpolicy/core",
-      "version": "0.0.9",
+      "version": "0.0.10",
       "dependencies": {
         "marked": "^17.0.4",
       },
@@ -148,7 +148,7 @@
     },
     "packages/sdk": {
       "name": "@openpolicy/sdk",
-      "version": "0.0.9",
+      "version": "0.0.10",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
@@ -156,7 +156,7 @@
     },
     "packages/vite": {
       "name": "@openpolicy/vite",
-      "version": "0.0.9",
+      "version": "0.0.10",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
