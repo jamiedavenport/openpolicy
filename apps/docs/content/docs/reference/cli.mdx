@@ -56,6 +56,7 @@ openpolicy generate [config] [options]
 |---|---|---|---|
 | `--format` | `string` | `markdown` | Comma-separated output formats: `markdown`, `html` |
 | `--out` | `string` | `./output` | Output directory |
+| `--watch` | `boolean` | `false` | Watch config files and regenerate on changes |
 
 **Output files**
 
@@ -75,6 +76,9 @@ openpolicy generate ./policy.config.ts --format markdown,html --out ./src/polici
 
 # Custom config path
 openpolicy generate ./config/privacy.ts --format html --out ./public
+
+# Watch mode — regenerate on config changes
+openpolicy generate ./policy.config.ts --format html --out ./public --watch
 ```
 
 ---

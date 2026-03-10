@@ -62,6 +62,7 @@ openpolicy generate ./terms.config.ts --format markdown,html --out ./src/policie
 | `--format` | `markdown` | Comma-separated list of output formats: `markdown`, `html` |
 | `--out` | `./output` | Output directory |
 | `--type` | _(auto-detected)_ | `"privacy"` or `"terms"` — inferred from the filename if omitted |
+| `--watch` | `false` | Watch config files and regenerate on changes |
 
 The output filename is determined by the policy type:
 
@@ -83,6 +84,9 @@ openpolicy generate ./terms.config.ts --format markdown,html --out ./src/policie
 
 # Explicit type override
 openpolicy generate ./my.config.ts --type terms --format markdown
+
+# Watch mode — regenerate on config changes
+openpolicy generate ./privacy.config.ts --format html --out ./src/policies --watch
 ```
 
 ## Validate
