@@ -1,7 +1,9 @@
-import { access, mkdir, writeFile } from "node:fs/promises";
+import { existsSync, watch } from "node:fs";
+import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type {
 	OutputFormat,
+	PolicyInput,
 	PrivacyPolicyConfig,
 	TermsOfServiceConfig,
 } from "@openpolicy/core";
@@ -10,6 +12,52 @@ import { defineCommand } from "citty";
 import consola from "consola";
 import { detectType } from "../utils/detect-type";
 import { loadConfig } from "../utils/load-config";
+
+function toPolicyInput(
+	policyType: "privacy" | "terms",
+	config: unknown,
+): PolicyInput {
+	if (policyType === "terms") {
+		return { type: "terms", ...(config as TermsOfServiceConfig) };
+	}
+	return { type: "privacy", ...(config as PrivacyPolicyConfig) };
+}
+
+async function generateFromConfig(
+	configPath: string,
+	formats: OutputFormat[],
+	outDir: string,
+	explicitType: string | undefined,
+	bustCache = false,
+): Promise<boolean> {
+	if (!existsSync(configPath)) {
+		return false;
+	}
+
+	const policyType = detectType(explicitType, configPath);
+
+	consola.start(
+		`Generating ${policyType} policy from ${configPath} → formats: ${formats.join(", ")}`,
+	);
+
+	const config = await loadConfig(configPath, bustCache);
+	const outputFilename =
+		policyType === "terms" ? "terms-of-service" : "privacy-policy";
+
+	const results = compilePolicy(toPolicyInput(policyType, config), {
+		formats,
+	});
+
+	await mkdir(outDir, { recursive: true });
+	for (const result of results) {
+		const ext = result.format === "markdown" ? "md" : result.format;
+		const outPath = join(outDir, `${outputFilename}.${ext}`);
+		await writeFile(outPath, result.content, "utf-8");
+		consola.success(`Written: ${outPath}`);
+	}
+
+	return true;
+}
 
 export const generateCommand = defineCommand({
 	meta: {
@@ -38,62 +86,69 @@ export const generateCommand = defineCommand({
 				'Policy type: "privacy" or "terms" (auto-detected from filename if omitted)',
 			default: "",
 		},
+		watch: {
+			type: "boolean",
+			description: "Watch config files and regenerate on changes",
+			default: false,
+		},
 	},
 	async run({ args }) {
-		const formats = (args.format ?? "markdown")
+		const formats = args.format
 			.split(",")
 			.map((f) => f.trim())
 			.filter(Boolean) as OutputFormat[];
-
-		const outDir = args.out ?? "./output";
-
-		const configPaths = (args.config ?? "./policy.config.ts,./terms.config.ts")
+		const outDir = args.out;
+		const explicitType = args.type || undefined;
+		const configPaths = args.config
 			.split(",")
 			.map((p) => p.trim())
 			.filter(Boolean);
 
-		const isMulti = configPaths.length > 1;
+		const hasMultipleConfigs = configPaths.length > 1;
+		const watchablePaths: string[] = [];
 
 		for (const configPath of configPaths) {
-			const exists = await access(configPath)
-				.then(() => true)
-				.catch(() => false);
+			const generated = await generateFromConfig(
+				configPath,
+				formats,
+				outDir,
+				explicitType,
+			);
 
-			if (!exists) {
-				if (isMulti) {
-					consola.warn(`Config not found, skipping: ${configPath}`);
-					continue;
-				}
+			if (generated) {
+				watchablePaths.push(configPath);
+			} else if (hasMultipleConfigs) {
+				consola.warn(`Config not found, skipping: ${configPath}`);
+			} else {
 				throw new Error(`Config not found: ${configPath}`);
-			}
-
-			const policyType = detectType(args.type || undefined, configPath);
-
-			consola.start(
-				`Generating ${policyType} policy from ${configPath} → formats: ${formats.join(", ")}`,
-			);
-
-			const config = await loadConfig(configPath);
-
-			const outputFilename =
-				policyType === "terms" ? "terms-of-service" : "privacy-policy";
-
-			const results = compilePolicy(
-				policyType === "terms"
-					? { type: "terms", ...(config as TermsOfServiceConfig) }
-					: { type: "privacy", ...(config as PrivacyPolicyConfig) },
-				{ formats },
-			);
-
-			await mkdir(outDir, { recursive: true });
-			for (const result of results) {
-				const ext = result.format === "markdown" ? "md" : result.format;
-				const outPath = join(outDir, `${outputFilename}.${ext}`);
-				await writeFile(outPath, result.content, "utf-8");
-				consola.success(`Written: ${outPath}`);
 			}
 		}
 
 		consola.success(`Policy generation complete → ${outDir}`);
+
+		if (args.watch && watchablePaths.length > 0) {
+			consola.info("Watching for changes...");
+
+			for (const configPath of watchablePaths) {
+				let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+				watch(configPath, () => {
+					if (debounceTimer) clearTimeout(debounceTimer);
+					debounceTimer = setTimeout(async () => {
+						try {
+							await generateFromConfig(
+								configPath,
+								formats,
+								outDir,
+								explicitType,
+								true,
+							);
+						} catch (err) {
+							consola.error(`Error regenerating ${configPath}:`, err);
+						}
+					}, 100);
+				});
+			}
+		}
 	},
 });

@@ -41,6 +41,7 @@ openpolicy generate ./terms.config.ts   --format markdown      --out ./public/po
 | `--format` | `markdown` | Comma-separated output formats: `markdown`, `html` |
 | `--out` | `./public/policies` | Output directory |
 | `--type` | auto-detected | Override policy type: `privacy` or `terms` |
+| `--watch` | `false` | Watch config files and regenerate on changes |
 
 Policy type is auto-detected from the filename — files containing `"terms"` compile as terms of service.
 
