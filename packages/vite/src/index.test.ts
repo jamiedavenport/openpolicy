@@ -3,9 +3,7 @@ import { existsSync } from "node:fs";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { generatePolicies, openPolicy, writeScaffold } from "./index";
-
-// --- Group 1: Plugin structure ---
+import { generatePolicies, openPolicy } from "./index";
 
 describe("plugin structure", () => {
 	test("openPolicy returns a vite plugin with correct name", () => {
@@ -29,30 +27,6 @@ describe("plugin structure", () => {
 		).not.toThrow();
 	});
 });
-
-// --- Group 2: Scaffold ---
-
-describe("writeScaffold", () => {
-	test("creates file with defineConfig and today's date", async () => {
-		const tmpDir = await mkdtemp(join(tmpdir(), "openpolicy-vite-scaffold-"));
-		try {
-			const configPath = join(tmpDir, "privacy.config.ts");
-			await writeScaffold(configPath);
-
-			expect(existsSync(configPath)).toBe(true);
-
-			const content = await readFile(configPath, "utf8");
-			expect(content).toContain("defineConfig");
-			expect(content).toContain(new Date().toISOString().slice(0, 10));
-			expect(content).toContain("effectiveDate");
-			expect(content).toContain("@openpolicy/sdk");
-		} finally {
-			await rm(tmpDir, { recursive: true });
-		}
-	});
-});
-
-// --- Group 3: generatePolicies ---
 
 const validConfig = `
 export default {
