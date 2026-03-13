@@ -1,9 +1,16 @@
 export function detectType(
 	explicitType: string | undefined,
 	configPath: string,
-): "privacy" | "terms" {
-	if (explicitType === "privacy" || explicitType === "terms") {
+): "privacy" | "terms" | "cookie" {
+	if (
+		explicitType === "privacy" ||
+		explicitType === "terms" ||
+		explicitType === "cookie"
+	) {
 		return explicitType;
 	}
-	return configPath.toLowerCase().includes("terms") ? "terms" : "privacy";
+	const lower = configPath.toLowerCase();
+	if (lower.includes("cookie")) return "cookie";
+	if (lower.includes("terms")) return "terms";
+	return "privacy";
 }

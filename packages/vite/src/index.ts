@@ -1,6 +1,7 @@
 import { access, mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import type {
+	CookiePolicyConfig,
 	OpenPolicyConfig,
 	OutputFormat,
 	PrivacyPolicyConfig,
@@ -10,6 +11,7 @@ import {
 	compilePolicy,
 	expandOpenPolicyConfig,
 	isOpenPolicyConfig,
+	validateCookiePolicy,
 	validatePrivacyPolicy,
 	validateTermsOfService,
 } from "@openpolicy/core";
@@ -17,23 +19,25 @@ import type { Plugin } from "vite";
 
 export type PolicyConfigEntry =
 	| string
-	| { config: string; type?: "privacy" | "terms" };
+	| { config: string; type?: "privacy" | "terms" | "cookie" };
 
 export interface OpenPolicyOptions {
 	configs?: PolicyConfigEntry[];
 	config?: string;
 	formats?: OutputFormat[];
 	outDir?: string;
-	type?: "privacy" | "terms";
+	type?: "privacy" | "terms" | "cookie";
 }
 
-function detectType(filename: string): "privacy" | "terms" {
-	return filename.includes("terms") ? "terms" : "privacy";
+function detectType(filename: string): "privacy" | "terms" | "cookie" {
+	if (filename.includes("cookie")) return "cookie";
+	if (filename.includes("terms")) return "terms";
+	return "privacy";
 }
 
 function normalizeEntries(
 	options: OpenPolicyOptions,
-): Array<{ configFile: string; type: "privacy" | "terms" }> {
+): Array<{ configFile: string; type: "privacy" | "terms" | "cookie" }> {
 	if (options.configs) {
 		return options.configs.map((entry) => {
 			if (typeof entry === "string") {
@@ -49,9 +53,11 @@ function normalizeEntries(
 		options.config ??
 		(options.type === "terms"
 			? "terms.config.ts"
-			: options.type === "privacy"
-				? "privacy.config.ts"
-				: "openpolicy.ts");
+			: options.type === "cookie"
+				? "cookie.config.ts"
+				: options.type === "privacy"
+					? "privacy.config.ts"
+					: "openpolicy.ts");
 	return [
 		{
 			configFile,
@@ -137,7 +143,7 @@ export default defineTermsOfService({
 
 export async function writeScaffold(
 	configPath: string,
-	type: "privacy" | "terms" = "privacy",
+	type: "privacy" | "terms" | "cookie" = "privacy",
 ): Promise<void> {
 	const template =
 		type === "terms" ? TERMS_SCAFFOLD_TEMPLATE : PRIVACY_SCAFFOLD_TEMPLATE;
@@ -148,7 +154,7 @@ export async function generatePolicies(
 	configPath: string,
 	outDir: string,
 	formats: OutputFormat[],
-	type: "privacy" | "terms" = "privacy",
+	type: "privacy" | "terms" | "cookie" = "privacy",
 ): Promise<void> {
 	const mod = await import(`${configPath}?t=${Date.now()}`);
 	const config =
@@ -169,7 +175,9 @@ export async function generatePolicies(
 			const issues =
 				input.type === "terms"
 					? validateTermsOfService(input)
-					: validatePrivacyPolicy(input);
+					: input.type === "cookie"
+						? validateCookiePolicy(input)
+						: validatePrivacyPolicy(input);
 			for (const issue of issues) {
 				if (issue.level === "error")
 					throw new Error(`[openpolicy] ${issue.message}`);
@@ -177,7 +185,11 @@ export async function generatePolicies(
 			}
 			const results = compilePolicy(input, { formats });
 			const outputFilename =
-				input.type === "terms" ? "terms-of-service" : "privacy-policy";
+				input.type === "terms"
+					? "terms-of-service"
+					: input.type === "cookie"
+						? "cookie-policy"
+						: "privacy-policy";
 			for (const result of results) {
 				const ext = result.format === "markdown" ? "md" : result.format;
 				await writeFile(
@@ -193,7 +205,9 @@ export async function generatePolicies(
 	const issues =
 		type === "terms"
 			? validateTermsOfService(config as TermsOfServiceConfig)
-			: validatePrivacyPolicy(config as PrivacyPolicyConfig);
+			: type === "cookie"
+				? validateCookiePolicy(config as CookiePolicyConfig)
+				: validatePrivacyPolicy(config as PrivacyPolicyConfig);
 
 	for (const issue of issues) {
 		if (issue.level === "error") {
@@ -205,12 +219,18 @@ export async function generatePolicies(
 	const results = compilePolicy(
 		type === "terms"
 			? { type: "terms", ...(config as TermsOfServiceConfig) }
-			: { type: "privacy", ...(config as PrivacyPolicyConfig) },
+			: type === "cookie"
+				? { type: "cookie", ...(config as CookiePolicyConfig) }
+				: { type: "privacy", ...(config as PrivacyPolicyConfig) },
 		{ formats },
 	);
 
 	const outputFilename =
-		type === "terms" ? "terms-of-service" : "privacy-policy";
+		type === "terms"
+			? "terms-of-service"
+			: type === "cookie"
+				? "cookie-policy"
+				: "privacy-policy";
 
 	await mkdir(outDir, { recursive: true });
 
@@ -227,7 +247,10 @@ export async function generatePolicies(
 export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 	const formats: OutputFormat[] = options.formats ?? ["markdown"];
 	let resolvedOutDir: string;
-	let resolvedEntries: Array<{ configPath: string; type: "privacy" | "terms" }>;
+	let resolvedEntries: Array<{
+		configPath: string;
+		type: "privacy" | "terms" | "cookie";
+	}>;
 
 	return {
 		name: "openpolicy",

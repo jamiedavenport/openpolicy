@@ -2,6 +2,7 @@ import { existsSync, watch } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type {
+	CookiePolicyConfig,
 	OpenPolicyConfig,
 	OutputFormat,
 	PolicyInput,
@@ -19,11 +20,14 @@ import { detectType } from "../utils/detect-type";
 import { loadConfig } from "../utils/load-config";
 
 function toPolicyInput(
-	policyType: "privacy" | "terms",
+	policyType: "privacy" | "terms" | "cookie",
 	config: unknown,
 ): PolicyInput {
 	if (policyType === "terms") {
 		return { type: "terms", ...(config as TermsOfServiceConfig) };
+	}
+	if (policyType === "cookie") {
+		return { type: "cookie", ...(config as CookiePolicyConfig) };
 	}
 	return { type: "privacy", ...(config as PrivacyPolicyConfig) };
 }
@@ -52,7 +56,11 @@ async function generateFromConfig(
 		await mkdir(outDir, { recursive: true });
 		for (const input of inputs) {
 			const outputFilename =
-				input.type === "terms" ? "terms-of-service" : "privacy-policy";
+				input.type === "terms"
+					? "terms-of-service"
+					: input.type === "cookie"
+						? "cookie-policy"
+						: "privacy-policy";
 			consola.start(
 				`Generating ${input.type} policy from ${configPath} → formats: ${formats.join(", ")}`,
 			);
@@ -74,7 +82,11 @@ async function generateFromConfig(
 	);
 
 	const outputFilename =
-		policyType === "terms" ? "terms-of-service" : "privacy-policy";
+		policyType === "terms"
+			? "terms-of-service"
+			: policyType === "cookie"
+				? "cookie-policy"
+				: "privacy-policy";
 
 	const results = compilePolicy(toPolicyInput(policyType, config), {
 		formats,
@@ -115,7 +127,7 @@ export const generateCommand = defineCommand({
 		type: {
 			type: "string",
 			description:
-				'Policy type: "privacy" or "terms" (auto-detected from filename if omitted)',
+				'Policy type: "privacy", "terms", or "cookie" (auto-detected from filename if omitted)',
 			default: "",
 		},
 		watch: {
