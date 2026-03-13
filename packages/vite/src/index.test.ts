@@ -17,14 +17,8 @@ describe("plugin structure", () => {
 
 	test("openPolicy() with partial args does not throw", () => {
 		expect(() => openPolicy({ formats: ["markdown"] })).not.toThrow();
-		expect(() => openPolicy({ config: "custom.config.ts" })).not.toThrow();
+		expect(() => openPolicy({ configPath: "custom.config.ts" })).not.toThrow();
 		expect(() => openPolicy({ outDir: "dist/policies" })).not.toThrow();
-	});
-
-	test("openPolicy() with configs array does not throw", () => {
-		expect(() =>
-			openPolicy({ configs: ["policy.config.ts", "terms.config.ts"] }),
-		).not.toThrow();
 	});
 });
 
@@ -94,52 +88,6 @@ export default {
 			await expect(
 				generatePolicies(configPath, outDir, ["markdown"]),
 			).rejects.toThrow(/[Vv]alidation error/);
-		} finally {
-			await rm(tmpDir, { recursive: true });
-		}
-	});
-
-	test("generates both privacy and terms policies via configs array", async () => {
-		const tmpDir = await mkdtemp(join(tmpdir(), "openpolicy-vite-multi-"));
-		try {
-			const privacyConfigPath = join(tmpDir, "policy.config.ts");
-			await Bun.write(privacyConfigPath, validConfig);
-
-			const termsConfig = `
-export default {
-  effectiveDate: "2026-01-01",
-  company: {
-    name: "Test Co",
-    legalName: "Test Co, Inc.",
-    address: "1 Test Ave, Testville, TX 12345",
-    contact: "legal@test.com",
-  },
-  acceptance: { methods: ["using the service"] },
-  eligibility: { minimumAge: 13 },
-  accounts: { registrationRequired: false, userResponsibleForCredentials: true, companyCanTerminate: true },
-  prohibitedUses: ["Violating laws"],
-  intellectualProperty: { companyOwnsService: true, usersMayNotCopy: true },
-  termination: { companyCanTerminate: true, userCanTerminate: true },
-  disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
-  limitationOfLiability: { excludesIndirectDamages: true },
-  governingLaw: { jurisdiction: "Delaware, USA" },
-  changesPolicy: { noticeMethod: "email", noticePeriodDays: 30 },
-};
-`;
-			const termsConfigPath = join(tmpDir, "terms.config.ts");
-			await Bun.write(termsConfigPath, termsConfig);
-
-			const outDir = join(tmpDir, "out");
-			await generatePolicies(
-				privacyConfigPath,
-				outDir,
-				["markdown"],
-				"privacy",
-			);
-			await generatePolicies(termsConfigPath, outDir, ["markdown"], "terms");
-
-			expect(existsSync(join(outDir, "privacy-policy.md"))).toBe(true);
-			expect(existsSync(join(outDir, "terms-of-service.md"))).toBe(true);
 		} finally {
 			await rm(tmpDir, { recursive: true });
 		}

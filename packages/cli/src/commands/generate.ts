@@ -36,13 +36,8 @@ async function generateFromConfig(
 	configPath: string,
 	formats: OutputFormat[],
 	outDir: string,
-	explicitType: string | undefined,
 	bustCache = false,
-): Promise<boolean> {
-	if (!existsSync(configPath)) {
-		return false;
-	}
-
+): Promise<void> {
 	const config = await loadConfig(configPath, bustCache);
 
 	if (isOpenPolicyConfig(config)) {
@@ -51,7 +46,7 @@ async function generateFromConfig(
 			consola.warn(
 				`Unified config has no privacy or terms sections: ${configPath}`,
 			);
-			return true;
+			return;
 		}
 		await mkdir(outDir, { recursive: true });
 		for (const input of inputs) {
@@ -72,10 +67,10 @@ async function generateFromConfig(
 				consola.success(`Written: ${outPath}`);
 			}
 		}
-		return true;
+		return;
 	}
 
-	const policyType = detectType(explicitType, configPath);
+	const policyType = detectType(undefined, configPath);
 
 	consola.start(
 		`Generating ${policyType} policy from ${configPath} → formats: ${formats.join(", ")}`,
@@ -99,8 +94,6 @@ async function generateFromConfig(
 		await writeFile(outPath, result.content, "utf-8");
 		consola.success(`Written: ${outPath}`);
 	}
-
-	return true;
 }
 
 export const generateCommand = defineCommand({
@@ -111,8 +104,8 @@ export const generateCommand = defineCommand({
 	args: {
 		config: {
 			type: "positional",
-			description: "Path(s) to policy config file(s), comma-separated",
-			default: "./openpolicy.ts,./policy.config.ts,./terms.config.ts",
+			description: "Path to policy config file",
+			default: "./openpolicy.ts",
 		},
 		format: {
 			type: "string",
@@ -124,15 +117,9 @@ export const generateCommand = defineCommand({
 			description: "Output directory",
 			default: "./output",
 		},
-		type: {
-			type: "string",
-			description:
-				'Policy type: "privacy", "terms", or "cookie" (auto-detected from filename if omitted)',
-			default: "",
-		},
 		watch: {
 			type: "boolean",
-			description: "Watch config files and regenerate on changes",
+			description: "Watch config file and regenerate on changes",
 			default: false,
 		},
 	},
@@ -142,57 +129,31 @@ export const generateCommand = defineCommand({
 			.map((f) => f.trim())
 			.filter(Boolean) as OutputFormat[];
 		const outDir = args.out;
-		const explicitType = args.type || undefined;
-		const configPaths = args.config
-			.split(",")
-			.map((p) => p.trim())
-			.filter(Boolean);
+		const configPath = args.config;
 
-		const hasMultipleConfigs = configPaths.length > 1;
-		const watchablePaths: string[] = [];
-
-		for (const configPath of configPaths) {
-			const generated = await generateFromConfig(
-				configPath,
-				formats,
-				outDir,
-				explicitType,
-			);
-
-			if (generated) {
-				watchablePaths.push(configPath);
-			} else if (hasMultipleConfigs) {
-				consola.warn(`Config not found, skipping: ${configPath}`);
-			} else {
-				throw new Error(`Config not found: ${configPath}`);
-			}
+		if (!existsSync(configPath)) {
+			throw new Error(`Config not found: ${configPath}`);
 		}
+
+		await generateFromConfig(configPath, formats, outDir);
 
 		consola.success(`Policy generation complete → ${outDir}`);
 
-		if (args.watch && watchablePaths.length > 0) {
+		if (args.watch) {
 			consola.info("Watching for changes...");
 
-			for (const configPath of watchablePaths) {
-				let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+			let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
-				watch(configPath, () => {
-					if (debounceTimer) clearTimeout(debounceTimer);
-					debounceTimer = setTimeout(async () => {
-						try {
-							await generateFromConfig(
-								configPath,
-								formats,
-								outDir,
-								explicitType,
-								true,
-							);
-						} catch (err) {
-							consola.error(`Error regenerating ${configPath}:`, err);
-						}
-					}, 100);
-				});
-			}
+			watch(configPath, () => {
+				if (debounceTimer) clearTimeout(debounceTimer);
+				debounceTimer = setTimeout(async () => {
+					try {
+						await generateFromConfig(configPath, formats, outDir, true);
+					} catch (err) {
+						consola.error(`Error regenerating ${configPath}:`, err);
+					}
+				}, 100);
+			});
 		}
 	},
 });

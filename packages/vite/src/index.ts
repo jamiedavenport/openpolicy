@@ -17,16 +17,10 @@ import {
 } from "@openpolicy/core";
 import type { Plugin } from "vite";
 
-export type PolicyConfigEntry =
-	| string
-	| { config: string; type?: "privacy" | "terms" | "cookie" };
-
 export interface OpenPolicyOptions {
-	configs?: PolicyConfigEntry[];
-	config?: string;
+	configPath?: string;
 	formats?: OutputFormat[];
 	outDir?: string;
-	type?: "privacy" | "terms" | "cookie";
 }
 
 function detectType(filename: string): "privacy" | "terms" | "cookie" {
@@ -35,42 +29,10 @@ function detectType(filename: string): "privacy" | "terms" | "cookie" {
 	return "privacy";
 }
 
-function normalizeEntries(
-	options: OpenPolicyOptions,
-): Array<{ configFile: string; type: "privacy" | "terms" | "cookie" }> {
-	if (options.configs) {
-		return options.configs.map((entry) => {
-			if (typeof entry === "string") {
-				return { configFile: entry, type: detectType(entry) };
-			}
-			return {
-				configFile: entry.config,
-				type: entry.type ?? detectType(entry.config),
-			};
-		});
-	}
-	const configFile =
-		options.config ??
-		(options.type === "terms"
-			? "terms.config.ts"
-			: options.type === "cookie"
-				? "cookie.config.ts"
-				: options.type === "privacy"
-					? "privacy.config.ts"
-					: "openpolicy.ts");
-	return [
-		{
-			configFile,
-			type: options.type ?? detectType(configFile),
-		},
-	];
-}
-
 export async function generatePolicies(
 	configPath: string,
 	outDir: string,
 	formats: OutputFormat[],
-	type: "privacy" | "terms" | "cookie" = "privacy",
 ): Promise<void> {
 	const mod = await import(`${configPath}?t=${Date.now()}`);
 	const config =
@@ -118,6 +80,8 @@ export async function generatePolicies(
 		return;
 	}
 
+	const type = detectType(configPath);
+
 	const issues =
 		type === "terms"
 			? validateTermsOfService(config as TermsOfServiceConfig)
@@ -162,11 +126,9 @@ export async function generatePolicies(
 
 export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 	const formats: OutputFormat[] = options.formats ?? ["markdown"];
+	const configFile = options.configPath ?? "openpolicy.ts";
 	let resolvedOutDir: string;
-	let resolvedEntries: Array<{
-		configPath: string;
-		type: "privacy" | "terms" | "cookie";
-	}>;
+	let resolvedConfigPath: string;
 
 	return {
 		name: "openpolicy",
@@ -176,45 +138,27 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 				config.root,
 				options.outDir ?? "public/policies",
 			);
-			resolvedEntries = normalizeEntries(options).map((e) => ({
-				configPath: resolve(config.root, e.configFile),
-				type: e.type,
-			}));
+			resolvedConfigPath = resolve(config.root, configFile);
 		},
 
 		async buildStart() {
-			for (const entry of resolvedEntries) {
-				const configExists = await access(entry.configPath).then(
-					() => true,
-					() => false,
-				);
-				if (!configExists) {
-					console.warn(`[openpolicy] no configuration file found`);
-					continue;
-				}
-				await generatePolicies(
-					entry.configPath,
-					resolvedOutDir,
-					formats,
-					entry.type,
-				);
+			const configExists = await access(resolvedConfigPath).then(
+				() => true,
+				() => false,
+			);
+			if (!configExists) {
+				console.warn(`[openpolicy] no configuration file found`);
+				return;
 			}
+			await generatePolicies(resolvedConfigPath, resolvedOutDir, formats);
 		},
 
 		configureServer(server) {
-			for (const entry of resolvedEntries) {
-				server.watcher.add(entry.configPath);
-			}
+			server.watcher.add(resolvedConfigPath);
 			server.watcher.on("change", async (path) => {
-				const entry = resolvedEntries.find((e) => e.configPath === path);
-				if (!entry) return;
+				if (path !== resolvedConfigPath) return;
 				try {
-					await generatePolicies(
-						entry.configPath,
-						resolvedOutDir,
-						formats,
-						entry.type,
-					);
+					await generatePolicies(resolvedConfigPath, resolvedOutDir, formats);
 					console.log("[openpolicy] Policies regenerated");
 				} catch (err) {
 					console.error("[openpolicy]", err);
