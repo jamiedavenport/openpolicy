@@ -1,0 +1,12 @@
+export { buildConsent } from "./consent";
+export { buildContact } from "./contact";
+export { buildCookieDuration } from "./cookie-duration";
+export { buildCookieTypes } from "./cookie-types";
+export { buildCookieUsage } from "./cookie-usage";
+export { buildIntroduction } from "./introduction";
+export { buildJurisdiction } from "./jurisdiction";
+export { buildManagingCookies } from "./managing-cookies";
+export { buildThirdPartyCookies } from "./third-party-cookies";
+export { buildTrackingTechnologies } from "./tracking-technologies";
+export { buildUpdates } from "./updates";
+export { buildWhatAreCookies } from "./what-are-cookies";

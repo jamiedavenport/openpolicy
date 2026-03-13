@@ -88,14 +88,35 @@ export type TermsOfServiceConfig = {
 	privacyPolicyUrl?: string;
 };
 
+export type CookiePolicyConfig = {
+	effectiveDate: string;
+	company: CompanyConfig;
+	cookies: {
+		essential: boolean;
+		analytics: boolean;
+		functional: boolean;
+		marketing: boolean;
+	};
+	thirdParties?: { name: string; purpose: string; policyUrl?: string }[];
+	trackingTechnologies?: string[];
+	consentMechanism?: {
+		hasBanner: boolean;
+		hasPreferencePanel: boolean;
+		canWithdraw: boolean;
+	};
+	jurisdictions: Jurisdiction[];
+};
+
 export type PolicyInput =
 	| ({ type: "privacy" } & PrivacyPolicyConfig)
-	| ({ type: "terms" } & TermsOfServiceConfig);
+	| ({ type: "terms" } & TermsOfServiceConfig)
+	| ({ type: "cookie" } & CookiePolicyConfig);
 
 export type OpenPolicyConfig = {
 	company: CompanyConfig;
 	privacy?: Omit<PrivacyPolicyConfig, "company">;
 	terms?: Omit<TermsOfServiceConfig, "company">;
+	cookie?: Omit<CookiePolicyConfig, "company">;
 };
 
 export function isOpenPolicyConfig(value: unknown): value is OpenPolicyConfig {
@@ -104,7 +125,7 @@ export function isOpenPolicyConfig(value: unknown): value is OpenPolicyConfig {
 	return (
 		"company" in obj &&
 		!("effectiveDate" in obj) &&
-		("privacy" in obj || "terms" in obj)
+		("privacy" in obj || "terms" in obj || "cookie" in obj)
 	);
 }
 
