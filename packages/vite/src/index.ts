@@ -46,11 +46,16 @@ function normalizeEntries(
 		});
 	}
 	const configFile =
-		options.type === "terms" ? "terms.config.ts" : "privacy.config.ts";
+		options.config ??
+		(options.type === "terms"
+			? "terms.config.ts"
+			: options.type === "privacy"
+				? "privacy.config.ts"
+				: "openpolicy.ts");
 	return [
 		{
-			configFile: options.config ?? configFile,
-			type: options.type ?? "privacy",
+			configFile,
+			type: options.type ?? detectType(configFile),
 		},
 	];
 }

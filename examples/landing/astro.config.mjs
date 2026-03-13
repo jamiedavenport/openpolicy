@@ -8,7 +8,6 @@ export default defineConfig({
 	vite: {
 		plugins: [
 			openPolicy({
-				config: "openpolicy.ts",
 				formats: ["markdown", "html"],
 				outDir: "src/policies",
 			}),
