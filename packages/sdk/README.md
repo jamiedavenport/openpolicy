@@ -52,24 +52,26 @@ export default defineConfig({
 
 ```ts
 // terms.config.ts
-import { defineTermsOfService } from "@openpolicy/sdk";
+import { defineConfig } from "@openpolicy/sdk";
 
-export default defineTermsOfService({
-  effectiveDate: "2026-01-01",
+export default defineConfig({
   company: {
     name: "Acme",
     legalName: "Acme, Inc.",
     address: "123 Main St, San Francisco, CA 94105",
     contact: "legal@acme.com",
   },
-  acceptance: { methods: ["using the service", "creating an account"] },
-  eligibility: { minimumAge: 13 },
-  disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
-  limitationOfLiability: { excludesIndirectDamages: true },
-  governingLaw: { jurisdiction: "Delaware, USA" },
-  changesPolicy: {
-    noticeMethod: "email or prominent notice on the website",
-    noticePeriodDays: 30,
+  terms: {
+    effectiveDate: "2026-01-01",
+    acceptance: { methods: ["using the service", "creating an account"] },
+    eligibility: { minimumAge: 13 },
+    disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
+    limitationOfLiability: { excludesIndirectDamages: true },
+    governingLaw: { jurisdiction: "Delaware, USA" },
+    changesPolicy: {
+      noticeMethod: "email or prominent notice on the website",
+      noticePeriodDays: 30,
+    },
   },
 });
 ```

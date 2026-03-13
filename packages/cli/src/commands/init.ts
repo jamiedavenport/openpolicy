@@ -106,53 +106,55 @@ function renderTermsConfig(values: {
 }): string {
 	const today = new Date().toISOString().slice(0, 10);
 
-	return `import { defineTermsOfService } from "@openpolicy/sdk";
+	return `import { defineConfig } from "@openpolicy/sdk";
 
-export default defineTermsOfService({
-  effectiveDate: "${today}",
+export default defineConfig({
   company: {
     name: ${JSON.stringify(values.companyName)},
     legalName: ${JSON.stringify(values.legalName)},
     address: ${JSON.stringify(values.address)},
     contact: ${JSON.stringify(values.contact)},
   },
-  acceptance: {
-    methods: ["using the service", "creating an account"],
-  },
-  eligibility: {
-    minimumAge: 13,
-  },
-  accounts: {
-    registrationRequired: false,
-    userResponsibleForCredentials: true,
-    companyCanTerminate: true,
-  },
-  prohibitedUses: [
-    "Violating any applicable laws or regulations",
-    "Infringing on intellectual property rights",
-    "Transmitting harmful or malicious content",
-  ],
-  intellectualProperty: {
-    companyOwnsService: true,
-    usersMayNotCopy: true,
-  },
-  termination: {
-    companyCanTerminate: true,
-    userCanTerminate: true,
-  },
-  disclaimers: {
-    serviceProvidedAsIs: true,
-    noWarranties: true,
-  },
-  limitationOfLiability: {
-    excludesIndirectDamages: true,
-  },
-  governingLaw: {
-    jurisdiction: ${JSON.stringify(values.jurisdiction)},
-  },
-  changesPolicy: {
-    noticeMethod: "email or prominent notice on our website",
-    noticePeriodDays: 30,
+  terms: {
+    effectiveDate: "${today}",
+    acceptance: {
+      methods: ["using the service", "creating an account"],
+    },
+    eligibility: {
+      minimumAge: 13,
+    },
+    accounts: {
+      registrationRequired: false,
+      userResponsibleForCredentials: true,
+      companyCanTerminate: true,
+    },
+    prohibitedUses: [
+      "Violating any applicable laws or regulations",
+      "Infringing on intellectual property rights",
+      "Transmitting harmful or malicious content",
+    ],
+    intellectualProperty: {
+      companyOwnsService: true,
+      usersMayNotCopy: true,
+    },
+    termination: {
+      companyCanTerminate: true,
+      userCanTerminate: true,
+    },
+    disclaimers: {
+      serviceProvidedAsIs: true,
+      noWarranties: true,
+    },
+    limitationOfLiability: {
+      excludesIndirectDamages: true,
+    },
+    governingLaw: {
+      jurisdiction: ${JSON.stringify(values.jurisdiction)},
+    },
+    changesPolicy: {
+      noticeMethod: "email or prominent notice on our website",
+      noticePeriodDays: 30,
+    },
   },
 });
 `;

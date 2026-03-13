@@ -12,7 +12,7 @@ A minimal Next.js app showing how to use the `@openpolicy/cli` to generate polic
 
 ```
 policy.config.ts         ← defineConfig() — privacy policy definition
-terms.config.ts          ← defineTermsOfService() — terms of service definition
+terms.config.ts          ← defineConfig() — terms of service definition
 public/policies/         ← generated output (privacy-policy.html, terms-of-service.html)
 ```
 
