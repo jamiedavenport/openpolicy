@@ -1,3 +1,5 @@
+[![OpenPolicy](https://openpolicy.sh/og.png)](https://openpolicy.sh)
+
 # OpenPolicy
 
 Policy-as-code framework for generating legal agreements from TypeScript.
