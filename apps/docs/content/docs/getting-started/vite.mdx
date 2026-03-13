@@ -8,12 +8,50 @@ The `@openpolicy/vite` package provides a Vite plugin that compiles your policy 
 ## Installation
 
 ```sh
-bun add -D @openpolicy/vite
+bun add -D @openpolicy/vite @openpolicy/sdk
 ```
+
+## Create your config
+
+Create an `openpolicy.ts` at the root of your project using `defineConfig()` from `@openpolicy/sdk`:
+
+```ts
+// openpolicy.ts
+import { defineConfig } from "@openpolicy/sdk";
+
+export default defineConfig({
+  company: {
+    name: "Acme Inc.",
+    legalName: "Acme Corporation",
+    address: "123 Main St, Springfield, USA",
+    contact: "privacy@acme.com",
+  },
+  privacy: {
+    effectiveDate: "2026-01-01",
+    dataCollected: {
+      "Account Information": ["Name", "Email address"],
+      "Usage Data": ["Pages visited", "Browser type", "IP address"],
+    },
+    legalBasis: "Legitimate interests and consent",
+    retention: { "Account data": "Until account deletion" },
+    cookies: { essential: true, analytics: false, marketing: false },
+    thirdParties: [],
+    userRights: ["access", "erasure"],
+    jurisdictions: ["us", "eu"],
+  },
+  terms: {
+    effectiveDate: "2026-01-01",
+    acceptance: { methods: ["using the service", "creating an account"] },
+    governingLaw: { jurisdiction: "Delaware, USA" },
+  },
+});
+```
+
+See the [openpolicy.ts reference →](/docs/reference/openpolicy-config) for all available fields.
 
 ## Setup
 
-Add `openPolicy()` to the `plugins` array in your Vite config:
+Add `openPolicy()` to the `plugins` array in your Vite config. When no options are passed, the plugin looks for `openpolicy.ts` by default:
 
 ```ts
 // vite.config.ts
@@ -21,33 +59,70 @@ import { defineConfig } from "vite";
 import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [
-    openPolicy({
-      configs: ["privacy.config.ts", "terms.config.ts"],
-      formats: ["markdown", "html"],
-      outDir: "public/policies",
-    }),
-  ],
+  plugins: [openPolicy()],
 });
+```
+
+To customize the output location or formats, pass options explicitly:
+
+```ts
+openPolicy({
+  formats: ["markdown", "html"],
+  outDir: "public/policies",
+})
 ```
 
 ## Options
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `configs` | `PolicyConfigEntry[]` | — | One or more policy configs to compile. Policy type is auto-detected from the filename (`"terms"` → terms of service, otherwise privacy). Each entry is a filename string or `{ config: string; type?: "privacy" \| "terms" }` for an explicit override. |
+| `configs` | `PolicyConfigEntry[]` | — | One or more policy config files to compile. Each entry is a filename string or `{ config: string; type?: "privacy" \| "terms" \| "cookie" }`. Defaults to `openpolicy.ts` when omitted. |
 | `formats` | `OutputFormat[]` | `["markdown"]` | Output formats: `"markdown"` \| `"html"` |
 | `outDir` | `string` | `"public/policies"` | Output directory, relative to the Vite root |
-| `config` | `string` | `"privacy.config.ts"` / `"terms.config.ts"` | _(Legacy)_ Single config path. Use `configs` instead. |
-| `type` | `"privacy" \| "terms"` | `"privacy"` | _(Legacy)_ Policy type for the single `config` option. |
+| `config` | `string` | — | _(Legacy)_ Single config path. Use `configs` instead. |
+| `type` | `"privacy" \| "terms" \| "cookie"` | — | _(Legacy)_ Policy type for the single `config` option. |
+
+## Type auto-detection
+
+When passing filenames to `configs`, the policy type is inferred from the filename:
+
+| Filename contains | Detected type |
+|---|---|
+| `"cookie"` | `cookie` |
+| `"terms"` | `terms` |
+| anything else | `privacy` |
+
+Use `{ config: "legal.config.ts", type: "terms" }` to override explicitly.
+
+## Unified config
+
+When the plugin loads a file that exports a `defineConfig()` result, it automatically compiles all sections present — `privacy`, `terms`, and `cookie` — in a single pass. You don't need to list them separately:
+
+```ts
+// generates privacy-policy.md, terms-of-service.md, and cookie-policy.md
+openPolicy({ formats: ["markdown"], outDir: "public/policies" })
+```
+
+To use separate files for each policy type instead, pass them via `configs`:
+
+```ts
+openPolicy({
+  configs: [
+    "privacy.config.ts",
+    { config: "terms.config.ts", type: "terms" },
+  ],
+  formats: ["markdown", "html"],
+  outDir: "public/policies",
+})
+```
 
 ## Scaffold
 
-If a config file doesn't exist when Vite starts, the plugin creates a starter config at that path with placeholder content. The scaffold template matches the detected type — `definePrivacyPolicy()` for privacy, `defineTermsOfService()` for terms. Edit the file and restart Vite to generate your first policy.
+If a config file doesn't exist when Vite starts, the plugin creates a starter config at that path with placeholder content. Edit the file and save — the dev server picks up the changes automatically.
 
 ## Build mode
 
-During `vite build`, the plugin runs `buildStart` and writes all policy files to `outDir` before Vite processes other assets. Files in `public/` are copied to `dist/` automatically by Vite.
+During `vite build`, the plugin writes all policy files to `outDir` before Vite processes other assets. Files in `public/` are copied to `dist/` automatically by Vite.
 
 ## Dev mode
 
@@ -59,57 +134,16 @@ During `vite dev`, the plugin:
 
 Errors during regeneration are logged to the console but don't crash the dev server.
 
-## Astro
-
-For Astro projects, use the dedicated [`@openpolicy/astro`](/docs/getting-started/astro) integration instead. It wraps this Vite plugin and plugs into Astro's first-class integration API.
-
 ## Output
 
-Output filenames are determined by the detected policy type:
+Output filenames are determined by the policy type:
 
 | Policy type | Output filenames |
 |---|---|
 | `"privacy"` | `privacy-policy.md`, `privacy-policy.html` |
 | `"terms"` | `terms-of-service.md`, `terms-of-service.html` |
+| `"cookie"` | `cookie-policy.md`, `cookie-policy.html` |
 
-Given `configs: ["privacy.config.ts", "terms.config.ts"]`, `formats: ["markdown", "html"]`, and `outDir: "public/policies"`, the plugin writes:
+## Astro
 
-```
-public/policies/
-  privacy-policy.md
-  privacy-policy.html
-  terms-of-service.md
-  terms-of-service.html
-```
-
-## Generating both policy types
-
-Pass both configs to a single `openPolicy()` call via the `configs` array. Policy type is auto-detected from each filename:
-
-```ts
-// vite.config.ts
-export default defineConfig({
-  plugins: [
-    openPolicy({
-      configs: ["privacy.config.ts", "terms.config.ts"],
-      formats: ["markdown", "html"],
-      outDir: "src/policies",
-    }),
-  ],
-});
-```
-
-This writes `privacy-policy.md`, `privacy-policy.html`, `terms-of-service.md`, and `terms-of-service.html` to `src/policies/`.
-
-If a filename doesn't follow the convention, pass an explicit `type`:
-
-```ts
-openPolicy({
-  configs: [
-    "privacy.config.ts",
-    { config: "legal.config.ts", type: "terms" },
-  ],
-  formats: ["markdown", "html"],
-  outDir: "src/policies",
-});
-```
+For Astro projects, use the dedicated [`@openpolicy/astro`](/docs/getting-started/astro) integration instead. It wraps this Vite plugin and plugs into Astro's first-class integration API.

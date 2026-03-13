@@ -14,33 +14,44 @@ bun add -D @openpolicy/cli
 
 ## Create your config
 
-```ts
-// policy.config.ts
-import { definePrivacyPolicy } from "@openpolicy/sdk";
+Create an `openpolicy.ts` at the root of your project using `defineConfig()`:
 
-export default definePrivacyPolicy({
-  effectiveDate: "2026-01-01",
+```ts
+// openpolicy.ts
+import { defineConfig } from "@openpolicy/sdk";
+
+export default defineConfig({
   company: {
     name: "Acme Inc.",
     legalName: "Acme Corporation",
     address: "123 Main St, Springfield, USA",
     contact: "privacy@acme.com",
   },
-  dataCollected: {
-    "Account Information": ["Name", "Email address"],
-    "Usage Data": ["Pages visited", "Browser type", "IP address"],
+  privacy: {
+    effectiveDate: "2026-01-01",
+    dataCollected: {
+      "Account Information": ["Name", "Email address"],
+      "Usage Data": ["Pages visited", "Browser type", "IP address"],
+    },
+    legalBasis: "Legitimate interests and consent",
+    retention: {
+      "Account data": "Until account deletion",
+      "Usage logs": "90 days",
+    },
+    cookies: { essential: true, analytics: false, marketing: false },
+    thirdParties: [],
+    userRights: ["access", "erasure", "rectification", "portability"],
+    jurisdictions: ["us", "eu"],
   },
-  legalBasis: "Legitimate interests and consent",
-  retention: {
-    "Account data": "Until account deletion",
-    "Usage logs": "90 days",
+  terms: {
+    effectiveDate: "2026-01-01",
+    acceptance: { methods: ["using the service", "creating an account"] },
+    governingLaw: { jurisdiction: "Delaware, USA" },
   },
-  cookies: { essential: true, analytics: false, marketing: false },
-  thirdParties: [],
-  userRights: ["access", "erasure", "rectification", "portability"],
-  jurisdictions: ["us", "eu"],
 });
 ```
+
+See the [openpolicy.ts reference →](/docs/reference/openpolicy-config) for all available fields.
 
 ## Generate policy files
 
@@ -49,7 +60,7 @@ Add a script to `package.json` and run it before your build:
 ```json
 {
   "scripts": {
-    "generate:policy": "openpolicy generate ./policy.config.ts --format markdown,html --out ./src/policies",
+    "generate:policy": "openpolicy generate --format markdown,html --out ./src/policies",
     "build": "bun run generate:policy && next build"
   }
 }
@@ -59,7 +70,15 @@ Add a script to `package.json` and run it before your build:
 bun run generate:policy
 ```
 
-This writes `src/policies/privacy-policy.md` and `src/policies/privacy-policy.html`.
+This writes all policy files for each section defined in `openpolicy.ts`:
+
+```
+src/policies/
+  privacy-policy.md
+  privacy-policy.html
+  terms-of-service.md
+  terms-of-service.html
+```
 
 ## Render in a page
 

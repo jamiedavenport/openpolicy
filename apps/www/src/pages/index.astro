@@ -8,7 +8,7 @@ import virentis from "../assets/virentis.png";
 import installCmd from "../snippets/install.sh?raw";
 import policyTs from "../snippets/policy.ts?raw";
 import viteConfig from "../snippets/vite.config.ts?raw";
-import privacyRoute from "../snippets/privacy-policy.astro?raw";
+import privacyRoute from "../snippets/privacy-policy.tsx?raw";
 import llmPrompt from "../snippets/prompt.txt?raw";
 ---
 
@@ -92,7 +92,7 @@ import llmPrompt from "../snippets/prompt.txt?raw";
     <div class="border border-gray-200 mb-4 bg-gray-100">
       <div class="flex border-b border-gray-200">
         <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
-          policy.ts
+          openpolicy.ts
         </div>
       </div>
       <Code code={policyTs} lang="ts" theme="github-light" class="p-4 text-sm" />
@@ -110,10 +110,10 @@ import llmPrompt from "../snippets/prompt.txt?raw";
     <div class="border border-gray-200 bg-gray-100">
       <div class="flex border-b border-gray-200">
         <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
-          pages/privacy-policy.astro
+          pages/privacy-policy.tsx
         </div>
       </div>
-      <Code code={privacyRoute} lang="astro" theme="github-light" class="p-4 text-sm" />
+      <Code code={privacyRoute} lang="tsx" theme="github-light" class="p-4 text-sm" />
     </div>
   </section>
 
@@ -122,7 +122,7 @@ import llmPrompt from "../snippets/prompt.txt?raw";
       LLMS.md
     </h2>
     <p class="mb-4">
-      OpenPolicy ships an <code>llms.txt</code> so AI coding assistants — Claude, Cursor, Copilot — understand the SDK. Paste this prompt into your assistant to generate a <code>policy.ts</code> from your existing codebase:
+      OpenPolicy ships an <code>llms.txt</code> so AI coding assistants — Claude, Cursor, Copilot — understand the SDK. Paste this prompt into your assistant to generate an <code>openpolicy.ts</code> from your existing codebase:
     </p>
     <div class="border border-gray-200 bg-gray-100">
       <div class="flex items-center justify-between border-b border-gray-200">

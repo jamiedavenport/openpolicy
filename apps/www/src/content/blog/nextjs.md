@@ -16,91 +16,81 @@ bun add @openpolicy/sdk
 bun add -D @openpolicy/cli
 ```
 
-## Define your privacy policy
+## Define your policies
+
+Create a single `openpolicy.ts` at the root of your project. The unified `defineConfig()` lets you define all policies in one file with a shared `company` block:
 
 ```ts
-// policy.config.ts
-import { definePrivacyPolicy } from "@openpolicy/sdk";
+// openpolicy.ts
+import { defineConfig } from "@openpolicy/sdk";
 
-export default definePrivacyPolicy({
-  effectiveDate: "2026-03-09",
+export default defineConfig({
   company: {
     name: "Acme",
     legalName: "Acme, Inc.",
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  dataCollected: {
-    "Account information": ["Email address", "Display name"],
-    "Usage data": ["Pages visited", "Session duration"],
+  privacy: {
+    effectiveDate: "2026-03-09",
+    dataCollected: {
+      "Account information": ["Email address", "Display name"],
+      "Usage data": ["Pages visited", "Session duration"],
+    },
+    legalBasis: "Legitimate interests and user consent",
+    retention: {
+      "Account data": "Until account deletion",
+      "Analytics data": "13 months",
+    },
+    cookies: {
+      essential: true,
+      analytics: true,
+      marketing: false,
+    },
+    thirdParties: [
+      { name: "Vercel", purpose: "Hosting and edge delivery" },
+      { name: "Plausible", purpose: "Privacy-friendly analytics" },
+    ],
+    userRights: ["access", "erasure", "portability", "objection"],
+    jurisdictions: ["us", "eu"],
   },
-  legalBasis: "Legitimate interests and user consent",
-  retention: {
-    "Account data": "Until account deletion",
-    "Analytics data": "13 months",
-  },
-  cookies: {
-    essential: true,
-    analytics: true,
-    marketing: false,
-  },
-  thirdParties: [
-    { name: "Vercel", purpose: "Hosting and edge delivery" },
-    { name: "Plausible", purpose: "Privacy-friendly analytics" },
-  ],
-  userRights: ["access", "erasure", "portability", "objection"],
-  jurisdictions: ["us", "eu"],
-});
-```
-
-## Define your terms of service
-
-```ts
-// terms.config.ts
-import { defineTermsOfService } from "@openpolicy/sdk";
-
-export default defineTermsOfService({
-  effectiveDate: "2026-03-09",
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "legal@acme.com",
-  },
-  acceptance: {
-    methods: ["using the service", "creating an account"],
-  },
-  eligibility: {
-    minimumAge: 13,
-  },
-  accounts: {
-    registrationRequired: true,
-    userResponsibleForCredentials: true,
-    companyCanTerminate: true,
-  },
-  prohibitedUses: [
-    "Violating any applicable laws or regulations",
-    "Attempting to gain unauthorized access to any part of the service",
-    "Transmitting malware or malicious code",
-  ],
-  intellectualProperty: {
-    companyOwnsService: true,
-    usersMayNotCopy: true,
-  },
-  disclaimers: {
-    serviceProvidedAsIs: true,
-    noWarranties: true,
-  },
-  limitationOfLiability: {
-    excludesIndirectDamages: true,
-    liabilityCap: "the amount paid by the user in the past 12 months",
-  },
-  governingLaw: {
-    jurisdiction: "Delaware, USA",
-  },
-  changesPolicy: {
-    noticeMethod: "email or prominent notice on the website",
-    noticePeriodDays: 30,
+  terms: {
+    effectiveDate: "2026-03-09",
+    acceptance: {
+      methods: ["using the service", "creating an account"],
+    },
+    eligibility: {
+      minimumAge: 13,
+    },
+    accounts: {
+      registrationRequired: true,
+      userResponsibleForCredentials: true,
+      companyCanTerminate: true,
+    },
+    prohibitedUses: [
+      "Violating any applicable laws or regulations",
+      "Attempting to gain unauthorized access to any part of the service",
+      "Transmitting malware or malicious code",
+    ],
+    intellectualProperty: {
+      companyOwnsService: true,
+      usersMayNotCopy: true,
+    },
+    disclaimers: {
+      serviceProvidedAsIs: true,
+      noWarranties: true,
+    },
+    limitationOfLiability: {
+      excludesIndirectDamages: true,
+      liabilityCap: "the amount paid by the user in the past 12 months",
+    },
+    governingLaw: {
+      jurisdiction: "Delaware, USA",
+    },
+    changesPolicy: {
+      noticeMethod: "email or prominent notice on the website",
+      noticePeriodDays: 30,
+    },
   },
 });
 ```
@@ -116,7 +106,7 @@ export default defineTermsOfService({
 }
 ```
 
-The `prebuild` script runs automatically before `next build`. Pass both config paths as a comma-separated list — the CLI generates both policies in a single invocation and skips any file that doesn't exist yet.
+The `prebuild` script runs automatically before `next build`. With a unified `openpolicy.ts`, a single `openpolicy generate` invocation compiles all sections in one pass.
 
 Run it manually to generate the files for the first time:
 

@@ -1,0 +1,257 @@
+---
+title: openpolicy.ts
+description: Reference for the unified OpenPolicy configuration file
+---
+
+The `openpolicy.ts` file (or `openpolicy.config.ts`) is the recommended way to define all of your policies in one place. It uses `defineConfig()` from `@openpolicy/sdk` to declare a shared `company` block alongside optional `privacy`, `terms`, and `cookie` sections.
+
+```ts
+import { defineConfig } from "@openpolicy/sdk";
+
+export default defineConfig({
+  company: { ... },
+  privacy: { ... },
+  terms: { ... },
+  cookie: { ... },
+});
+```
+
+The Vite plugin and CLI both accept this file directly. At build/generate time, each section that is present produces its own output file — sections you omit are skipped.
+
+---
+
+## company
+
+**Required.** Shared company information reused across all policy sections.
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | `string` | Public-facing company name |
+| `legalName` | `string` | Full legal entity name |
+| `address` | `string` | Business address |
+| `contact` | `string` | Privacy/legal contact email or URL |
+
+```ts
+company: {
+  name: "Acme Inc.",
+  legalName: "Acme Corporation",
+  address: "123 Main St, Springfield, USA",
+  contact: "privacy@acme.com",
+},
+```
+
+---
+
+## privacy
+
+**Optional.** Compiles to `privacy-policy.md` / `privacy-policy.html`.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `effectiveDate` | `string` | Yes | ISO date string (e.g. `"2026-01-01"`) |
+| `dataCollected` | `Record<string, string[]>` | Yes | Categories of data collected and examples |
+| `legalBasis` | `string` | Yes | Legal basis for processing (e.g. `"Legitimate interests and consent"`) |
+| `retention` | `Record<string, string>` | Yes | Retention period per data category |
+| `cookies` | `{ essential, analytics, marketing }` | Yes | Which cookie types are in use |
+| `thirdParties` | `{ name, purpose }[]` | Yes | Third-party services that receive data |
+| `userRights` | `string[]` | Yes | Rights afforded to users (e.g. `"access"`, `"erasure"`) |
+| `jurisdictions` | `Jurisdiction[]` | Yes | Applicable jurisdictions: `"us"`, `"eu"`, `"ca"`, `"au"`, `"nz"`, `"other"` |
+| `children` | `{ underAge, noticeUrl? }` | No | Children's privacy policy details |
+
+```ts
+privacy: {
+  effectiveDate: "2026-01-01",
+  dataCollected: {
+    "Account Information": ["Name", "Email address"],
+    "Usage Data": ["Pages visited", "IP address"],
+  },
+  legalBasis: "Legitimate interests and consent",
+  retention: {
+    "Account data": "Until account deletion",
+    "Usage logs": "90 days",
+  },
+  cookies: {
+    essential: true,
+    analytics: false,
+    marketing: false,
+  },
+  thirdParties: [],
+  userRights: ["access", "erasure"],
+  jurisdictions: ["us", "eu"],
+},
+```
+
+---
+
+## terms
+
+**Optional.** Compiles to `terms-of-service.md` / `terms-of-service.html`.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `effectiveDate` | `string` | Yes | ISO date string |
+| `acceptance` | `{ methods: string[] }` | Yes | How users accept the terms |
+| `governingLaw` | `{ jurisdiction: string }` | Yes | Legal jurisdiction for disputes |
+| `eligibility` | `{ minimumAge, jurisdictionRestrictions? }` | No | Age and geographic requirements |
+| `accounts` | `{ registrationRequired, userResponsibleForCredentials, companyCanTerminate }` | No | Account management terms |
+| `prohibitedUses` | `string[]` | No | List of prohibited activities |
+| `userContent` | `{ usersOwnContent, licenseGrantedToCompany, licenseDescription?, companyCanRemoveContent }` | No | User-generated content terms |
+| `intellectualProperty` | `{ companyOwnsService, usersMayNotCopy }` | No | IP ownership terms |
+| `payments` | `{ hasPaidFeatures, refundPolicy?, priceChangesNotice? }` | No | Billing and payment terms |
+| `availability` | `{ noUptimeGuarantee, maintenanceWindows? }` | No | Service availability terms |
+| `termination` | `{ companyCanTerminate, userCanTerminate, effectOfTermination? }` | No | Termination conditions |
+| `disclaimers` | `{ serviceProvidedAsIs, noWarranties }` | No | Warranty disclaimers |
+| `limitationOfLiability` | `{ excludesIndirectDamages, liabilityCap? }` | No | Liability limits |
+| `indemnification` | `{ userIndemnifiesCompany, scope? }` | No | Indemnification terms |
+| `thirdPartyServices` | `{ name, purpose }[]` | No | Third-party services used |
+| `disputeResolution` | `{ method, venue?, classActionWaiver? }` | No | Dispute resolution method: `"arbitration"`, `"litigation"`, `"mediation"` |
+| `changesPolicy` | `{ noticeMethod, noticePeriodDays? }` | No | How users are notified of changes |
+| `privacyPolicyUrl` | `string` | No | Link to the privacy policy |
+
+```ts
+terms: {
+  effectiveDate: "2026-01-01",
+  acceptance: {
+    methods: ["using the service", "creating an account"],
+  },
+  eligibility: { minimumAge: 13 },
+  prohibitedUses: [
+    "Violating any applicable laws or regulations",
+    "Transmitting spam or malicious content",
+  ],
+  termination: {
+    companyCanTerminate: true,
+    userCanTerminate: true,
+  },
+  disclaimers: {
+    serviceProvidedAsIs: true,
+    noWarranties: true,
+  },
+  limitationOfLiability: {
+    excludesIndirectDamages: true,
+    liabilityCap: "Total liability shall not exceed $100 or amounts paid in the past 12 months.",
+  },
+  governingLaw: { jurisdiction: "Delaware, USA" },
+  changesPolicy: {
+    noticeMethod: "email or prominent notice on our website",
+    noticePeriodDays: 30,
+  },
+  privacyPolicyUrl: "/privacy",
+},
+```
+
+---
+
+## cookie
+
+**Optional.** Compiles to `cookie-policy.md` / `cookie-policy.html`.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `effectiveDate` | `string` | Yes | ISO date string |
+| `cookies` | `{ essential, analytics, functional, marketing }` | Yes | Which cookie categories are in use |
+| `jurisdictions` | `Jurisdiction[]` | Yes | Applicable jurisdictions |
+| `thirdParties` | `{ name, purpose, policyUrl? }[]` | No | Third-party cookie providers |
+| `trackingTechnologies` | `string[]` | No | Other tracking technologies in use (e.g. `"web beacons"`, `"local storage"`) |
+| `consentMechanism` | `{ hasBanner, hasPreferencePanel, canWithdraw }` | No | Consent UI details |
+
+```ts
+cookie: {
+  effectiveDate: "2026-01-01",
+  cookies: {
+    essential: true,
+    analytics: true,
+    functional: false,
+    marketing: false,
+  },
+  thirdParties: [
+    {
+      name: "Google Analytics",
+      purpose: "Website analytics and performance monitoring",
+      policyUrl: "https://policies.google.com/privacy",
+    },
+  ],
+  trackingTechnologies: ["web beacons", "local storage"],
+  consentMechanism: {
+    hasBanner: true,
+    hasPreferencePanel: true,
+    canWithdraw: true,
+  },
+  jurisdictions: ["us", "eu"],
+},
+```
+
+---
+
+## Full example
+
+```ts
+import { defineConfig } from "@openpolicy/sdk";
+
+export default defineConfig({
+  company: {
+    name: "Acme Inc.",
+    legalName: "Acme Corporation",
+    address: "123 Main St, Springfield, USA",
+    contact: "privacy@acme.com",
+  },
+  privacy: {
+    effectiveDate: "2026-01-01",
+    dataCollected: {
+      "Account Information": ["Name", "Email address"],
+      "Usage Data": ["Pages visited", "Browser type", "IP address"],
+    },
+    legalBasis: "Legitimate interests and consent",
+    retention: {
+      "Account data": "Until account deletion",
+      "Usage logs": "90 days",
+    },
+    cookies: { essential: true, analytics: false, marketing: false },
+    thirdParties: [],
+    userRights: ["access", "erasure"],
+    jurisdictions: ["us", "eu"],
+  },
+  cookie: {
+    effectiveDate: "2026-01-01",
+    cookies: { essential: true, analytics: true, functional: false, marketing: false },
+    thirdParties: [
+      {
+        name: "Google Analytics",
+        purpose: "Website analytics and performance monitoring",
+        policyUrl: "https://policies.google.com/privacy",
+      },
+    ],
+    trackingTechnologies: ["web beacons", "local storage"],
+    consentMechanism: { hasBanner: true, hasPreferencePanel: true, canWithdraw: true },
+    jurisdictions: ["us", "eu"],
+  },
+  terms: {
+    effectiveDate: "2026-01-01",
+    acceptance: { methods: ["using the service", "creating an account", "clicking 'I Agree'"] },
+    eligibility: { minimumAge: 13 },
+    accounts: {
+      registrationRequired: false,
+      userResponsibleForCredentials: true,
+      companyCanTerminate: true,
+    },
+    prohibitedUses: [
+      "Violating any applicable laws or regulations",
+      "Infringing on the intellectual property rights of others",
+    ],
+    intellectualProperty: { companyOwnsService: true, usersMayNotCopy: true },
+    termination: {
+      companyCanTerminate: true,
+      userCanTerminate: true,
+      effectOfTermination: "Your right to use the service ceases immediately.",
+    },
+    disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
+    limitationOfLiability: {
+      excludesIndirectDamages: true,
+      liabilityCap: "Total liability shall not exceed the greater of $100 or amounts paid in the past 12 months.",
+    },
+    governingLaw: { jurisdiction: "Delaware, USA" },
+    changesPolicy: { noticeMethod: "email or prominent notice", noticePeriodDays: 30 },
+    privacyPolicyUrl: "/privacy",
+  },
+});
+```

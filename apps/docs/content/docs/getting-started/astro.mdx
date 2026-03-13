@@ -25,9 +25,47 @@ Or install manually:
 bun add -D @openpolicy/astro @openpolicy/vite
 ```
 
+## Create your config
+
+Create an `openpolicy.ts` at the root of your project using `defineConfig()`:
+
+```ts
+// openpolicy.ts
+import { defineConfig } from "@openpolicy/sdk";
+
+export default defineConfig({
+  company: {
+    name: "Acme Inc.",
+    legalName: "Acme Corporation",
+    address: "123 Main St, Springfield, USA",
+    contact: "privacy@acme.com",
+  },
+  privacy: {
+    effectiveDate: "2026-01-01",
+    dataCollected: {
+      "Account Information": ["Name", "Email address"],
+      "Usage Data": ["Pages visited", "Browser type", "IP address"],
+    },
+    legalBasis: "Legitimate interests and consent",
+    retention: { "Account data": "Until account deletion" },
+    cookies: { essential: true, analytics: false, marketing: false },
+    thirdParties: [],
+    userRights: ["access", "erasure"],
+    jurisdictions: ["us", "eu"],
+  },
+  terms: {
+    effectiveDate: "2026-01-01",
+    acceptance: { methods: ["using the service", "creating an account"] },
+    governingLaw: { jurisdiction: "Delaware, USA" },
+  },
+});
+```
+
+See the [openpolicy.ts reference →](/docs/reference/openpolicy-config) for all available fields.
+
 ## Setup
 
-Add `openPolicy()` to the `integrations` array in your Astro config:
+Add `openPolicy()` to the `integrations` array in your Astro config. When no options are passed, the integration looks for `openpolicy.ts` by default:
 
 ```js
 // astro.config.mjs
@@ -35,12 +73,16 @@ import { defineConfig } from "astro/config";
 import { openPolicy } from "@openpolicy/astro";
 
 export default defineConfig({
+  integrations: [openPolicy()],
+});
+```
+
+To customize the output location or formats:
+
+```js
+export default defineConfig({
   integrations: [
     openPolicy({
-      configs: [
-        "privacy.config.ts",
-        { config: "terms.config.ts", type: "terms" },
-      ],
       formats: ["markdown"],
       outDir: "src/generated/policies",
     }),
@@ -56,44 +98,38 @@ The integration accepts the same options as the Vite plugin:
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `configs` | `PolicyConfigEntry[]` | — | One or more policy configs to compile. Policy type is auto-detected from the filename (`"terms"` → terms of service, otherwise privacy). Each entry is a filename string or `{ config: string; type?: "privacy" \| "terms" }` for an explicit override. |
+| `configs` | `PolicyConfigEntry[]` | — | One or more policy config files to compile. Each entry is a filename string or `{ config: string; type?: "privacy" \| "terms" \| "cookie" }`. Defaults to `openpolicy.ts` when omitted. |
 | `formats` | `OutputFormat[]` | `["markdown"]` | Output formats: `"markdown"` \| `"html"` |
 | `outDir` | `string` | `"public/policies"` | Output directory, relative to the Astro root |
-| `config` | `string` | `"privacy.config.ts"` / `"terms.config.ts"` | _(Legacy)_ Single config path. Use `configs` instead. |
-| `type` | `"privacy" \| "terms"` | `"privacy"` | _(Legacy)_ Policy type for the single `config` option. |
+| `config` | `string` | — | _(Legacy)_ Single config path. Use `configs` instead. |
+| `type` | `"privacy" \| "terms" \| "cookie"` | — | _(Legacy)_ Policy type for the single `config` option. |
 
-See the [Vite plugin docs](/docs/getting-started/vite) for full details on each option.
+See the [Vite plugin docs →](/docs/getting-started/vite) for full details on each option.
 
-## Example
+## Unified config
 
-A full `astro.config.mjs` generating both a privacy policy and terms of service as Markdown:
-
-```js
-// astro.config.mjs
-import { defineConfig } from "astro/config";
-import { openPolicy } from "@openpolicy/astro";
-
-export default defineConfig({
-  integrations: [
-    openPolicy({
-      configs: [
-        "privacy.config.ts",
-        { config: "terms.config.ts", type: "terms" },
-      ],
-      formats: ["markdown"],
-      outDir: "src/generated/policies",
-    }),
-  ],
-});
-```
-
-After the next build (or on save in dev), the integration writes:
+When the integration loads a file that exports a `defineConfig()` result, it automatically compiles all sections present — `privacy`, `terms`, and `cookie` — in a single pass:
 
 ```
 src/generated/policies/
   privacy-policy.md
   terms-of-service.md
 ```
+
+To use separate files for each policy type, pass them via `configs`:
+
+```js
+openPolicy({
+  configs: [
+    "privacy.config.ts",
+    { config: "terms.config.ts", type: "terms" },
+  ],
+  formats: ["markdown"],
+  outDir: "src/generated/policies",
+})
+```
+
+## Rendering policies
 
 Because the files land inside `src/`, Astro can import them directly as Markdown components:
 
