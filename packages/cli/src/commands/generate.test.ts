@@ -21,3 +21,9 @@ test("generateCommand has out arg", () => {
 test("generateCommand has watch arg", () => {
 	expect((generateCommand.args as ArgsDef)?.watch?.type).toBe("boolean");
 });
+
+test("generateCommand default config includes openpolicy.ts", () => {
+	const defaultConfig = (generateCommand.args as ArgsDef)?.config
+		?.default as string;
+	expect(defaultConfig).toContain("./openpolicy.ts");
+});

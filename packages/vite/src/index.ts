@@ -1,12 +1,15 @@
 import { access, mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import type {
+	OpenPolicyConfig,
 	OutputFormat,
 	PrivacyPolicyConfig,
 	TermsOfServiceConfig,
 } from "@openpolicy/core";
 import {
 	compilePolicy,
+	expandOpenPolicyConfig,
+	isOpenPolicyConfig,
 	validatePrivacyPolicy,
 	validateTermsOfService,
 } from "@openpolicy/core";
@@ -43,11 +46,16 @@ function normalizeEntries(
 		});
 	}
 	const configFile =
-		options.type === "terms" ? "terms.config.ts" : "privacy.config.ts";
+		options.config ??
+		(options.type === "terms"
+			? "terms.config.ts"
+			: options.type === "privacy"
+				? "privacy.config.ts"
+				: "openpolicy.ts");
 	return [
 		{
-			configFile: options.config ?? configFile,
-			type: options.type ?? "privacy",
+			configFile,
+			type: options.type ?? detectType(configFile),
 		},
 	];
 }
@@ -152,6 +160,34 @@ export async function generatePolicies(
 		throw new Error(
 			`[openpolicy] Config must export a non-null object: ${configPath}`,
 		);
+	}
+
+	if (isOpenPolicyConfig(config)) {
+		const inputs = expandOpenPolicyConfig(config as OpenPolicyConfig);
+		await mkdir(outDir, { recursive: true });
+		for (const input of inputs) {
+			const issues =
+				input.type === "terms"
+					? validateTermsOfService(input)
+					: validatePrivacyPolicy(input);
+			for (const issue of issues) {
+				if (issue.level === "error")
+					throw new Error(`[openpolicy] ${issue.message}`);
+				console.warn(`[openpolicy] Warning: ${issue.message}`);
+			}
+			const results = compilePolicy(input, { formats });
+			const outputFilename =
+				input.type === "terms" ? "terms-of-service" : "privacy-policy";
+			for (const result of results) {
+				const ext = result.format === "markdown" ? "md" : result.format;
+				await writeFile(
+					join(outDir, `${outputFilename}.${ext}`),
+					result.content,
+					"utf8",
+				);
+			}
+		}
+		return;
 	}
 
 	const issues =
