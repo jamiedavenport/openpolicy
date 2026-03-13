@@ -2,7 +2,7 @@
 
 > Astro integration for compiling [OpenPolicy](https://openpolicy.sh) policy documents at build time.
 
-A first-class Astro integration that compiles `definePrivacyPolicy()` and `defineTermsOfService()` configs to Markdown or HTML — on every build and on save in dev mode. Delegates to `@openpolicy/vite` under the hood.
+A first-class Astro integration that compiles `defineConfig()` and `defineTermsOfService()` configs to Markdown or HTML — on every build and on save in dev mode. Delegates to `@openpolicy/vite` under the hood.
 
 ## Install
 

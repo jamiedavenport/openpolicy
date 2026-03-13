@@ -1,7 +1,6 @@
 import type {
 	CookiePolicyConfig,
 	OpenPolicyConfig,
-	PrivacyPolicyConfig,
 	TermsOfServiceConfig,
 } from "@openpolicy/core";
 
@@ -13,12 +12,6 @@ export type {
 } from "@openpolicy/core";
 
 export function defineConfig(config: OpenPolicyConfig): OpenPolicyConfig {
-	return config;
-}
-
-export function definePrivacyPolicy(
-	config: PrivacyPolicyConfig,
-): PrivacyPolicyConfig {
 	return config;
 }
 

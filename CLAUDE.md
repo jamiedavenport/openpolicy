@@ -15,7 +15,7 @@ Default to using Bun instead of Node.js.
 
 This is a monorepo under `packages/`. Key packages:
 
-- `packages/sdk` — `@openpolicy/sdk`: public API — `definePrivacyPolicy()`, `defineTermsOfService()`, and related types
+- `packages/sdk` — `@openpolicy/sdk`: public API — `defineConfig()`, `defineTermsOfService()`, and related types
 - `packages/core` — `@openpolicy/core`: compilation engine; published to npm as a dependency of sdk and vite
 - `packages/vite` — `@openpolicy/vite`: Vite plugin (`openPolicy()`) that compiles policies at build time
 - `packages/cli` — `@openpolicy/cli`: CLI tool for generating policy documents outside of a Vite build
@@ -23,7 +23,7 @@ This is a monorepo under `packages/`. Key packages:
 ## Domain Concepts
 
 - **Policy types**: `"privacy"` (PrivacyPolicyConfig) and `"terms"` (TermsOfServiceConfig) — `PolicyInput` is a discriminated union
-- **Policy definition**: TypeScript object passed to `definePrivacyPolicy()` or `defineTermsOfService()` describing the policy content
+- **Policy definition**: TypeScript object passed to `defineConfig()` or `defineTermsOfService()` describing the policy content
 - **Compilation**: Policy definitions are compiled to HTML or Markdown — triggered either by the Vite plugin at build time or by `openpolicy generate` via the CLI
 - **Section builders**: Each section is a `(config) => PolicySection | null` function; `null` means the section is not applicable and is omitted
 - **Output filenames**: `privacy-policy.{ext}` for privacy, `terms-of-service.{ext}` for terms

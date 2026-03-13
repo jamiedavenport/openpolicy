@@ -19,9 +19,9 @@ Steps to reproduce the behavior:
 **Policy config (if applicable):**
 
 ```ts
-import { definePrivacyPolicy } from '@openpolicy/sdk'
+import { defineConfig } from '@openpolicy/sdk'
 
-export default definePrivacyPolicy({
+export default defineConfig({
   // ...
 })
 ```

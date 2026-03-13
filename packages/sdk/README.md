@@ -16,33 +16,35 @@ bun add @openpolicy/sdk
 ### Privacy policy
 
 ```ts
-// privacy.config.ts
-import { definePrivacyPolicy } from "@openpolicy/sdk";
+// openpolicy.ts
+import { defineConfig } from "@openpolicy/sdk";
 
-export default definePrivacyPolicy({
-  effectiveDate: "2026-01-01",
+export default defineConfig({
   company: {
     name: "Acme",
     legalName: "Acme, Inc.",
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  dataCollected: {
-    "Account information": ["Email address", "Display name"],
-    "Usage data": ["Pages visited", "Session duration"],
+  privacy: {
+    effectiveDate: "2026-01-01",
+    dataCollected: {
+      "Account information": ["Email address", "Display name"],
+      "Usage data": ["Pages visited", "Session duration"],
+    },
+    legalBasis: "Legitimate interests and user consent",
+    retention: {
+      "Account data": "Until account deletion",
+      "Analytics data": "13 months",
+    },
+    cookies: { essential: true, analytics: true, marketing: false },
+    thirdParties: [
+      { name: "Vercel", purpose: "Hosting" },
+      { name: "Plausible", purpose: "Privacy-friendly analytics" },
+    ],
+    userRights: ["access", "erasure", "portability"],
+    jurisdictions: ["us", "eu"],
   },
-  legalBasis: "Legitimate interests and user consent",
-  retention: {
-    "Account data": "Until account deletion",
-    "Analytics data": "13 months",
-  },
-  cookies: { essential: true, analytics: true, marketing: false },
-  thirdParties: [
-    { name: "Vercel", purpose: "Hosting" },
-    { name: "Plausible", purpose: "Privacy-friendly analytics" },
-  ],
-  userRights: ["access", "erasure", "portability"],
-  jurisdictions: ["us", "eu"],
 });
 ```
 

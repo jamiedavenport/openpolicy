@@ -66,28 +66,30 @@ function normalizeEntries(
 	];
 }
 
-const PRIVACY_SCAFFOLD_TEMPLATE = `import { definePrivacyPolicy } from "@openpolicy/sdk";
+const PRIVACY_SCAFFOLD_TEMPLATE = `import { defineConfig } from "@openpolicy/sdk";
 
-export default definePrivacyPolicy({
-  effectiveDate: "${new Date().toISOString().slice(0, 10)}",
+export default defineConfig({
   company: {
     name: "Your Company",
     legalName: "Your Company, Inc.",
     address: "123 Main St, City, State, ZIP",
     contact: "privacy@yourcompany.com",
   },
-  dataCollected: {
-    "Personal Information": ["Full name", "Email address"],
+  privacy: {
+    effectiveDate: "${new Date().toISOString().slice(0, 10)}",
+    dataCollected: {
+      "Personal Information": ["Full name", "Email address"],
+    },
+    legalBasis: "Legitimate interests and consent",
+    retention: {
+      "All personal data": "As long as necessary for the purposes described in this policy",
+    },
+    cookies: { essential: true, analytics: false, marketing: false },
+    thirdParties: [],
+    userRights: ["access", "erasure"],
+    jurisdictions: ["us"],
+    children: { underAge: 13, noticeUrl: "https://example.com/parental" },
   },
-  legalBasis: "Legitimate interests and consent",
-  retention: {
-    "All personal data": "As long as necessary for the purposes described in this policy",
-  },
-  cookies: { essential: true, analytics: false, marketing: false },
-  thirdParties: [],
-  userRights: ["access", "erasure"],
-  jurisdictions: ["us"],
-  children: { underAge: 13, noticeUrl: "https://example.com/parental" },
 });
 `;
 

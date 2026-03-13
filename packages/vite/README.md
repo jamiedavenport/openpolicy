@@ -2,7 +2,7 @@
 
 > Vite plugin for compiling [OpenPolicy](https://openpolicy.sh) policy documents at build time.
 
-Compiles `definePrivacyPolicy()` and `defineTermsOfService()` configs to Markdown or HTML automatically — on every build and on save in dev mode.
+Compiles `defineConfig()` and `defineTermsOfService()` configs to Markdown or HTML automatically — on every build and on save in dev mode.
 
 ## Install
 

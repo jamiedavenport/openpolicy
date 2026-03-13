@@ -13,7 +13,7 @@ A minimal TanStack Start (React + Vite) app showing how to use the `@openpolicy/
 
 ```
 vite.config.ts           ← openPolicy() plugin configured here
-policy.config.ts         ← definePrivacyPolicy() — privacy policy definition
+policy.config.ts         ← defineConfig() — privacy policy definition
 terms.config.ts          ← defineTermsOfService() — terms of service definition
 src/policies/            ← generated output (privacy-policy.html, terms-of-service.html)
 src/routes/privacy.tsx   ← /privacy route — renders generated HTML

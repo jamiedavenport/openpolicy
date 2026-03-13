@@ -33,7 +33,7 @@ describe("plugin structure", () => {
 // --- Group 2: Scaffold ---
 
 describe("writeScaffold", () => {
-	test("creates file with definePrivacyPolicy and today's date", async () => {
+	test("creates file with defineConfig and today's date", async () => {
 		const tmpDir = await mkdtemp(join(tmpdir(), "openpolicy-vite-scaffold-"));
 		try {
 			const configPath = join(tmpDir, "privacy.config.ts");
@@ -42,7 +42,7 @@ describe("writeScaffold", () => {
 			expect(existsSync(configPath)).toBe(true);
 
 			const content = await readFile(configPath, "utf8");
-			expect(content).toContain("definePrivacyPolicy");
+			expect(content).toContain("defineConfig");
 			expect(content).toContain(new Date().toISOString().slice(0, 10));
 			expect(content).toContain("effectiveDate");
 			expect(content).toContain("@openpolicy/sdk");

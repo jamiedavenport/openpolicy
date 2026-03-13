@@ -19,7 +19,7 @@ This is a Bun monorepo under `packages/`:
 
 | Package | Description |
 |---|---|
-| `packages/sdk` | `@openpolicy/sdk` — public API (`definePrivacyPolicy`, `defineTermsOfService`) |
+| `packages/sdk` | `@openpolicy/sdk` — public API (`defineConfig`, `defineTermsOfService`) |
 | `packages/core` | `@openpolicy/core` — compilation engine |
 | `packages/vite` | `@openpolicy/vite` — Vite plugin |
 | `packages/cli` | `@openpolicy/cli` — CLI tool |

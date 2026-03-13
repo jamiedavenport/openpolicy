@@ -13,7 +13,7 @@ A minimal Astro static site showing how to integrate OpenPolicy using the `@open
 
 ```
 astro.config.mjs      ← openPolicy() plugin configured here
-policy.config.ts      ← definePrivacyPolicy() — privacy policy definition
+policy.config.ts      ← defineConfig() — privacy policy definition
 terms.config.ts       ← defineTermsOfService() — terms of service definition
 src/policies/         ← generated output (privacy-policy.{md,html}, terms-of-service.{md,html})
 ```

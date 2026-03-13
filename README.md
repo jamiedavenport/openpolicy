@@ -12,7 +12,7 @@ Define privacy policies, terms of service, and other compliance documents in cod
 
 | Package | Description |
 |---|---|
-| `@openpolicy/sdk` | Public API — `defineConfig()`, `definePrivacyPolicy()`, `defineTermsOfService()`, and related types |
+| `@openpolicy/sdk` | Public API — `defineConfig()`, `defineTermsOfService()`, and related types |
 | `@openpolicy/core` | Compilation engine — published to npm as a dependency of sdk and vite |
 | `@openpolicy/vite` | Vite plugin for build-time compilation |
 | `@openpolicy/cli` | CLI tool for generating policy documents |

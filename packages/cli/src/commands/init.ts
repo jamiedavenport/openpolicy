@@ -61,36 +61,38 @@ function renderPrivacyConfig(values: {
 	userRights: string[];
 }): string {
 	const dataLines = Object.entries(values.dataCollected)
-		.map(([k, v]) => `    ${JSON.stringify(k)}: ${JSON.stringify(v)},`)
+		.map(([k, v]) => `      ${JSON.stringify(k)}: ${JSON.stringify(v)},`)
 		.join("\n");
 
 	const today = new Date().toISOString().slice(0, 10);
 
-	return `import { definePrivacyPolicy } from "@openpolicy/sdk";
+	return `import { defineConfig } from "@openpolicy/sdk";
 
-export default definePrivacyPolicy({
-  effectiveDate: "${today}",
+export default defineConfig({
   company: {
     name: ${JSON.stringify(values.companyName)},
     legalName: ${JSON.stringify(values.legalName)},
     address: ${JSON.stringify(values.address)},
     contact: ${JSON.stringify(values.contact)},
   },
-  dataCollected: {
+  privacy: {
+    effectiveDate: "${today}",
+    dataCollected: {
 ${dataLines}
+    },
+    legalBasis: ${JSON.stringify(values.legalBasis)},
+    retention: {
+      "All personal data": "As long as necessary for the purposes described in this policy",
+    },
+    cookies: {
+      essential: true,
+      analytics: ${values.hasCookies},
+      marketing: false,
+    },
+    thirdParties: [],
+    userRights: ${JSON.stringify(values.userRights)},
+    jurisdictions: ${JSON.stringify(values.jurisdictions)},
   },
-  legalBasis: ${JSON.stringify(values.legalBasis)},
-  retention: {
-    "All personal data": "As long as necessary for the purposes described in this policy",
-  },
-  cookies: {
-    essential: true,
-    analytics: ${values.hasCookies},
-    marketing: false,
-  },
-  thirdParties: [],
-  userRights: ${JSON.stringify(values.userRights)},
-  jurisdictions: ${JSON.stringify(values.jurisdictions)},
 });
 `;
 }
