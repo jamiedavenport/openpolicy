@@ -145,12 +145,37 @@ export default defineConfig({
 });
 `;
 
+const COOKIE_SCAFFOLD_TEMPLATE = `import { defineConfig } from "@openpolicy/sdk";
+
+export default defineConfig({
+  company: {
+    name: "Your Company",
+    legalName: "Your Company, Inc.",
+    address: "123 Main St, City, State, ZIP",
+    contact: "privacy@yourcompany.com",
+  },
+  cookie: {
+    effectiveDate: "${new Date().toISOString().slice(0, 10)}",
+    cookies: {
+      essential: [{ name: "session", purpose: "Authentication", duration: "Session" }],
+      analytics: [],
+      marketing: [],
+    },
+    jurisdictions: ["gdpr"],
+  },
+});
+`;
+
 export async function writeScaffold(
 	configPath: string,
 	type: "privacy" | "terms" | "cookie" = "privacy",
 ): Promise<void> {
 	const template =
-		type === "terms" ? TERMS_SCAFFOLD_TEMPLATE : PRIVACY_SCAFFOLD_TEMPLATE;
+		type === "terms"
+			? TERMS_SCAFFOLD_TEMPLATE
+			: type === "cookie"
+				? COOKIE_SCAFFOLD_TEMPLATE
+				: PRIVACY_SCAFFOLD_TEMPLATE;
 	await writeFile(configPath, template, "utf8");
 }
 

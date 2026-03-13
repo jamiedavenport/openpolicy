@@ -15,7 +15,7 @@ Default to using Bun instead of Node.js.
 
 This is a monorepo under `packages/`. Key packages:
 
-- `packages/sdk` — `@openpolicy/sdk`: public API — `defineConfig()`, `defineCookiePolicy()`, and related types
+- `packages/sdk` — `@openpolicy/sdk`: public API — `defineConfig()` and related types
 - `packages/core` — `@openpolicy/core`: compilation engine; published to npm as a dependency of sdk and vite
 - `packages/vite` — `@openpolicy/vite`: Vite plugin (`openPolicy()`) that compiles policies at build time
 - `packages/cli` — `@openpolicy/cli`: CLI tool for generating policy documents outside of a Vite build
