@@ -1,5 +1,11 @@
 # @openpolicy/vite
 
+## 0.0.11
+
+### Patch Changes
+
+- Cookie policy
+
 ## 0.0.10
 
 ## 0.0.9
