@@ -10,14 +10,16 @@ export type PolicySection = {
 
 export type Jurisdiction = "us" | "eu" | "ca" | "au" | "nz" | "other";
 
+export type CompanyConfig = {
+	name: string;
+	legalName: string;
+	address: string;
+	contact: string;
+};
+
 export type PrivacyPolicyConfig = {
 	effectiveDate: string;
-	company: {
-		name: string;
-		legalName: string;
-		address: string;
-		contact: string;
-	};
+	company: CompanyConfig;
 	dataCollected: Record<string, string[]>;
 	legalBasis: string;
 	retention: Record<string, string>;
@@ -39,12 +41,7 @@ export type DisputeResolutionMethod =
 
 export type TermsOfServiceConfig = {
 	effectiveDate: string;
-	company: {
-		name: string;
-		legalName: string;
-		address: string;
-		contact: string;
-	};
+	company: CompanyConfig;
 	acceptance: { methods: string[] };
 	eligibility?: { minimumAge: number; jurisdictionRestrictions?: string[] };
 	accounts?: {
@@ -94,6 +91,22 @@ export type TermsOfServiceConfig = {
 export type PolicyInput =
 	| ({ type: "privacy" } & PrivacyPolicyConfig)
 	| ({ type: "terms" } & TermsOfServiceConfig);
+
+export type OpenPolicyConfig = {
+	company: CompanyConfig;
+	privacy?: Omit<PrivacyPolicyConfig, "company">;
+	terms?: Omit<TermsOfServiceConfig, "company">;
+};
+
+export function isOpenPolicyConfig(value: unknown): value is OpenPolicyConfig {
+	if (value === null || typeof value !== "object") return false;
+	const obj = value as Record<string, unknown>;
+	return (
+		"company" in obj &&
+		!("effectiveDate" in obj) &&
+		("privacy" in obj || "terms" in obj)
+	);
+}
 
 export type ValidationIssue = {
 	level: "error" | "warning";

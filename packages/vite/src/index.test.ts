@@ -171,6 +171,47 @@ export default {
 		}
 	});
 
+	test("generates both privacy-policy.md and terms-of-service.md from unified config", async () => {
+		const tmpDir = await mkdtemp(join(tmpdir(), "openpolicy-vite-unified-"));
+		try {
+			const unifiedConfig = `
+export default {
+  company: {
+    name: "Acme Inc.",
+    legalName: "Acme Corporation",
+    address: "123 Main St, Springfield, USA",
+    contact: "privacy@acme.com",
+  },
+  privacy: {
+    effectiveDate: "2026-01-01",
+    dataCollected: { "Account Information": ["Name", "Email"] },
+    legalBasis: "Legitimate interests",
+    retention: { "Account data": "Until deletion" },
+    cookies: { essential: true, analytics: false, marketing: false },
+    thirdParties: [],
+    userRights: ["access"],
+    jurisdictions: ["us"],
+  },
+  terms: {
+    effectiveDate: "2026-01-01",
+    acceptance: { methods: ["using the service"] },
+    governingLaw: { jurisdiction: "Delaware, USA" },
+  },
+};
+`;
+			const configPath = join(tmpDir, "openpolicy.ts");
+			await Bun.write(configPath, unifiedConfig);
+
+			const outDir = join(tmpDir, "out");
+			await generatePolicies(configPath, outDir, ["markdown"]);
+
+			expect(existsSync(join(outDir, "privacy-policy.md"))).toBe(true);
+			expect(existsSync(join(outDir, "terms-of-service.md"))).toBe(true);
+		} finally {
+			await rm(tmpDir, { recursive: true });
+		}
+	});
+
 	test("creates outDir if it does not exist", async () => {
 		const tmpDir = await mkdtemp(join(tmpdir(), "openpolicy-vite-mkdir-"));
 		try {

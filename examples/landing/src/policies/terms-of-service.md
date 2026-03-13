@@ -97,4 +97,4 @@ If you have any questions about these Terms, please contact us at:
 
 **Acme Corporation**
 123 Main St, Springfield, USA
-legal@acme.com
+privacy@acme.com

@@ -2,12 +2,17 @@ import { existsSync, watch } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type {
+	OpenPolicyConfig,
 	OutputFormat,
 	PolicyInput,
 	PrivacyPolicyConfig,
 	TermsOfServiceConfig,
 } from "@openpolicy/core";
-import { compilePolicy } from "@openpolicy/core";
+import {
+	compilePolicy,
+	expandOpenPolicyConfig,
+	isOpenPolicyConfig,
+} from "@openpolicy/core";
 import { defineCommand } from "citty";
 import consola from "consola";
 import { detectType } from "../utils/detect-type";
@@ -34,13 +39,40 @@ async function generateFromConfig(
 		return false;
 	}
 
+	const config = await loadConfig(configPath, bustCache);
+
+	if (isOpenPolicyConfig(config)) {
+		const inputs = expandOpenPolicyConfig(config as OpenPolicyConfig);
+		if (inputs.length === 0) {
+			consola.warn(
+				`Unified config has no privacy or terms sections: ${configPath}`,
+			);
+			return true;
+		}
+		await mkdir(outDir, { recursive: true });
+		for (const input of inputs) {
+			const outputFilename =
+				input.type === "terms" ? "terms-of-service" : "privacy-policy";
+			consola.start(
+				`Generating ${input.type} policy from ${configPath} → formats: ${formats.join(", ")}`,
+			);
+			const results = compilePolicy(input, { formats });
+			for (const result of results) {
+				const ext = result.format === "markdown" ? "md" : result.format;
+				const outPath = join(outDir, `${outputFilename}.${ext}`);
+				await writeFile(outPath, result.content, "utf-8");
+				consola.success(`Written: ${outPath}`);
+			}
+		}
+		return true;
+	}
+
 	const policyType = detectType(explicitType, configPath);
 
 	consola.start(
 		`Generating ${policyType} policy from ${configPath} → formats: ${formats.join(", ")}`,
 	);
 
-	const config = await loadConfig(configPath, bustCache);
 	const outputFilename =
 		policyType === "terms" ? "terms-of-service" : "privacy-policy";
 
@@ -68,7 +100,7 @@ export const generateCommand = defineCommand({
 		config: {
 			type: "positional",
 			description: "Path(s) to policy config file(s), comma-separated",
-			default: "./policy.config.ts,./terms.config.ts",
+			default: "./openpolicy.ts,./policy.config.ts,./terms.config.ts",
 		},
 		format: {
 			type: "string",
