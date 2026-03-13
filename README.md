@@ -12,7 +12,7 @@ Define privacy policies, terms of service, and other compliance documents in cod
 
 | Package | Description |
 |---|---|
-| `@openpolicy/sdk` | Public API — `definePrivacyPolicy()`, `defineTermsOfService()`, and related types |
+| `@openpolicy/sdk` | Public API — `defineConfig()`, `definePrivacyPolicy()`, `defineTermsOfService()`, and related types |
 | `@openpolicy/core` | Compilation engine — published to npm as a dependency of sdk and vite |
 | `@openpolicy/vite` | Vite plugin for build-time compilation |
 | `@openpolicy/cli` | CLI tool for generating policy documents |
@@ -23,51 +23,41 @@ Define privacy policies, terms of service, and other compliance documents in cod
 bun install
 ```
 
-### 1. Define a policy
+### 1. Define your policies
+
+Create a single `openpolicy.ts` at the root of your project. `defineConfig()` lets you define all policies in one file with a shared `company` block:
 
 ```ts
-// privacy.config.ts
-import { definePrivacyPolicy } from '@openpolicy/sdk'
+// openpolicy.ts
+import { defineConfig } from '@openpolicy/sdk'
 
-export default definePrivacyPolicy({
-  effectiveDate: '2026-01-01',
+export default defineConfig({
   company: {
     name: 'Acme Inc.',
     legalName: 'Acme Incorporated',
     address: '123 Market St, San Francisco, CA 94105',
     contact: 'privacy@acme.com',
   },
-  dataCollected: {
-    'Account Information': ['Email', 'Name'],
-    'Usage Data': ['IP address', 'Browser', 'Pages visited'],
+  privacy: {
+    effectiveDate: '2026-01-01',
+    dataCollected: {
+      'Account Information': ['Email', 'Name'],
+      'Usage Data': ['IP address', 'Browser', 'Pages visited'],
+    },
+    legalBasis: 'Legitimate interests and consent',
+    retention: { 'Account data': '3 years after account closure', 'Usage logs': '90 days' },
+    cookies: { essential: true, analytics: true, marketing: false },
+    thirdParties: [{ name: 'Stripe', purpose: 'Payment processing' }],
+    userRights: ['access', 'rectification', 'erasure', 'portability'],
+    jurisdictions: ['us', 'eu'],
   },
-  legalBasis: 'Legitimate interests and consent',
-  retention: { 'Account data': '3 years after account closure', 'Usage logs': '90 days' },
-  cookies: { essential: true, analytics: true, marketing: false },
-  thirdParties: [{ name: 'Stripe', purpose: 'Payment processing' }],
-  userRights: ['access', 'rectification', 'erasure', 'portability'],
-  jurisdictions: ['us', 'eu'],
-})
-```
-
-Or define terms of service:
-
-```ts
-// terms.config.ts
-import { defineTermsOfService } from '@openpolicy/sdk'
-
-export default defineTermsOfService({
-  effectiveDate: '2026-01-01',
-  company: {
-    name: 'Acme Inc.',
-    legalName: 'Acme Incorporated',
-    address: '123 Market St, San Francisco, CA 94105',
-    contact: 'legal@acme.com',
+  terms: {
+    effectiveDate: '2026-01-01',
+    acceptance: { methods: ['using the service', 'creating an account'] },
+    disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
+    limitationOfLiability: { excludesIndirectDamages: true },
+    governingLaw: { jurisdiction: 'Delaware, USA' },
   },
-  acceptance: { methods: ['using the service', 'creating an account'] },
-  disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
-  limitationOfLiability: { excludesIndirectDamages: true },
-  governingLaw: { jurisdiction: 'Delaware, USA' },
 })
 ```
 
@@ -80,15 +70,12 @@ import { openPolicy } from '@openpolicy/vite'
 
 export default defineConfig({
   plugins: [
-    openPolicy({
-      configs: ['privacy.config.ts', 'terms.config.ts'],
-      formats: ['markdown', 'html'],
-    }),
+    openPolicy({ formats: ['markdown', 'html'] }),
   ],
 })
 ```
 
-Policy type is auto-detected from the filename — files containing `"terms"` compile as terms of service, all others as privacy policy. Pass an explicit type to override:
+With no `configs` option, the plugin looks for `openpolicy.ts` by default and compiles all sections present in a single pass. Pass `configs` to use separate files or override the detected type:
 
 ```ts
 openPolicy({
@@ -99,8 +86,6 @@ openPolicy({
   formats: ['markdown', 'html'],
 })
 ```
-
-The legacy single-config form (`config` + `type`) still works unchanged.
 
 ### 3. Use generated output
 
@@ -115,12 +100,22 @@ export default function PrivacyPolicyPage() {
 
 ## Policy Types
 
+### Unified config — `OpenPolicyConfig`
+
+The recommended approach. Define all policies in one file with a shared `company` block:
+
+| Field | Type | Description |
+|---|---|---|
+| `company` | `object` | Shared legal name, address, contact email |
+| `privacy` | `object?` | Privacy policy fields (see below) |
+| `terms` | `object?` | Terms of service fields (see below) |
+| `cookie` | `object?` | Cookie policy fields |
+
 ### Privacy Policy — `PrivacyPolicyConfig`
 
 | Field | Type | Description |
 |---|---|---|
 | `effectiveDate` | `string` | ISO date the policy takes effect |
-| `company` | `object` | Legal name, address, contact email |
 | `dataCollected` | `Record<string, string[]>` | Categories and fields of collected data |
 | `legalBasis` | `string` | e.g. `'Legitimate interests and consent'` |
 | `retention` | `Record<string, string>` | Data retention periods per category |
@@ -129,14 +124,11 @@ export default function PrivacyPolicyPage() {
 | `userRights` | `string[]` | e.g. `['access', 'erasure', 'portability']` |
 | `jurisdictions` | `Jurisdiction[]` | `'us'`, `'eu'`, `'ca'`, etc. |
 
-See the [policy.config.ts reference](https://openpolicy.dev/reference/policy) for full field documentation.
-
 ### Terms of Service — `TermsOfServiceConfig`
 
 | Field | Type | Description |
 |---|---|---|
 | `effectiveDate` | `string` | ISO date the terms take effect |
-| `company` | `object` | Legal name, address, contact email |
 | `acceptance` | `object` | Methods by which users accept the terms |
 | `governingLaw` | `object` | Jurisdiction whose laws govern the agreement |
 | `eligibility` | `object?` | Minimum age and jurisdiction restrictions |
@@ -148,7 +140,7 @@ See the [policy.config.ts reference](https://openpolicy.dev/reference/policy) fo
 | `disputeResolution` | `object?` | Arbitration, litigation, or mediation |
 | `changesPolicy` | `object?` | How users are notified of updates |
 
-See the [terms.config.ts reference](https://openpolicy.dev/reference/terms) for full field documentation.
+See the [openpolicy.ts reference](https://docs.openpolicy.sh/reference/openpolicy-config) for full field documentation.
 
 ## Output Formats
 
@@ -168,33 +160,30 @@ Pre-built templates for:
 Use the `openpolicy` CLI to generate and validate policies outside of a Vite build.
 
 ```bash
+# Generate all policies from openpolicy.ts (default)
+openpolicy generate
+
+# Generate with custom format and output directory
+openpolicy generate --format markdown,html --out ./output
+
 # Interactive setup wizard — privacy policy (default)
 openpolicy init
 
 # Interactive setup wizard — terms of service
 openpolicy init --type terms
 
-# Compile a privacy policy config
-openpolicy generate ./privacy.config.ts --format markdown,html --out ./output
-
-# Compile a terms of service config (auto-detected from filename)
-openpolicy generate ./terms.config.ts --format markdown,html --out ./output
-
-# Validate a privacy policy
-openpolicy validate ./privacy.config.ts --jurisdiction gdpr
-
-# Validate terms of service (auto-detected from filename)
-openpolicy validate ./terms.config.ts
+# Validate policies
+openpolicy validate ./openpolicy.ts --jurisdiction gdpr
 ```
 
 | Command | Description |
 |---|---|
 | `init [--type privacy\|terms]` | Interactive wizard that scaffolds a config file |
-| `generate [config] [--type privacy\|terms]` | Compiles the policy to the requested output formats |
-| `validate [config] [--type privacy\|terms]` | Validates the policy config |
+| `generate [config] [--type privacy\|terms\|cookie]` | Compiles the policy to the requested output formats. Defaults to `./openpolicy.ts`. |
+| `validate [config] [--type privacy\|terms\|cookie]` | Validates the policy config |
 
 `--format` accepts a comma-separated list: `markdown`, `html` (default: `markdown`).
-`--type` is auto-detected from the config filename — files containing `"terms"` are treated as terms of service configs.
+`--type` is auto-detected from the config filename — files containing `"terms"` are treated as terms of service, `"cookie"` as cookie policy. Ignored for unified configs.
 `--jurisdiction` accepts `gdpr`, `ccpa`, or `all` (default: `all`, privacy only).
 
 ## Development
