@@ -19,5 +19,3 @@ export function openPolicy(options: OpenPolicyOptions = {}): AstroIntegration {
 		},
 	};
 }
-
-export default openPolicy;

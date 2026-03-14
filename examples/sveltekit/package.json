@@ -12,8 +12,7 @@
 	},
 	"dependencies": {
 		"@openpolicy/sdk": "workspace:*",
-		"@openpolicy/vite": "workspace:*",
-		"@openpolicy/cli": "workspace:*"
+		"@openpolicy/vite": "workspace:*"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.0",

@@ -14,7 +14,7 @@ export default defineConfig({
 	adapter: vercel(),
 	integrations: [
 		openPolicy({
-			configs: ["privacy.config.ts", "terms.config.ts"],
+			configs: ["openpolicy.ts"],
 			formats: ["markdown"],
 			outDir: "./src/policies",
 		}),
