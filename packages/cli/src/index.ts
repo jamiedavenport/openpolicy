@@ -1,6 +1,5 @@
-import pkgJson from '../package.json'
 import { defineCommand } from "citty";
-
+import pkgJson from "../package.json";
 
 export const mainCommand = defineCommand({
 	meta: {
