@@ -24,24 +24,22 @@ describe("plugin structure", () => {
 
 const validConfig = `
 export default {
-  effectiveDate: "2026-01-01",
   company: {
     name: "Test Co",
     legalName: "Test Co, Inc.",
     address: "1 Test Ave, Testville, TX 12345",
     contact: "privacy@test.com",
   },
-  dataCollected: {
-    "Usage Data": ["Page views", "Session duration"],
+  privacy: {
+    effectiveDate: "2026-01-01",
+    dataCollected: { "Usage Data": ["Page views", "Session duration"] },
+    legalBasis: "Legitimate interests",
+    retention: { "Usage Data": "90 days" },
+    cookies: { essential: true, analytics: true, marketing: false },
+    thirdParties: [],
+    userRights: ["access", "erasure"],
+    jurisdictions: ["us"],
   },
-  legalBasis: "Legitimate interests",
-  retention: {
-    "Usage Data": "90 days",
-  },
-  cookies: { essential: true, analytics: true, marketing: false },
-  thirdParties: [],
-  userRights: ["access", "erasure"],
-  jurisdictions: ["us"],
 };
 `;
 
@@ -65,7 +63,7 @@ describe("generatePolicies", () => {
 		}
 	});
 
-	test("throws on config with validation errors", async () => {
+	test("throws on non-unified config", async () => {
 		const tmpDir = await mkdtemp(join(tmpdir(), "openpolicy-vite-invalid-"));
 		try {
 			const invalidConfig = `
@@ -87,7 +85,7 @@ export default {
 			const outDir = join(tmpDir, "out");
 			await expect(
 				generatePolicies(configPath, outDir, ["markdown"]),
-			).rejects.toThrow(/[Vv]alidation error/);
+			).rejects.toThrow(/Config must use defineConfig/);
 		} finally {
 			await rm(tmpDir, { recursive: true });
 		}

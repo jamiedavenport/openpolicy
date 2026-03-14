@@ -1,12 +1,6 @@
 import { access, mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import type {
-	CookiePolicyConfig,
-	OpenPolicyConfig,
-	OutputFormat,
-	PrivacyPolicyConfig,
-	TermsOfServiceConfig,
-} from "@openpolicy/core";
+import type { OpenPolicyConfig, OutputFormat } from "@openpolicy/core";
 import {
 	compilePolicy,
 	expandOpenPolicyConfig,
@@ -21,12 +15,6 @@ export interface OpenPolicyOptions {
 	configPath?: string;
 	formats?: OutputFormat[];
 	outDir?: string;
-}
-
-function detectType(filename: string): "privacy" | "terms" | "cookie" {
-	if (filename.includes("cookie")) return "cookie";
-	if (filename.includes("terms")) return "terms";
-	return "privacy";
 }
 
 export async function generatePolicies(
@@ -80,48 +68,9 @@ export async function generatePolicies(
 		return;
 	}
 
-	const type = detectType(configPath);
-
-	const issues =
-		type === "terms"
-			? validateTermsOfService(config as TermsOfServiceConfig)
-			: type === "cookie"
-				? validateCookiePolicy(config as CookiePolicyConfig)
-				: validatePrivacyPolicy(config as PrivacyPolicyConfig);
-
-	for (const issue of issues) {
-		if (issue.level === "error") {
-			throw new Error(`[openpolicy] Validation error: ${issue.message}`);
-		}
-		console.warn(`[openpolicy] Warning: ${issue.message}`);
-	}
-
-	const results = compilePolicy(
-		type === "terms"
-			? { type: "terms", ...(config as TermsOfServiceConfig) }
-			: type === "cookie"
-				? { type: "cookie", ...(config as CookiePolicyConfig) }
-				: { type: "privacy", ...(config as PrivacyPolicyConfig) },
-		{ formats },
+	throw new Error(
+		`[openpolicy] Config must use defineConfig() (OpenPolicyConfig): ${configPath}`,
 	);
-
-	const outputFilename =
-		type === "terms"
-			? "terms-of-service"
-			: type === "cookie"
-				? "cookie-policy"
-				: "privacy-policy";
-
-	await mkdir(outDir, { recursive: true });
-
-	for (const result of results) {
-		const ext = result.format === "markdown" ? "md" : result.format;
-		await writeFile(
-			join(outDir, `${outputFilename}.${ext}`),
-			result.content,
-			"utf8",
-		);
-	}
 }
 
 export function openPolicy(options: OpenPolicyOptions = {}): Plugin {

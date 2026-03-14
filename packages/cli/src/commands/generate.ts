@@ -1,14 +1,7 @@
 import { existsSync, watch } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type {
-	CookiePolicyConfig,
-	OpenPolicyConfig,
-	OutputFormat,
-	PolicyInput,
-	PrivacyPolicyConfig,
-	TermsOfServiceConfig,
-} from "@openpolicy/core";
+import type { OpenPolicyConfig, OutputFormat } from "@openpolicy/core";
 import {
 	compilePolicy,
 	expandOpenPolicyConfig,
@@ -16,21 +9,7 @@ import {
 } from "@openpolicy/core";
 import { defineCommand } from "citty";
 import consola from "consola";
-import { detectType } from "../utils/detect-type";
 import { loadConfig } from "../utils/load-config";
-
-function toPolicyInput(
-	policyType: "privacy" | "terms" | "cookie",
-	config: unknown,
-): PolicyInput {
-	if (policyType === "terms") {
-		return { type: "terms", ...(config as TermsOfServiceConfig) };
-	}
-	if (policyType === "cookie") {
-		return { type: "cookie", ...(config as CookiePolicyConfig) };
-	}
-	return { type: "privacy", ...(config as PrivacyPolicyConfig) };
-}
 
 async function generateFromConfig(
 	configPath: string,
@@ -70,30 +49,9 @@ async function generateFromConfig(
 		return;
 	}
 
-	const policyType = detectType(undefined, configPath);
-
-	consola.start(
-		`Generating ${policyType} policy from ${configPath} → formats: ${formats.join(", ")}`,
+	throw new Error(
+		`[openpolicy] Config must use defineConfig() (OpenPolicyConfig): ${configPath}`,
 	);
-
-	const outputFilename =
-		policyType === "terms"
-			? "terms-of-service"
-			: policyType === "cookie"
-				? "cookie-policy"
-				: "privacy-policy";
-
-	const results = compilePolicy(toPolicyInput(policyType, config), {
-		formats,
-	});
-
-	await mkdir(outDir, { recursive: true });
-	for (const result of results) {
-		const ext = result.format === "markdown" ? "md" : result.format;
-		const outPath = join(outDir, `${outputFilename}.${ext}`);
-		await writeFile(outPath, result.content, "utf-8");
-		consola.success(`Written: ${outPath}`);
-	}
 }
 
 export const generateCommand = defineCommand({
