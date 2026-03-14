@@ -1,5 +1,5 @@
 {
-	"name": "landing",
+	"name": "astro-example",
 	"type": "module",
 	"private": true,
 	"scripts": {

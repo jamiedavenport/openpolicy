@@ -1,5 +1,5 @@
 {
-	"name": "sveltekit",
+	"name": "sveltekit-example",
 	"private": true,
 	"type": "module",
 	"scripts": {
