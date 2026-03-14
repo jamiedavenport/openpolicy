@@ -14,7 +14,6 @@ export default defineConfig({
 	adapter: vercel(),
 	integrations: [
 		openPolicy({
-			configs: ["openpolicy.ts"],
 			formats: ["markdown"],
 			outDir: "./src/policies",
 		}),

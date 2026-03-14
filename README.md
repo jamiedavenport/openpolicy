@@ -75,14 +75,11 @@ export default defineConfig({
 })
 ```
 
-With no `configs` option, the plugin looks for `openpolicy.ts` by default and compiles all sections present in a single pass. Pass `configs` to use separate files or override the detected type:
+By default, the plugin looks for `openpolicy.ts` and compiles all sections present in a single pass. Pass `configPath` to use a different filename:
 
 ```ts
 openPolicy({
-  configs: [
-    'privacy.config.ts',
-    { config: 'legal.config.ts', type: 'terms' },
-  ],
+  configPath: 'legal.config.ts',
   formats: ['markdown', 'html'],
 })
 ```

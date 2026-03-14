@@ -31,10 +31,6 @@ import { openPolicy } from "@openpolicy/astro";
 export default defineConfig({
   integrations: [
     openPolicy({
-      configs: [
-        "privacy.config.ts",
-        { config: "terms.config.ts", type: "terms" },
-      ],
       formats: ["markdown"],
       outDir: "src/generated/policies",
     }),
@@ -46,7 +42,7 @@ export default defineConfig({
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `configs` | `PolicyConfigEntry[]` | — | Policy configs to compile. Type is auto-detected from filename (`"terms"` → terms of service, otherwise privacy). Each entry is a path string or `{ config: string; type?: "privacy" \| "terms" }`. |
+| `configPath` | `string` | `"openpolicy.ts"` | Path to the unified policy config file, relative to the Astro root. |
 | `formats` | `OutputFormat[]` | `["markdown"]` | `"markdown"` or `"html"` |
 | `outDir` | `string` | `"public/policies"` | Output directory, relative to the Astro root |
 
