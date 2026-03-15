@@ -18,37 +18,38 @@ OpenPolicy treats policies like code: they live in your repo, they're reviewed i
 
 ```ts
 // policy.ts
-import { definePrivacyPolicy } from '@openpolicy/sdk'
+import { defineConfig } from '@openpolicy/sdk'
 
-export default definePrivacyPolicy({
-  effectiveDate: '2026-01-01',
+export default defineConfig({
   company: {
     name: 'Acme Inc.',
     legalName: 'Acme Incorporated',
     address: '123 Market St, San Francisco, CA 94105',
     contact: 'privacy@acme.com',
   },
-  dataCollected: {
-    account: ['email', 'name', 'password'],
-    usage: ['ip_address', 'browser', 'pages_visited'],
-    payment: ['billing_address', 'last_4_digits'],
+  privacy: {
+    effectiveDate: '2026-01-01',
+    dataCollected: {
+      'Account Information': ['Email', 'Name'],
+      'Usage Data': ['IP address', 'Browser', 'Pages visited'],
+    },
+    legalBasis: 'Legitimate interests and consent',
+    retention: {
+      'Account data': '3 years after account closure',
+      'Usage logs': '90 days',
+    },
+    cookies: {
+      essential: true,
+      analytics: true,
+      marketing: false,
+    },
+    thirdParties: [
+      { name: 'Stripe', purpose: 'Payment processing' },
+      { name: 'PostHog', purpose: 'Product analytics' },
+    ],
+    userRights: ['access', 'rectification', 'erasure', 'portability'],
+    jurisdictions: ['us'],
   },
-  legalBasis: 'legitimate_interest',
-  retention: {
-    account: '3 years after account closure',
-    logs: '90 days',
-  },
-  cookies: {
-    essential: true,
-    analytics: true,
-    marketing: false,
-  },
-  thirdParties: [
-    { name: 'Stripe', purpose: 'payment processing' },
-    { name: 'PostHog', purpose: 'product analytics' },
-  ],
-  userRights: ['access', 'rectification', 'erasure', 'portability'],
-  jurisdiction: 'US',
 })
 ```
 
@@ -113,7 +114,7 @@ Your output should capture:
 - Legal basis for processing
 - User rights supported
 
-Output only a single policy.ts using definePrivacyPolicy(). No explanations.
+Output only a single openpolicy.ts using defineConfig(). No explanations.
 ```
 
 ## Author

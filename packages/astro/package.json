@@ -1,9 +1,9 @@
 {
 	"name": "@openpolicy/astro",
-	"version": "0.0.11",
+	"version": "0.0.12",
 	"type": "module",
 	"description": "Astro integration for compiling OpenPolicy documents at build time",
-	"license": "MIT",
+	"license": "GPL-3.0-only",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/jamiedavenport/openpolicy",
@@ -32,9 +32,9 @@
 	},
 	"peerDependencies": {
 		"astro": ">=4.0.0",
-		"@openpolicy/vite": ">=0.0.11",
-		"@openpolicy/sdk": ">=0.0.11",
-		"@openpolicy/core": ">=0.0.11"
+		"@openpolicy/vite": ">=0.0.12",
+		"@openpolicy/sdk": ">=0.0.12",
+		"@openpolicy/core": ">=0.0.12"
 	},
 	"devDependencies": {
 		"@openpolicy/tooling": "workspace:*",

@@ -12,7 +12,7 @@ Define privacy policies, terms of service, and other compliance documents in cod
 
 | Package | Description |
 |---|---|
-| `@openpolicy/sdk` | Public API — `defineConfig()`, `definePrivacyPolicy()`, `defineTermsOfService()`, and related types |
+| `@openpolicy/sdk` | Public API — `defineConfig()` and related types |
 | `@openpolicy/core` | Compilation engine — published to npm as a dependency of sdk and vite |
 | `@openpolicy/vite` | Vite plugin for build-time compilation |
 | `@openpolicy/cli` | CLI tool for generating policy documents |
@@ -75,14 +75,11 @@ export default defineConfig({
 })
 ```
 
-With no `configs` option, the plugin looks for `openpolicy.ts` by default and compiles all sections present in a single pass. Pass `configs` to use separate files or override the detected type:
+By default, the plugin looks for `openpolicy.ts` and compiles all sections present in a single pass. Pass `configPath` to use a different filename:
 
 ```ts
 openPolicy({
-  configs: [
-    'privacy.config.ts',
-    { config: 'legal.config.ts', type: 'terms' },
-  ],
+  configPath: 'legal.config.ts',
   formats: ['markdown', 'html'],
 })
 ```

@@ -98,11 +98,9 @@ The integration accepts the same options as the Vite plugin:
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `configs` | `PolicyConfigEntry[]` | — | One or more policy config files to compile. Each entry is a filename string or `{ config: string; type?: "privacy" \| "terms" \| "cookie" }`. Defaults to `openpolicy.ts` when omitted. |
+| `configPath` | `string` | `"openpolicy.ts"` | Path to the unified policy config file, relative to the Astro root. |
 | `formats` | `OutputFormat[]` | `["markdown"]` | Output formats: `"markdown"` \| `"html"` |
 | `outDir` | `string` | `"public/policies"` | Output directory, relative to the Astro root |
-| `config` | `string` | — | _(Legacy)_ Single config path. Use `configs` instead. |
-| `type` | `"privacy" \| "terms" \| "cookie"` | — | _(Legacy)_ Policy type for the single `config` option. |
 
 See the [Vite plugin docs →](/docs/getting-started/vite) for full details on each option.
 
@@ -116,14 +114,11 @@ src/generated/policies/
   terms-of-service.md
 ```
 
-To use separate files for each policy type, pass them via `configs`:
+To use a different filename, pass `configPath`:
 
 ```js
 openPolicy({
-  configs: [
-    "privacy.config.ts",
-    { config: "terms.config.ts", type: "terms" },
-  ],
+  configPath: "my-policies.ts",
   formats: ["markdown"],
   outDir: "src/generated/policies",
 })

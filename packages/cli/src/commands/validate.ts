@@ -1,14 +1,13 @@
-import type {
-	PrivacyPolicyConfig,
-	TermsOfServiceConfig,
-} from "@openpolicy/core";
+import type { CookiePolicyConfig } from "@openpolicy/core";
 import {
+	expandOpenPolicyConfig,
+	isOpenPolicyConfig,
+	validateCookiePolicy,
 	validatePrivacyPolicy,
 	validateTermsOfService,
 } from "@openpolicy/core";
 import { defineCommand } from "citty";
 import consola from "consola";
-import { detectType } from "../utils/detect-type";
 import { loadConfig } from "../utils/load-config";
 
 export const validateCommand = defineCommand({
@@ -27,44 +26,57 @@ export const validateCommand = defineCommand({
 			description: "Jurisdiction to validate against: gdpr, ccpa, or all",
 			default: "all",
 		},
-		type: {
-			type: "string",
-			description:
-				'Policy type: "privacy" or "terms" (auto-detected from filename if omitted)',
-			default: "",
-		},
 	},
 	async run({ args }) {
 		const configPath = args.config ?? "./policy.config.ts";
-		const policyType = detectType(args.type || undefined, configPath);
-
-		consola.start(`Validating ${policyType} policy: ${configPath}`);
 
 		const config = await loadConfig(configPath);
-		const issues =
-			policyType === "terms"
-				? validateTermsOfService(config as TermsOfServiceConfig)
-				: validatePrivacyPolicy(config as PrivacyPolicyConfig);
 
-		if (issues.length === 0) {
-			consola.success("Config is valid — no issues found.");
-			return;
+		if (!isOpenPolicyConfig(config)) {
+			throw new Error(
+				`[openpolicy] Config must use defineConfig() (OpenPolicyConfig): ${configPath}`,
+			);
 		}
 
-		for (const issue of issues) {
-			if (issue.level === "error") {
-				consola.error(issue.message);
+		const inputs = expandOpenPolicyConfig(config);
+		let totalErrors = 0;
+
+		for (const input of inputs) {
+			consola.start(`Validating ${input.type} policy: ${configPath}`);
+
+			const issues =
+				input.type === "terms"
+					? validateTermsOfService(input)
+					: input.type === "cookie"
+						? validateCookiePolicy(input as CookiePolicyConfig)
+						: validatePrivacyPolicy(input);
+
+			if (issues.length === 0) {
+				consola.success(`${input.type}: no issues found.`);
+				continue;
+			}
+
+			for (const issue of issues) {
+				if (issue.level === "error") {
+					consola.error(issue.message);
+				} else {
+					consola.warn(issue.message);
+				}
+			}
+
+			const errors = issues.filter((i) => i.level === "error");
+			totalErrors += errors.length;
+			if (errors.length > 0) {
+				consola.fail(
+					`${input.type}: validation failed with ${errors.length} error(s).`,
+				);
 			} else {
-				consola.warn(issue.message);
+				consola.success(`${input.type}: validation passed with warnings.`);
 			}
 		}
 
-		const errors = issues.filter((i) => i.level === "error");
-		if (errors.length > 0) {
-			consola.fail(`Validation failed with ${errors.length} error(s).`);
+		if (totalErrors > 0) {
 			process.exit(1);
 		}
-
-		consola.success("Validation passed with warnings.");
 	},
 });

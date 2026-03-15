@@ -1,9 +1,9 @@
 {
 	"name": "@openpolicy/cli",
-	"version": "0.0.11",
+	"version": "0.0.12",
 	"type": "module",
 	"description": "CLI for generating and validating OpenPolicy privacy policy documents",
-	"license": "MIT",
+	"license": "GPL-3.0-only",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/jamiedavenport/openpolicy",

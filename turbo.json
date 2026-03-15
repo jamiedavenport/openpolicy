@@ -1,9 +1,10 @@
 {
 	"$schema": "https://turborepo.dev/schema.json",
+	"ui": "tui",
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],
-			"outputs": [".next/**", "!.next/cache/**", "dist/**"]
+			"outputs": [".next/**", "!.next/cache/**", "dist/**", ".svelte-kit/**"]
 		},
 		"check-types": {
 			"dependsOn": ["^build", "^check-types"]

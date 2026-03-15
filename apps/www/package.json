@@ -19,7 +19,6 @@
 	},
 	"devDependencies": {
 		"@openpolicy/astro": "workspace:*",
-		"@openpolicy/cli": "workspace:*",
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/sdk": "workspace:*",
 		"@openpolicy/vite": "workspace:*",

@@ -76,21 +76,9 @@ openPolicy({
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `configs` | `PolicyConfigEntry[]` | — | One or more policy config files to compile. Each entry is a filename string or `{ config: string; type?: "privacy" \| "terms" \| "cookie" }`. Defaults to `openpolicy.ts` when omitted. |
+| `configPath` | `string` | `"openpolicy.ts"` | Path to the unified policy config file, relative to the Vite root. |
 | `formats` | `OutputFormat[]` | `["markdown"]` | Output formats: `"markdown"` \| `"html"` |
 | `outDir` | `string` | `"public/policies"` | Output directory, relative to the Vite root |
-| `config` | `string` | — | _(Legacy)_ Single config path. Use `configs` instead. |
-| `type` | `"privacy" \| "terms" \| "cookie"` | — | _(Legacy)_ Policy type for the single `config` option. |
-
-## Type auto-detection
-
-When passing filenames to `configs`, the policy type is inferred from the filename:
-
-| Filename contains | Detected type |
-|---|---|
-| `"cookie"` | `cookie` |
-| `"terms"` | `terms` |
-| anything else | `privacy` |
 
 Use `{ config: "legal.config.ts", type: "terms" }` to override explicitly.
 
@@ -103,14 +91,11 @@ When the plugin loads a file that exports a `defineConfig()` result, it automati
 openPolicy({ formats: ["markdown"], outDir: "public/policies" })
 ```
 
-To use separate files for each policy type instead, pass them via `configs`:
+To use a different filename, pass `configPath`:
 
 ```ts
 openPolicy({
-  configs: [
-    "privacy.config.ts",
-    { config: "terms.config.ts", type: "terms" },
-  ],
+  configPath: "my-policies.ts",
   formats: ["markdown", "html"],
   outDir: "public/policies",
 })

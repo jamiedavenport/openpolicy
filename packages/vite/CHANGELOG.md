@@ -1,5 +1,11 @@
 # @openpolicy/vite
 
+## 0.0.12
+
+### Patch Changes
+
+- Unified Config
+
 ## 0.0.11
 
 ### Patch Changes

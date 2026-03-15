@@ -2,7 +2,7 @@
 
 > Astro integration for compiling [OpenPolicy](https://openpolicy.sh) policy documents at build time.
 
-A first-class Astro integration that compiles `definePrivacyPolicy()` and `defineTermsOfService()` configs to Markdown or HTML — on every build and on save in dev mode. Delegates to `@openpolicy/vite` under the hood.
+A first-class Astro integration that compiles `defineConfig()` configs to Markdown or HTML — on every build and on save in dev mode. Delegates to `@openpolicy/vite` under the hood.
 
 ## Install
 
@@ -31,10 +31,6 @@ import { openPolicy } from "@openpolicy/astro";
 export default defineConfig({
   integrations: [
     openPolicy({
-      configs: [
-        "privacy.config.ts",
-        { config: "terms.config.ts", type: "terms" },
-      ],
       formats: ["markdown"],
       outDir: "src/generated/policies",
     }),
@@ -46,7 +42,7 @@ export default defineConfig({
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `configs` | `PolicyConfigEntry[]` | — | Policy configs to compile. Type is auto-detected from filename (`"terms"` → terms of service, otherwise privacy). Each entry is a path string or `{ config: string; type?: "privacy" \| "terms" }`. |
+| `configPath` | `string` | `"openpolicy.ts"` | Path to the unified policy config file, relative to the Astro root. |
 | `formats` | `OutputFormat[]` | `["markdown"]` | `"markdown"` or `"html"` |
 | `outDir` | `string` | `"public/policies"` | Output directory, relative to the Astro root |
 

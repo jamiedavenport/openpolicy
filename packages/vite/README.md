@@ -2,7 +2,7 @@
 
 > Vite plugin for compiling [OpenPolicy](https://openpolicy.sh) policy documents at build time.
 
-Compiles `definePrivacyPolicy()` and `defineTermsOfService()` configs to Markdown or HTML automatically — on every build and on save in dev mode.
+Compiles `defineConfig()` configs to Markdown or HTML automatically — on every build and on save in dev mode.
 
 ## Install
 
@@ -22,7 +22,6 @@ import { openPolicy } from "@openpolicy/vite";
 export default defineConfig({
   plugins: [
     openPolicy({
-      configs: ["privacy.config.ts", "terms.config.ts"],
       formats: ["markdown"],
       outDir: "public/policies",
     }),
@@ -34,7 +33,7 @@ export default defineConfig({
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `configs` | `PolicyConfigEntry[]` | — | Policy configs to compile. Type is auto-detected from filename (`"terms"` → terms of service, otherwise privacy). Each entry is a path string or `{ config: string; type?: "privacy" \| "terms" }`. |
+| `configPath` | `string` | `"openpolicy.ts"` | Path to the unified policy config file, relative to the Vite root. |
 | `formats` | `OutputFormat[]` | `["markdown"]` | `"markdown"` or `"html"` |
 | `outDir` | `string` | `"public/policies"` | Output directory, relative to the Vite root |
 

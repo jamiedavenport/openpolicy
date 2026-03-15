@@ -1,20 +1,21 @@
 {
 	"name": "openpolicy",
-	"module": "index.ts",
 	"type": "module",
 	"private": true,
+	"license": "GPL-3.0-only",
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.5",
 		"@changesets/cli": "^2.30.0",
 		"@types/bun": "latest",
-		"all-contributors-cli": "^6.26.1",
+		"@types/node": "^25.5.0",
+		"knip": "^5.86.0",
 		"lefthook": "^2.1.2",
 		"rolldown": "^1.0.0-rc.7",
 		"rolldown-plugin-dts": "^0.22.3",
 		"turbo": "^2.8.12"
 	},
 	"peerDependencies": {
-		"typescript": "^5"
+		"typescript": "^5.9.3"
 	},
 	"scripts": {
 		"build": "turbo run build",
@@ -26,7 +27,8 @@
 		"format:write": "biome format --write .",
 		"changeset": "changeset",
 		"version-packages": "changeset version",
-		"publish-packages": "turbo run build && changeset publish"
+		"publish-packages": "turbo run build && changeset publish",
+		"knip": "knip"
 	},
 	"workspaces": [
 		"apps/*",

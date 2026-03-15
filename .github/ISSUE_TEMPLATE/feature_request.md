@@ -17,7 +17,7 @@ What problem does this solve? Who would benefit and how?
 Describe what you'd like to happen. If you have ideas about the API or config shape, sketch them out:
 
 ```ts
-definePrivacyPolicy({
+defineConfig({
   // proposed new field or behavior
 })
 ```

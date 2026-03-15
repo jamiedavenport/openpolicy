@@ -1,5 +1,15 @@
 # @openpolicy/astro
 
+## 0.0.12
+
+### Patch Changes
+
+- Unified Config
+- Updated dependencies
+  - @openpolicy/core@0.0.12
+  - @openpolicy/vite@0.0.12
+  - @openpolicy/sdk@0.0.12
+
 ## 0.0.11
 
 ### Patch Changes
