@@ -15,7 +15,11 @@ export type PolicyTheme = Partial<
 		| "--op-section-gap"
 		| "--op-font-family"
 		| "--op-font-size-heading"
+		| "--op-font-weight-heading"
 		| "--op-font-size-body"
+		| "--op-line-height"
+		| "--op-link-color"
+		| "--op-link-color-hover"
 		| "--op-border-color"
 		| "--op-border-radius",
 		string

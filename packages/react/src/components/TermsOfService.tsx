@@ -27,7 +27,7 @@ export function TermsOfService({
 	if (!input) return null;
 	const doc = compile(input);
 	return (
-		<div data-op-policy style={style}>
+		<div data-op-policy className="op-policy" style={style}>
 			{renderDocument(doc, components)}
 		</div>
 	);

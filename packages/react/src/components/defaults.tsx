@@ -10,7 +10,7 @@ export function DefaultHeading({
 	children: ReactNode;
 }) {
 	return (
-		<h2 data-op-heading id={id}>
+		<h2 data-op-heading className="op-heading" id={id}>
 			{children}
 		</h2>
 	);
@@ -19,7 +19,7 @@ export function DefaultHeading({
 export function DefaultParagraph({ node }: { node: ParagraphNode }) {
 	const { Text, Bold, Link } = useContext(InlineComponentsContext);
 	return (
-		<p data-op-paragraph>
+		<p data-op-paragraph className="op-paragraph">
 			{node.children.map((n, i) => {
 				// biome-ignore lint/suspicious/noArrayIndexKey: todo
 				if (n.type === "text") return <Text key={i} node={n} />;
@@ -35,10 +35,10 @@ export function DefaultParagraph({ node }: { node: ParagraphNode }) {
 export function DefaultList({ node }: { node: ListNode }) {
 	const { Text, Bold, Link } = useContext(InlineComponentsContext);
 	return (
-		<ul data-op-list>
+		<ul data-op-list className="op-list">
 			{node.items.map((item, i) => (
 				// biome-ignore lint/suspicious/noArrayIndexKey: list items have no stable key
-				<li key={i} data-op-list-item>
+				<li key={i} data-op-list-item className="op-list-item">
 					{item.children.map((n, j) => {
 						// biome-ignore lint/suspicious/noArrayIndexKey: todo
 						if (n.type === "text") return <Text key={j} node={n} />;

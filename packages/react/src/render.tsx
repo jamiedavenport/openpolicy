@@ -50,7 +50,12 @@ export function renderDocument(
 						{inner}
 					</SectionComp>
 				) : (
-					<section key={section.id} data-op-section id={section.id}>
+					<section
+						key={section.id}
+						data-op-section
+						className="op-section"
+						id={section.id}
+					>
 						{inner}
 					</section>
 				);

@@ -12,11 +12,15 @@ export function DefaultText({ node }: { node: TextNode }) {
 }
 
 export function DefaultBold({ node }: { node: BoldNode }) {
-	return <strong>{node.value}</strong>;
+	return <strong className="op-bold">{node.value}</strong>;
 }
 
 export function DefaultLink({ node }: { node: LinkNode }) {
-	return <a href={node.href}>{node.value}</a>;
+	return (
+		<a href={node.href} className="op-link">
+			{node.value}
+		</a>
+	);
 }
 
 export const InlineComponentsContext = createContext<InlineComponents>({

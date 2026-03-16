@@ -1,5 +1,6 @@
 import type { OpenPolicyConfig } from "@openpolicy/core";
 import { createContext, type ReactNode } from "react";
+import { defaultStyles } from "./styles";
 
 interface OpenPolicyContextValue {
 	config: OpenPolicyConfig | null;
@@ -19,8 +20,13 @@ export function OpenPolicyProvider({
 	children,
 }: OpenPolicyProviderProps) {
 	return (
-		<OpenPolicyContext.Provider value={{ config }}>
-			{children}
-		</OpenPolicyContext.Provider>
+		<>
+			<style href="@openpolicy/react" precedence="default">
+				{defaultStyles}
+			</style>
+			<OpenPolicyContext.Provider value={{ config }}>
+				{children}
+			</OpenPolicyContext.Provider>
+		</>
 	);
 }

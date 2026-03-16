@@ -13,5 +13,7 @@ export { OpenPolicyProvider as OpenPolicy } from "./context";
 export { DefaultBold, DefaultLink, DefaultText } from "./inline-context";
 // Render
 export { renderDocument } from "./render";
+// Styles
+export { defaultStyles } from "./styles";
 // Types
 export type { PolicyComponents, PolicyTheme } from "./types";
