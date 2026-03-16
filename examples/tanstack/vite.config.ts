@@ -11,6 +11,7 @@ export default defineConfig({
 	plugins: [
 		tsConfigPaths(),
 		openPolicy({
+			configPath: "./src/openpolicy.ts",
 			formats: ["html"],
 			outDir: "src/policies",
 		}),
