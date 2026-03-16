@@ -11,6 +11,7 @@ import {
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import openpolicy from "../openpolicy";
+import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
 	head: () => ({
@@ -26,6 +27,7 @@ export const Route = createRootRoute({
 				title: "TanStack Start Starter",
 			},
 		],
+		links: [{ rel: "stylesheet", href: appCss }],
 	}),
 	component: RootComponent,
 });
@@ -47,7 +49,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 				<HeadContent />
 			</head>
 			<body>
-				<nav>
+				<nav className="p-5 flex items-center gap-5">
 					<Link to="/">Home</Link>
 					<Link to="/privacy">Privacy</Link>
 					<Link to="/terms">Terms</Link>

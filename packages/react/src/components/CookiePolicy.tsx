@@ -1,27 +1,30 @@
-import type { CookiePolicyConfig, OpenPolicyConfig } from "@openpolicy/core";
+import {
+	type CookiePolicyConfig,
+	compile,
+	expandOpenPolicyConfig,
+	isOpenPolicyConfig,
+	type OpenPolicyConfig,
+} from "@openpolicy/core";
 import type { CSSProperties } from "react";
-import { useCookiePolicy } from "../hooks/useCookiePolicy";
-import type { PolicySlots } from "../types";
-import { PolicySection } from "./PolicySection";
+import { renderDocument } from "../render";
+import type { PolicyComponents } from "../types";
 
 interface CookiePolicyProps {
 	config?: OpenPolicyConfig | CookiePolicyConfig;
-	components?: PolicySlots;
+	components?: PolicyComponents;
 	style?: CSSProperties;
 }
 
 export function CookiePolicy({ config, components, style }: CookiePolicyProps) {
-	const { sections } = useCookiePolicy(config);
-
+	if (!config) return null;
+	const input = isOpenPolicyConfig(config)
+		? expandOpenPolicyConfig(config).find((i) => i.type === "cookie")
+		: { type: "cookie" as const, ...config };
+	if (!input) return null;
+	const doc = compile(input);
 	return (
 		<div data-op-policy style={style}>
-			{sections.map((section) => (
-				<PolicySection
-					key={section.id}
-					section={section}
-					components={components}
-				/>
-			))}
+			{renderDocument(doc, components)}
 		</div>
 	);
 }

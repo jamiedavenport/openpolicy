@@ -1,12 +1,17 @@
-import type { OpenPolicyConfig, TermsOfServiceConfig } from "@openpolicy/core";
+import {
+	compile,
+	expandOpenPolicyConfig,
+	isOpenPolicyConfig,
+	type OpenPolicyConfig,
+	type TermsOfServiceConfig,
+} from "@openpolicy/core";
 import type { CSSProperties } from "react";
-import { useTermsOfService } from "../hooks/useTermsOfService";
-import type { PolicySlots } from "../types";
-import { PolicySection } from "./PolicySection";
+import { renderDocument } from "../render";
+import type { PolicyComponents } from "../types";
 
 interface TermsOfServiceProps {
 	config?: OpenPolicyConfig | TermsOfServiceConfig;
-	components?: PolicySlots;
+	components?: PolicyComponents;
 	style?: CSSProperties;
 }
 
@@ -15,17 +20,15 @@ export function TermsOfService({
 	components,
 	style,
 }: TermsOfServiceProps) {
-	const { sections } = useTermsOfService(config);
-
+	if (!config) return null;
+	const input = isOpenPolicyConfig(config)
+		? expandOpenPolicyConfig(config).find((i) => i.type === "terms")
+		: { type: "terms" as const, ...config };
+	if (!input) return null;
+	const doc = compile(input);
 	return (
 		<div data-op-policy style={style}>
-			{sections.map((section) => (
-				<PolicySection
-					key={section.id}
-					section={section}
-					components={components}
-				/>
-			))}
+			{renderDocument(doc, components)}
 		</div>
 	);
 }

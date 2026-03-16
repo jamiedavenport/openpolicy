@@ -6,5 +6,15 @@ export const Route = createFileRoute("/framework/privacy")({
 });
 
 function RouteComponent() {
-	return <PrivacyPolicy />;
+	return (
+		<PrivacyPolicy
+			components={{
+				Heading: ({ id, children }) => (
+					<h2 id={id} className="text-2xl font-bold text-red-500">
+						{children}
+					</h2>
+				),
+			}}
+		/>
+	);
 }

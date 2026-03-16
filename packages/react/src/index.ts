@@ -1,17 +1,17 @@
-// Hooks
-
-export { CookiePolicy } from "./components/CookiePolicy";
 // Components
-export { PolicySection } from "./components/PolicySection";
+export { CookiePolicy } from "./components/CookiePolicy";
+// Default renderers
+export {
+	DefaultHeading,
+	DefaultList,
+	DefaultParagraph,
+} from "./components/defaults";
 export { PrivacyPolicy } from "./components/PrivacyPolicy";
 export { TermsOfService } from "./components/TermsOfService";
 // Context / Provider
 export { OpenPolicyProvider as OpenPolicy } from "./context";
-export type { UseCookiePolicyResult } from "./hooks/useCookiePolicy";
-export { useCookiePolicy } from "./hooks/useCookiePolicy";
-export type { UsePrivacyPolicyResult } from "./hooks/usePrivacyPolicy";
-export { usePrivacyPolicy } from "./hooks/usePrivacyPolicy";
-export type { UseTermsOfServiceResult } from "./hooks/useTermsOfService";
-export { useTermsOfService } from "./hooks/useTermsOfService";
+export { DefaultBold, DefaultLink, DefaultText } from "./inline-context";
+// Render
+export { renderDocument } from "./render";
 // Types
-export type { PolicySlots, PolicyTheme } from "./types";
+export type { PolicyComponents, PolicyTheme } from "./types";

@@ -1,4 +1,17 @@
 export { compileCookiePolicy } from "./cookie";
+export type {
+	BoldNode,
+	ContentNode,
+	Document,
+	DocumentSection,
+	InlineNode,
+	LinkNode,
+	ListItemNode,
+	ListNode,
+	ParagraphNode,
+	TextNode,
+} from "./documents";
+export { bold, compile, li, link, p, text, ul } from "./documents";
 export { compilePrivacyPolicy } from "./privacy";
 export { compileTermsOfService } from "./terms";
 export type {

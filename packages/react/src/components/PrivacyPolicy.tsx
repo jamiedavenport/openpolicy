@@ -1,31 +1,37 @@
-import type { OpenPolicyConfig, PrivacyPolicyConfig } from "@openpolicy/core";
-import type { CSSProperties } from "react";
-import { usePrivacyPolicy } from "../hooks/usePrivacyPolicy";
-import type { PolicySlots } from "../types";
-import { PolicySection } from "./PolicySection";
+import {
+	compile,
+	expandOpenPolicyConfig,
+	isOpenPolicyConfig,
+	type OpenPolicyConfig,
+	type PrivacyPolicyConfig,
+} from "@openpolicy/core";
+import { type CSSProperties, useContext } from "react";
+import { OpenPolicyContext } from "../context";
+import { renderDocument } from "../render";
+import type { PolicyComponents } from "../types";
 
 interface PrivacyPolicyProps {
 	config?: OpenPolicyConfig | PrivacyPolicyConfig;
-	components?: PolicySlots;
+	components?: PolicyComponents;
 	style?: CSSProperties;
 }
 
 export function PrivacyPolicy({
-	config,
+	config: configProp,
 	components,
 	style,
 }: PrivacyPolicyProps) {
-	const { sections } = usePrivacyPolicy(config);
-
+	const { config: contextConfig } = useContext(OpenPolicyContext);
+	const config = configProp ?? contextConfig ?? undefined;
+	if (!config) return null;
+	const input = isOpenPolicyConfig(config)
+		? expandOpenPolicyConfig(config).find((i) => i.type === "privacy")
+		: { type: "privacy" as const, ...config };
+	if (!input) return null;
+	const doc = compile(input);
 	return (
 		<div data-op-policy style={style}>
-			{sections.map((section) => (
-				<PolicySection
-					key={section.id}
-					section={section}
-					components={components}
-				/>
-			))}
+			{renderDocument(doc, components)}
 		</div>
 	);
 }

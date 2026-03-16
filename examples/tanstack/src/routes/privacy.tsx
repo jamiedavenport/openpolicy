@@ -7,5 +7,5 @@ export const Route = createFileRoute("/privacy")({
 
 function RouteComponent() {
 	// biome-ignore lint/security/noDangerouslySetInnerHtml: oki
-	return <div dangerouslySetInnerHTML={{ __html: html }} />;
+	return <div className="p-5" dangerouslySetInnerHTML={{ __html: html }} />;
 }
