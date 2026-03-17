@@ -53,35 +53,29 @@ export function DefaultSection({
 }
 
 export function DefaultParagraph({
-	node,
-	components,
+	node: _node,
+	children,
 }: {
 	node: import("@openpolicy/core").ParagraphNode;
-	components?: PolicyComponents;
+	children: ReactNode;
 }) {
 	return (
 		<p data-op-paragraph className="op-paragraph">
-			{node.children.map((n, i) =>
-				// biome-ignore lint/suspicious/noArrayIndexKey: todo
-				renderNode(n, components ?? {}, i),
-			)}
+			{children}
 		</p>
 	);
 }
 
 export function DefaultList({
-	node,
-	components,
+	node: _node,
+	children,
 }: {
 	node: import("@openpolicy/core").ListNode;
-	components?: PolicyComponents;
+	children: ReactNode;
 }) {
 	return (
 		<ul data-op-list className="op-list">
-			{node.items.map((item, i) =>
-				// biome-ignore lint/suspicious/noArrayIndexKey: list items have no stable key
-				renderNode(item, components ?? {}, i),
-			)}
+			{children}
 		</ul>
 	);
 }
@@ -107,20 +101,35 @@ export function renderNode(
 		}
 
 		case "paragraph": {
+			const children = node.children.map((n, i) =>
+				renderNode(n, components, i),
+			);
 			if (components.Paragraph)
-				return <components.Paragraph key={key} node={node} />;
+				return (
+					<components.Paragraph key={key} node={node}>
+						{children}
+					</components.Paragraph>
+				);
 			return (
 				<p key={key} data-op-paragraph className="op-paragraph">
-					{node.children.map((n, i) => renderNode(n, components, i))}
+					{children}
 				</p>
 			);
 		}
 
 		case "list": {
-			if (components.List) return <components.List key={key} node={node} />;
+			const children = node.items.map((item, i) =>
+				renderNode(item, components, i),
+			);
+			if (components.List)
+				return (
+					<components.List key={key} node={node}>
+						{children}
+					</components.List>
+				);
 			return (
 				<ul key={key} data-op-list className="op-list">
-					{node.items.map((item, i) => renderNode(item, components, i))}
+					{children}
 				</ul>
 			);
 		}

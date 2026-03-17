@@ -29,8 +29,8 @@ export type PolicyTheme = Partial<
 export interface PolicyComponents {
 	Section?: ComponentType<{ section: DocumentSection; children: ReactNode }>;
 	Heading?: ComponentType<{ id: string; children: ReactNode }>;
-	Paragraph?: ComponentType<{ node: ParagraphNode }>;
-	List?: ComponentType<{ node: ListNode }>;
+	Paragraph?: ComponentType<{ node: ParagraphNode; children: ReactNode }>;
+	List?: ComponentType<{ node: ListNode; children: ReactNode }>;
 	Text?: ComponentType<{ node: TextNode }>;
 	Bold?: ComponentType<{ node: BoldNode }>;
 	Link?: ComponentType<{ node: LinkNode }>;
