@@ -22,7 +22,7 @@ const minimalPrivacyConfig: PrivacyPolicyConfig = {
 
 test("compile returns a Document with correct type", () => {
 	const doc = compile({ type: "privacy", ...minimalPrivacyConfig });
-	expect(doc.type).toBe("privacy");
+	expect(doc.policyType).toBe("privacy");
 	expect(Array.isArray(doc.sections)).toBe(true);
 });
 
@@ -39,7 +39,7 @@ test("compile returns correct type for terms", () => {
 		acceptance: { methods: ["using the service"] },
 		governingLaw: { jurisdiction: "California, USA" },
 	});
-	expect(doc.type).toBe("terms");
+	expect(doc.policyType).toBe("terms");
 	expect(Array.isArray(doc.sections)).toBe(true);
 });
 

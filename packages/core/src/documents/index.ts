@@ -5,15 +5,20 @@ import type { Document } from "./types";
 export function compile(input: PolicyInput): Document {
 	if (input.type === "privacy") {
 		const { type: _, ...config } = input;
-		return { type: "privacy", sections: compilePrivacyDocument(config) };
+		return {
+			type: "document",
+			policyType: "privacy",
+			sections: compilePrivacyDocument(config),
+		};
 	}
 	return {
-		type: input.type,
+		type: "document",
+		policyType: input.type,
 		sections: [], // TODO: migrate terms + cookie builders
 	};
 }
 
-export { bold, li, link, p, text, ul } from "./helpers";
+export { bold, li, link, p, section, text, ul } from "./helpers";
 export type {
 	BoldNode,
 	ContentNode,
@@ -23,6 +28,7 @@ export type {
 	LinkNode,
 	ListItemNode,
 	ListNode,
+	Node,
 	ParagraphNode,
 	TextNode,
 } from "./types";

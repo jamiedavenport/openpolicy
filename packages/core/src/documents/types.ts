@@ -8,14 +8,14 @@ export type InlineNode = TextNode | BoldNode | LinkNode;
 export type ParagraphNode = { type: "paragraph"; children: InlineNode[] };
 export type ListItemNode = {
 	type: "listItem";
-	children: InlineNode[];
-	nested?: ListNode;
+	children: (InlineNode | ListNode)[];
 };
 export type ListNode = { type: "list"; items: ListItemNode[] };
 export type ContentNode = ParagraphNode | ListNode;
 
 // A single section of a document
 export type DocumentSection = {
+	type: "section";
 	id: string;
 	title: string;
 	content: ContentNode[];
@@ -23,6 +23,15 @@ export type DocumentSection = {
 
 // The top-level document
 export type Document = {
-	type: "privacy" | "terms" | "cookie";
+	type: "document";
+	policyType: "privacy" | "terms" | "cookie";
 	sections: DocumentSection[];
 };
+
+// Every node in the document tree
+export type Node =
+	| Document
+	| DocumentSection
+	| ContentNode
+	| ListItemNode
+	| InlineNode;

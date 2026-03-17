@@ -1,5 +1,7 @@
 import type {
 	BoldNode,
+	ContentNode,
+	DocumentSection,
 	InlineNode,
 	LinkNode,
 	ListItemNode,
@@ -20,14 +22,17 @@ export const p = (...children: (string | InlineNode)[]): ParagraphNode => ({
 	children: children.map((c) => (typeof c === "string" ? text(c) : c)),
 });
 export const li = (
-	children: (string | InlineNode)[],
-	nested?: ListNode,
+	children: (string | InlineNode | ListNode)[],
 ): ListItemNode => ({
 	type: "listItem",
 	children: children.map((c) => (typeof c === "string" ? text(c) : c)),
-	...(nested ? { nested } : {}),
 });
 export const ul = (...items: ListItemNode[]): ListNode => ({
 	type: "list",
 	items,
 });
+export const section = (
+	id: string,
+	title: string,
+	content: ContentNode[],
+): DocumentSection => ({ type: "section", id, title, content });

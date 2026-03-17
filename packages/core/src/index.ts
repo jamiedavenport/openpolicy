@@ -8,10 +8,11 @@ export type {
 	LinkNode,
 	ListItemNode,
 	ListNode,
+	Node,
 	ParagraphNode,
 	TextNode,
 } from "./documents";
-export { bold, compile, li, link, p, text, ul } from "./documents";
+export { bold, compile, li, link, p, section, text, ul } from "./documents";
 export { compilePrivacyPolicy } from "./privacy";
 export { compileTermsOfService } from "./terms";
 export type {

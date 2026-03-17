@@ -1,5 +1,5 @@
 import type { PrivacyPolicyConfig } from "../types";
-import { bold, li, link, p, ul } from "./helpers";
+import { bold, li, link, p, section, ul } from "./helpers";
 import type { DocumentSection } from "./types";
 
 const RIGHTS_LABELS: Record<string, string> = {
@@ -15,18 +15,14 @@ const RIGHTS_LABELS: Record<string, string> = {
 };
 
 function buildIntroduction(config: PrivacyPolicyConfig): DocumentSection {
-	return {
-		id: "introduction",
-		title: "Introduction",
-		content: [
-			p(
-				`This Privacy Policy describes how ${config.company.name} ("we", "us", or "our") collects, uses, and shares information about you when you use our services. Effective Date: ${config.effectiveDate}.`,
-			),
-			p(
-				`If you have questions about this policy, please contact us at ${config.company.contact}.`,
-			),
-		],
-	};
+	return section("introduction", "Introduction", [
+		p(
+			`This Privacy Policy describes how ${config.company.name} ("we", "us", or "our") collects, uses, and shares information about you when you use our services. Effective Date: ${config.effectiveDate}.`,
+		),
+		p(
+			`If you have questions about this policy, please contact us at ${config.company.contact}.`,
+		),
+	]);
 }
 
 function buildChildrenPrivacy(
@@ -48,44 +44,34 @@ function buildChildrenPrivacy(
 			),
 		);
 	}
-	return { id: "children-privacy", title: "Children's Privacy", content };
+	return section("children-privacy", "Children's Privacy", content);
 }
 
 function buildDataCollected(config: PrivacyPolicyConfig): DocumentSection {
 	const items = Object.entries(config.dataCollected).map(([category, fields]) =>
-		li([bold(category)], ul(...fields.map((f) => li([f])))),
+		li([bold(category), ul(...fields.map((f) => li([f])))]),
 	);
-	return {
-		id: "data-collected",
-		title: "Information We Collect",
-		content: [
-			p("We collect the following categories of information:"),
-			ul(...items),
-		],
-	};
+	return section("data-collected", "Information We Collect", [
+		p("We collect the following categories of information:"),
+		ul(...items),
+	]);
 }
 
 function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
 	if (!config.jurisdictions.includes("eu")) return null;
-	return {
-		id: "legal-basis",
-		title: "Legal Basis for Processing",
-		content: [p(config.legalBasis)],
-	};
+	return section("legal-basis", "Legal Basis for Processing", [
+		p(config.legalBasis),
+	]);
 }
 
 function buildDataRetention(config: PrivacyPolicyConfig): DocumentSection {
 	const items = Object.entries(config.retention).map(([category, period]) =>
 		li([bold(category), ": ", period]),
 	);
-	return {
-		id: "data-retention",
-		title: "Data Retention",
-		content: [
-			p("We retain your data for the following periods:"),
-			ul(...items),
-		],
-	};
+	return section("data-retention", "Data Retention", [
+		p("We retain your data for the following periods:"),
+		ul(...items),
+	]);
 }
 
 function buildCookies(config: PrivacyPolicyConfig): DocumentSection {
@@ -100,46 +86,32 @@ function buildCookies(config: PrivacyPolicyConfig): DocumentSection {
 		enabled.push("Marketing cookies — used to deliver relevant advertisements");
 
 	if (enabled.length === 0) {
-		return {
-			id: "cookies",
-			title: "Cookies and Tracking",
-			content: [p("We do not use cookies or similar tracking technologies.")],
-		};
+		return section("cookies", "Cookies and Tracking", [
+			p("We do not use cookies or similar tracking technologies."),
+		]);
 	}
-	return {
-		id: "cookies",
-		title: "Cookies and Tracking",
-		content: [
-			p("We use the following types of cookies and tracking technologies:"),
-			ul(...enabled.map((e) => li([e]))),
-		],
-	};
+	return section("cookies", "Cookies and Tracking", [
+		p("We use the following types of cookies and tracking technologies:"),
+		ul(...enabled.map((e) => li([e]))),
+	]);
 }
 
 function buildThirdParties(config: PrivacyPolicyConfig): DocumentSection {
 	if (config.thirdParties.length === 0) {
-		return {
-			id: "third-parties",
-			title: "Third-Party Services",
-			content: [
-				p(
-					"We do not share your personal information with third parties except as required by law.",
-				),
-			],
-		};
-	}
-	return {
-		id: "third-parties",
-		title: "Third-Party Services",
-		content: [
-			p("We share data with the following third-party services:"),
-			ul(
-				...config.thirdParties.map((t) =>
-					li([bold(t.name), " \u2014 ", t.purpose]),
-				),
+		return section("third-parties", "Third-Party Services", [
+			p(
+				"We do not share your personal information with third parties except as required by law.",
 			),
-		],
-	};
+		]);
+	}
+	return section("third-parties", "Third-Party Services", [
+		p("We share data with the following third-party services:"),
+		ul(
+			...config.thirdParties.map((t) =>
+				li([bold(t.name), " \u2014 ", t.purpose]),
+			),
+		),
+	]);
 }
 
 function buildUserRights(config: PrivacyPolicyConfig): DocumentSection {
@@ -147,84 +119,68 @@ function buildUserRights(config: PrivacyPolicyConfig): DocumentSection {
 		const label = RIGHTS_LABELS[right] ?? right;
 		return li([label]);
 	});
-	return {
-		id: "user-rights",
-		title: "Your Rights",
-		content: [
-			p("You have the following rights regarding your personal data:"),
-			ul(...items),
-		],
-	};
+	return section("user-rights", "Your Rights", [
+		p("You have the following rights regarding your personal data:"),
+		ul(...items),
+	]);
 }
 
 function buildGdprSupplement(
 	config: PrivacyPolicyConfig,
 ): DocumentSection | null {
 	if (!config.jurisdictions.includes("eu")) return null;
-	return {
-		id: "gdpr-supplement",
-		title: "GDPR Supplemental Disclosures",
-		content: [
-			p(
-				"This section applies to individuals in the European Economic Area (EEA) under the General Data Protection Regulation (GDPR).",
-			),
-			p(
-				"Data Controller: ",
-				bold(config.company.legalName),
-				`, ${config.company.address}`,
-			),
-			p(
-				"In addition to the rights listed above, you have the right to lodge a complaint with your local data protection authority if you believe we have not handled your data in accordance with applicable law.",
-			),
-			p(
-				"If we transfer your personal data outside the EEA, we ensure adequate safeguards are in place in accordance with GDPR requirements.",
-			),
-		],
-	};
+	return section("gdpr-supplement", "GDPR Supplemental Disclosures", [
+		p(
+			"This section applies to individuals in the European Economic Area (EEA) under the General Data Protection Regulation (GDPR).",
+		),
+		p(
+			"Data Controller: ",
+			bold(config.company.legalName),
+			`, ${config.company.address}`,
+		),
+		p(
+			"In addition to the rights listed above, you have the right to lodge a complaint with your local data protection authority if you believe we have not handled your data in accordance with applicable law.",
+		),
+		p(
+			"If we transfer your personal data outside the EEA, we ensure adequate safeguards are in place in accordance with GDPR requirements.",
+		),
+	]);
 }
 
 function buildCcpaSupplement(
 	config: PrivacyPolicyConfig,
 ): DocumentSection | null {
 	if (!config.jurisdictions.includes("ca")) return null;
-	return {
-		id: "ccpa-supplement",
-		title: "California Privacy Rights (CCPA)",
-		content: [
-			p(
-				"If you are a California resident, you have the following additional rights:",
-			),
-			ul(
-				li([
-					"Right to Know — You may request disclosure of the personal information we collect, use, and share about you.",
-				]),
-				li([
-					"Right to Delete — You may request deletion of personal information we have collected about you.",
-				]),
-				li([
-					"Right to Opt-Out — You may opt out of the sale of your personal information.",
-				]),
-				li([
-					"Right to Non-Discrimination — We will not discriminate against you for exercising your CCPA rights.",
-				]),
-			),
-		],
-	};
+	return section("ccpa-supplement", "California Privacy Rights (CCPA)", [
+		p(
+			"If you are a California resident, you have the following additional rights:",
+		),
+		ul(
+			li([
+				"Right to Know — You may request disclosure of the personal information we collect, use, and share about you.",
+			]),
+			li([
+				"Right to Delete — You may request deletion of personal information we have collected about you.",
+			]),
+			li([
+				"Right to Opt-Out — You may opt out of the sale of your personal information.",
+			]),
+			li([
+				"Right to Non-Discrimination — We will not discriminate against you for exercising your CCPA rights.",
+			]),
+		),
+	]);
 }
 
 function buildContact(config: PrivacyPolicyConfig): DocumentSection {
-	return {
-		id: "contact",
-		title: "Contact Us",
-		content: [
-			p("Contact us:"),
-			ul(
-				li([bold("Legal Name: "), config.company.legalName]),
-				li([bold("Address: "), config.company.address]),
-				li([bold("Email: "), config.company.contact]),
-			),
-		],
-	};
+	return section("contact", "Contact Us", [
+		p("Contact us:"),
+		ul(
+			li([bold("Legal Name: "), config.company.legalName]),
+			li([bold("Address: "), config.company.address]),
+			li([bold("Email: "), config.company.contact]),
+		),
+	]);
 }
 
 const SECTION_BUILDERS: ((
