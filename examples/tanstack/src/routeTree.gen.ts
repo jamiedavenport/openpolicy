@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as FrameworkTailwindRouteImport } from './routes/framework/tailwind'
 import { Route as FrameworkShadcnRouteImport } from './routes/framework/shadcn'
 import { Route as FrameworkPrivacyRouteImport } from './routes/framework/privacy'
+import { Route as FrameworkCssVarsRouteImport } from './routes/framework/css-vars'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -46,11 +47,17 @@ const FrameworkPrivacyRoute = FrameworkPrivacyRouteImport.update({
   path: '/framework/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FrameworkCssVarsRoute = FrameworkCssVarsRouteImport.update({
+  id: '/framework/css-vars',
+  path: '/framework/css-vars',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/framework/css-vars': typeof FrameworkCssVarsRoute
   '/framework/privacy': typeof FrameworkPrivacyRoute
   '/framework/shadcn': typeof FrameworkShadcnRoute
   '/framework/tailwind': typeof FrameworkTailwindRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/framework/css-vars': typeof FrameworkCssVarsRoute
   '/framework/privacy': typeof FrameworkPrivacyRoute
   '/framework/shadcn': typeof FrameworkShadcnRoute
   '/framework/tailwind': typeof FrameworkTailwindRoute
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/framework/css-vars': typeof FrameworkCssVarsRoute
   '/framework/privacy': typeof FrameworkPrivacyRoute
   '/framework/shadcn': typeof FrameworkShadcnRoute
   '/framework/tailwind': typeof FrameworkTailwindRoute
@@ -78,6 +87,7 @@ export interface FileRouteTypes {
     | '/'
     | '/privacy'
     | '/terms'
+    | '/framework/css-vars'
     | '/framework/privacy'
     | '/framework/shadcn'
     | '/framework/tailwind'
@@ -86,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/privacy'
     | '/terms'
+    | '/framework/css-vars'
     | '/framework/privacy'
     | '/framework/shadcn'
     | '/framework/tailwind'
@@ -94,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/privacy'
     | '/terms'
+    | '/framework/css-vars'
     | '/framework/privacy'
     | '/framework/shadcn'
     | '/framework/tailwind'
@@ -103,6 +115,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  FrameworkCssVarsRoute: typeof FrameworkCssVarsRoute
   FrameworkPrivacyRoute: typeof FrameworkPrivacyRoute
   FrameworkShadcnRoute: typeof FrameworkShadcnRoute
   FrameworkTailwindRoute: typeof FrameworkTailwindRoute
@@ -152,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FrameworkPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/framework/css-vars': {
+      id: '/framework/css-vars'
+      path: '/framework/css-vars'
+      fullPath: '/framework/css-vars'
+      preLoaderRoute: typeof FrameworkCssVarsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -159,6 +179,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  FrameworkCssVarsRoute: FrameworkCssVarsRoute,
   FrameworkPrivacyRoute: FrameworkPrivacyRoute,
   FrameworkShadcnRoute: FrameworkShadcnRoute,
   FrameworkTailwindRoute: FrameworkTailwindRoute,
