@@ -29,7 +29,6 @@ jobs:
           bun-version: latest
       - run: bun install --frozen-lockfile
       - run: bun run build
-        working-directory: packages/core
       - run: bunx playwright install --with-deps chromium
         working-directory: examples/tanstack
       - run: bun run test:e2e
