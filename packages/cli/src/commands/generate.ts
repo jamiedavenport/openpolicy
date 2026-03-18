@@ -2,11 +2,8 @@ import { existsSync, watch } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { OpenPolicyConfig, OutputFormat } from "@openpolicy/core";
-import {
-	compilePolicy,
-	expandOpenPolicyConfig,
-	isOpenPolicyConfig,
-} from "@openpolicy/core";
+import { expandOpenPolicyConfig, isOpenPolicyConfig } from "@openpolicy/core";
+import { compilePolicy } from "@openpolicy/renderers";
 import { defineCommand } from "citty";
 import consola from "consola";
 import { loadConfig } from "../utils/load-config";

@@ -1,0 +1,21 @@
+{
+	"name": "@openpolicy/renderers",
+	"version": "0.0.13",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"check-types": "tsc --noEmit",
+		"test": "bun test"
+	},
+	"dependencies": {
+		"pdfkit": "^0.18.0"
+	},
+	"devDependencies": {
+		"@openpolicy/core": "workspace:*",
+		"@openpolicy/tooling": "workspace:*",
+		"@types/pdfkit": "^0.17.5"
+	}
+}

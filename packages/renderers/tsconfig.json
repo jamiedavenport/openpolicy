@@ -1,0 +1,8 @@
+{
+	"extends": "@openpolicy/tooling/base",
+	"compilerOptions": {
+		"rootDir": "src",
+		"outDir": "dist"
+	},
+	"include": ["src"]
+}

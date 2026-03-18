@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import type { Document } from "../documents/types";
+import type { Document } from "@openpolicy/core";
 import { renderMarkdown } from "./markdown";
 
 function doc(sections: Document["sections"]): Document {

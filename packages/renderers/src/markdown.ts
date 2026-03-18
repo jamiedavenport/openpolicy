@@ -3,7 +3,7 @@ import type {
 	InlineNode,
 	ListItemNode,
 	ListNode,
-} from "../documents/types";
+} from "@openpolicy/core";
 
 function renderInline(node: InlineNode): string {
 	switch (node.type) {

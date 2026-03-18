@@ -1,11 +1,11 @@
-import PDFDocument from "pdfkit";
 import type {
 	Document,
 	DocumentSection,
 	InlineNode,
 	ListItemNode,
 	ListNode,
-} from "../documents/types";
+} from "@openpolicy/core";
+import PDFDocument from "pdfkit";
 
 const FONT_REGULAR = "Helvetica";
 const FONT_BOLD = "Helvetica-Bold";

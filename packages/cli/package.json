@@ -28,6 +28,7 @@
 	},
 	"devDependencies": {
 		"@openpolicy/core": "workspace:*",
+		"@openpolicy/renderers": "workspace:*",
 		"@openpolicy/tooling": "workspace:*"
 	}
 }

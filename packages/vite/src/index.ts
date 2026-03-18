@@ -2,13 +2,13 @@ import { access, mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import type { OpenPolicyConfig, OutputFormat } from "@openpolicy/core";
 import {
-	compilePolicy,
 	expandOpenPolicyConfig,
 	isOpenPolicyConfig,
 	validateCookiePolicy,
 	validatePrivacyPolicy,
 	validateTermsOfService,
 } from "@openpolicy/core";
+import { compilePolicy } from "@openpolicy/renderers";
 import type { Plugin } from "vite";
 
 export interface OpenPolicyOptions {

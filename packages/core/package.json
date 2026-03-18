@@ -27,10 +27,6 @@
 		"test": "bun test"
 	},
 	"devDependencies": {
-		"@openpolicy/tooling": "workspace:*",
-		"@types/pdfkit": "^0.17.5"
-	},
-	"dependencies": {
-		"pdfkit": "^0.18.0"
+		"@openpolicy/tooling": "workspace:*"
 	}
 }

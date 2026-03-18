@@ -33,6 +33,7 @@
 	},
 	"devDependencies": {
 		"@openpolicy/core": "workspace:*",
+		"@openpolicy/renderers": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
 		"vite": "^5.0.0"
 	}

@@ -159,18 +159,15 @@
       },
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
+        "@openpolicy/renderers": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
       },
     },
     "packages/core": {
       "name": "@openpolicy/core",
       "version": "0.0.12",
-      "dependencies": {
-        "pdfkit": "^0.18.0",
-      },
       "devDependencies": {
         "@openpolicy/tooling": "workspace:*",
-        "@types/pdfkit": "^0.17.5",
       },
     },
     "packages/react": {
@@ -189,6 +186,18 @@
         "react-dom": ">=19",
       },
     },
+    "packages/renderers": {
+      "name": "@openpolicy/renderers",
+      "version": "0.0.13",
+      "dependencies": {
+        "pdfkit": "^0.18.0",
+      },
+      "devDependencies": {
+        "@openpolicy/core": "workspace:*",
+        "@openpolicy/tooling": "workspace:*",
+        "@types/pdfkit": "^0.17.5",
+      },
+    },
     "packages/sdk": {
       "name": "@openpolicy/sdk",
       "version": "0.0.12",
@@ -202,6 +211,7 @@
       "version": "0.0.12",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
+        "@openpolicy/renderers": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
         "vite": "^5.0.0",
       },
@@ -588,6 +598,8 @@
     "@openpolicy/core": ["@openpolicy/core@workspace:packages/core"],
 
     "@openpolicy/react": ["@openpolicy/react@workspace:packages/react"],
+
+    "@openpolicy/renderers": ["@openpolicy/renderers@workspace:packages/renderers"],
 
     "@openpolicy/sdk": ["@openpolicy/sdk@workspace:packages/sdk"],
 

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { compile } from "../documents";
+import { compile } from "@openpolicy/core";
 import { renderPDF } from "./pdf";
 
 const input = {
