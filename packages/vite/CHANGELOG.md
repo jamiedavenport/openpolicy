@@ -1,5 +1,11 @@
 # @openpolicy/vite
 
+## 0.0.15
+
+### Patch Changes
+
+- 28b6b14: Fixes Jamie's mistakes
+
 ## 0.0.13
 
 ### Patch Changes
