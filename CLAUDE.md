@@ -44,22 +44,37 @@ Two hooks are active:
 - **pre-commit** — runs Biome format/lint on staged files
 - **pre-push** — runs `bun run check-types` across all packages
 
-## Versioning
+## Versioning & Release
 
 This repo uses [Changesets](https://github.com/changesets/changesets) for versioning and publishing. Publishable packages are `@openpolicy/sdk`, `@openpolicy/cli`, `@openpolicy/vite`, and `@openpolicy/core`.
 
-```sh
-# Create a changeset describing your change
-bun run changeset
+### Automated release flow
 
-# Bump versions and generate CHANGELOGs (done by CI, but can run locally)
+Releases are fully automated via `.github/workflows/release.yml` using `changesets/action`:
+
+1. **Add a changeset** as part of your feature/fix PR:
+   ```sh
+   bun run changeset
+   ```
+   Commit the generated `.changeset/*.md` file alongside your changes.
+
+2. **Merge to `main`** → CI runs and opens (or updates) a **"Version Packages" PR** that bumps `package.json` versions and updates `CHANGELOG.md` files.
+
+3. **Merge the "Version Packages" PR** → CI publishes all changed packages to NPM and creates GitHub releases.
+
+### Required secret
+
+`NPM_TOKEN` (an npm Automation token) must be set in **GitHub repo → Settings → Secrets and variables → Actions**. `GITHUB_TOKEN` is provided automatically by GitHub Actions.
+
+### Manual commands (local use only)
+
+```sh
+# Bump versions and generate CHANGELOGs
 bun run version-packages
 
 # Build all packages and publish to NPM
 bun run publish-packages
 ```
-
-The GitHub Actions workflow (`.github/workflows/release.yml`) automates this: when changesets are merged to `main`, it opens a "Version Packages" PR; merging that PR publishes to NPM. Requires `NPM_TOKEN` secret in GitHub repo settings.
 
 ### publishConfig pattern
 `exports` in each package.json points to `./src/index.ts` during development (Bun resolves TypeScript directly). `publishConfig.exports` overrides this to `./dist/` on `npm publish`, so consumers get compiled JS + `.d.ts` files without any extra setup for local development.
