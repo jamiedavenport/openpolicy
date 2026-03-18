@@ -6,6 +6,8 @@ export default defineConfig({
 	plugins: [dts()],
 	platform: "node",
 	external: (id) =>
-		id !== "@openpolicy/core" && (/^node:/.test(id) || /^[^./]/.test(id)),
+		id !== "@openpolicy/core" &&
+		id !== "@openpolicy/renderers" &&
+		(/^node:/.test(id) || /^[^./]/.test(id)),
 	output: { format: "esm", dir: "dist" },
 });

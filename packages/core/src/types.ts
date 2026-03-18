@@ -2,12 +2,6 @@ export type OutputFormat = "markdown" | "html" | "pdf" | "jsx";
 
 export type CompileOptions = { formats: OutputFormat[] };
 
-export type PolicySection = {
-	id: string;
-	title: string;
-	body: string;
-};
-
 export type Jurisdiction = "us" | "eu" | "ca" | "au" | "nz" | "other";
 
 export type CompanyConfig = {

@@ -1,0 +1,114 @@
+---
+title: Next.js
+description: Using OpenPolicy with Next.js
+---
+
+Next.js doesn't use Vite, so the recommended approach for generating static policy files is to use the `openpolicy generate` CLI command to produce policy files and then import them in your pages.
+
+For Next.js projects that prefer React components over file output, see the [React docs →](/docs/react).
+
+## Installation
+
+```sh
+bun add @openpolicy/sdk
+bun add -D @openpolicy/cli
+```
+
+## Create your config
+
+Create an `openpolicy.ts` at the root of your project using `defineConfig()`:
+
+```ts
+// openpolicy.ts
+import { defineConfig } from "@openpolicy/sdk";
+
+export default defineConfig({
+  company: {
+    name: "Acme Inc.",
+    legalName: "Acme Corporation",
+    address: "123 Main St, Springfield, USA",
+    contact: "privacy@acme.com",
+  },
+  privacy: {
+    effectiveDate: "2026-01-01",
+    dataCollected: {
+      "Account Information": ["Name", "Email address"],
+      "Usage Data": ["Pages visited", "Browser type", "IP address"],
+    },
+    legalBasis: "Legitimate interests and consent",
+    retention: {
+      "Account data": "Until account deletion",
+      "Usage logs": "90 days",
+    },
+    cookies: { essential: true, analytics: false, marketing: false },
+    thirdParties: [],
+    userRights: ["access", "erasure", "rectification", "portability"],
+    jurisdictions: ["us", "eu"],
+  },
+  terms: {
+    effectiveDate: "2026-01-01",
+    acceptance: { methods: ["using the service", "creating an account"] },
+    governingLaw: { jurisdiction: "Delaware, USA" },
+  },
+});
+```
+
+See the [openpolicy.ts reference →](/docs/reference/openpolicy-config) for all available fields.
+
+## Generate policy files
+
+Add a script to `package.json` and run it before your build:
+
+```json
+{
+  "scripts": {
+    "generate:policy": "openpolicy generate --format markdown,html --out ./src/policies",
+    "build": "bun run generate:policy && next build"
+  }
+}
+```
+
+```sh
+bun run generate:policy
+```
+
+This writes all policy files for each section defined in `openpolicy.ts`:
+
+```
+src/policies/
+  privacy-policy.md
+  privacy-policy.html
+  terms-of-service.md
+  terms-of-service.html
+```
+
+## Render in a page
+
+Import the HTML as a raw string and render it in a Server Component:
+
+```tsx
+// app/privacy/page.tsx
+import policy from "@/policies/privacy-policy.html?raw";
+
+export default function PrivacyPolicyPage() {
+  return (
+    <main>
+      <div dangerouslySetInnerHTML={{ __html: policy }} />
+    </main>
+  );
+}
+```
+
+### Using the Markdown output as an MDX page
+
+Copy or symlink the generated `.md` into your `content/` directory and process it with your MDX pipeline (e.g. Contentlayer, next-mdx-remote, or Fumadocs).
+
+## Keeping policies in sync
+
+Because the generated files are committed alongside your source, a pre-commit hook or CI step can verify they're up to date:
+
+```sh
+# In CI: regenerate and fail if the output differs
+bun run generate:policy
+git diff --exit-code src/policies/
+```

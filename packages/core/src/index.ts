@@ -1,6 +1,33 @@
-export { compileCookiePolicy } from "./cookie";
-export { compilePrivacyPolicy } from "./privacy";
-export { compileTermsOfService } from "./terms";
+export type {
+	BoldNode,
+	ContentNode,
+	Document,
+	DocumentSection,
+	HeadingNode,
+	InlineNode,
+	ItalicNode,
+	LinkNode,
+	ListItemNode,
+	ListNode,
+	Node,
+	NodeContext,
+	ParagraphNode,
+	PolicyType,
+	TextNode,
+} from "./documents";
+export {
+	bold,
+	compile,
+	heading,
+	italic,
+	li,
+	link,
+	ol,
+	p,
+	section,
+	text,
+	ul,
+} from "./documents";
 export type {
 	CompanyConfig,
 	CompileOptions,
@@ -10,7 +37,6 @@ export type {
 	OpenPolicyConfig,
 	OutputFormat,
 	PolicyInput,
-	PolicySection,
 	PrivacyPolicyConfig,
 	TermsOfServiceConfig,
 	ValidationIssue,
@@ -20,10 +46,7 @@ export { validatePrivacyPolicy } from "./validate";
 export { validateCookiePolicy } from "./validate-cookie";
 export { validateTermsOfService } from "./validate-terms";
 
-import { compileCookiePolicy } from "./cookie";
-import { compilePrivacyPolicy } from "./privacy";
-import { compileTermsOfService } from "./terms";
-import type { CompileOptions, OpenPolicyConfig, PolicyInput } from "./types";
+import type { OpenPolicyConfig, PolicyInput } from "./types";
 
 export function expandOpenPolicyConfig(
 	config: OpenPolicyConfig,
@@ -43,21 +66,4 @@ export function expandOpenPolicyConfig(
 		inputs.push({ type: "cookie", company: config.company, ...config.cookie });
 	}
 	return inputs;
-}
-
-export function compilePolicy(input: PolicyInput, options?: CompileOptions) {
-	switch (input.type) {
-		case "privacy": {
-			const { type: _, ...config } = input;
-			return compilePrivacyPolicy(config, options);
-		}
-		case "terms": {
-			const { type: _, ...config } = input;
-			return compileTermsOfService(config, options);
-		}
-		case "cookie": {
-			const { type: _, ...config } = input;
-			return compileCookiePolicy(config, options);
-		}
-	}
 }

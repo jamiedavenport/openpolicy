@@ -38,3 +38,9 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Generated policy files
 examples/tanstack/src/policies/
+
+# Bundle analysis
+examples/tanstack/bundle-stats.html
+
+# Docs
+v0.0.13

@@ -2,13 +2,13 @@ import { access, mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import type { OpenPolicyConfig, OutputFormat } from "@openpolicy/core";
 import {
-	compilePolicy,
 	expandOpenPolicyConfig,
 	isOpenPolicyConfig,
 	validateCookiePolicy,
 	validatePrivacyPolicy,
 	validateTermsOfService,
 } from "@openpolicy/core";
+import { compilePolicy } from "@openpolicy/renderers";
 import type { Plugin } from "vite";
 
 export interface OpenPolicyOptions {
@@ -49,7 +49,7 @@ export async function generatePolicies(
 					throw new Error(`[openpolicy] ${issue.message}`);
 				console.warn(`[openpolicy] Warning: ${issue.message}`);
 			}
-			const results = compilePolicy(input, { formats });
+			const results = await compilePolicy(input, { formats });
 			const outputFilename =
 				input.type === "terms"
 					? "terms-of-service"

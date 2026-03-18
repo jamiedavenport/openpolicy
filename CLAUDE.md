@@ -24,11 +24,11 @@ This is a monorepo under `packages/`. Key packages:
 
 - **Policy types**: `"privacy"` (PrivacyPolicyConfig) and `"terms"` (TermsOfServiceConfig) — `PolicyInput` is a discriminated union
 - **Policy definition**: TypeScript object passed to `defineConfig()` describing the policy content
-- **Compilation**: Policy definitions are compiled to HTML or Markdown — triggered either by the Vite plugin at build time or by `openpolicy generate` via the CLI
+- **Compilation**: Policy definitions are compiled to HTML, Markdown, or PDF — triggered either by the Vite plugin at build time or by `openpolicy generate` via the CLI
 - **Section builders**: Each section is a `(config) => PolicySection | null` function; `null` means the section is not applicable and is omitted
 - **Output filenames**: `privacy-policy.{ext}` for privacy, `terms-of-service.{ext}` for terms
 - **Type auto-detection**: config filenames containing `"terms"` are treated as `TermsOfServiceConfig`; all others default to `PrivacyPolicyConfig`. Used by both the CLI (`--type` overrides) and the Vite plugin (`configs` array; per-entry `type` overrides)
-- **Formats**: `markdown` | `html` (implemented); `pdf` | `jsx` throw "not yet implemented"
+- **Formats**: `markdown` | `html` | `pdf` (implemented); `jsx` throws "not yet implemented"
 - **Compliance targets**: GDPR, CCPA, and multi-jurisdiction templates (privacy only)
 - **`llms.txt`**: AI-readable reference for auto-generating policy configs from existing codebases
 
@@ -44,22 +44,37 @@ Two hooks are active:
 - **pre-commit** — runs Biome format/lint on staged files
 - **pre-push** — runs `bun run check-types` across all packages
 
-## Versioning
+## Versioning & Release
 
 This repo uses [Changesets](https://github.com/changesets/changesets) for versioning and publishing. Publishable packages are `@openpolicy/sdk`, `@openpolicy/cli`, `@openpolicy/vite`, and `@openpolicy/core`.
 
-```sh
-# Create a changeset describing your change
-bun run changeset
+### Automated release flow
 
-# Bump versions and generate CHANGELOGs (done by CI, but can run locally)
+Releases are fully automated via `.github/workflows/release.yml` using `changesets/action`:
+
+1. **Add a changeset** as part of your feature/fix PR:
+   ```sh
+   bun run changeset
+   ```
+   Commit the generated `.changeset/*.md` file alongside your changes.
+
+2. **Merge to `main`** → CI runs and opens (or updates) a **"Version Packages" PR** that bumps `package.json` versions and updates `CHANGELOG.md` files.
+
+3. **Merge the "Version Packages" PR** → CI publishes all changed packages to NPM and creates GitHub releases.
+
+### Required secret
+
+`NPM_TOKEN` (an npm Automation token) must be set in **GitHub repo → Settings → Secrets and variables → Actions**. `GITHUB_TOKEN` is provided automatically by GitHub Actions.
+
+### Manual commands (local use only)
+
+```sh
+# Bump versions and generate CHANGELOGs
 bun run version-packages
 
 # Build all packages and publish to NPM
 bun run publish-packages
 ```
-
-The GitHub Actions workflow (`.github/workflows/release.yml`) automates this: when changesets are merged to `main`, it opens a "Version Packages" PR; merging that PR publishes to NPM. Requires `NPM_TOKEN` secret in GitHub repo settings.
 
 ### publishConfig pattern
 `exports` in each package.json points to `./src/index.ts` during development (Bun resolves TypeScript directly). `publishConfig.exports` overrides this to `./dist/` on `npm publish`, so consumers get compiled JS + `.d.ts` files without any extra setup for local development.

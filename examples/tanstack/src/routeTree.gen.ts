@@ -9,18 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TailwindRouteImport } from './routes/tailwind'
+import { Route as ShadcnRouteImport } from './routes/shadcn'
+import { Route as CssVarsRouteImport } from './routes/css-vars'
 import { Route as IndexRouteImport } from './routes/index'
 
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
+const TailwindRoute = TailwindRouteImport.update({
+  id: '/tailwind',
+  path: '/tailwind',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
+const ShadcnRoute = ShadcnRouteImport.update({
+  id: '/shadcn',
+  path: '/shadcn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CssVarsRoute = CssVarsRouteImport.update({
+  id: '/css-vars',
+  path: '/css-vars',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,48 +37,59 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/privacy': typeof PrivacyRoute
-  '/terms': typeof TermsRoute
+  '/css-vars': typeof CssVarsRoute
+  '/shadcn': typeof ShadcnRoute
+  '/tailwind': typeof TailwindRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/privacy': typeof PrivacyRoute
-  '/terms': typeof TermsRoute
+  '/css-vars': typeof CssVarsRoute
+  '/shadcn': typeof ShadcnRoute
+  '/tailwind': typeof TailwindRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/privacy': typeof PrivacyRoute
-  '/terms': typeof TermsRoute
+  '/css-vars': typeof CssVarsRoute
+  '/shadcn': typeof ShadcnRoute
+  '/tailwind': typeof TailwindRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/privacy' | '/terms'
+  fullPaths: '/' | '/css-vars' | '/shadcn' | '/tailwind'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/privacy' | '/terms'
-  id: '__root__' | '/' | '/privacy' | '/terms'
+  to: '/' | '/css-vars' | '/shadcn' | '/tailwind'
+  id: '__root__' | '/' | '/css-vars' | '/shadcn' | '/tailwind'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PrivacyRoute: typeof PrivacyRoute
-  TermsRoute: typeof TermsRoute
+  CssVarsRoute: typeof CssVarsRoute
+  ShadcnRoute: typeof ShadcnRoute
+  TailwindRoute: typeof TailwindRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
+    '/tailwind': {
+      id: '/tailwind'
+      path: '/tailwind'
+      fullPath: '/tailwind'
+      preLoaderRoute: typeof TailwindRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
+    '/shadcn': {
+      id: '/shadcn'
+      path: '/shadcn'
+      fullPath: '/shadcn'
+      preLoaderRoute: typeof ShadcnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/css-vars': {
+      id: '/css-vars'
+      path: '/css-vars'
+      fullPath: '/css-vars'
+      preLoaderRoute: typeof CssVarsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -87,8 +104,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PrivacyRoute: PrivacyRoute,
-  TermsRoute: TermsRoute,
+  CssVarsRoute: CssVarsRoute,
+  ShadcnRoute: ShadcnRoute,
+  TailwindRoute: TailwindRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

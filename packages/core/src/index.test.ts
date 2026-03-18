@@ -1,9 +1,5 @@
 import { expect, test } from "bun:test";
-import {
-	compilePolicy,
-	expandOpenPolicyConfig,
-	isOpenPolicyConfig,
-} from "./index";
+import { expandOpenPolicyConfig, isOpenPolicyConfig } from "./index";
 import type { OpenPolicyConfig, PolicyInput } from "./types";
 
 const input: PolicyInput = {
@@ -102,11 +98,4 @@ test("expandOpenPolicyConfig returns only terms when privacy omitted", () => {
 test("expandOpenPolicyConfig returns empty array when neither privacy nor terms", () => {
 	const inputs = expandOpenPolicyConfig({ company } as OpenPolicyConfig);
 	expect(inputs).toHaveLength(0);
-});
-
-test("compilePolicy routes privacy input to markdown", () => {
-	const results = compilePolicy(input);
-	expect(results).toBeArray();
-	expect(results[0]?.format).toBe("markdown");
-	expect(results[0]?.content).toContain("Acme Inc.");
 });

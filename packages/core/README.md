@@ -6,7 +6,7 @@ This is an internal package used by `@openpolicy/sdk`, `@openpolicy/vite`, and `
 
 ## What it does
 
-- Compiles `PrivacyPolicyConfig` and `TermsOfServiceConfig` definitions to Markdown and HTML
+- Compiles `PrivacyPolicyConfig` and `TermsOfServiceConfig` definitions to Markdown, HTML, and PDF
 - Validates policy configs and returns structured warnings and errors
 - Exports section builders, renderers, and all core types
 
@@ -17,18 +17,19 @@ If you're building a custom integration (e.g. a framework plugin not covered by 
 ```ts
 import { compilePolicy } from "@openpolicy/core";
 
-const results = compilePolicy(
+const results = await compilePolicy(
   {
     type: "privacy",
     effectiveDate: "2026-01-01",
     company: { name: "Acme", legalName: "Acme, Inc.", address: "...", contact: "privacy@acme.com" },
     // ... rest of config
   },
-  { formats: ["markdown", "html"] },
+  { formats: ["markdown", "html", "pdf"] },
 );
 
 for (const result of results) {
-  console.log(result.format, result.content);
+  // result.content is string for markdown/html, Buffer for pdf
+  console.log(result.format, result.filename);
 }
 ```
 

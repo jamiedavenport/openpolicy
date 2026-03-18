@@ -141,9 +141,10 @@ See the [openpolicy.ts reference](https://docs.openpolicy.sh/reference/openpolic
 
 ## Output Formats
 
-- **`jsx`** — React component (`<PrivacyPolicy />`)
-- **`pdf`** — Static PDF file
 - **`markdown`** — Plain Markdown document
+- **`html`** — Static HTML file
+- **`pdf`** — Static PDF file (via PDFKit; A4, Helvetica, styled)
+- **`jsx`** — React component (`<PrivacyPolicy />`) _(not yet implemented)_
 
 ## Compliance
 
@@ -179,7 +180,7 @@ openpolicy validate ./openpolicy.ts --jurisdiction gdpr
 | `generate [config] [--type privacy\|terms\|cookie]` | Compiles the policy to the requested output formats. Defaults to `./openpolicy.ts`. |
 | `validate [config] [--type privacy\|terms\|cookie]` | Validates the policy config |
 
-`--format` accepts a comma-separated list: `markdown`, `html` (default: `markdown`).
+`--format` accepts a comma-separated list: `markdown`, `html`, `pdf` (default: `markdown`).
 `--type` is auto-detected from the config filename — files containing `"terms"` are treated as terms of service, `"cookie"` as cookie policy. Ignored for unified configs.
 `--jurisdiction` accepts `gdpr`, `ccpa`, or `all` (default: `all`, privacy only).
 

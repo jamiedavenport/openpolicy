@@ -1,42 +1,35 @@
 ## Terms of Service
 
-These Terms of Service ("Terms") govern your access to and use of the services provided by Acme Inc. ("Acme Inc.", "we", "us", or "our"). By using our services, you agree to these Terms.
-
-**Effective Date:** 2026-03-03
-
-For information about how we collect and use your data, please review our [Privacy Policy](/privacy).
+These Terms of Service ("Terms") govern your use of services provided by Acme Inc. ("we", "us", or "our"). By using our services, you agree to these Terms. Effective Date: 2026-03-03.
 
 ---
 
 ## Acceptance of Terms
 
-By accessing or using our services, you agree to be bound by these Terms. You accept these Terms by:
+You accept these Terms by:
 
 - using the service
 - creating an account
 - clicking 'I Agree'
 
-If you do not agree to these Terms, you may not use our services.
-
 ---
 
 ## Eligibility
 
-You must be at least **13 years old** to use our services. By using our services, you represent and warrant that you meet this age requirement.
+You must be at least 13 years old to use our services. By using the services, you represent that you meet this age requirement.
 
 ---
 
 ## Accounts
 
-You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must notify us immediately of any unauthorized use of your account.
-
-Acme Inc. reserves the right to suspend or terminate your account at any time, with or without notice, for any reason including violation of these Terms.
+- You are responsible for maintaining the confidentiality of your account credentials and for all activity under your account.
+- We reserve the right to terminate or suspend accounts at our discretion.
 
 ---
 
 ## Prohibited Uses
 
-You agree not to use our services for any of the following purposes:
+You may not use our services for the following purposes:
 
 - Violating any applicable laws or regulations
 - Infringing on the intellectual property rights of others
@@ -47,54 +40,49 @@ You agree not to use our services for any of the following purposes:
 
 ## Intellectual Property
 
-The services and all content, features, and functionality (including but not limited to text, graphics, logos, and software) are owned by Acme Corporation and are protected by intellectual property laws.
-
-You may not copy, modify, distribute, sell, or lease any part of our services or included software, nor may you reverse engineer or attempt to extract the source code of that software.
+- All content, features, and functionality of our services are owned by Acme Inc. and are protected by intellectual property laws.
+- You may not copy, modify, distribute, sell, or lease any part of our services without our express written permission.
 
 ---
 
 ## Termination
 
-Acme Inc. may suspend or terminate your access to the services at any time, with or without cause, and with or without notice.
-
-You may terminate your account at any time by discontinuing use of our services or by contacting us to close your account.
-
-**Effect of Termination:** Upon termination, your right to use the services ceases immediately.
+- We may terminate or suspend your access to our services at any time, with or without cause or notice.
+- You may terminate your use of our services at any time.
+- Upon termination, your right to use the services ceases immediately.
 
 ---
 
-## Disclaimer of Warranties
+## Disclaimers
 
-OUR SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND.
-
-Acme Corporation EXPRESSLY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING WITHOUT LIMITATION ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+- Our services are provided on an "as is" and "as available" basis.
+- We make no warranties, express or implied, regarding the reliability, accuracy, or fitness for a particular purpose of our services.
 
 ---
 
 ## Limitation of Liability
 
-TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, ACME CORPORATION SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.
-
-**Liability Cap:** Our total liability shall not exceed the greater of $100 or the amount you paid us in the past twelve months.
+- To the fullest extent permitted by law, we shall not be liable for any indirect, incidental, special, or consequential damages.
+- Our total liability shall not exceed the greater of $100 or the amount you paid us in the past twelve months.
 
 ---
 
 ## Governing Law
 
-These Terms shall be governed by and construed in accordance with the laws of **Delaware, USA**, without regard to its conflict of law provisions.
+These Terms are governed by the laws of Delaware, USA, without regard to conflict of law principles.
 
 ---
 
 ## Changes to These Terms
 
-We may update these Terms from time to time. We will notify you of material changes via email or prominent notice on our website at least **30 days** before they take effect. Your continued use of our services after changes become effective constitutes your acceptance of the revised Terms.
+We may update these Terms from time to time. We will provide at least 30 days' notice via email or prominent notice on our website before changes take effect. Continued use of our services after changes constitutes acceptance of the revised Terms.
 
 ---
 
 ## Contact Us
 
-If you have any questions about these Terms, please contact us at:
+If you have questions about these Terms, please contact us:
 
-**Acme Corporation**
-123 Main St, Springfield, USA
-privacy@acme.com
+- **Legal Name: **Acme Corporation
+- **Address: **123 Main St, Springfield, USA
+- **Email: **privacy@acme.com
