@@ -7,8 +7,8 @@ import virentis from "../assets/virentis.png";
 
 import installCmd from "../snippets/install.sh?raw";
 import policyTs from "../snippets/policy.ts?raw";
-import viteConfig from "../snippets/vite.config.ts?raw";
 import privacyRoute from "../snippets/privacy-policy.tsx?raw";
+import componentsSnippet from "../snippets/components.tsx?raw";
 import llmPrompt from "../snippets/prompt.txt?raw";
 ---
 
@@ -84,9 +84,7 @@ import llmPrompt from "../snippets/prompt.txt?raw";
       GETTING-STARTED.md
     </h2>
     <p class="mb-4">
-      Define your policies in TypeScript, then let the Vite plugin
-      generate compliant HTML and PDF documents at build time. No lawyers,
-      no templates—just code.
+      Define your policies in TypeScript, then render them as React components — fully headless, styled however you want.
     </p>
 
     <div class="border border-gray-200 mb-4 bg-gray-100">
@@ -99,15 +97,6 @@ import llmPrompt from "../snippets/prompt.txt?raw";
     </div>
 
     <div class="border border-gray-200 mb-4 bg-gray-100">
-      <div class="flex border-b border-gray-200">
-        <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
-          vite.config.ts
-        </div>
-      </div>
-      <Code code={viteConfig} lang="ts" theme="github-light" class="p-4 text-sm" />
-    </div>
-
-    <div class="border border-gray-200 bg-gray-100">
       <div class="flex border-b border-gray-200">
         <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
           pages/privacy-policy.tsx
