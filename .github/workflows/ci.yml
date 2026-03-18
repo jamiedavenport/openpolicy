@@ -29,6 +29,8 @@ jobs:
           bun-version: latest
       - run: bun install --frozen-lockfile
       - run: ls node_modules/.bin | grep openpolicy
+      - run: ls node_modules/@openpolicy/cli
+      - run: bun install --frozen-lockfile # Ensure the CLI is installed
       - run: bun run build
       - run: bunx playwright install --with-deps chromium
         working-directory: examples/tanstack
