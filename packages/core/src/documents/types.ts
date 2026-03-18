@@ -5,17 +5,23 @@ export type NodeContext = {
 // Inline nodes
 export type TextNode = { type: "text"; value: string; context?: NodeContext };
 export type BoldNode = { type: "bold"; value: string; context?: NodeContext };
+export type ItalicNode = {
+	type: "italic";
+	value: string;
+	context?: NodeContext;
+};
 export type LinkNode = {
 	type: "link";
 	href: string;
 	value: string;
 	context?: NodeContext;
 };
-export type InlineNode = TextNode | BoldNode | LinkNode;
+export type InlineNode = TextNode | BoldNode | ItalicNode | LinkNode;
 
 // Block nodes
 export type HeadingNode = {
 	type: "heading";
+	level?: 1 | 2 | 3 | 4 | 5 | 6; // defaults to 2 if omitted
 	value: string;
 	context?: NodeContext;
 };
@@ -31,6 +37,7 @@ export type ListItemNode = {
 };
 export type ListNode = {
 	type: "list";
+	ordered?: boolean; // defaults to false (unordered)
 	items: ListItemNode[];
 	context?: NodeContext;
 };
@@ -44,10 +51,12 @@ export type DocumentSection = {
 	context?: NodeContext;
 };
 
+export type PolicyType = "privacy" | "terms" | "cookie";
+
 // The top-level document
 export type Document = {
 	type: "document";
-	policyType: "privacy" | "terms" | "cookie";
+	policyType: PolicyType;
 	sections: DocumentSection[];
 	context?: NodeContext;
 };
@@ -56,7 +65,6 @@ export type Document = {
 export type Node =
 	| Document
 	| DocumentSection
-	| HeadingNode
 	| ContentNode
 	| ListItemNode
 	| InlineNode;

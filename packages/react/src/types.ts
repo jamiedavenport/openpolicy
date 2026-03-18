@@ -2,6 +2,7 @@ import type {
 	BoldNode,
 	DocumentSection,
 	HeadingNode,
+	ItalicNode,
 	LinkNode,
 	ListNode,
 	ParagraphNode,
@@ -34,5 +35,6 @@ export interface PolicyComponents {
 	List?: ComponentType<{ node: ListNode; children: ReactNode }>;
 	Text?: ComponentType<{ node: TextNode }>;
 	Bold?: ComponentType<{ node: BoldNode }>;
+	Italic?: ComponentType<{ node: ItalicNode }>;
 	Link?: ComponentType<{ node: LinkNode }>;
 }

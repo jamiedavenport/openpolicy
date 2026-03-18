@@ -2,6 +2,7 @@ import type {
 	BoldNode,
 	DocumentSection,
 	HeadingNode,
+	ItalicNode,
 	LinkNode,
 	Node,
 	TextNode,
@@ -10,10 +11,12 @@ import { createElement, type ReactNode } from "react";
 import type { PolicyComponents } from "../types";
 
 export function DefaultHeading({ node }: { node: HeadingNode }) {
+	const level = node.level ?? 2;
+	const Tag = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 	return (
-		<h2 data-op-heading className="op-heading">
+		<Tag data-op-heading className="op-heading">
 			{node.value}
-		</h2>
+		</Tag>
 	);
 }
 
@@ -23,6 +26,10 @@ export function DefaultText({ node }: { node: TextNode }) {
 
 export function DefaultBold({ node }: { node: BoldNode }) {
 	return <strong className="op-bold">{node.value}</strong>;
+}
+
+export function DefaultItalic({ node }: { node: ItalicNode }) {
+	return <em className="op-italic">{node.value}</em>;
 }
 
 export function DefaultLink({ node }: { node: LinkNode }) {
@@ -69,16 +76,17 @@ export function DefaultParagraph({
 }
 
 export function DefaultList({
-	node: _node,
+	node,
 	children,
 }: {
 	node: import("@openpolicy/core").ListNode;
 	children: ReactNode;
 }) {
+	const Tag = node.ordered ? "ol" : "ul";
 	return (
-		<ul data-op-list className="op-list">
+		<Tag data-op-list className="op-list">
 			{children}
-		</ul>
+		</Tag>
 	);
 }
 
@@ -132,10 +140,11 @@ export function renderNode(
 						{children}
 					</components.List>
 				);
+			const ListTag = node.ordered ? "ol" : "ul";
 			return (
-				<ul key={key} data-op-list className="op-list">
+				<ListTag key={key} data-op-list className="op-list">
 					{children}
-				</ul>
+				</ListTag>
 			);
 		}
 
@@ -152,6 +161,10 @@ export function renderNode(
 		}
 		case "bold": {
 			const Comp = components.Bold ?? DefaultBold;
+			return <Comp key={key} node={node} />;
+		}
+		case "italic": {
+			const Comp = components.Italic ?? DefaultItalic;
 			return <Comp key={key} node={node} />;
 		}
 		case "link": {

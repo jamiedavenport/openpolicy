@@ -4,6 +4,7 @@ import type {
 	DocumentSection,
 	HeadingNode,
 	InlineNode,
+	ItalicNode,
 	LinkNode,
 	ListItemNode,
 	ListNode,
@@ -12,11 +13,20 @@ import type {
 	TextNode,
 } from "./types";
 
-export const heading = (value: string, context?: NodeContext): HeadingNode => ({
-	type: "heading",
-	value,
-	...(context && { context }),
-});
+export const heading = (
+	value: string,
+	levelOrContext?: (1 | 2 | 3 | 4 | 5 | 6) | NodeContext,
+	context?: NodeContext,
+): HeadingNode => {
+	const level = typeof levelOrContext === "number" ? levelOrContext : undefined;
+	const ctx = typeof levelOrContext === "object" ? levelOrContext : context;
+	return {
+		type: "heading",
+		...(level !== undefined && { level }),
+		value,
+		...(ctx && { context: ctx }),
+	};
+};
 export const text = (value: string, context?: NodeContext): TextNode => ({
 	type: "text",
 	value,
@@ -24,6 +34,11 @@ export const text = (value: string, context?: NodeContext): TextNode => ({
 });
 export const bold = (value: string, context?: NodeContext): BoldNode => ({
 	type: "bold",
+	value,
+	...(context && { context }),
+});
+export const italic = (value: string, context?: NodeContext): ItalicNode => ({
+	type: "italic",
 	value,
 	...(context && { context }),
 });
@@ -50,6 +65,12 @@ export const li = (
 });
 export const ul = (items: ListItemNode[], context?: NodeContext): ListNode => ({
 	type: "list",
+	items,
+	...(context && { context }),
+});
+export const ol = (items: ListItemNode[], context?: NodeContext): ListNode => ({
+	type: "list",
+	ordered: true,
 	items,
 	...(context && { context }),
 });

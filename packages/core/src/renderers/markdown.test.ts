@@ -138,6 +138,78 @@ test("joins multiple sections with dividers", () => {
 	expect(result).toBe("## One\n\n---\n\n## Two");
 });
 
+test("renders heading with level 3", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [{ type: "heading", level: 3, value: "Sub-section" }],
+			},
+		]),
+	);
+	expect(result).toBe("### Sub-section");
+});
+
+test("renders heading with level 1", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [{ type: "heading", level: 1, value: "Title" }],
+			},
+		]),
+	);
+	expect(result).toBe("# Title");
+});
+
+test("renders ordered list with numbered items", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [
+					{
+						type: "list",
+						ordered: true,
+						items: [
+							{
+								type: "listItem",
+								children: [{ type: "text", value: "First" }],
+							},
+							{
+								type: "listItem",
+								children: [{ type: "text", value: "Second" }],
+							},
+						],
+					},
+				],
+			},
+		]),
+	);
+	expect(result).toBe("1. First\n2. Second");
+});
+
+test("renders italic inline node", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [
+					{
+						type: "paragraph",
+						children: [{ type: "italic", value: "emphasis" }],
+					},
+				],
+			},
+		]),
+	);
+	expect(result).toBe("_emphasis_");
+});
+
 test("joins multiple content nodes within a section with blank lines", () => {
 	const result = renderMarkdown(
 		doc([

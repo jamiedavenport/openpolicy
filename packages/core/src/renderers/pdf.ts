@@ -9,11 +9,17 @@ import type {
 
 const FONT_REGULAR = "Helvetica";
 const FONT_BOLD = "Helvetica-Bold";
-const SIZE_HEADING = 14;
+const FONT_ITALIC = "Helvetica-Oblique";
+const SIZE_HEADING_BASE = 16;
 const SIZE_BODY = 11;
 const COLOR_BODY = "#374151";
 const COLOR_HEADING = "#111827";
 const COLOR_LINK = "#2563eb";
+
+function headingSize(level: number): number {
+	// H1=16, H2=14, H3=13, H4=12, H5=11, H6=10
+	return Math.max(10, SIZE_HEADING_BASE - (level - 1) * 1.5);
+}
 
 function renderInlineNodes(
 	doc: InstanceType<typeof PDFDocument>,
@@ -35,6 +41,12 @@ function renderInlineNodes(
 					.fillColor(COLOR_HEADING)
 					.text(node!.value, { continued });
 				break;
+			case "italic":
+				doc
+					.font(FONT_ITALIC)
+					.fillColor(COLOR_BODY)
+					.text(node!.value, { continued });
+				break;
 			case "link":
 				doc
 					.font(FONT_REGULAR)
@@ -50,9 +62,11 @@ function renderListItem(
 	doc: InstanceType<typeof PDFDocument>,
 	item: ListItemNode,
 	depth: number,
+	ordered: boolean,
+	index: number,
 ): void {
 	const indent = doc.page.margins.left + 10 + depth * 15;
-	const bullet = depth === 0 ? "•" : "◦";
+	const bullet = ordered ? `${index + 1}.` : depth === 0 ? "•" : "◦";
 
 	const inlineNodes = item.children.filter(
 		(c): c is InlineNode => c.type !== "list",
@@ -73,8 +87,14 @@ function renderListItem(
 	}
 
 	if (nested) {
-		for (const child of nested.items) {
-			renderListItem(doc, child, depth + 1);
+		for (let i = 0; i < nested.items.length; i++) {
+			renderListItem(
+				doc,
+				nested.items[i]!,
+				depth + 1,
+				nested.ordered ?? false,
+				i,
+			);
 		}
 	}
 }
@@ -100,7 +120,7 @@ function renderSection(
 			case "heading":
 				doc
 					.font(FONT_BOLD)
-					.fontSize(SIZE_HEADING)
+					.fontSize(headingSize(node.level ?? 2))
 					.fillColor(COLOR_HEADING)
 					.text(node.value)
 					.moveDown(0.3);
@@ -112,8 +132,8 @@ function renderSection(
 				break;
 			case "list":
 				doc.fontSize(SIZE_BODY);
-				for (const item of node.items) {
-					renderListItem(doc, item, 0);
+				for (let i = 0; i < node.items.length; i++) {
+					renderListItem(doc, node.items[i]!, 0, node.ordered ?? false, i);
 				}
 				doc.moveDown(0.3);
 				break;

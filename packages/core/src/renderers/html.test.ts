@@ -75,6 +75,67 @@ test("renders link as <a>", () => {
 	expect(result).toContain('<a href="https://example.com">here</a>');
 });
 
+test("renders heading with level 3 as <h3>", () => {
+	const result = renderHTML(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [{ type: "heading", level: 3, value: "Sub-section" }],
+			},
+		]),
+	);
+	expect(result).toContain("<h3>Sub-section</h3>");
+});
+
+test("renders ordered list as <ol>/<li>", () => {
+	const result = renderHTML(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [
+					{
+						type: "list",
+						ordered: true,
+						items: [
+							{
+								type: "listItem",
+								children: [{ type: "text", value: "First" }],
+							},
+							{
+								type: "listItem",
+								children: [{ type: "text", value: "Second" }],
+							},
+						],
+					},
+				],
+			},
+		]),
+	);
+	expect(result).toContain("<ol>");
+	expect(result).toContain("<li>First</li>");
+	expect(result).toContain("<li>Second</li>");
+});
+
+test("renders italic as <em>", () => {
+	const result = renderHTML(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [
+					{
+						type: "paragraph",
+						children: [{ type: "italic", value: "emphasis" }],
+					},
+				],
+			},
+		]),
+	);
+	expect(result).toContain("<em>emphasis</em>");
+});
+
 test("renders list as <ul>/<li>", () => {
 	const result = renderHTML(
 		doc([
