@@ -28,6 +28,7 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
+      - run: ls node_modules/.bin | grep openpolicy
       - run: bun run build
       - run: bunx playwright install --with-deps chromium
         working-directory: examples/tanstack
