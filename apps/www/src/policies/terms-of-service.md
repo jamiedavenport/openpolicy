@@ -1,33 +1,27 @@
 ## Terms of Service
 
-These Terms of Service ("Terms") govern your access to and use of the services provided by OpenPolicy ("OpenPolicy", "we", "us", or "our"). By using our services, you agree to these Terms.
-
-**Effective Date:** 2026-03-05
-
-For information about how we collect and use your data, please review our [Privacy Policy](https://openpolicy.sh/privacy).
+These Terms of Service ("Terms") govern your use of services provided by OpenPolicy ("we", "us", or "our"). By using our services, you agree to these Terms. Effective Date: 2026-03-05.
 
 ---
 
 ## Acceptance of Terms
 
-By accessing or using our services, you agree to be bound by these Terms. You accept these Terms by:
+You accept these Terms by:
 
 - using the service
 - registering for early access
-
-If you do not agree to these Terms, you may not use our services.
 
 ---
 
 ## Eligibility
 
-You must be at least **18 years old** to use our services. By using our services, you represent and warrant that you meet this age requirement.
+You must be at least 18 years old to use our services. By using the services, you represent that you meet this age requirement.
 
 ---
 
 ## Prohibited Uses
 
-You agree not to use our services for any of the following purposes:
+You may not use our services for the following purposes:
 
 - Violating any applicable laws or regulations
 - Infringing on intellectual property rights
@@ -38,60 +32,54 @@ You agree not to use our services for any of the following purposes:
 
 ## Intellectual Property
 
-The services and all content, features, and functionality (including but not limited to text, graphics, logos, and software) are owned by JXD Ltd and are protected by intellectual property laws.
-
-You may not copy, modify, distribute, sell, or lease any part of our services or included software, nor may you reverse engineer or attempt to extract the source code of that software.
+- All content, features, and functionality of our services are owned by OpenPolicy and are protected by intellectual property laws.
+- You may not copy, modify, distribute, sell, or lease any part of our services without our express written permission.
 
 ---
 
 ## Termination
 
-OpenPolicy may suspend or terminate your access to the services at any time, with or without cause, and with or without notice.
-
-You may terminate your account at any time by discontinuing use of our services or by contacting us to close your account.
-
-**Effect of Termination:** Access to the service will be revoked immediately
+- We may terminate or suspend your access to our services at any time, with or without cause or notice.
+- You may terminate your use of our services at any time.
+- Access to the service will be revoked immediately
 
 ---
 
-## Disclaimer of Warranties
+## Disclaimers
 
-OUR SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND.
-
-JXD Ltd EXPRESSLY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING WITHOUT LIMITATION ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+- Our services are provided on an "as is" and "as available" basis.
+- We make no warranties, express or implied, regarding the reliability, accuracy, or fitness for a particular purpose of our services.
 
 ---
 
 ## Limitation of Liability
 
-TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, JXD LTD SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.
+- To the fullest extent permitted by law, we shall not be liable for any indirect, incidental, special, or consequential damages.
 
 ---
 
 ## Indemnification
 
-You agree to indemnify and hold harmless JXD Ltd and its officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, and expenses arising out of or in any way connected with your access to or use of our services.
-
-**Scope:** claims arising from your use of the service or violation of these terms
+claims arising from your use of the service or violation of these terms
 
 ---
 
 ## Governing Law
 
-These Terms shall be governed by and construed in accordance with the laws of **England and Wales**, without regard to its conflict of law provisions.
+These Terms are governed by the laws of England and Wales, without regard to conflict of law principles.
 
 ---
 
 ## Changes to These Terms
 
-We may update these Terms from time to time. We will notify you of material changes via prominent notice on our website at least **14 days** before they take effect. Your continued use of our services after changes become effective constitutes your acceptance of the revised Terms.
+We may update these Terms from time to time. We will provide at least 14 days' notice via prominent notice on our website before changes take effect. Continued use of our services after changes constitutes acceptance of the revised Terms.
 
 ---
 
 ## Contact Us
 
-If you have any questions about these Terms, please contact us at:
+If you have questions about these Terms, please contact us:
 
-**JXD Ltd**
-86-90 Paul Street, London, EC2A 4NE, United Kingdom
-jamie@jxd.dev
+- **Legal Name: **JXD Ltd
+- **Address: **86-90 Paul Street, London, EC2A 4NE, United Kingdom
+- **Email: **jamie@jxd.dev

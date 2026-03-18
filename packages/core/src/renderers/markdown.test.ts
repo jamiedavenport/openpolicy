@@ -1,0 +1,158 @@
+import { expect, test } from "bun:test";
+import type { Document } from "../documents/types";
+import { renderMarkdown } from "./markdown";
+
+function doc(sections: Document["sections"]): Document {
+	return { type: "document", policyType: "privacy", sections };
+}
+
+test("renders a heading node", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [{ type: "heading", value: "Introduction" }],
+			},
+		]),
+	);
+	expect(result).toBe("## Introduction");
+});
+
+test("renders a paragraph with text", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [
+					{
+						type: "paragraph",
+						children: [{ type: "text", value: "Hello world" }],
+					},
+				],
+			},
+		]),
+	);
+	expect(result).toBe("Hello world");
+});
+
+test("renders bold and link inline nodes", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [
+					{
+						type: "paragraph",
+						children: [
+							{ type: "bold", value: "Important" },
+							{ type: "text", value: ": see " },
+							{ type: "link", href: "https://example.com", value: "here" },
+						],
+					},
+				],
+			},
+		]),
+	);
+	expect(result).toBe("**Important**: see [here](https://example.com)");
+});
+
+test("renders a list with items", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [
+					{
+						type: "list",
+						items: [
+							{
+								type: "listItem",
+								children: [{ type: "text", value: "Alpha" }],
+							},
+							{
+								type: "listItem",
+								children: [{ type: "text", value: "Beta" }],
+							},
+						],
+					},
+				],
+			},
+		]),
+	);
+	expect(result).toBe("- Alpha\n- Beta");
+});
+
+test("renders nested list with indented items", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [
+					{
+						type: "list",
+						items: [
+							{
+								type: "listItem",
+								children: [
+									{ type: "text", value: "Parent" },
+									{
+										type: "list",
+										items: [
+											{
+												type: "listItem",
+												children: [{ type: "text", value: "Child" }],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		]),
+	);
+	expect(result).toBe("- Parent\n  - Child");
+});
+
+test("joins multiple sections with dividers", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [{ type: "heading", value: "One" }],
+			},
+			{
+				type: "section",
+				id: "s2",
+				content: [{ type: "heading", value: "Two" }],
+			},
+		]),
+	);
+	expect(result).toBe("## One\n\n---\n\n## Two");
+});
+
+test("joins multiple content nodes within a section with blank lines", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [
+					{ type: "heading", value: "Title" },
+					{
+						type: "paragraph",
+						children: [{ type: "text", value: "Body text." }],
+					},
+				],
+			},
+		]),
+	);
+	expect(result).toBe("## Title\n\nBody text.");
+});

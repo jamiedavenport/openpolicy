@@ -1,4 +1,3 @@
-export { compileCookiePolicy } from "./cookie";
 export type {
 	BoldNode,
 	ContentNode,
@@ -25,8 +24,6 @@ export {
 	text,
 	ul,
 } from "./documents";
-export { compilePrivacyPolicy } from "./privacy";
-export { compileTermsOfService } from "./terms";
 export type {
 	CompanyConfig,
 	CompileOptions,
@@ -36,7 +33,6 @@ export type {
 	OpenPolicyConfig,
 	OutputFormat,
 	PolicyInput,
-	PolicySection,
 	PrivacyPolicyConfig,
 	TermsOfServiceConfig,
 	ValidationIssue,
@@ -46,10 +42,15 @@ export { validatePrivacyPolicy } from "./validate";
 export { validateCookiePolicy } from "./validate-cookie";
 export { validateTermsOfService } from "./validate-terms";
 
-import { compileCookiePolicy } from "./cookie";
-import { compilePrivacyPolicy } from "./privacy";
-import { compileTermsOfService } from "./terms";
-import type { CompileOptions, OpenPolicyConfig, PolicyInput } from "./types";
+import { compile } from "./documents";
+import { renderHTML } from "./renderers/html";
+import { renderMarkdown } from "./renderers/markdown";
+import type {
+	CompileOptions,
+	OpenPolicyConfig,
+	OutputFormat,
+	PolicyInput,
+} from "./types";
 
 export function expandOpenPolicyConfig(
 	config: OpenPolicyConfig,
@@ -71,19 +72,43 @@ export function expandOpenPolicyConfig(
 	return inputs;
 }
 
-export function compilePolicy(input: PolicyInput, options?: CompileOptions) {
-	switch (input.type) {
-		case "privacy": {
-			const { type: _, ...config } = input;
-			return compilePrivacyPolicy(config, options);
-		}
-		case "terms": {
-			const { type: _, ...config } = input;
-			return compileTermsOfService(config, options);
-		}
-		case "cookie": {
-			const { type: _, ...config } = input;
-			return compileCookiePolicy(config, options);
-		}
+function filenameFor(type: PolicyInput["type"], ext: string): string {
+	switch (type) {
+		case "privacy":
+			return `privacy-policy.${ext}`;
+		case "terms":
+			return `terms-of-service.${ext}`;
+		case "cookie":
+			return `cookie-policy.${ext}`;
 	}
+}
+
+export function compilePolicy(
+	input: PolicyInput,
+	options?: CompileOptions,
+): { format: OutputFormat; filename: string; content: string }[] {
+	const doc = compile(input);
+	const formats = options?.formats ?? ["markdown"];
+	return formats.map((format) => {
+		switch (format) {
+			case "markdown":
+				return {
+					format,
+					filename: filenameFor(input.type, "md"),
+					content: renderMarkdown(doc),
+				};
+			case "html":
+				return {
+					format,
+					filename: filenameFor(input.type, "html"),
+					content: renderHTML(doc),
+				};
+			case "pdf":
+				throw new Error("pdf format is not yet implemented");
+			case "jsx":
+				throw new Error("jsx format is not yet implemented");
+			default:
+				throw new Error(`Format not yet implemented: ${format}`);
+		}
+	});
 }
