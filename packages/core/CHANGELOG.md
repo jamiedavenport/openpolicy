@@ -1,5 +1,12 @@
 # @openpolicy/core
 
+## 0.0.13
+
+### Patch Changes
+
+- 2372fdb: - Adds @openpolicy/react library.
+  - Adds PDF renderer
+
 ## 0.0.12
 
 ### Patch Changes
