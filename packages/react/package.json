@@ -31,10 +31,9 @@
 		"react": ">=19",
 		"react-dom": ">=19"
 	},
-	"dependencies": {
-		"@openpolicy/core": "workspace:*"
-	},
+	"dependencies": {},
 	"devDependencies": {
+		"@openpolicy/core": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
 		"@types/react": "^19.0.0",
 		"react": "^19.0.0"

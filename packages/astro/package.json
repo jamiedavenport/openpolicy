@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/astro",
-	"version": "0.0.13",
+	"version": "0.0.14",
 	"type": "module",
 	"description": "Astro integration for compiling OpenPolicy documents at build time",
 	"license": "GPL-3.0-only",
