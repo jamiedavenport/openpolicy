@@ -11,6 +11,7 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
+      - run: node --version
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
         with:
