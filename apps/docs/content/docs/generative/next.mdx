@@ -3,7 +3,9 @@ title: Next.js
 description: Using OpenPolicy with Next.js
 ---
 
-Next.js doesn't use Vite, so the recommended approach is to use the `openpolicy generate` CLI command to produce policy files and then import them in your pages.
+Next.js doesn't use Vite, so the recommended approach for generating static policy files is to use the `openpolicy generate` CLI command to produce policy files and then import them in your pages.
+
+For Next.js projects that prefer React components over file output, see the [React docs →](/docs/react).
 
 ## Installation
 
@@ -82,9 +84,7 @@ src/policies/
 
 ## Render in a page
 
-### Using the HTML output
-
-Import the HTML as a raw string and use `dangerouslySetInnerHTML`:
+Import the HTML as a raw string and render it in a Server Component:
 
 ```tsx
 // app/privacy/page.tsx
@@ -94,24 +94,6 @@ export default function PrivacyPolicyPage() {
   return (
     <main>
       <div dangerouslySetInnerHTML={{ __html: policy }} />
-    </main>
-  );
-}
-```
-
-### Using the Markdown output with a renderer
-
-Install a Markdown renderer such as `react-markdown` or `marked`, then import the `.md` file as a raw string:
-
-```tsx
-// app/privacy/page.tsx
-import Markdown from "react-markdown";
-import policy from "@/policies/privacy-policy.md?raw";
-
-export default function PrivacyPolicyPage() {
-  return (
-    <main>
-      <Markdown>{policy}</Markdown>
     </main>
   );
 }

@@ -3,7 +3,7 @@ title: Introduction to OpenPolicy
 description: Type-safe privacy policy generation for TypeScript projects
 ---
 
-OpenPolicy is a TypeScript-first toolkit for generating privacy policy documents. Define your policy once as a typed configuration object, then compile it to Markdown, HTML, or other formats — at build time via the Vite plugin, or on demand via the CLI.
+OpenPolicy is a TypeScript-first toolkit for generating and rendering privacy policy documents. Define your policy once as a typed configuration object, then either compile it to Markdown or HTML at build time — or render it directly as a React component at runtime.
 
 ## Why OpenPolicy
 
@@ -14,53 +14,74 @@ OpenPolicy lets you:
 - **Define policies as code** — TypeScript gives you autocomplete, type checking, and refactoring across your policy config
 - **Validate for compliance** — built-in checks flag missing GDPR and CCPA requirements before you publish
 - **Generate multiple formats** — one config produces Markdown, HTML, and more
+- **Render as React components** — framework mode renders policies at runtime with headless, fully customizable components
 - **Integrate with your build** — the Vite plugin compiles policies automatically so output is always in sync
 
 ## Packages
 
 | Package | Description |
 |---|---|
-| `@openpolicy/sdk` | `definePrivacyPolicy()` and the `PrivacyPolicyConfig` type |
+| `@openpolicy/sdk` | `defineConfig()` and policy config types |
+| `@openpolicy/react` | Headless React components — `PrivacyPolicy`, `TermsOfService`, `CookiePolicy` |
 | `@openpolicy/cli` | `openpolicy` CLI — `init`, `generate`, `validate` commands |
 | `@openpolicy/vite` | Vite plugin — compiles policies at build time and watches in dev mode |
 
 ## How it works
 
-1. Create a `policy.config.ts` that exports a `definePrivacyPolicy()` call with your company details, data categories, cookies, and jurisdictions
-2. Run `openpolicy generate` or add `openPolicy()` to your Vite config
-3. Import the generated Markdown or HTML in your app and render it
+### Generative mode
+
+Define a config, run `openpolicy generate` or add `openPolicy()` to your Vite config, and import the generated Markdown or HTML in your app.
 
 ```ts
-// policy.config.ts
-import { definePrivacyPolicy } from "@openpolicy/sdk";
+// openpolicy.ts
+import { defineConfig } from "@openpolicy/sdk";
 
-export default definePrivacyPolicy({
-  effectiveDate: "2026-01-01",
+export default defineConfig({
   company: {
     name: "Acme Inc.",
     legalName: "Acme Corporation",
     address: "123 Main St, Springfield, USA",
     contact: "privacy@acme.com",
   },
-  dataCollected: {
-    "Account Information": ["Name", "Email address"],
-    "Usage Data": ["Pages visited", "Browser type", "IP address"],
+  privacy: {
+    effectiveDate: "2026-01-01",
+    dataCollected: {
+      "Account Information": ["Name", "Email address"],
+      "Usage Data": ["Pages visited", "Browser type", "IP address"],
+    },
+    legalBasis: "Legitimate interests and consent",
+    retention: {
+      "Account data": "Until account deletion",
+      "Usage logs": "90 days",
+    },
+    cookies: { essential: true, analytics: false, marketing: false },
+    thirdParties: [],
+    userRights: ["access", "erasure"],
+    jurisdictions: ["us", "eu"],
   },
-  legalBasis: "Legitimate interests and consent",
-  retention: {
-    "Account data": "Until account deletion",
-    "Usage logs": "90 days",
-  },
-  cookies: { essential: true, analytics: false, marketing: false },
-  thirdParties: [],
-  userRights: ["access", "erasure"],
-  jurisdictions: ["us", "eu"],
 });
+```
+
+### Framework mode (React)
+
+Import the config and render a policy component directly — no file generation required.
+
+```tsx
+import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
+import openpolicy from "./openpolicy";
+
+export function PrivacyPolicyPage() {
+  return (
+    <OpenPolicy config={openpolicy}>
+      <PrivacyPolicy />
+    </OpenPolicy>
+  );
+}
 ```
 
 ## Get started
 
-- [Quick Start](/quickstart) — install, configure, and generate your first policy in minutes
-- [Using the CLI](/getting-started/cli) — interactive wizard and command reference
-- [Using the Vite plugin](/getting-started/vite) — automatic compilation during builds and in dev mode
-- [Using with Next.js](/getting-started/next) — rendering generated policies in a Next.js app
+- [React components](/docs/react) — render policies as headless React components
+- [Vite plugin](/docs/generative/vite) — automatic compilation during builds and in dev mode
+- [CLI](/docs/generative/cli) — interactive wizard and command reference
+- [Next.js](/docs/generative/next) — rendering generated policies in a Next.js app
