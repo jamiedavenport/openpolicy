@@ -14,7 +14,12 @@
 		"README.md"
 	],
 	"bin": {
-		"openpolicy": "./dist/cli.js"
+		"openpolicy": "./src/cli.ts"
+	},
+	"publishConfig": {
+		"bin": {
+			"openpolicy": "./dist/cli.js"
+		}
 	},
 	"scripts": {
 		"dev": "rolldown -c --watch",

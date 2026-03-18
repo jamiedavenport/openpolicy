@@ -29,7 +29,6 @@ jobs:
           bun-version: latest
       - run: bun install --frozen-lockfile
       - run: bun run build
-      - run: bun install --frozen-lockfile # Ensure the CLI is installed
       - run: bunx playwright install --with-deps chromium
         working-directory: examples/tanstack
       - run: bun run test:e2e
