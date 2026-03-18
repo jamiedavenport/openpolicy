@@ -49,7 +49,7 @@ export async function generatePolicies(
 					throw new Error(`[openpolicy] ${issue.message}`);
 				console.warn(`[openpolicy] Warning: ${issue.message}`);
 			}
-			const results = compilePolicy(input, { formats });
+			const results = await compilePolicy(input, { formats });
 			const outputFilename =
 				input.type === "terms"
 					? "terms-of-service"

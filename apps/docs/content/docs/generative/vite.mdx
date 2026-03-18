@@ -77,7 +77,7 @@ openPolicy({
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `configPath` | `string` | `"openpolicy.ts"` | Path to the unified policy config file, relative to the Vite root. |
-| `formats` | `OutputFormat[]` | `["markdown"]` | Output formats: `"markdown"` \| `"html"` |
+| `formats` | `OutputFormat[]` | `["markdown"]` | Output formats: `"markdown"` \| `"html"` \| `"pdf"` |
 | `outDir` | `string` | `"public/policies"` | Output directory, relative to the Vite root |
 
 Use `{ config: "legal.config.ts", type: "terms" }` to override explicitly.
@@ -125,9 +125,9 @@ Output filenames are determined by the policy type:
 
 | Policy type | Output filenames |
 |---|---|
-| `"privacy"` | `privacy-policy.md`, `privacy-policy.html` |
-| `"terms"` | `terms-of-service.md`, `terms-of-service.html` |
-| `"cookie"` | `cookie-policy.md`, `cookie-policy.html` |
+| `"privacy"` | `privacy-policy.md`, `privacy-policy.html`, `privacy-policy.pdf` |
+| `"terms"` | `terms-of-service.md`, `terms-of-service.html`, `terms-of-service.pdf` |
+| `"cookie"` | `cookie-policy.md`, `cookie-policy.html`, `cookie-policy.pdf` |
 
 ## Astro
 

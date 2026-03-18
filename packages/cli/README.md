@@ -2,7 +2,7 @@
 
 > CLI for generating and validating [OpenPolicy](https://openpolicy.sh) policy documents.
 
-Compile privacy policies and terms of service to Markdown or HTML from the command line — no Vite or Astro required.
+Compile privacy policies and terms of service to Markdown, HTML, or PDF from the command line — no Vite or Astro required.
 
 ## Install
 
@@ -38,7 +38,7 @@ openpolicy generate ./terms.config.ts   --format markdown      --out ./public/po
 
 | Flag | Default | Description |
 |---|---|---|
-| `--format` | `markdown` | Comma-separated output formats: `markdown`, `html` |
+| `--format` | `markdown` | Comma-separated output formats: `markdown`, `html`, `pdf` |
 | `--out` | `./public/policies` | Output directory |
 | `--type` | auto-detected | Override policy type: `privacy` or `terms` |
 | `--watch` | `false` | Watch config files and regenerate on changes |

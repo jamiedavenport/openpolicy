@@ -45,6 +45,7 @@ export { validateTermsOfService } from "./validate-terms";
 import { compile } from "./documents";
 import { renderHTML } from "./renderers/html";
 import { renderMarkdown } from "./renderers/markdown";
+import { renderPDF } from "./renderers/pdf";
 import type {
 	CompileOptions,
 	OpenPolicyConfig,
@@ -83,32 +84,40 @@ function filenameFor(type: PolicyInput["type"], ext: string): string {
 	}
 }
 
-export function compilePolicy(
+export async function compilePolicy(
 	input: PolicyInput,
 	options?: CompileOptions,
-): { format: OutputFormat; filename: string; content: string }[] {
+): Promise<
+	{ format: OutputFormat; filename: string; content: string | Buffer }[]
+> {
 	const doc = compile(input);
 	const formats = options?.formats ?? ["markdown"];
-	return formats.map((format) => {
-		switch (format) {
-			case "markdown":
-				return {
-					format,
-					filename: filenameFor(input.type, "md"),
-					content: renderMarkdown(doc),
-				};
-			case "html":
-				return {
-					format,
-					filename: filenameFor(input.type, "html"),
-					content: renderHTML(doc),
-				};
-			case "pdf":
-				throw new Error("pdf format is not yet implemented");
-			case "jsx":
-				throw new Error("jsx format is not yet implemented");
-			default:
-				throw new Error(`Format not yet implemented: ${format}`);
-		}
-	});
+	return Promise.all(
+		formats.map(async (format) => {
+			switch (format) {
+				case "markdown":
+					return {
+						format,
+						filename: filenameFor(input.type, "md"),
+						content: renderMarkdown(doc),
+					};
+				case "html":
+					return {
+						format,
+						filename: filenameFor(input.type, "html"),
+						content: renderHTML(doc),
+					};
+				case "pdf":
+					return {
+						format,
+						filename: filenameFor(input.type, "pdf"),
+						content: await renderPDF(doc),
+					};
+				case "jsx":
+					throw new Error("jsx format is not yet implemented");
+				default:
+					throw new Error(`Format not yet implemented: ${format}`);
+			}
+		}),
+	);
 }

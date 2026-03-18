@@ -6,7 +6,11 @@
 		".": {},
 		"apps/www": {
 			"entry": ["openpolicy.ts", "src/snippets/**"],
-			"ignoreDependencies": ["@iconify-json/simple-icons", "vite"]
+			"ignoreDependencies": [
+				"@iconify-json/simple-icons",
+				"vite",
+				"@openpolicy/react"
+			]
 		},
 		"apps/docs": {
 			"entry": ["source.config.ts"]

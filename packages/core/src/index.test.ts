@@ -104,8 +104,8 @@ test("expandOpenPolicyConfig returns empty array when neither privacy nor terms"
 	expect(inputs).toHaveLength(0);
 });
 
-test("compilePolicy routes privacy input to markdown", () => {
-	const results = compilePolicy(input);
+test("compilePolicy routes privacy input to markdown", async () => {
+	const results = await compilePolicy(input);
 	expect(results).toBeArray();
 	expect(results[0]?.format).toBe("markdown");
 	expect(results[0]?.content).toContain("Acme Inc.");

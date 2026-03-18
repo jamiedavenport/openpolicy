@@ -38,7 +38,7 @@ async function generateFromConfig(
 			consola.start(
 				`Generating ${input.type} policy from ${configPath} → formats: ${formats.join(", ")}`,
 			);
-			const results = compilePolicy(input, { formats });
+			const results = await compilePolicy(input, { formats });
 			for (const result of results) {
 				const ext = result.format === "markdown" ? "md" : result.format;
 				const outPath = join(outDir, `${outputFilename}.${ext}`);

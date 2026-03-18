@@ -1,5 +1,5 @@
 import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
-import openpolicy from "../openpolicy";
+import openpolicy from "./openpolicy";
 
 export function PrivacyPolicyPage() {
 	return (

@@ -24,11 +24,11 @@ This is a monorepo under `packages/`. Key packages:
 
 - **Policy types**: `"privacy"` (PrivacyPolicyConfig) and `"terms"` (TermsOfServiceConfig) — `PolicyInput` is a discriminated union
 - **Policy definition**: TypeScript object passed to `defineConfig()` describing the policy content
-- **Compilation**: Policy definitions are compiled to HTML or Markdown — triggered either by the Vite plugin at build time or by `openpolicy generate` via the CLI
+- **Compilation**: Policy definitions are compiled to HTML, Markdown, or PDF — triggered either by the Vite plugin at build time or by `openpolicy generate` via the CLI
 - **Section builders**: Each section is a `(config) => PolicySection | null` function; `null` means the section is not applicable and is omitted
 - **Output filenames**: `privacy-policy.{ext}` for privacy, `terms-of-service.{ext}` for terms
 - **Type auto-detection**: config filenames containing `"terms"` are treated as `TermsOfServiceConfig`; all others default to `PrivacyPolicyConfig`. Used by both the CLI (`--type` overrides) and the Vite plugin (`configs` array; per-entry `type` overrides)
-- **Formats**: `markdown` | `html` (implemented); `pdf` | `jsx` throw "not yet implemented"
+- **Formats**: `markdown` | `html` | `pdf` (implemented); `jsx` throws "not yet implemented"
 - **Compliance targets**: GDPR, CCPA, and multi-jurisdiction templates (privacy only)
 - **`llms.txt`**: AI-readable reference for auto-generating policy configs from existing codebases
 
