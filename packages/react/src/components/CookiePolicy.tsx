@@ -5,7 +5,8 @@ import {
 	isOpenPolicyConfig,
 	type OpenPolicyConfig,
 } from "@openpolicy/core";
-import type { CSSProperties } from "react";
+import { type CSSProperties, useContext } from "react";
+import { OpenPolicyContext } from "../context";
 import { renderDocument } from "../render";
 import type { PolicyComponents } from "../types";
 
@@ -15,8 +16,13 @@ interface CookiePolicyProps {
 	style?: CSSProperties;
 }
 
-export function CookiePolicy({ config, components, style }: CookiePolicyProps) {
-	if (!config) return null;
+export function CookiePolicy({
+	config: configProp,
+	components,
+	style,
+}: CookiePolicyProps) {
+	const { config: contextConfig } = useContext(OpenPolicyContext);
+	const config = configProp ?? contextConfig ?? undefined;
 	const input = isOpenPolicyConfig(config)
 		? expandOpenPolicyConfig(config).find((i) => i.type === "cookie")
 		: { type: "cookie" as const, ...config };

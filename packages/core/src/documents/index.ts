@@ -1,5 +1,7 @@
 import type { PolicyInput } from "../types";
+import { compileCookieDocument } from "./cookie";
 import { compilePrivacyDocument } from "./privacy";
+import { compileTermsDocument } from "./terms";
 import type { Document } from "./types";
 
 export function compile(input: PolicyInput): Document {
@@ -11,10 +13,19 @@ export function compile(input: PolicyInput): Document {
 			sections: compilePrivacyDocument(config),
 		};
 	}
+	if (input.type === "terms") {
+		const { type: _, ...config } = input;
+		return {
+			type: "document",
+			policyType: "terms",
+			sections: compileTermsDocument(config),
+		};
+	}
+	const { type: _, ...config } = input;
 	return {
 		type: "document",
-		policyType: input.type,
-		sections: [], // TODO: migrate terms + cookie builders
+		policyType: "cookie",
+		sections: compileCookieDocument(config),
 	};
 }
 

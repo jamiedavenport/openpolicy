@@ -1,8 +1,8 @@
-import { PrivacyPolicy } from "@openpolicy/react";
+import { CookiePolicy } from "@openpolicy/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/framework/tailwind")({
+export const Route = createFileRoute("/framework/cookie")({
 	component: RouteComponent,
 });
 
@@ -17,7 +17,7 @@ function RouteComponent() {
 				"**:data-op-list:list-disc **:data-op-list:list-inside **:data-op-list:space-y-1 **:data-op-list:text-sm **:data-op-list:text-muted-foreground **:data-op-list:mb-3",
 			)}
 		>
-			<PrivacyPolicy />
+			<CookiePolicy />
 		</div>
 	);
 }

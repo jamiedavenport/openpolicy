@@ -5,7 +5,8 @@ import {
 	type OpenPolicyConfig,
 	type TermsOfServiceConfig,
 } from "@openpolicy/core";
-import type { CSSProperties } from "react";
+import { type CSSProperties, useContext } from "react";
+import { OpenPolicyContext } from "../context";
 import { renderDocument } from "../render";
 import type { PolicyComponents } from "../types";
 
@@ -16,10 +17,12 @@ interface TermsOfServiceProps {
 }
 
 export function TermsOfService({
-	config,
+	config: configProp,
 	components,
 	style,
 }: TermsOfServiceProps) {
+	const { config: contextConfig } = useContext(OpenPolicyContext);
+	const config = configProp ?? contextConfig ?? undefined;
 	if (!config) return null;
 	const input = isOpenPolicyConfig(config)
 		? expandOpenPolicyConfig(config).find((i) => i.type === "terms")
