@@ -32,5 +32,5 @@ jobs:
         working-directory: packages/core
       - run: bunx playwright install --with-deps chromium
         working-directory: examples/tanstack
-      - run: bun run e2e
+      - run: bun run test:e2e
         working-directory: examples/tanstack

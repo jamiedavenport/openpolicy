@@ -28,7 +28,7 @@ export function DefaultBold({ node }: { node: BoldNode }) {
 	return <strong className="op-bold">{node.value}</strong>;
 }
 
-export function DefaultItalic({ node }: { node: ItalicNode }) {
+function DefaultItalic({ node }: { node: ItalicNode }) {
 	return <em className="op-italic">{node.value}</em>;
 }
 
