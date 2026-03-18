@@ -1,5 +1,6 @@
 ---
-import PrivacyPolicy from "../policies/privacy-policy.md";
+import { Content } from "../policies/privacy-policy.md";
+import "../styles/site.css";
 ---
 
 <html lang="en">
@@ -13,7 +14,13 @@ import PrivacyPolicy from "../policies/privacy-policy.md";
 	</head>
 	<body>
 		<main>
-			<PrivacyPolicy />
+			<nav>
+				<a href="/">Home</a>
+				<a href="/privacy">Privacy</a>
+				<a href="/terms">Terms</a>
+				<a href="/cookie">Cookie</a>
+			</nav>
+			<Content />
 		</main>
 	</body>
 </html>

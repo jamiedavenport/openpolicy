@@ -1,5 +1,6 @@
 ---
-import TermsOfService from "../policies/terms-of-service.md";
+import { Content } from "../policies/terms-of-service.md";
+import "../styles/site.css";
 ---
 
 <html lang="en">
@@ -13,7 +14,13 @@ import TermsOfService from "../policies/terms-of-service.md";
 	</head>
 	<body>
 		<main>
-			<TermsOfService />
+			<nav>
+				<a href="/">Home</a>
+				<a href="/privacy">Privacy</a>
+				<a href="/terms">Terms</a>
+				<a href="/cookie">Cookie</a>
+			</nav>
+			<Content />
 		</main>
 	</body>
 </html>
