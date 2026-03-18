@@ -1,5 +1,15 @@
 # @openpolicy/astro
 
+## 0.0.15
+
+### Patch Changes
+
+- 28b6b14: Fixes Jamie's mistakes
+- Updated dependencies [28b6b14]
+  - @openpolicy/core@0.0.15
+  - @openpolicy/vite@0.0.15
+  - @openpolicy/sdk@0.0.15
+
 ## 0.0.13
 
 ### Patch Changes
