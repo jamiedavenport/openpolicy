@@ -59,13 +59,25 @@ const {
           <p class="text-xl font-medium mb-4">
             The First Policy Framework for Busy Founders and Developers
           </p>
-          <a
-            href={ctaHref}
-            target="_blank"
-            class="px-4 py-2.5 bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors duration-200"
-          >
-            {ctaText}
-          </a>
+          <div class="flex flex-wrap gap-2">
+            <a
+              href={ctaHref}
+              target="_blank"
+              class="px-4 py-2.5 bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors duration-200"
+            >
+              {ctaText}
+            </a>
+            <a
+              href="https://github.com/jamiedavenport/openpolicy"
+              target="_blank"
+              class="px-4 py-2.5 border border-gray-300 text-xs font-medium hover:bg-gray-100 transition-colors duration-200 flex items-center gap-1.5"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="#eab308" stroke="#eab308" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              Star us on GitHub
+            </a>
+          </div>
         </div>
         <div class="flex items-center gap-4">
           <a
