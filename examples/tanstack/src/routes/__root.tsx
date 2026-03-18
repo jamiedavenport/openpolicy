@@ -57,6 +57,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 					<Link to="/privacy">Privacy</Link>
 					<Link to="/terms">Terms</Link>
 					<Link to="/framework/privacy">Framework Privacy</Link>
+					<Link to="/framework/tailwind">Tailwind</Link>
 				</nav>
 
 				{children}

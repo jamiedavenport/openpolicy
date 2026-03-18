@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FrameworkTailwindRouteImport } from './routes/framework/tailwind'
 import { Route as FrameworkShadcnRouteImport } from './routes/framework/shadcn'
 import { Route as FrameworkPrivacyRouteImport } from './routes/framework/privacy'
 
@@ -28,6 +29,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrameworkTailwindRoute = FrameworkTailwindRouteImport.update({
+  id: '/framework/tailwind',
+  path: '/framework/tailwind',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FrameworkShadcnRoute = FrameworkShadcnRouteImport.update({
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/framework/privacy': typeof FrameworkPrivacyRoute
   '/framework/shadcn': typeof FrameworkShadcnRoute
+  '/framework/tailwind': typeof FrameworkTailwindRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/framework/privacy': typeof FrameworkPrivacyRoute
   '/framework/shadcn': typeof FrameworkShadcnRoute
+  '/framework/tailwind': typeof FrameworkTailwindRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,6 +70,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/framework/privacy': typeof FrameworkPrivacyRoute
   '/framework/shadcn': typeof FrameworkShadcnRoute
+  '/framework/tailwind': typeof FrameworkTailwindRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,8 +80,15 @@ export interface FileRouteTypes {
     | '/terms'
     | '/framework/privacy'
     | '/framework/shadcn'
+    | '/framework/tailwind'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/privacy' | '/terms' | '/framework/privacy' | '/framework/shadcn'
+  to:
+    | '/'
+    | '/privacy'
+    | '/terms'
+    | '/framework/privacy'
+    | '/framework/shadcn'
+    | '/framework/tailwind'
   id:
     | '__root__'
     | '/'
@@ -80,6 +96,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/framework/privacy'
     | '/framework/shadcn'
+    | '/framework/tailwind'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -88,6 +105,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   FrameworkPrivacyRoute: typeof FrameworkPrivacyRoute
   FrameworkShadcnRoute: typeof FrameworkShadcnRoute
+  FrameworkTailwindRoute: typeof FrameworkTailwindRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -113,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/framework/tailwind': {
+      id: '/framework/tailwind'
+      path: '/framework/tailwind'
+      fullPath: '/framework/tailwind'
+      preLoaderRoute: typeof FrameworkTailwindRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/framework/shadcn': {
       id: '/framework/shadcn'
       path: '/framework/shadcn'
@@ -136,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   FrameworkPrivacyRoute: FrameworkPrivacyRoute,
   FrameworkShadcnRoute: FrameworkShadcnRoute,
+  FrameworkTailwindRoute: FrameworkTailwindRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
