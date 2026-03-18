@@ -53,12 +53,9 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 			</head>
 			<body>
 				<nav className="p-5 flex items-center gap-5">
-					<Link to="/">Home</Link>
-					<Link to="/privacy">Privacy</Link>
-					<Link to="/terms">Terms</Link>
-					<Link to="/framework/privacy">Framework Privacy</Link>
-					<Link to="/framework/tailwind">Tailwind</Link>
-					<Link to="/framework/css-vars">CSS Vars</Link>
+					<Link to="/tailwind">Tailwind</Link>
+					<Link to="/css-vars">CSS Variables</Link>
+					<Link to="/shadcn">Shadcn</Link>
 				</nav>
 
 				{children}

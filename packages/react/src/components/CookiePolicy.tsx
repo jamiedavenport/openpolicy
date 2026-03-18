@@ -23,6 +23,7 @@ export function CookiePolicy({
 }: CookiePolicyProps) {
 	const { config: contextConfig } = useContext(OpenPolicyContext);
 	const config = configProp ?? contextConfig ?? undefined;
+	if (!config) return null;
 	const input = isOpenPolicyConfig(config)
 		? expandOpenPolicyConfig(config).find((i) => i.type === "cookie")
 		: { type: "cookie" as const, ...config };

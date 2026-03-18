@@ -9,222 +9,86 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as FrameworkTermsRouteImport } from './routes/framework/terms'
-import { Route as FrameworkTailwindRouteImport } from './routes/framework/tailwind'
-import { Route as FrameworkShadcnRouteImport } from './routes/framework/shadcn'
-import { Route as FrameworkPrivacyRouteImport } from './routes/framework/privacy'
-import { Route as FrameworkCssVarsRouteImport } from './routes/framework/css-vars'
-import { Route as FrameworkCookieRouteImport } from './routes/framework/cookie'
+import { Route as TailwindRouteImport } from './routes/tailwind'
+import { Route as ShadcnRouteImport } from './routes/shadcn'
+import { Route as CssVarsRouteImport } from './routes/css-vars'
 
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
+const TailwindRoute = TailwindRouteImport.update({
+  id: '/tailwind',
+  path: '/tailwind',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
+const ShadcnRoute = ShadcnRouteImport.update({
+  id: '/shadcn',
+  path: '/shadcn',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrameworkTermsRoute = FrameworkTermsRouteImport.update({
-  id: '/framework/terms',
-  path: '/framework/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrameworkTailwindRoute = FrameworkTailwindRouteImport.update({
-  id: '/framework/tailwind',
-  path: '/framework/tailwind',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrameworkShadcnRoute = FrameworkShadcnRouteImport.update({
-  id: '/framework/shadcn',
-  path: '/framework/shadcn',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrameworkPrivacyRoute = FrameworkPrivacyRouteImport.update({
-  id: '/framework/privacy',
-  path: '/framework/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrameworkCssVarsRoute = FrameworkCssVarsRouteImport.update({
-  id: '/framework/css-vars',
-  path: '/framework/css-vars',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrameworkCookieRoute = FrameworkCookieRouteImport.update({
-  id: '/framework/cookie',
-  path: '/framework/cookie',
+const CssVarsRoute = CssVarsRouteImport.update({
+  id: '/css-vars',
+  path: '/css-vars',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/privacy': typeof PrivacyRoute
-  '/terms': typeof TermsRoute
-  '/framework/cookie': typeof FrameworkCookieRoute
-  '/framework/css-vars': typeof FrameworkCssVarsRoute
-  '/framework/privacy': typeof FrameworkPrivacyRoute
-  '/framework/shadcn': typeof FrameworkShadcnRoute
-  '/framework/tailwind': typeof FrameworkTailwindRoute
-  '/framework/terms': typeof FrameworkTermsRoute
+  '/css-vars': typeof CssVarsRoute
+  '/shadcn': typeof ShadcnRoute
+  '/tailwind': typeof TailwindRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/privacy': typeof PrivacyRoute
-  '/terms': typeof TermsRoute
-  '/framework/cookie': typeof FrameworkCookieRoute
-  '/framework/css-vars': typeof FrameworkCssVarsRoute
-  '/framework/privacy': typeof FrameworkPrivacyRoute
-  '/framework/shadcn': typeof FrameworkShadcnRoute
-  '/framework/tailwind': typeof FrameworkTailwindRoute
-  '/framework/terms': typeof FrameworkTermsRoute
+  '/css-vars': typeof CssVarsRoute
+  '/shadcn': typeof ShadcnRoute
+  '/tailwind': typeof TailwindRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/privacy': typeof PrivacyRoute
-  '/terms': typeof TermsRoute
-  '/framework/cookie': typeof FrameworkCookieRoute
-  '/framework/css-vars': typeof FrameworkCssVarsRoute
-  '/framework/privacy': typeof FrameworkPrivacyRoute
-  '/framework/shadcn': typeof FrameworkShadcnRoute
-  '/framework/tailwind': typeof FrameworkTailwindRoute
-  '/framework/terms': typeof FrameworkTermsRoute
+  '/css-vars': typeof CssVarsRoute
+  '/shadcn': typeof ShadcnRoute
+  '/tailwind': typeof TailwindRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/privacy'
-    | '/terms'
-    | '/framework/cookie'
-    | '/framework/css-vars'
-    | '/framework/privacy'
-    | '/framework/shadcn'
-    | '/framework/tailwind'
-    | '/framework/terms'
+  fullPaths: '/css-vars' | '/shadcn' | '/tailwind'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/privacy'
-    | '/terms'
-    | '/framework/cookie'
-    | '/framework/css-vars'
-    | '/framework/privacy'
-    | '/framework/shadcn'
-    | '/framework/tailwind'
-    | '/framework/terms'
-  id:
-    | '__root__'
-    | '/'
-    | '/privacy'
-    | '/terms'
-    | '/framework/cookie'
-    | '/framework/css-vars'
-    | '/framework/privacy'
-    | '/framework/shadcn'
-    | '/framework/tailwind'
-    | '/framework/terms'
+  to: '/css-vars' | '/shadcn' | '/tailwind'
+  id: '__root__' | '/css-vars' | '/shadcn' | '/tailwind'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  PrivacyRoute: typeof PrivacyRoute
-  TermsRoute: typeof TermsRoute
-  FrameworkCookieRoute: typeof FrameworkCookieRoute
-  FrameworkCssVarsRoute: typeof FrameworkCssVarsRoute
-  FrameworkPrivacyRoute: typeof FrameworkPrivacyRoute
-  FrameworkShadcnRoute: typeof FrameworkShadcnRoute
-  FrameworkTailwindRoute: typeof FrameworkTailwindRoute
-  FrameworkTermsRoute: typeof FrameworkTermsRoute
+  CssVarsRoute: typeof CssVarsRoute
+  ShadcnRoute: typeof ShadcnRoute
+  TailwindRoute: typeof TailwindRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
+    '/tailwind': {
+      id: '/tailwind'
+      path: '/tailwind'
+      fullPath: '/tailwind'
+      preLoaderRoute: typeof TailwindRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
+    '/shadcn': {
+      id: '/shadcn'
+      path: '/shadcn'
+      fullPath: '/shadcn'
+      preLoaderRoute: typeof ShadcnRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/framework/terms': {
-      id: '/framework/terms'
-      path: '/framework/terms'
-      fullPath: '/framework/terms'
-      preLoaderRoute: typeof FrameworkTermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/framework/tailwind': {
-      id: '/framework/tailwind'
-      path: '/framework/tailwind'
-      fullPath: '/framework/tailwind'
-      preLoaderRoute: typeof FrameworkTailwindRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/framework/shadcn': {
-      id: '/framework/shadcn'
-      path: '/framework/shadcn'
-      fullPath: '/framework/shadcn'
-      preLoaderRoute: typeof FrameworkShadcnRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/framework/privacy': {
-      id: '/framework/privacy'
-      path: '/framework/privacy'
-      fullPath: '/framework/privacy'
-      preLoaderRoute: typeof FrameworkPrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/framework/css-vars': {
-      id: '/framework/css-vars'
-      path: '/framework/css-vars'
-      fullPath: '/framework/css-vars'
-      preLoaderRoute: typeof FrameworkCssVarsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/framework/cookie': {
-      id: '/framework/cookie'
-      path: '/framework/cookie'
-      fullPath: '/framework/cookie'
-      preLoaderRoute: typeof FrameworkCookieRouteImport
+    '/css-vars': {
+      id: '/css-vars'
+      path: '/css-vars'
+      fullPath: '/css-vars'
+      preLoaderRoute: typeof CssVarsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  PrivacyRoute: PrivacyRoute,
-  TermsRoute: TermsRoute,
-  FrameworkCookieRoute: FrameworkCookieRoute,
-  FrameworkCssVarsRoute: FrameworkCssVarsRoute,
-  FrameworkPrivacyRoute: FrameworkPrivacyRoute,
-  FrameworkShadcnRoute: FrameworkShadcnRoute,
-  FrameworkTailwindRoute: FrameworkTailwindRoute,
-  FrameworkTermsRoute: FrameworkTermsRoute,
+  CssVarsRoute: CssVarsRoute,
+  ShadcnRoute: ShadcnRoute,
+  TailwindRoute: TailwindRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
