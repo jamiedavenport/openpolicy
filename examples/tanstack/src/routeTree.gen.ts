@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TailwindRouteImport } from './routes/tailwind'
 import { Route as ShadcnRouteImport } from './routes/shadcn'
 import { Route as CssVarsRouteImport } from './routes/css-vars'
+import { Route as IndexRouteImport } from './routes/index'
 
 const TailwindRoute = TailwindRouteImport.update({
   id: '/tailwind',
@@ -28,32 +29,41 @@ const CssVarsRoute = CssVarsRouteImport.update({
   path: '/css-vars',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/css-vars': typeof CssVarsRoute
   '/shadcn': typeof ShadcnRoute
   '/tailwind': typeof TailwindRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/css-vars': typeof CssVarsRoute
   '/shadcn': typeof ShadcnRoute
   '/tailwind': typeof TailwindRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/css-vars': typeof CssVarsRoute
   '/shadcn': typeof ShadcnRoute
   '/tailwind': typeof TailwindRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/css-vars' | '/shadcn' | '/tailwind'
+  fullPaths: '/' | '/css-vars' | '/shadcn' | '/tailwind'
   fileRoutesByTo: FileRoutesByTo
-  to: '/css-vars' | '/shadcn' | '/tailwind'
-  id: '__root__' | '/css-vars' | '/shadcn' | '/tailwind'
+  to: '/' | '/css-vars' | '/shadcn' | '/tailwind'
+  id: '__root__' | '/' | '/css-vars' | '/shadcn' | '/tailwind'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   CssVarsRoute: typeof CssVarsRoute
   ShadcnRoute: typeof ShadcnRoute
   TailwindRoute: typeof TailwindRoute
@@ -82,10 +92,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CssVarsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   CssVarsRoute: CssVarsRoute,
   ShadcnRoute: ShadcnRoute,
   TailwindRoute: TailwindRoute,

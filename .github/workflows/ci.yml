@@ -20,3 +20,17 @@ jobs:
       - run: bun run lint
       - run: bun run test
       - run: bun run knip
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+        working-directory: packages/core
+      - run: bunx playwright install --with-deps chromium
+        working-directory: examples/tanstack
+      - run: bun run e2e
+        working-directory: examples/tanstack
