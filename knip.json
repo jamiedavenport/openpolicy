@@ -21,6 +21,9 @@
 		},
 		"examples/*": {
 			"entry": ["openpolicy.ts"]
+		},
+		"examples/tanstack": {
+			"entry": ["src/openpolicy.ts"]
 		}
 	}
 }
