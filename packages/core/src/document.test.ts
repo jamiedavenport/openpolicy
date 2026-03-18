@@ -107,8 +107,8 @@ test("children-privacy has noticeUrl link when provided", () => {
 		children: { underAge: 13, noticeUrl: "https://acme.com/children" },
 	});
 	const section = doc.sections.find((s) => s.id === "children-privacy")!;
-	expect(section.content.length).toBe(2);
-	const secondPara = section.content[1];
+	expect(section.content.length).toBe(3); // heading + 2 paragraphs
+	const secondPara = section.content[2];
 	expect(secondPara?.type).toBe("paragraph");
 	const children = (secondPara as ParagraphNode).children;
 	const linkNode = children.find((c) => c.type === "link");
@@ -120,8 +120,8 @@ test("introduction section has ParagraphNode children", () => {
 	const intro = doc.sections.find((s) => s.id === "introduction")!;
 	expect(intro.content.length).toBeGreaterThan(0);
 	const firstNode = intro.content[0];
-	expect(firstNode?.type).toBe("paragraph");
-	const firstPara = firstNode as ParagraphNode;
+	expect(firstNode?.type).toBe("heading");
+	const firstPara = intro.content[1] as ParagraphNode;
 	expect(firstPara.children.length).toBeGreaterThan(0);
 	expect(firstPara.children[0]?.type).toBe("text");
 });
