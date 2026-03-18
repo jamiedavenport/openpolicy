@@ -10,6 +10,7 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import openpolicy from "../openpolicy";
 import appCss from "../styles.css?url";
 
@@ -35,9 +36,11 @@ export const Route = createRootRoute({
 function RootComponent() {
 	return (
 		<RootDocument>
-			<OpenPolicy config={openpolicy}>
-				<Outlet />
-			</OpenPolicy>
+			<TooltipProvider>
+				<OpenPolicy config={openpolicy}>
+					<Outlet />
+				</OpenPolicy>
+			</TooltipProvider>
 		</RootDocument>
 	);
 }

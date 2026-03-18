@@ -18,17 +18,19 @@ export function compile(input: PolicyInput): Document {
 	};
 }
 
-export { bold, li, link, p, section, text, ul } from "./helpers";
+export { bold, heading, li, link, p, section, text, ul } from "./helpers";
 export type {
 	BoldNode,
 	ContentNode,
 	Document,
 	DocumentSection,
+	HeadingNode,
 	InlineNode,
 	LinkNode,
 	ListItemNode,
 	ListNode,
 	Node,
+	NodeContext,
 	ParagraphNode,
 	TextNode,
 } from "./types";

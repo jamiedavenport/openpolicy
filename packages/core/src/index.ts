@@ -4,15 +4,27 @@ export type {
 	ContentNode,
 	Document,
 	DocumentSection,
+	HeadingNode,
 	InlineNode,
 	LinkNode,
 	ListItemNode,
 	ListNode,
 	Node,
+	NodeContext,
 	ParagraphNode,
 	TextNode,
 } from "./documents";
-export { bold, compile, li, link, p, section, text, ul } from "./documents";
+export {
+	bold,
+	compile,
+	heading,
+	li,
+	link,
+	p,
+	section,
+	text,
+	ul,
+} from "./documents";
 export { compilePrivacyPolicy } from "./privacy";
 export { compileTermsOfService } from "./terms";
 export type {

@@ -1,6 +1,7 @@
 import type {
 	BoldNode,
 	DocumentSection,
+	HeadingNode,
 	LinkNode,
 	Node,
 	TextNode,
@@ -8,16 +9,10 @@ import type {
 import { createElement, type ReactNode } from "react";
 import type { PolicyComponents } from "../types";
 
-export function DefaultHeading({
-	id,
-	children,
-}: {
-	id: string;
-	children: ReactNode;
-}) {
+export function DefaultHeading({ node }: { node: HeadingNode }) {
 	return (
-		<h2 data-op-heading className="op-heading" id={id}>
-			{children}
+		<h2 data-op-heading className="op-heading">
+			{node.value}
 		</h2>
 	);
 }
@@ -46,7 +41,14 @@ export function DefaultSection({
 	children: ReactNode;
 }) {
 	return (
-		<section data-op-section className="op-section" id={section.id}>
+		<section
+			data-op-section
+			className="op-section"
+			id={section.id}
+			{...(section.context?.reason && {
+				"data-op-reason": section.context.reason,
+			})}
+		>
 			{children}
 		</section>
 	);
@@ -91,13 +93,16 @@ export function renderNode(
 
 		case "section": {
 			const SectionComp = components.Section ?? DefaultSection;
-			const HeadingComp = components.Heading ?? DefaultHeading;
 			return (
 				<SectionComp key={key} section={node}>
-					<HeadingComp id={node.id}>{node.title}</HeadingComp>
 					{node.content.map((n, i) => renderNode(n, components, i))}
 				</SectionComp>
 			);
+		}
+
+		case "heading": {
+			const HeadingComp = components.Heading ?? DefaultHeading;
+			return <HeadingComp key={key} node={node} />;
 		}
 
 		case "paragraph": {

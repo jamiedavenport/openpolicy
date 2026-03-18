@@ -1,6 +1,7 @@
 import type {
 	BoldNode,
 	DocumentSection,
+	HeadingNode,
 	LinkNode,
 	ListNode,
 	ParagraphNode,
@@ -28,7 +29,7 @@ export type PolicyTheme = Partial<
 
 export interface PolicyComponents {
 	Section?: ComponentType<{ section: DocumentSection; children: ReactNode }>;
-	Heading?: ComponentType<{ id: string; children: ReactNode }>;
+	Heading?: ComponentType<{ node: HeadingNode }>;
 	Paragraph?: ComponentType<{ node: ParagraphNode; children: ReactNode }>;
 	List?: ComponentType<{ node: ListNode; children: ReactNode }>;
 	Text?: ComponentType<{ node: TextNode }>;
