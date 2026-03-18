@@ -6,6 +6,7 @@ export default defineConfig({
 	plugins: [
 		sveltekit(),
 		openPolicy({
+			configPath: "./openpolicy.ts",
 			formats: ["html"],
 			outDir: "src/lib/policies",
 		}),
