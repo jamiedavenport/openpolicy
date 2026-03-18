@@ -47,9 +47,6 @@ export { validateCookiePolicy } from "./validate-cookie";
 export { validateTermsOfService } from "./validate-terms";
 
 import { compile } from "./documents";
-import { renderHTML } from "./renderers/html";
-import { renderMarkdown } from "./renderers/markdown";
-import { renderPDF } from "./renderers/pdf";
 import type {
 	CompileOptions,
 	OpenPolicyConfig,
@@ -99,24 +96,30 @@ export async function compilePolicy(
 	return Promise.all(
 		formats.map(async (format) => {
 			switch (format) {
-				case "markdown":
+				case "markdown": {
+					const { renderMarkdown } = await import("./renderers/markdown");
 					return {
 						format,
 						filename: filenameFor(input.type, "md"),
 						content: renderMarkdown(doc),
 					};
-				case "html":
+				}
+				case "html": {
+					const { renderHTML } = await import("./renderers/html");
 					return {
 						format,
 						filename: filenameFor(input.type, "html"),
 						content: renderHTML(doc),
 					};
-				case "pdf":
+				}
+				case "pdf": {
+					const { renderPDF } = await import("./renderers/pdf");
 					return {
 						format,
 						filename: filenameFor(input.type, "pdf"),
 						content: await renderPDF(doc),
 					};
+				}
 				case "jsx":
 					throw new Error("jsx format is not yet implemented");
 				default:

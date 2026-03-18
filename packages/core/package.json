@@ -9,6 +9,7 @@
 		"url": "https://github.com/jamiedavenport/openpolicy",
 		"directory": "packages/core"
 	},
+	"sideEffects": false,
 	"files": [
 		"dist",
 		"README.md"
