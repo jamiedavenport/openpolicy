@@ -7,7 +7,7 @@ import type {
 	Node,
 	TextNode,
 } from "@openpolicy/core";
-import { createElement, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { PolicyComponents } from "../types";
 
 export function DefaultHeading({ node }: { node: HeadingNode }) {

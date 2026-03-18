@@ -2,6 +2,7 @@ import { openPolicy } from "@openpolicy/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
+import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 
@@ -20,5 +21,12 @@ export default defineConfig({
 		tanstackStart(),
 		// react's vite plugin must come after start's vite plugin
 		viteReact(),
+		process.env.ANALYZE === "true" &&
+			visualizer({
+				filename: "bundle-stats.html",
+				open: true,
+				gzipSize: true,
+				brotliSize: true,
+			}),
 	],
 });

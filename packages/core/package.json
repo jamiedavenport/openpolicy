@@ -31,7 +31,6 @@
 		"@types/pdfkit": "^0.17.5"
 	},
 	"dependencies": {
-		"marked": "^17.0.4",
 		"pdfkit": "^0.18.0"
 	}
 }

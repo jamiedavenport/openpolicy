@@ -5,6 +5,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
+		"analyze": "ANALYZE=true vite build",
 		"test:e2e": "playwright test",
 		"test:e2e:ui": "playwright test --ui"
 	},
@@ -32,6 +33,7 @@
 		"@vitejs/plugin-react": "^5.1.4",
 		"tailwindcss": "^4.2.1",
 		"vite": "catalog:",
-		"vite-tsconfig-paths": "^6.1.1"
+		"vite-tsconfig-paths": "^6.1.1",
+		"rollup-plugin-visualizer": "^5.14.0"
 	}
 }
