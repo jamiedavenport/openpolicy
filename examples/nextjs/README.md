@@ -1,3 +1,5 @@
+[![OpenPolicy](https://openpolicy.sh/og.png)](https://openpolicy.sh)
+
 # Next.js Example — OpenPolicy CLI
 
 A minimal Next.js app showing how to use the `@openpolicy/cli` to generate policy documents as part of a Next.js build. Policies are generated to `public/policies/` before each build so they're served as static files.

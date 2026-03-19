@@ -1,3 +1,5 @@
+[![OpenPolicy](https://openpolicy.sh/og.png)](https://openpolicy.sh)
+
 # Landing Page Example — Astro + OpenPolicy
 
 A minimal Astro static site showing how to integrate OpenPolicy using the `@openpolicy/astro` integration. Policy documents are compiled at build time.

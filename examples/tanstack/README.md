@@ -1,3 +1,5 @@
+[![OpenPolicy](https://openpolicy.sh/og.png)](https://openpolicy.sh)
+
 # TanStack Start Example — Vite + React + OpenPolicy
 
 A TanStack Start (React + Vite) app showcasing three different ways to style `@openpolicy/react` components: Tailwind utility classes, CSS custom properties, and shadcn component overrides.
