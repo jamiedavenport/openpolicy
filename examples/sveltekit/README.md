@@ -1,3 +1,5 @@
+[![OpenPolicy](https://openpolicy.sh/og.png)](https://openpolicy.sh)
+
 # SvelteKit Example — OpenPolicy Vite Plugin
 
 A minimal SvelteKit app showing how to use the `@openpolicy/vite` plugin to generate policy documents at build time. Policies are compiled from a typed TypeScript config and rendered as SvelteKit routes.
