@@ -1,4 +1,5 @@
 ---
+import "../styles/site.css";
 
 ---
 
@@ -9,9 +10,17 @@
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>OpenPolicy Astro Example</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<main>
+			<h1>OpenPolicy Astro Example</h1>
+			<p>Open each route below to view the generated policy pages.</p>
+			<nav>
+				<a href="/privacy">Privacy Policy</a>
+				<a href="/terms">Terms of Service</a>
+				<a href="/cookie">Cookie Policy</a>
+			</nav>
+		</main>
 	</body>
 </html>
