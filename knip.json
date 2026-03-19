@@ -19,6 +19,9 @@
 			"entry": ["rolldown.config.ts"],
 			"ignoreDependencies": ["@openpolicy/tooling"]
 		},
+		"packages/renderers": {
+			"ignoreDependencies": ["@openpolicy/tooling"]
+		},
 		"examples/*": {
 			"entry": ["openpolicy.ts"]
 		},

@@ -11,7 +11,7 @@ import {
 } from "vue";
 import { defaultStyles } from "./styles";
 
-export interface OpenPolicyContextValue {
+interface OpenPolicyContextValue {
 	config: Ref<OpenPolicyConfig | null>;
 }
 
