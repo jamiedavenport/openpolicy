@@ -9,7 +9,8 @@
 			"@openpolicy/vite",
 			"@openpolicy/cli",
 			"@openpolicy/astro",
-			"@openpolicy/react"
+			"@openpolicy/react",
+			"@openpolicy/vue"
 		]
 	],
 	"linked": [],

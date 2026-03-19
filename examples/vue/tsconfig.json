@@ -1,0 +1,8 @@
+{
+	"extends": "@openpolicy/tooling/base",
+	"compilerOptions": {
+		"jsx": "preserve",
+		"types": ["vite/client"]
+	},
+	"include": ["src", "openpolicy.ts"]
+}

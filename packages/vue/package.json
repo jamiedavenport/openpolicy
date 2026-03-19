@@ -1,0 +1,48 @@
+{
+	"name": "@openpolicy/vue",
+	"version": "0.0.15",
+	"type": "module",
+	"description": "Vue components for OpenPolicy",
+	"license": "GPL-3.0-only",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jamiedavenport/openpolicy",
+		"directory": "packages/vue"
+	},
+	"files": [
+		"dist",
+		"styles.css",
+		"README.md"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		},
+		"./styles.css": "./styles.css"
+	},
+	"scripts": {
+		"dev": "rolldown -c --watch",
+		"build": "rolldown -c",
+		"check-types": "tsc --noEmit",
+		"test": "bun test"
+	},
+	"peerDependencies": {
+		"vue": ">=3.5"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@openpolicy/core": "workspace:*",
+		"@openpolicy/tooling": "workspace:*",
+		"vue": "^3.5.0"
+	},
+	"publishConfig": {
+		"exports": {
+			".": {
+				"import": "./dist/index.js",
+				"types": "./dist/index.d.ts"
+			},
+			"./styles.css": "./styles.css"
+		}
+	}
+}
