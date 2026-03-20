@@ -5,7 +5,7 @@ export default defineConfig({
 		name: "OpenPolicy",
 		legalName: "JXD Ltd",
 		address: "86-90 Paul Street, London, EC2A 4NE, United Kingdom",
-		contact: "jamie@jxd.dev",
+		contact: "jamie@openpolicy.sh",
 	},
 	privacy: {
 		effectiveDate: "2026-03-03",

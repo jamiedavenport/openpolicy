@@ -2,7 +2,7 @@
 
 This Privacy Policy describes how OpenPolicy ("we", "us", or "our") collects, uses, and shares information about you when you use our services. Effective Date: 2026-03-03.
 
-If you have questions about this policy, please contact us at jamie@jxd.dev.
+If you have questions about this policy, please contact us at jamie@openpolicy.sh.
 
 ---
 
@@ -76,4 +76,4 @@ Contact us:
 
 - **Legal Name:** JXD Ltd
 - **Address:** 86-90 Paul Street, London, EC2A 4NE, United Kingdom
-- **Email:** jamie@jxd.dev
+- **Email:** jamie@openpolicy.sh

@@ -82,4 +82,4 @@ If you have questions about these Terms, please contact us:
 
 - **Legal Name:** JXD Ltd
 - **Address:** 86-90 Paul Street, London, EC2A 4NE, United Kingdom
-- **Email:** jamie@jxd.dev
+- **Email:** jamie@openpolicy.sh
