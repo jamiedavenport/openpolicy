@@ -1,0 +1,152 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="OpenPolicy+ — Coming Soon"
+  description="OpenPolicy for teams who need more. Consent management, PR review bots, legal workflows, i18n, and more."
+  ogUrl="https://openpolicy.sh/plus"
+>
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">PLUS.md</h2>
+    <h1 class="text-2xl font-medium mb-3">OpenPolicy, for teams who need more</h1>
+    <p class="text-sm text-gray-600 max-w-prose">
+      OpenPolicy+ is a commercial tier built on top of the open-source core. It adds consent
+      management, automated compliance monitoring, legal review workflows, multi-language output,
+      and more — all staying in sync with your codebase.
+    </p>
+    <p class="text-xs text-gray-400 mt-3 font-mono">Coming soon. Join the waitlist below.</p>
+  </section>
+
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">FEATURES.md</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-gray-200 border border-gray-200">
+
+      <!-- Consent & Tracking -->
+      <div class="bg-white p-4 col-span-full">
+        <p class="font-mono font-medium text-xs text-gray-400">Consent &amp; Tracking</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Consent Management</p>
+        <p class="text-xs text-gray-500">Cookie banners and opt-in/out flows that stay in sync with your policies automatically.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Tracking Controls</p>
+        <p class="text-xs text-gray-500">Manage third-party trackers across your stack, mapped directly to your privacy policy.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Consent Analytics</p>
+        <p class="text-xs text-gray-500">Track acceptance rates, banner interactions, and jurisdiction-level consent coverage.</p>
+      </div>
+
+      <!-- Automation & Bots -->
+      <div class="bg-white p-4 col-span-full border-t border-gray-200">
+        <p class="font-mono font-medium text-xs text-gray-400">Automation &amp; Bots</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">PR Bot</p>
+        <p class="text-xs text-gray-500">GitHub app that reviews every policy change, flags compliance risks, and suggests missing clauses before merge.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Compliance Alerts</p>
+        <p class="text-xs text-gray-500">Get notified when GDPR, CCPA, or other regulations change and your policies need updating.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Policy Change Notifications</p>
+        <p class="text-xs text-gray-500">Automatically email end-users when your published policies are updated, with a plain-language diff.</p>
+      </div>
+
+      <!-- Legal Workflow -->
+      <div class="bg-white p-4 col-span-full border-t border-gray-200">
+        <p class="font-mono font-medium text-xs text-gray-400">Legal Workflow</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Lawyer Interface</p>
+        <p class="text-xs text-gray-500">Invite legal counsel to a review portal where they can comment, approve, and sign off on policy drafts.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Approval Gates</p>
+        <p class="text-xs text-gray-500">Require legal sign-off before any policy change deploys to production.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Audit Reports</p>
+        <p class="text-xs text-gray-500">Generate compliance-ready reports for legal, security, and due diligence reviews.</p>
+      </div>
+
+      <!-- Coverage -->
+      <div class="bg-white p-4 col-span-full border-t border-gray-200">
+        <p class="font-mono font-medium text-xs text-gray-400">Coverage</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">i18n</p>
+        <p class="text-xs text-gray-500">Auto-generate policies in 20+ languages, kept in sync on every build.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Extended Jurisdictions</p>
+        <p class="text-xs text-gray-500">LGPD (Brazil), PIPEDA (Canada), Australia Privacy Act, and emerging frameworks.</p>
+      </div>
+      <div class="bg-white p-4">
+        <p class="font-mono font-medium text-xs mb-1">Policy Versioning</p>
+        <p class="text-xs text-gray-500">Full publish history for every policy, with plain-language diffs and one-click rollback.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="waitlist">
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">WAITLIST.md</h2>
+    <div class="border border-gray-200 bg-white p-8">
+      <h3 class="text-lg font-medium mb-2">Get early access</h3>
+      <p class="text-sm text-gray-600 mb-6">
+        OpenPolicy+ is in development. Leave your email and we'll reach out when it's ready.
+      </p>
+      <form id="waitlist-form" class="flex flex-col sm:flex-row gap-3 max-w-md">
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder="you@example.com"
+          class="flex-1 px-3 py-2.5 border border-gray-300 text-sm font-mono placeholder-gray-400 focus:outline-none focus:border-gray-600 transition-colors"
+        />
+        <button
+          type="submit"
+          class="px-4 py-2.5 bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors duration-200 whitespace-nowrap"
+        >
+          Join the waitlist
+        </button>
+      </form>
+      <p id="waitlist-status" class="text-xs text-gray-400 mt-3">No spam. Unsubscribe any time.</p>
+
+      <script>
+        const form = document.getElementById("waitlist-form") as HTMLFormElement;
+        const status = document.getElementById("waitlist-status") as HTMLParagraphElement;
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+
+          try {
+            const res = await fetch("/api/waitlist", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email }),
+            });
+
+            if (res.ok) {
+              form.style.display = "none";
+              status.textContent = "You're on the list. We'll be in touch.";
+              status.classList.remove("text-red-500");
+              status.classList.add("text-gray-600");
+            } else {
+              status.textContent = "Something went wrong. Please try again.";
+              status.classList.add("text-red-500");
+            }
+          } catch {
+            status.textContent = "Something went wrong. Please try again.";
+            status.classList.add("text-red-500");
+          }
+        });
+      </script>
+    </div>
+  </section>
+</BaseLayout>
