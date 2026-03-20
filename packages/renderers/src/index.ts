@@ -55,8 +55,6 @@ export async function compilePolicy(
 						content: await renderPDF(doc),
 					};
 				}
-				case "jsx":
-					throw new Error("jsx format is not yet implemented");
 				default:
 					throw new Error(`Format not yet implemented: ${format}`);
 			}

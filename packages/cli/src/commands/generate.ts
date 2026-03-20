@@ -64,7 +64,7 @@ export const generateCommand = defineCommand({
 		},
 		format: {
 			type: "string",
-			description: "Comma-separated output formats: markdown,pdf,jsx",
+			description: "Comma-separated output formats: markdown,html,pdf",
 			default: "markdown",
 		},
 		out: {

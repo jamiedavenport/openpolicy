@@ -1,4 +1,4 @@
-export type OutputFormat = "markdown" | "html" | "pdf" | "jsx";
+export type OutputFormat = "markdown" | "html" | "pdf";
 
 export type CompileOptions = { formats: OutputFormat[] };
 
