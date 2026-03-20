@@ -82,6 +82,6 @@ If we transfer your personal data outside the EEA, we ensure adequate safeguards
 
 Contact us:
 
-- **Legal Name: **Acme Corporation
-- **Address: **123 Main St, Springfield, USA
-- **Email: **privacy@acme.com
+- **Legal Name:** Acme Corporation
+- **Address:** 123 Main St, Springfield, USA
+- **Email:** privacy@acme.com

@@ -74,6 +74,6 @@ If we transfer your personal data outside the EEA, we ensure adequate safeguards
 
 Contact us:
 
-- **Legal Name: **JXD Ltd
-- **Address: **86-90 Paul Street, London, EC2A 4NE, United Kingdom
-- **Email: **jamie@jxd.dev
+- **Legal Name:** JXD Ltd
+- **Address:** 86-90 Paul Street, London, EC2A 4NE, United Kingdom
+- **Email:** jamie@jxd.dev

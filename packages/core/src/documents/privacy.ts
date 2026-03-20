@@ -190,9 +190,9 @@ function buildContact(config: PrivacyPolicyConfig): DocumentSection {
 		heading("Contact Us"),
 		p(["Contact us:"]),
 		ul([
-			li([bold("Legal Name: "), config.company.legalName]),
-			li([bold("Address: "), config.company.address]),
-			li([bold("Email: "), config.company.contact]),
+			li([bold("Legal Name:"), " ", config.company.legalName]),
+			li([bold("Address:"), " ", config.company.address]),
+			li([bold("Email:"), " ", config.company.contact]),
 		]),
 	]);
 }

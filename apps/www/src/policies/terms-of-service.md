@@ -80,6 +80,6 @@ We may update these Terms from time to time. We will provide at least 14 days' n
 
 If you have questions about these Terms, please contact us:
 
-- **Legal Name: **JXD Ltd
-- **Address: **86-90 Paul Street, London, EC2A 4NE, United Kingdom
-- **Email: **jamie@jxd.dev
+- **Legal Name:** JXD Ltd
+- **Address:** 86-90 Paul Street, London, EC2A 4NE, United Kingdom
+- **Email:** jamie@jxd.dev

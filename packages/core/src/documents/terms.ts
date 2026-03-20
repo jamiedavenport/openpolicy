@@ -298,9 +298,9 @@ function buildContact(config: TermsOfServiceConfig): DocumentSection {
 		heading("Contact Us"),
 		p(["If you have questions about these Terms, please contact us:"]),
 		ul([
-			li([bold("Legal Name: "), config.company.legalName]),
-			li([bold("Address: "), config.company.address]),
-			li([bold("Email: "), config.company.contact]),
+			li([bold("Legal Name:"), " ", config.company.legalName]),
+			li([bold("Address:"), " ", config.company.address]),
+			li([bold("Email:"), " ", config.company.contact]),
 		]),
 	]);
 }

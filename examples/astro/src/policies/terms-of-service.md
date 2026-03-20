@@ -83,6 +83,6 @@ We may update these Terms from time to time. We will provide at least 30 days' n
 
 If you have questions about these Terms, please contact us:
 
-- **Legal Name: **Acme Corporation
-- **Address: **123 Main St, Springfield, USA
-- **Email: **privacy@acme.com
+- **Legal Name:** Acme Corporation
+- **Address:** 123 Main St, Springfield, USA
+- **Email:** privacy@acme.com
