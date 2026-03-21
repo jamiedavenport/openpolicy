@@ -1,77 +1,39 @@
 ---
-title: "How to Build a Legal Chatbot with OpenPolicy and AI SDK"
-description: "Compile your privacy policy and terms of service into a Claude system prompt and stream plain-English answers to user questions — in about 100 lines of Next.js."
+title: "Building a Legal Chatbot with OpenPolicy and AI SDK"
+description: "Compile your privacy policy and terms of service into a Claude system prompt and stream plain-English answers — no RAG, no vector DB, just a route handler and 100 lines of React."
 pubDate: 2026-03-21
 author: "OpenPolicy Team"
 ---
 
-Most users never read a privacy policy or terms of service. The documents are long, written in legalese, and buried in footers. But the information in them matters — users have rights, and they should be able to exercise them. What if instead of a PDF wall of text, your site had a conversational assistant that could answer "how can I delete my data?" in plain English, instantly?
+Nobody reads privacy policies. They're long, dense, and written for lawyers, not users. But the information in them matters — and with a language model and a couple of hours of work, you can let users just ask questions instead.
 
-In this tutorial we'll build exactly that: a chat UI embedded in a Next.js app that answers questions about the site's own privacy policy and terms of service. The policies are defined in TypeScript using OpenPolicy, compiled to Markdown at startup, injected into a Claude system prompt, and streamed back to the user via Vercel's AI SDK.
+Here's what we built: a chat UI in Next.js where users can ask things like "how can I delete my data?" or "what happens if you terminate my account?" and get clear, accurate answers sourced directly from the site's own policies.
 
-By the end you'll have:
+The interesting part is how the policies get into the model. Rather than RAG or a vector database, we compile them to Markdown at startup and drop the whole thing into the system prompt. For legal documents this is actually the right call — I'll explain why below.
 
-- A type-safe policy config that generates both a privacy policy and terms of service
-- A `/api/chat` route that compiles those policies and answers questions about them
-- A polished chat UI built with AI Elements (shadcn-style components for AI interfaces)
-- An understanding of why this approach works — and when to reach for something more complex
+<!-- IMAGE: Screenshot of the chat UI with an active conversation -->
 
----
-
-## How it works
-
-The data flow is straightforward:
-
-```
-openpolicy.ts
-  └─ defineConfig()              ← one config, both policies
-       └─ expandOpenPolicyConfig()    ← splits into [privacyInput, termsInput]
-            └─ compile()              ← builds PolicySection[] for each
-                 └─ renderMarkdown()       ← serializes to Markdown string
-                      └─ system prompt     ← passed to Claude on every request
-                           └─ streamText()      ← AI SDK streaming
-                                └─ chat UI       ← React, AI Elements components
-```
-
-The entire policy context fits comfortably in Claude's context window. Because the policies are short and deterministic — they come from a structured config, not free-form text — there's no need for retrieval or chunking. The full documents go into the system prompt, and Claude answers with direct citations.
-
-<!-- IMAGE: Architecture diagram showing the data flow from openpolicy.ts through compile/renderMarkdown to the system prompt and streaming chat UI -->
+You can find the [full working example on GitHub](https://github.com/openpolicyai/openpolicy/tree/main/examples/nextjs). This post walks through how it's built and the decisions behind it.
 
 ---
 
-## Prerequisites
+## The setup
 
-- **Bun** (or Node 18+)
-- An **Anthropic API key** — get one at [console.anthropic.com](https://console.anthropic.com)
-- Basic familiarity with Next.js App Router
-
----
-
-## Step 1 — Project setup
-
-Create a new Next.js app and install the required packages:
+Install the OpenPolicy packages alongside your existing AI SDK dependencies:
 
 ```sh
-bun create next-app legal-chatbot --typescript --tailwind --app
-cd legal-chatbot
 bun add @openpolicy/sdk @openpolicy/core @openpolicy/renderers
-bun add @ai-sdk/anthropic @ai-sdk/react ai
 ```
 
-| Package | Role |
-|---|---|
-| `@openpolicy/sdk` | `defineConfig()` — the type-safe policy authoring API |
-| `@openpolicy/core` | `compile()` and `expandOpenPolicyConfig()` — the compilation engine |
-| `@openpolicy/renderers` | `renderMarkdown()` — serializes compiled policy to a Markdown string |
-| `@ai-sdk/anthropic` | Anthropic provider for Vercel AI SDK |
-| `@ai-sdk/react` | `useChat` hook |
-| `ai` | Core AI SDK — `streamText`, `DefaultChatTransport`, message types |
+- **`@openpolicy/sdk`** — type-safe policy authoring
+- **`@openpolicy/core`** — compilation engine
+- **`@openpolicy/renderers`** — renders compiled policies to Markdown, HTML, or PDF
 
 ---
 
-## Step 2 — Define your policies
+## Define your policies
 
-Create `openpolicy.ts` at the project root. This single file defines both your privacy policy and terms of service:
+Create `openpolicy.ts` at the project root. One config, both policies:
 
 ```ts
 import { defineConfig } from "@openpolicy/sdk";
@@ -90,8 +52,7 @@ export default defineConfig({
     },
     legalBasis: "Legitimate interests and consent",
     retention: {
-      "All personal data":
-        "As long as necessary for the purposes described in this policy",
+      "All personal data": "As long as necessary for the purposes described in this policy",
     },
     cookies: { essential: true, analytics: false, marketing: false },
     thirdParties: [],
@@ -100,9 +61,7 @@ export default defineConfig({
   },
   terms: {
     effectiveDate: "2026-03-09",
-    acceptance: {
-      methods: ["using the service", "creating an account"],
-    },
+    acceptance: { methods: ["using the service", "creating an account"] },
     eligibility: { minimumAge: 13 },
     accounts: {
       registrationRequired: false,
@@ -113,21 +72,10 @@ export default defineConfig({
       "Violating any applicable laws or regulations",
       "Infringing on intellectual property rights",
     ],
-    intellectualProperty: {
-      companyOwnsService: true,
-      usersMayNotCopy: true,
-    },
-    termination: {
-      companyCanTerminate: true,
-      userCanTerminate: true,
-    },
-    disclaimers: {
-      serviceProvidedAsIs: true,
-      noWarranties: true,
-    },
-    limitationOfLiability: {
-      excludesIndirectDamages: true,
-    },
+    intellectualProperty: { companyOwnsService: true, usersMayNotCopy: true },
+    termination: { companyCanTerminate: true, userCanTerminate: true },
+    disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
+    limitationOfLiability: { excludesIndirectDamages: true },
     governingLaw: { jurisdiction: "Delaware, USA" },
     changesPolicy: {
       noticeMethod: "email or prominent notice on our website",
@@ -137,19 +85,13 @@ export default defineConfig({
 });
 ```
 
-A few things worth noting:
-
-**Single config, dual output.** The `privacy` and `terms` keys live side by side. `expandOpenPolicyConfig()` splits this into two separate `PolicyInput` objects — one typed `"privacy"`, one typed `"terms"` — so you can compile and render them independently.
-
-**Structured, not freeform.** Instead of writing policy prose yourself, you declare facts: what data you collect, what jurisdictions you operate in, what rights users have. OpenPolicy generates correctly worded legal language from those declarations. The output is consistent and auditable.
-
-**TypeScript all the way down.** The config is fully type-checked. If you add a jurisdiction that doesn't exist, or omit a required field, TypeScript tells you at author time, not at runtime.
+You're declaring *facts* — what data you collect, what rights users have, which jurisdictions you operate in — and OpenPolicy generates correctly worded legal prose from them. It's fully typed, so mistakes get caught at author time rather than discovered after you've shipped.
 
 ---
 
-## Step 3 — Wire up the provider
+## Wire up the provider
 
-OpenPolicy ships a React provider that makes your config available to the built-in `<PrivacyPolicy />` and `<TermsOfService />` components. Even if you're only building the chatbot, it's worth setting up — the components are a nice complement to the chat UI.
+OpenPolicy ships a React provider so the built-in `<PrivacyPolicy />` and `<TermsOfService />` components can pick up your config. Even if the chatbot is all you want right now, it's worth setting up — it makes adding rendered policy pages later trivial.
 
 ```tsx
 // app/providers.tsx
@@ -160,15 +102,9 @@ import type { ReactNode } from "react";
 import openpolicy from "../openpolicy";
 
 export function Providers({ children }: { children: ReactNode }) {
-  return (
-    <OpenPolicy config={openpolicy}>
-      {children}
-    </OpenPolicy>
-  );
+  return <OpenPolicy config={openpolicy}>{children}</OpenPolicy>;
 }
 ```
-
-Then wrap your root layout:
 
 ```tsx
 // app/layout.tsx
@@ -185,13 +121,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-<!-- IMAGE: Screenshot of the privacy policy page rendered in the browser using the <PrivacyPolicy /> component -->
+<!-- IMAGE: Screenshot of the privacy policy page rendered in the browser -->
 
 ---
 
-## Step 4 — Build the chat API route
+## The API route
 
-This is the core of the integration. Create `app/api/chat/route.ts`:
+This is the interesting part. Create `app/api/chat/route.ts`:
 
 ```ts
 import { anthropic } from "@ai-sdk/anthropic";
@@ -222,76 +158,33 @@ export async function POST(req: Request) {
 }
 ```
 
-Let's walk through what's happening:
+**Why Markdown instead of HTML?** The renderers support both, but Markdown is the better choice for LLM context. HTML tags burn tokens without adding meaning. Markdown gives the model the same structural information — headings, lists, emphasis — without the noise.
 
-**Module-level compilation.** The first four lines run once when the route module is first loaded — not on every request. `expandOpenPolicyConfig(openpolicy)` splits the combined config into `[privacyInput, termsInput]`. Each input is `compile()`d into a `PolicySection[]` array and `renderMarkdown()`d into a Markdown string. The two documents are joined with a horizontal rule separator.
+**Why a system prompt instead of RAG?** Privacy policies and terms of service are short (typically 2,000–5,000 words combined), deterministic, and meant to be understood as a whole. A user asking about termination might also need to know about the notice period, what happens to their data, and whether they can appeal — all from different sections. Stuffing the full documents in as context lets Claude surface that complete picture naturally, without retrieval getting in the way.
 
-**Why Markdown over HTML?** `renderMarkdown()` produces clean, structured text. HTML would include tags that consume tokens without adding meaning to the model. Markdown preserves document structure — headings, lists, bold terms — which helps Claude reference specific sections accurately.
-
-**System prompt construction.** The company name is interpolated directly so the assistant identifies itself correctly. The full policy Markdown follows. Claude has both documents available for every message in the conversation.
-
-**`convertToModelMessages(messages)`** is an AI SDK v5 utility that converts the `UIMessage[]` format (which includes rendering metadata) into the plain message format that model providers expect.
-
-**`result.toUIMessageStreamResponse()`** returns a streaming `Response` using AI SDK's UI message streaming protocol — the same protocol `useChat` on the client side knows how to consume.
-
-**A note on performance.** The system prompt is built once at module load time, so compilation happens once per cold start rather than once per request. For production, consider enabling Anthropic's [prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) — policies don't change between requests, so cached prompt tokens are effectively free after the first request.
+If you have a large suite of policies that push against context limits, [Anthropic's prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) is worth looking at — the policy content doesn't change between requests, so you'd pay for those tokens once per cache TTL rather than every call.
 
 ---
 
-## Step 5 — Install AI Elements
+## The chat UI
 
-AI Elements is a set of shadcn-style components designed for AI chat interfaces. Install the ones you need:
-
-```sh
-bunx ai-elements@latest add conversation message prompt-input
-```
-
-This copies the component source into `components/ai-elements/` in your project — the same pattern as shadcn/ui.
-
-One more step: the `MessageResponse` component uses [Streamdown](https://github.com/ai-elements/streamdown) to render streaming Markdown with animated token appearance. Streamdown's Tailwind classes live in `node_modules` and won't be scanned by default. Add an `@source` directive to `globals.css`:
-
-```css
-/* app/globals.css */
-@import "tailwindcss";
-
-@source "../node_modules/streamdown/dist/*.js";
-
-/* rest of your CSS... */
-```
-
-This tells Tailwind to scan the Streamdown bundle for class names and include them in the output.
-
----
-
-## Step 6 — Build the chat UI
-
-Create `app/chat/page.tsx`:
+On the client side, this is standard AI SDK v5 with [AI Elements](https://ai-elements.dev) components for the chat layout. One thing worth calling out: the `isAnimating` prop on `<MessageResponse>`:
 
 ```tsx
-"use client";
+const isLastAssistant = msg.role === "assistant" && i === messages.length - 1;
 
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
-import {
-  Conversation,
-  ConversationContent,
-  ConversationEmptyState,
-  ConversationScrollButton,
-} from "@/components/ai-elements/conversation";
-import {
-  Message,
-  MessageContent,
-  MessageResponse,
-} from "@/components/ai-elements/message";
-import {
-  PromptInput,
-  PromptInputBody,
-  PromptInputFooter,
-  PromptInputSubmit,
-  PromptInputTextarea,
-  PromptInputTools,
-} from "@/components/ai-elements/prompt-input";
+<MessageResponse isAnimating={isLastAssistant && isStreaming}>
+  {text}
+</MessageResponse>
+```
 
+`isAnimating` enables Streamdown's typewriter rendering — tokens appear progressively as they arrive. You only want it on the message currently being streamed; everything before that should render as static Markdown immediately. Getting this wrong makes previously completed messages re-animate on every render, which looks broken.
+
+AI Elements' `<PromptInputSubmit>` handles the stop button automatically — pass it `status` and `onStop` and it switches between send and stop states without any extra logic on your end.
+
+The empty state uses a handful of starter questions so users aren't staring at a blank input:
+
+```tsx
 const STARTERS = [
   "What data do you collect about me?",
   "How can I delete my data?",
@@ -299,156 +192,51 @@ const STARTERS = [
   "What is the governing law for disputes?",
 ];
 
-export default function ChatPage() {
-  const { messages, sendMessage, status, stop } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/chat" }),
-  });
-
-  const isStreaming = status === "streaming" || status === "submitted";
-
-  function handleSubmit({ text }: { text: string }) {
-    if (!text.trim() || isStreaming) return;
-    sendMessage({ text });
-  }
-
-  return (
-    <div className="flex flex-col h-screen max-w-2xl mx-auto">
-      <header className="px-6 py-4 border-b">
-        <h1 className="text-xl font-semibold">Legal Assistant</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Ask questions about our privacy policy and terms of service
-        </p>
-      </header>
-
-      <Conversation className="flex-1">
-        <ConversationContent>
-          {messages.length === 0 && (
-            <ConversationEmptyState title="" description="">
-              <div className="flex flex-col gap-2 w-full max-w-sm">
-                <p className="text-sm text-muted-foreground text-center mb-2">
-                  Try one of these questions:
-                </p>
-                {STARTERS.map((q) => (
-                  <button
-                    type="button"
-                    key={q}
-                    onClick={() => sendMessage({ text: q })}
-                    className="text-left text-sm px-4 py-2.5 rounded-lg border hover:bg-muted transition-colors"
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-            </ConversationEmptyState>
-          )}
-
-          {messages.map((msg, i) => {
-            const text = msg.parts
-              .filter((p) => p.type === "text")
-              .map((p) => p.text)
-              .join("");
-            const isLastAssistant =
-              msg.role === "assistant" && i === messages.length - 1;
-            return (
-              <Message key={msg.id} from={msg.role}>
-                <MessageContent>
-                  <MessageResponse isAnimating={isLastAssistant && isStreaming}>
-                    {text}
-                  </MessageResponse>
-                </MessageContent>
-              </Message>
-            );
-          })}
-        </ConversationContent>
-        <ConversationScrollButton />
-      </Conversation>
-
-      <div className="px-4 py-4 border-t">
-        <PromptInput onSubmit={handleSubmit}>
-          <PromptInputBody>
-            <PromptInputTextarea placeholder="Ask about our policies…" />
-          </PromptInputBody>
-          <PromptInputFooter>
-            <PromptInputTools />
-            <PromptInputSubmit status={status} onStop={stop} />
-          </PromptInputFooter>
-        </PromptInput>
-      </div>
-    </div>
-  );
-}
+// In the empty state:
+{STARTERS.map((q) => (
+  <button key={q} onClick={() => sendMessage({ text: q })} ...>
+    {q}
+  </button>
+))}
 ```
 
-Walking through the key parts:
+One Tailwind config note: Streamdown's classes live in `node_modules` and won't be picked up by the content scanner. Add this to `globals.css`:
 
-**`useChat` with `DefaultChatTransport`.** AI SDK v5 separates the transport layer. `DefaultChatTransport` handles fetch + SSE parsing for our `/api/chat` endpoint.
+```css
+@source "../node_modules/streamdown/dist/*.js";
+```
 
-**`<ConversationEmptyState>`.** Shown when `messages.length === 0`. The starter question buttons give users something to click immediately, reducing the blank-page friction that kills engagement with chat interfaces.
-
-**Message parts.** AI SDK v5 messages have a `parts` array rather than a single `content` string. Each part has a `type` — we filter for `"text"` parts and join them. This keeps the component forward-compatible with tool calls or image parts you might add later.
-
-**`isAnimating` on `<MessageResponse>`.** This is the streaming animation prop. It's `true` only for the last assistant message while `status` is `"streaming"` or `"submitted"`. Streamdown uses it to enable typewriter-style rendering as tokens arrive. All prior messages render as static Markdown.
-
-**`<PromptInputSubmit status={status} onStop={stop}>`.** The submit button automatically switches to a stop button while streaming, letting users interrupt a long response.
-
-<!-- IMAGE: Screenshot of the chat UI showing the empty state with four starter question buttons -->
-
-<!-- IMAGE: Screenshot of the chat UI with an active conversation — user question visible, assistant response mid-stream -->
+<!-- IMAGE: Screenshot of the chat UI showing the empty state with starter question buttons -->
 
 ---
 
-## Step 7 — Set the env variable and run
+## Run it
 
 ```sh
 echo "ANTHROPIC_API_KEY=sk-ant-..." >> .env.local
 bun run dev
 ```
 
-Navigate to `http://localhost:3000/chat`.
+Go to `http://localhost:3000/chat`.
 
-<!-- IMAGE: Screenshot of the running app home page with navigation to privacy policy, terms of service, and the legal assistant chat -->
-
----
-
-## How the context works — a deeper look
-
-Why does this work without retrieval or vector search?
-
-Privacy policies and terms of service are short. A typical policy is 2,000–5,000 words — well within a single context window, with room left for conversation history. Unlike a support knowledge base, policies are meant to be read in full. A user asking "can the company terminate my account?" benefits from knowing not just the termination clause, but the notice period, what happens to their data afterward, and whether they can appeal — all in adjacent sections. Full-document context lets Claude surface that complete picture naturally.
-
-Policies are also deterministic. Because OpenPolicy compiles them from a structured config rather than free-form prose, the output is consistent and predictable. Claude isn't trying to reason about ambiguous text — the policy says exactly what it means, section by section.
-
-**When to reach for something more complex.** If you're operating across multiple jurisdictions with materially different policy versions, or if you have a large suite of documents that together exceed a few thousand words, consider:
-
-- **Prompt caching** (Anthropic's beta feature): cache the policy portion of the system prompt so you only pay input tokens once per cache TTL
-- **Chunked retrieval**: embed policy sections and retrieve only the top-k relevant ones per question
-- **Multi-turn context management**: summarize older turns to keep the context window from filling with conversation history
-
-For most apps with a single privacy policy and a single set of terms, the approach shown here is the right one: simple, correct, and zero infrastructure.
-
-**Model choice.** Claude Sonnet 4.6 balances capability and cost well for this use case. It follows structured instructions precisely, cites specific sections accurately, and declines to speculate beyond what the policies state — exactly the behavior you want from a legal assistant.
+<!-- IMAGE: Screenshot of the home page with nav links to policy pages and the chat -->
 
 ---
 
-## Production considerations
+## Before you ship
 
-**Add your API key to your hosting platform.** On Vercel: Settings → Environment Variables → `ANTHROPIC_API_KEY`. Never commit the key to your repo.
-
-**Rate-limit the `/api/chat` route.** The route calls the Anthropic API on every request, so an unprotected endpoint is a direct line to your bill. Add per-user rate limiting with something like `@upstash/ratelimit`:
+**Rate-limit the route.** It calls the Anthropic API on every request — an unprotected endpoint is a direct line to your bill. Something like `@upstash/ratelimit` keyed on the client IP is usually enough:
 
 ```ts
-// In your POST handler, before calling streamText:
 const identifier = req.headers.get("x-forwarded-for") ?? "anonymous";
 const { success } = await ratelimit.limit(identifier);
 if (!success) return new Response("Too many requests", { status: 429 });
 ```
 
-**Chat history is currently stateless.** Each page load starts a fresh conversation. If you want persistence, store messages in a database and pass them as `initialMessages` to `useChat`.
+**The chat is stateless by default.** Each page load starts fresh. If you want persistence, store messages in a database and pass them back via `initialMessages`.
 
-**Audit logging.** For compliance-sensitive use cases, persist conversations so you can demonstrate what your assistant told users.
-
-**Policy pages are also available.** OpenPolicy renders your policies as full HTML pages or PDFs from the same config. The `<PrivacyPolicy />` and `<TermsOfService />` React components render the full documents — link to them from the chat UI for users who want to read the original.
+**Policy pages come for free.** The same config that feeds the chatbot also powers `<PrivacyPolicy />` and `<TermsOfService />` components — rendered HTML pages, linked from the footer. Users who want to read the full document still can.
 
 ---
 
-The full working example is in the [OpenPolicy GitHub repository](https://github.com/openpolicyai/openpolicy/tree/main/examples/nextjs).
+The [full example](https://github.com/openpolicyai/openpolicy/tree/main/examples/nextjs) has everything wired together — policy pages, the chat route, and the UI — if you want to poke around or fork it as a starting point.
