@@ -1,5 +1,6 @@
 ---
 import { Code } from "astro:components";
+import { Icon } from "astro-icon/components";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 import Lucid from "../assets/lucid.svg";
@@ -78,6 +79,37 @@ import auvia from "../assets/auvia.png";
       </div>
     </div>
   </section>
+
+  {(() => {
+    const frameworks = [
+      { name: "React", icon: "simple-icons:react" },
+      { name: "Next.js", icon: "simple-icons:nextdotjs" },
+      { name: "Vue", icon: "simple-icons:vuedotjs" },
+      { name: "Nuxt", icon: "simple-icons:nuxtdotjs" },
+      { name: "Svelte", icon: "simple-icons:svelte" },
+      { name: "Astro", icon: "simple-icons:astro" },
+      { name: "TanStack", icon: "simple-icons:tanstack" },
+      { name: "Remix", icon: "simple-icons:remix" },
+    ];
+    return (
+      <section>
+        <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
+          FRAMEWORKS.md
+        </h2>
+        <p class="mb-4">
+          OpenPolicy is framework agnostic. Render directly into your React, Next.js, Vue, Nuxt, Astro, or any other app.
+        </p>
+        <div class="grid grid-cols-4 gap-px bg-gray-200 border border-gray-200">
+          {frameworks.map(({ name, icon }) => (
+            <div class="bg-white p-4 flex flex-col items-center gap-2">
+              <Icon name={icon} class="size-6 text-gray-700" />
+              <span class="font-mono text-xs text-gray-500">{name}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  })()}
 
   <section>
     <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
