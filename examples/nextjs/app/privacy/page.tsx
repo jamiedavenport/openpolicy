@@ -7,14 +7,7 @@ export default async function PrivacyPage() {
 		"utf-8",
 	);
 	return (
-		<main
-			style={{
-				maxWidth: 800,
-				margin: "0 auto",
-				padding: "40px 24px",
-				fontFamily: "sans-serif",
-			}}
-		>
+		<main className="text-red-500">
 			{/** biome-ignore lint/security/noDangerouslySetInnerHtml: oki */}
 			<div dangerouslySetInnerHTML={{ __html: html }} />
 		</main>
