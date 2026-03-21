@@ -8,8 +8,13 @@
 		"start": "next start"
 	},
 	"dependencies": {
+		"@ai-sdk/anthropic": "^2.0.0",
+		"@ai-sdk/react": "^2.0.0",
+		"@openpolicy/core": "workspace:*",
 		"@openpolicy/react": "workspace:*",
+		"@openpolicy/renderers": "workspace:*",
 		"@openpolicy/sdk": "workspace:*",
+		"ai": "^5.0.0",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"lucide-react": "^0.577.0",
