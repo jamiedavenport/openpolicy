@@ -2,9 +2,25 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import {
+	Conversation,
+	ConversationContent,
+	ConversationEmptyState,
+	ConversationScrollButton,
+} from "@/components/ai-elements/conversation";
+import {
+	Message,
+	MessageContent,
+	MessageResponse,
+} from "@/components/ai-elements/message";
+import {
+	PromptInput,
+	PromptInputBody,
+	PromptInputFooter,
+	PromptInputSubmit,
+	PromptInputTextarea,
+	PromptInputTools,
+} from "@/components/ai-elements/prompt-input";
 
 const STARTERS = [
 	"What data do you collect about me?",
@@ -14,22 +30,15 @@ const STARTERS = [
 ];
 
 export default function ChatPage() {
-	const { messages, sendMessage, status } = useChat({
+	const { messages, sendMessage, status, stop } = useChat({
 		transport: new DefaultChatTransport({ api: "/api/chat" }),
 	});
-	const [input, setInput] = useState("");
-	const bottomRef = useRef<HTMLDivElement>(null);
-	const isStreaming = status === "streaming";
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: oki
-	useEffect(() => {
-		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-	}, [messages]);
+	const isStreaming = status === "streaming" || status === "submitted";
 
-	function submit(text: string) {
+	function handleSubmit({ text }: { text: string }) {
 		if (!text.trim() || isStreaming) return;
 		sendMessage({ text });
-		setInput("");
 	}
 
 	return (
@@ -41,85 +50,60 @@ export default function ChatPage() {
 				</p>
 			</header>
 
-			<div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-				{messages.length === 0 && (
-					<div className="pt-8">
-						<p className="text-sm text-muted-foreground text-center mb-4">
-							Try one of these questions:
-						</p>
-						<div className="flex flex-col gap-2">
-							{STARTERS.map((q) => (
-								<button
-									type="button"
-									key={q}
-									onClick={() => submit(q)}
-									className="text-left text-sm px-4 py-2.5 rounded-lg border hover:bg-muted transition-colors"
-								>
-									{q}
-								</button>
-							))}
-						</div>
-					</div>
-				)}
-
-				{messages.map((msg) => {
-					const isUser = msg.role === "user";
-					const text = msg.parts
-						.filter((p) => p.type === "text")
-						.map((p) => p.text)
-						.join("");
-					return (
-						<div
-							key={msg.id}
-							className={cn("flex", isUser ? "justify-end" : "justify-start")}
-						>
-							<div
-								className={cn(
-									"max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-									isUser
-										? "bg-primary text-primary-foreground rounded-br-sm"
-										: "bg-muted text-foreground rounded-bl-sm",
-								)}
-							>
-								<p className="whitespace-pre-wrap">{text}</p>
+			<Conversation className="flex-1">
+				<ConversationContent>
+					{messages.length === 0 && (
+						<ConversationEmptyState title="" description="">
+							<div className="flex flex-col gap-2 w-full max-w-sm">
+								<p className="text-sm text-muted-foreground text-center mb-2">
+									Try one of these questions:
+								</p>
+								{STARTERS.map((q) => (
+									<button
+										type="button"
+										key={q}
+										onClick={() => sendMessage({ text: q })}
+										className="text-left text-sm px-4 py-2.5 rounded-lg border hover:bg-muted transition-colors"
+									>
+										{q}
+									</button>
+								))}
 							</div>
-						</div>
-					);
-				})}
+						</ConversationEmptyState>
+					)}
 
-				{isStreaming && (
-					<div className="flex justify-start">
-						<div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-3">
-							<span className="flex gap-1 items-center">
-								<span className="size-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:0ms]" />
-								<span className="size-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:150ms]" />
-								<span className="size-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:300ms]" />
-							</span>
-						</div>
-					</div>
-				)}
+					{messages.map((msg, i) => {
+						const text = msg.parts
+							.filter((p) => p.type === "text")
+							.map((p) => p.text)
+							.join("");
+						const isLastAssistant =
+							msg.role === "assistant" && i === messages.length - 1;
+						return (
+							<Message key={msg.id} from={msg.role}>
+								<MessageContent>
+									<MessageResponse isAnimating={isLastAssistant && isStreaming}>
+										{text}
+									</MessageResponse>
+								</MessageContent>
+							</Message>
+						);
+					})}
+				</ConversationContent>
+				<ConversationScrollButton />
+			</Conversation>
 
-				<div ref={bottomRef} />
+			<div className="px-4 py-4 border-t">
+				<PromptInput onSubmit={handleSubmit}>
+					<PromptInputBody>
+						<PromptInputTextarea placeholder="Ask about our policies…" />
+					</PromptInputBody>
+					<PromptInputFooter>
+						<PromptInputTools />
+						<PromptInputSubmit status={status} onStop={stop} />
+					</PromptInputFooter>
+				</PromptInput>
 			</div>
-
-			<form
-				onSubmit={(e) => {
-					e.preventDefault();
-					submit(input);
-				}}
-				className="px-6 py-4 border-t flex gap-2"
-			>
-				<input
-					value={input}
-					onChange={(e) => setInput(e.target.value)}
-					placeholder="Ask about our policies…"
-					disabled={isStreaming}
-					className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50 disabled:opacity-50"
-				/>
-				<Button type="submit" disabled={!input.trim() || isStreaming}>
-					Send
-				</Button>
-			</form>
 		</div>
 	);
 }
