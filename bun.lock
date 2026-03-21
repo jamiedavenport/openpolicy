@@ -74,7 +74,7 @@
     "examples/nextjs": {
       "name": "nextjs-example",
       "dependencies": {
-        "@openpolicy/cli": "workspace:*",
+        "@openpolicy/react": "workspace:*",
         "@openpolicy/sdk": "workspace:*",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",

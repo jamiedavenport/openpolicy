@@ -1,15 +1,18 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+"use client";
 
-export default async function PrivacyPage() {
-	const html = await readFile(
-		join(process.cwd(), "public/policies/privacy-policy.html"),
-		"utf-8",
-	);
+import { PrivacyPolicy } from "@openpolicy/react";
+
+export default function PrivacyPage() {
 	return (
-		<main className="text-red-500">
-			{/** biome-ignore lint/security/noDangerouslySetInnerHtml: oki */}
-			<div dangerouslySetInnerHTML={{ __html: html }} />
+		<main
+			style={{
+				maxWidth: 800,
+				margin: "0 auto",
+				padding: "40px 24px",
+				fontFamily: "sans-serif",
+			}}
+		>
+			<PrivacyPolicy />
 		</main>
 	);
 }

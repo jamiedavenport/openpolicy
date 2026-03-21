@@ -1,11 +1,8 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+"use client";
 
-export default async function TermsPage() {
-	const html = await readFile(
-		join(process.cwd(), "public/policies/terms-of-service.html"),
-		"utf-8",
-	);
+import { TermsOfService } from "@openpolicy/react";
+
+export default function TermsPage() {
 	return (
 		<main
 			style={{
@@ -15,8 +12,7 @@ export default async function TermsPage() {
 				fontFamily: "sans-serif",
 			}}
 		>
-			{/** biome-ignore lint/security/noDangerouslySetInnerHtml: oki */}
-			<div dangerouslySetInnerHTML={{ __html: html }} />
+			<TermsOfService />
 		</main>
 	);
 }

@@ -14,7 +14,7 @@ export default function Home() {
 				OpenPolicy Next.js Example
 			</h1>
 			<p style={{ color: "#666", marginBottom: "2rem" }}>
-				Policies are generated at build time via <code>@openpolicy/cli</code>.
+				Policies are rendered at runtime via <code>@openpolicy/react</code>.
 			</p>
 			<nav style={{ display: "flex", gap: "1rem" }}>
 				<Link href="/privacy" style={{ color: "#0070f3" }}>
