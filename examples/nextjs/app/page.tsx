@@ -2,28 +2,26 @@ import Link from "next/link";
 
 export default function Home() {
 	return (
-		<main
-			style={{
-				fontFamily: "sans-serif",
-				maxWidth: 600,
-				margin: "80px auto",
-				padding: "0 24px",
-			}}
-		>
-			<h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "0.5rem" }}>
-				OpenPolicy Next.js Example
-			</h1>
-			<p style={{ color: "#666", marginBottom: "2rem" }}>
-				Policies are generated at build time via <code>@openpolicy/cli</code>.
+		<main>
+			<h1 className="text-2xl font-bold mb-2">OpenPolicy Next.js Example</h1>
+			<p className="text-gray-500 mb-4">
+				Policies are rendered at runtime via <code>@openpolicy/react</code>.
 			</p>
-			<nav style={{ display: "flex", gap: "1rem" }}>
-				<Link href="/privacy" style={{ color: "#0070f3" }}>
+			<nav className="flex gap-4 flex-wrap">
+				<Link href="/privacy" className="text-blue-500">
 					Privacy Policy
 				</Link>
-				<Link href="/terms" style={{ color: "#0070f3" }}>
+				<Link href="/terms" className="text-blue-500">
 					Terms of Service
 				</Link>
+				<Link href="/chat" className="text-blue-500">
+					AI Legal Assistant
+				</Link>
 			</nav>
+			<p className="text-gray-500 mt-4 text-sm">
+				Ask our AI assistant about your rights and what our policies mean for
+				you.
+			</p>
 		</main>
 	);
 }

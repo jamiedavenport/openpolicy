@@ -1,0 +1,158 @@
+---
+title: Next.js
+description: Using @openpolicy/react with Next.js App Router
+---
+
+This guide covers how to render policies directly into your Next.js app using `@openpolicy/react`. No build step, no generated files — your policy config lives in TypeScript and renders as React.
+
+For teams that prefer static file output, see the [generative approach →](/docs/generative/next).
+
+## Installation
+
+```sh
+bun add @openpolicy/react @openpolicy/sdk
+```
+
+## Create your config
+
+Create an `openpolicy.ts` at the root of your project:
+
+```ts
+// openpolicy.ts
+import { defineConfig } from "@openpolicy/sdk";
+
+export default defineConfig({
+  company: {
+    name: "Acme Inc.",
+    legalName: "Acme Corporation",
+    address: "123 Main St, Springfield, USA",
+    contact: "privacy@acme.com",
+  },
+  privacy: {
+    effectiveDate: "2026-01-01",
+    dataCollected: {
+      "Account Information": ["Name", "Email address"],
+      "Usage Data": ["Pages visited", "Browser type", "IP address"],
+    },
+    legalBasis: "Legitimate interests and consent",
+    retention: {
+      "Account data": "Until account deletion",
+      "Usage logs": "90 days",
+    },
+    cookies: { essential: true, analytics: false, marketing: false },
+    thirdParties: [],
+    userRights: ["access", "erasure", "rectification", "portability"],
+    jurisdictions: ["us", "eu"],
+  },
+  terms: {
+    effectiveDate: "2026-01-01",
+    acceptance: { methods: ["using the service", "creating an account"] },
+    governingLaw: { jurisdiction: "Delaware, USA" },
+  },
+});
+```
+
+See the [openpolicy.ts reference →](/docs/reference/openpolicy-config) for all available fields.
+
+## The `"use client"` requirement
+
+`@openpolicy/react` uses `createContext` and `useContext` internally — both are client-only React APIs. In Next.js App Router, all components are Server Components by default, so you need to mark anything that uses these APIs with `"use client"`.
+
+The standard pattern is a thin `Providers` wrapper that you import into your Server Component layout. The pages themselves still SSR on first load — the `"use client"` directive only tells Next.js where the client boundary begins.
+
+## Add the provider wrapper
+
+Create `app/providers.tsx`:
+
+```tsx
+// app/providers.tsx
+"use client";
+
+import { OpenPolicy } from "@openpolicy/react";
+import type { ReactNode } from "react";
+import openpolicy from "../openpolicy";
+
+export function Providers({ children }: { children: ReactNode }) {
+  return <OpenPolicy config={openpolicy}>{children}</OpenPolicy>;
+}
+```
+
+## Wrap your layout
+
+Import `<Providers>` into your root layout (which remains a Server Component):
+
+```tsx
+// app/layout.tsx
+import type { ReactNode } from "react";
+import { Providers } from "./providers";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
+}
+```
+
+## Policy pages
+
+With the provider in place, policy pages just import and render the component. Mark each page `"use client"` since it's inside the client boundary:
+
+```tsx
+// app/privacy/page.tsx
+"use client";
+
+import { PrivacyPolicy } from "@openpolicy/react";
+
+export default function PrivacyPage() {
+  return (
+    <main style={{ maxWidth: 800, margin: "0 auto", padding: "40px 24px" }}>
+      <PrivacyPolicy />
+    </main>
+  );
+}
+```
+
+```tsx
+// app/terms/page.tsx
+"use client";
+
+import { TermsOfService } from "@openpolicy/react";
+
+export default function TermsPage() {
+  return (
+    <main style={{ maxWidth: 800, margin: "0 auto", padding: "40px 24px" }}>
+      <TermsOfService />
+    </main>
+  );
+}
+```
+
+## Wrapping only policy pages
+
+If you don't want the provider at the root layout level, you can wrap just the policy pages individually. In that case, each page needs both `"use client"` and its own `<OpenPolicy>` wrapper:
+
+```tsx
+// app/privacy/page.tsx
+"use client";
+
+import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
+import openpolicy from "../../openpolicy";
+
+export default function PrivacyPage() {
+  return (
+    <OpenPolicy config={openpolicy}>
+      <main style={{ maxWidth: 800, margin: "0 auto", padding: "40px 24px" }}>
+        <PrivacyPolicy />
+      </main>
+    </OpenPolicy>
+  );
+}
+```
+
+## Styling
+
+By default `<OpenPolicy>` injects a minimal stylesheet. See [Styling →](/docs/react/styling) to customize or replace it.

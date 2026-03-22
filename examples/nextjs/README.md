@@ -1,39 +1,34 @@
 [![OpenPolicy](https://openpolicy.sh/og.png)](https://openpolicy.sh)
 
-# Next.js Example — OpenPolicy CLI
+# Next.js Example — OpenPolicy React
 
-A minimal Next.js app showing how to use the `@openpolicy/cli` to generate policy documents as part of a Next.js build. Policies are generated to `public/policies/` before each build so they're served as static files.
+A minimal Next.js App Router app showing how to render policy documents directly using `@openpolicy/react`. Policies are compiled and rendered at runtime — no build step, no generated files.
 
 ## What it demonstrates
 
-- Using `openpolicy generate` in a `prebuild` script so policies are always up to date before `next build`
-- Defining policies using `@openpolicy/sdk` and pointing the CLI at the config files
-- Serving generated HTML policy files as static assets from `public/`
+- Wrapping the app in `<OpenPolicy>` via a `"use client"` provider in `app/providers.tsx`
+- Rendering `<PrivacyPolicy />` and `<TermsOfService />` as client components in App Router
+- Defining policies using `defineConfig()` from `@openpolicy/sdk`
 
 ## Project structure
 
 ```
-policy.config.ts         ← defineConfig() — privacy policy definition
-terms.config.ts          ← defineConfig() — terms of service definition
-public/policies/         ← generated output (privacy-policy.html, terms-of-service.html)
+openpolicy.ts            ← defineConfig() — privacy + terms config
+app/providers.tsx        ← "use client" wrapper around <OpenPolicy>
+app/layout.tsx           ← root layout that renders <Providers>
+app/privacy/page.tsx     ← renders <PrivacyPolicy />
+app/terms/page.tsx       ← renders <TermsOfService />
 ```
 
 ## Running locally
 
 ```sh
 bun install
-bun run dev     # starts Next.js dev server (policies are NOT auto-regenerated in dev)
-bun run build   # runs generate:policies first, then next build
-```
-
-To regenerate policies manually:
-
-```sh
-bun run generate:policies
+bun run dev
 ```
 
 ## Learn more
 
-- [OpenPolicy docs](https://openpolicy.dev/docs)
-- [`@openpolicy/cli` reference](https://openpolicy.dev/docs/cli)
-- [`@openpolicy/sdk` reference](https://openpolicy.dev/docs/sdk)
+- [Next.js + React components guide](https://openpolicy.sh/docs/react/next)
+- [`@openpolicy/react` reference](https://openpolicy.sh/docs/react)
+- [`@openpolicy/sdk` reference](https://openpolicy.sh/docs/reference/openpolicy-config)
