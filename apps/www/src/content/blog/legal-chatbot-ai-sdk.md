@@ -1,7 +1,7 @@
 ---
 title: "Building a Legal Chatbot with OpenPolicy and AI SDK"
 description: "Compile your privacy policy and terms of service into a Claude system prompt and stream plain-English answers — no RAG, no vector DB, just a route handler and 100 lines of React."
-pubDate: 2026-03-21
+pubDate: 2026-03-23
 author: "OpenPolicy Team"
 ---
 
