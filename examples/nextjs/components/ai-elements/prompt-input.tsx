@@ -59,7 +59,7 @@ const convertBlobUrlToDataUrl = async (url: string): Promise<string | null> => {
 // Provider Context & Types
 // ============================================================================
 
-export interface AttachmentsContext {
+interface AttachmentsContext {
 	files: (FileUIPart & { id: string })[];
 	add: (files: File[] | FileList) => void;
 	remove: (id: string) => void;
@@ -68,13 +68,13 @@ export interface AttachmentsContext {
 	fileInputRef: RefObject<HTMLInputElement | null>;
 }
 
-export interface TextInputContext {
+interface TextInputContext {
 	value: string;
 	setInput: (v: string) => void;
 	clear: () => void;
 }
 
-export interface PromptInputControllerProps {
+interface PromptInputControllerProps {
 	textInput: TextInputContext;
 	attachments: AttachmentsContext;
 	/** INTERNAL: Allows PromptInput to register its file textInput + "open" callback */
@@ -131,12 +131,12 @@ interface ReferencedSourcesContext {
 const LocalReferencedSourcesContext =
 	createContext<ReferencedSourcesContext | null>(null);
 
-export interface PromptInputMessage {
+interface PromptInputMessage {
 	text: string;
 	files: FileUIPart[];
 }
 
-export type PromptInputProps = Omit<
+type PromptInputProps = Omit<
 	HTMLAttributes<HTMLFormElement>,
 	"onSubmit" | "onError"
 > & {
@@ -590,7 +590,7 @@ export const PromptInput = ({
 	);
 };
 
-export type PromptInputBodyProps = HTMLAttributes<HTMLDivElement>;
+type PromptInputBodyProps = HTMLAttributes<HTMLDivElement>;
 
 export const PromptInputBody = ({
 	className,
@@ -599,9 +599,7 @@ export const PromptInputBody = ({
 	<div className={cn("contents", className)} {...props} />
 );
 
-export type PromptInputTextareaProps = ComponentProps<
-	typeof InputGroupTextarea
->;
+type PromptInputTextareaProps = ComponentProps<typeof InputGroupTextarea>;
 
 export const PromptInputTextarea = ({
 	onChange,
@@ -718,7 +716,7 @@ export const PromptInputTextarea = ({
 	);
 };
 
-export type PromptInputFooterProps = Omit<
+type PromptInputFooterProps = Omit<
 	ComponentProps<typeof InputGroupAddon>,
 	"align"
 >;
@@ -734,7 +732,7 @@ export const PromptInputFooter = ({
 	/>
 );
 
-export type PromptInputToolsProps = HTMLAttributes<HTMLDivElement>;
+type PromptInputToolsProps = HTMLAttributes<HTMLDivElement>;
 
 export const PromptInputTools = ({
 	className,
@@ -746,7 +744,7 @@ export const PromptInputTools = ({
 	/>
 );
 
-export type PromptInputSubmitProps = ComponentProps<typeof InputGroupButton> & {
+type PromptInputSubmitProps = ComponentProps<typeof InputGroupButton> & {
 	status?: ChatStatus;
 	onStop?: () => void;
 };

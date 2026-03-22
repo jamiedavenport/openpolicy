@@ -10,7 +10,7 @@ import { memo } from "react";
 import { Streamdown } from "streamdown";
 import { cn } from "@/lib/utils";
 
-export type MessageProps = HTMLAttributes<HTMLDivElement> & {
+type MessageProps = HTMLAttributes<HTMLDivElement> & {
 	from: UIMessage["role"];
 };
 
@@ -25,7 +25,7 @@ export const Message = ({ className, from, ...props }: MessageProps) => (
 	/>
 );
 
-export type MessageContentProps = HTMLAttributes<HTMLDivElement>;
+type MessageContentProps = HTMLAttributes<HTMLDivElement>;
 
 export const MessageContent = ({
 	children,
@@ -45,7 +45,7 @@ export const MessageContent = ({
 	</div>
 );
 
-export type MessageResponseProps = ComponentProps<typeof Streamdown>;
+type MessageResponseProps = ComponentProps<typeof Streamdown>;
 
 const streamdownPlugins = { cjk, code, math, mermaid };
 
