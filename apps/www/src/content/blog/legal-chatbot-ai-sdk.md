@@ -13,7 +13,7 @@ With a language model and about 30 lines of backend code, you can let them just 
 
 Here's how it works: OpenPolicy compiles your policy configuration into Markdown. That Markdown becomes a Claude system prompt. Users type a question, Claude answers it in plain English, citing the relevant section. No RAG, no vector database — the whole policy fits comfortably in context.
 
-The [full example is on GitHub](https://github.com/openpolicyai/openpolicy/tree/main/examples/nextjs) if you want to jump straight to the code.
+You can try the [live demo](https://nextjs.openpolicy.sh) or browse the [full example on GitHub](https://github.com/openpolicyai/openpolicy/tree/main/examples/nextjs) if you want to jump straight to the code.
 
 ## Your policies as data
 
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
 
 ## The chat UI
 
-The UI is built with AI SDK's `useChat` hook and a set of composable chat components. Most of it is straightforward — the one non-obvious detail is the `isAnimating` prop:
+The UI is built with [AI SDK](https://sdk.vercel.ai/docs)'s `useChat` hook and a set of composable [AI Elements](https://github.com/openpolicyai/openpolicy/tree/main/examples/nextjs/components/ai-elements) chat components. Most of it is straightforward — the one non-obvious detail is the `isAnimating` prop:
 
 ```tsx
 const isLastAssistant = msg.role === "assistant" && i === messages.length - 1;
@@ -126,6 +126,6 @@ const { success } = await ratelimit.limit(ip);
 if (!success) return new Response("Too many requests", { status: 429 });
 ```
 
-**The same config also powers policy pages.** `<PrivacyPolicy />` and `<TermsOfService />` components render the full documents directly into your app. Users who want to read everything still can — the chatbot and the rendered pages are two outputs of the same config.
+**You still get traditional policy pages too.** The chatbot doesn't replace your `/privacy` and `/terms` routes — it sits alongside them. `<PrivacyPolicy />` and `<TermsOfService />` render the full documents directly into your Next.js app from the same config object. Users who want to read the full text still can; users who just want a quick answer can ask. Both outputs, one source of truth.
 
-The [full example](https://github.com/openpolicyai/openpolicy/tree/main/examples/nextjs) has all of it wired together — policy pages, the chat route, and the UI.
+The [live demo](https://nextjs.openpolicy.sh) and the [full example](https://github.com/openpolicyai/openpolicy/tree/main/examples/nextjs) have all of it wired together — policy pages, the chat route, and the UI.
