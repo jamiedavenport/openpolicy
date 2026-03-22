@@ -9,7 +9,7 @@ Nobody reads privacy policies. They're long, dense, and written for lawyers — 
 
 With a language model and about 30 lines of backend code, you can let them just ask.
 
-<!-- IMAGE: Chat UI with an active conversation — user asked "how do I delete my data?" and got a clear, cited answer -->
+![Chatbot](../../assets/chatbot.png)
 
 Here's how it works: OpenPolicy compiles your policy configuration into Markdown. That Markdown becomes a Claude system prompt. Users type a question, Claude answers it in plain English, citing the relevant section. No RAG, no vector database — the whole policy fits comfortably in context.
 
@@ -98,8 +98,6 @@ const isLastAssistant = msg.role === "assistant" && i === messages.length - 1;
 
 `isAnimating` enables typewriter-style streaming rendering. The guard matters: without it, every completed message re-animates on each render cycle. You only want animation on the message that's actively streaming.
 
-<!-- IMAGE: Empty state showing starter question buttons -->
-
 Starter questions help users get started without staring at a blank input:
 
 ```tsx
@@ -114,8 +112,6 @@ const STARTERS = [
 `PromptInputSubmit` handles the send/stop toggle automatically when you pass `status` and `onStop` — no extra state needed.
 
 ## What you get
-
-<!-- IMAGE: Full chat UI with an answered question, showing markdown-rendered response -->
 
 Users open the chat, see the starter questions, pick one or type their own, and get a clear answer in seconds. The answer cites the relevant section of the policy — so if they want to verify it, they can go read the actual document.
 
