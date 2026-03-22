@@ -42,7 +42,7 @@ export default function ChatPage() {
 	}
 
 	return (
-		<div className="flex flex-col h-screen max-w-2xl mx-auto">
+		<div className="flex flex-col h-screen">
 			<header className="px-6 py-4 border-b">
 				<h1 className="text-xl font-semibold">Legal Assistant</h1>
 				<p className="text-sm text-muted-foreground mt-0.5">
