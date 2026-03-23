@@ -1,7 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { comparisons } from "../../data/comparisons";
-import type { Comparison } from "../../data/comparisons";
+import { comparisons, type Comparison } from "../../data/comparisons";
 
 export function getStaticPaths() {
 	return comparisons.map((c) => ({

@@ -46,6 +46,11 @@ export const comparisons: Comparison[] = [
 				competitor: "$500–$5,000+",
 			},
 			{
+				feature: "Renders as React / Vue / Svelte component",
+				openpolicy: "✓ <PrivacyPolicy /> drops into your app",
+				competitor: "✗ Document only",
+			},
+			{
 				feature: "Updates as product changes",
 				openpolicy: "✓ Automatic on every build",
 				competitor: "Manual re-engagement",
@@ -104,6 +109,11 @@ export const comparisons: Comparison[] = [
 			"Templates are static documents that go stale. OpenPolicy generates policies from your actual configuration — so they stay accurate as your product evolves.",
 		rows: [
 			{
+				feature: "Renders as React / Vue / Svelte component",
+				openpolicy: "✓ <PrivacyPolicy /> drops into your app",
+				competitor: "✗ Document only",
+			},
+			{
 				feature: "Stays in sync with your product",
 				openpolicy: "✓ Regenerated on every build",
 				competitor: "✗ Manual updates",
@@ -134,11 +144,6 @@ export const comparisons: Comparison[] = [
 				competitor: "Varies",
 			},
 			{
-				feature: "Framework integration",
-				openpolicy: "✓",
-				competitor: "✗",
-			},
-			{
 				feature: "Cost",
 				openpolicy: "Free",
 				competitor: "Free to $50+",
@@ -166,6 +171,11 @@ export const comparisons: Comparison[] = [
 		verdict:
 			"Termly is built for non-technical users managing policies through a dashboard. OpenPolicy is built for developers who want policies in their codebase — not a SaaS subscription.",
 		rows: [
+			{
+				feature: "Renders as React / Vue / Svelte component",
+				openpolicy: "✓ <PrivacyPolicy /> drops into your app",
+				competitor: "✗ Hosted page only",
+			},
 			{
 				feature: "Developer-native workflow",
 				openpolicy: "✓ Code, Git, CI",
@@ -207,11 +217,6 @@ export const comparisons: Comparison[] = [
 				competitor: "$10–$30+/mo",
 			},
 			{
-				feature: "Framework integration",
-				openpolicy: "✓",
-				competitor: "✗",
-			},
-			{
 				feature: "Works offline / in CI",
 				openpolicy: "✓",
 				competitor: "✗",
@@ -239,6 +244,11 @@ export const comparisons: Comparison[] = [
 		verdict:
 			"iubenda is a compliance SaaS aimed at non-technical users. OpenPolicy gives developers the same legal coverage — as code, in their repo, with no monthly fee.",
 		rows: [
+			{
+				feature: "Renders as React / Vue / Svelte component",
+				openpolicy: "✓ <PrivacyPolicy /> drops into your app",
+				competitor: "✗ Hosted widget only",
+			},
 			{
 				feature: "Developer-native workflow",
 				openpolicy: "✓ Code, Git, CI",
@@ -283,11 +293,6 @@ export const comparisons: Comparison[] = [
 				feature: "Pricing",
 				openpolicy: "Free",
 				competitor: "$27–$129+/yr",
-			},
-			{
-				feature: "Framework integration",
-				openpolicy: "✓",
-				competitor: "✗",
 			},
 		],
 		narrative: [
@@ -365,7 +370,7 @@ export const homepageRows: HomepageRow[] = [
 		iubenda: "✗",
 	},
 	{
-		feature: "Framework integration",
+		feature: "Renders as React / Vue / Svelte component",
 		openpolicy: "✓",
 		lawyers: "✗",
 		templates: "✗",
