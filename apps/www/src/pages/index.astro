@@ -2,6 +2,7 @@
 import { Code } from "astro:components";
 import { Icon } from "astro-icon/components";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { homepageRows } from "../data/comparisons";
 
 import Lucid from "../assets/lucid.svg";
 import virentis from "../assets/virentis.png";
@@ -152,6 +153,47 @@ import auvia from "../assets/auvia.png";
         </div>
       </div>
       <Code code={llmPrompt} lang="text" theme="github-light" class="p-4 text-sm" />
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
+      COMPARE.md
+    </h2>
+    <p class="mb-4">How OpenPolicy compares to the alternatives.</p>
+    <div class="overflow-x-auto">
+      <table class="w-full border border-gray-200 text-xs border-collapse">
+        <thead>
+          <tr class="border-b border-gray-200 bg-gray-50">
+            <th class="text-left p-3 font-mono font-medium border-r border-gray-200"></th>
+            <th class="text-left p-3 font-mono font-medium border-r border-gray-200">OpenPolicy</th>
+            <th class="text-left p-3 font-mono font-medium border-r border-gray-200">
+              <a href="/compare/lawyers" class="hover:underline">Lawyers</a>
+            </th>
+            <th class="text-left p-3 font-mono font-medium border-r border-gray-200">
+              <a href="/compare/templates" class="hover:underline">Templates</a>
+            </th>
+            <th class="text-left p-3 font-mono font-medium border-r border-gray-200">
+              <a href="/compare/termly" class="hover:underline">Termly</a>
+            </th>
+            <th class="text-left p-3 font-mono font-medium">
+              <a href="/compare/iubenda" class="hover:underline">iubenda</a>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {homepageRows.map((row, i) => (
+            <tr class:list={["border-b border-gray-200", i % 2 === 1 ? "bg-gray-50" : "bg-white"]}>
+              <td class="p-3 text-gray-600 border-r border-gray-200">{row.feature}</td>
+              <td class="p-3 font-medium border-r border-gray-200">{row.openpolicy}</td>
+              <td class="p-3 text-gray-500 border-r border-gray-200">{row.lawyers}</td>
+              <td class="p-3 text-gray-500 border-r border-gray-200">{row.templates}</td>
+              <td class="p-3 text-gray-500 border-r border-gray-200">{row.termly}</td>
+              <td class="p-3 text-gray-500">{row.iubenda}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   </section>
 
