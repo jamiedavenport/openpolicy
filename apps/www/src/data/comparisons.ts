@@ -18,7 +18,7 @@ export interface Comparison {
 	narrative: Narrative[];
 }
 
-export interface HomepageRow {
+interface HomepageRow {
 	feature: string;
 	openpolicy: string;
 	lawyers: string;

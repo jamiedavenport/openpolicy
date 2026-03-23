@@ -83,14 +83,14 @@ import auvia from "../assets/auvia.png";
 
   {(() => {
     const frameworks = [
-      { name: "React", icon: "simple-icons:react" },
-      { name: "Next.js", icon: "simple-icons:nextdotjs" },
-      { name: "Vue", icon: "simple-icons:vuedotjs" },
-      { name: "Nuxt", icon: "simple-icons:nuxtdotjs" },
-      { name: "Svelte", icon: "simple-icons:svelte" },
-      { name: "Astro", icon: "simple-icons:astro" },
-      { name: "TanStack", icon: "simple-icons:tanstack" },
-      { name: "Remix", icon: "simple-icons:remix" },
+      { name: "React", icon: "simple-icons:react", slug: "react" },
+      { name: "Next.js", icon: "simple-icons:nextdotjs", slug: "nextjs" },
+      { name: "Vue", icon: "simple-icons:vuedotjs", slug: "vue" },
+      { name: "Nuxt", icon: "simple-icons:nuxtdotjs", slug: "nuxt" },
+      { name: "Svelte", icon: "simple-icons:svelte", slug: "svelte" },
+      { name: "Astro", icon: "simple-icons:astro", slug: "astro" },
+      { name: "TanStack", icon: "simple-icons:tanstack", slug: "tanstack" },
+      { name: "Remix", icon: "simple-icons:remix", slug: "remix" },
     ];
     return (
       <section>
@@ -101,11 +101,11 @@ import auvia from "../assets/auvia.png";
           OpenPolicy is framework agnostic. Render directly into your React, Next.js, Vue, Nuxt, Astro, or any other app.
         </p>
         <div class="grid grid-cols-4 gap-px bg-gray-200 border border-gray-200">
-          {frameworks.map(({ name, icon }) => (
-            <div class="bg-white p-4 flex flex-col items-center gap-2">
+          {frameworks.map(({ name, icon, slug }) => (
+            <a href={`/framework/${slug}`} class="bg-white p-4 flex flex-col items-center gap-2 hover:bg-gray-50 transition-colors">
               <Icon name={icon} class="size-6 text-gray-700" />
               <span class="font-mono text-xs text-gray-500">{name}</span>
-            </div>
+            </a>
           ))}
         </div>
       </section>
