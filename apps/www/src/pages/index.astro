@@ -2,6 +2,7 @@
 import { Code } from "astro:components";
 import { Icon } from "astro-icon/components";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { homepageRows } from "../data/comparisons";
 
 import Lucid from "../assets/lucid.svg";
 import virentis from "../assets/virentis.png";
@@ -82,14 +83,14 @@ import auvia from "../assets/auvia.png";
 
   {(() => {
     const frameworks = [
-      { name: "React", icon: "simple-icons:react" },
-      { name: "Next.js", icon: "simple-icons:nextdotjs" },
-      { name: "Vue", icon: "simple-icons:vuedotjs" },
-      { name: "Nuxt", icon: "simple-icons:nuxtdotjs" },
-      { name: "Svelte", icon: "simple-icons:svelte" },
-      { name: "Astro", icon: "simple-icons:astro" },
-      { name: "TanStack", icon: "simple-icons:tanstack" },
-      { name: "Remix", icon: "simple-icons:remix" },
+      { name: "React", icon: "simple-icons:react", slug: "react" },
+      { name: "Next.js", icon: "simple-icons:nextdotjs", slug: "nextjs" },
+      { name: "Vue", icon: "simple-icons:vuedotjs", slug: "vue" },
+      { name: "Nuxt", icon: "simple-icons:nuxtdotjs", slug: "nuxt" },
+      { name: "Svelte", icon: "simple-icons:svelte", slug: "svelte" },
+      { name: "Astro", icon: "simple-icons:astro", slug: "astro" },
+      { name: "TanStack", icon: "simple-icons:tanstack", slug: "tanstack" },
+      { name: "Remix", icon: "simple-icons:remix", slug: "remix" },
     ];
     return (
       <section>
@@ -100,11 +101,11 @@ import auvia from "../assets/auvia.png";
           OpenPolicy is framework agnostic. Render directly into your React, Next.js, Vue, Nuxt, Astro, or any other app.
         </p>
         <div class="grid grid-cols-4 gap-px bg-gray-200 border border-gray-200">
-          {frameworks.map(({ name, icon }) => (
-            <div class="bg-white p-4 flex flex-col items-center gap-2">
+          {frameworks.map(({ name, icon, slug }) => (
+            <a href={`/framework/${slug}`} class="bg-white p-4 flex flex-col items-center gap-2 hover:bg-gray-50 transition-colors">
               <Icon name={icon} class="size-6 text-gray-700" />
               <span class="font-mono text-xs text-gray-500">{name}</span>
-            </div>
+            </a>
           ))}
         </div>
       </section>
@@ -152,6 +153,47 @@ import auvia from "../assets/auvia.png";
         </div>
       </div>
       <Code code={llmPrompt} lang="text" theme="github-light" class="p-4 text-sm" />
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
+      COMPARE.md
+    </h2>
+    <p class="mb-4">How OpenPolicy compares to the alternatives.</p>
+    <div class="overflow-x-auto">
+      <table class="w-full border border-gray-200 text-xs border-collapse">
+        <thead>
+          <tr class="border-b border-gray-200 bg-gray-50">
+            <th class="text-left p-3 font-mono font-medium border-r border-gray-200"></th>
+            <th class="text-left p-3 font-mono font-medium border-r border-gray-200">OpenPolicy</th>
+            <th class="text-left p-3 font-mono font-medium border-r border-gray-200">
+              <a href="/compare/lawyers" class="hover:underline">Lawyers</a>
+            </th>
+            <th class="text-left p-3 font-mono font-medium border-r border-gray-200">
+              <a href="/compare/templates" class="hover:underline">Templates</a>
+            </th>
+            <th class="text-left p-3 font-mono font-medium border-r border-gray-200">
+              <a href="/compare/termly" class="hover:underline">Termly</a>
+            </th>
+            <th class="text-left p-3 font-mono font-medium">
+              <a href="/compare/iubenda" class="hover:underline">iubenda</a>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {homepageRows.map((row, i) => (
+            <tr class:list={["border-b border-gray-200", i % 2 === 1 ? "bg-gray-50" : "bg-white"]}>
+              <td class="p-3 text-gray-600 border-r border-gray-200">{row.feature}</td>
+              <td class="p-3 font-medium border-r border-gray-200">{row.openpolicy}</td>
+              <td class="p-3 text-gray-500 border-r border-gray-200">{row.lawyers}</td>
+              <td class="p-3 text-gray-500 border-r border-gray-200">{row.templates}</td>
+              <td class="p-3 text-gray-500 border-r border-gray-200">{row.termly}</td>
+              <td class="p-3 text-gray-500">{row.iubenda}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   </section>
 
