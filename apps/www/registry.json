@@ -1,0 +1,21 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry.json",
+	"name": "openpolicy",
+	"homepage": "https://openpolicy.sh",
+	"items": [
+		{
+			"name": "openpolicy-config",
+			"type": "registry:file",
+			"title": "OpenPolicy Config",
+			"description": "Starter openpolicy.ts config file for defining your privacy policy, terms of service, and cookie policy.",
+			"dependencies": ["@openpolicy/sdk"],
+			"files": [
+				{
+					"path": "registry/openpolicy.ts",
+					"target": "openpolicy.ts",
+					"type": "registry:file"
+				}
+			]
+		}
+	]
+}

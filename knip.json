@@ -5,7 +5,7 @@
 	"workspaces": {
 		".": {},
 		"apps/www": {
-			"entry": ["openpolicy.ts", "src/snippets/**"],
+			"entry": ["openpolicy.ts", "src/snippets/**", "registry/**"],
 			"ignoreDependencies": [
 				"@iconify-json/simple-icons",
 				"vite",

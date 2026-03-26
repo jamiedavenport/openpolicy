@@ -6,7 +6,8 @@
 		"dev": "astro dev",
 		"build": "astro build",
 		"preview": "astro preview",
-		"astro": "astro"
+		"astro": "astro",
+		"registry:build": "shadcn build"
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "^3.7.0",
@@ -26,6 +27,7 @@
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/sdk": "workspace:*",
 		"@openpolicy/vite": "workspace:*",
-		"@tailwindcss/typography": "^0.5.19"
+		"@tailwindcss/typography": "^0.5.19",
+		"shadcn": "latest"
 	}
 }
