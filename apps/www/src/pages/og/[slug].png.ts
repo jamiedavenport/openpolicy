@@ -1,5 +1,6 @@
 import { getCollection } from "astro:content";
 import fs from "node:fs";
+import path from "node:path";
 import { Resvg } from "@resvg/resvg-js";
 import type { APIRoute } from "astro";
 import type { ReactNode } from "react";
@@ -11,7 +12,7 @@ export async function getStaticPaths() {
 }
 
 const fontData = fs.readFileSync(
-	new URL("../../fonts/GeistMono-Bold.woff", import.meta.url),
+	path.join(process.cwd(), "src/fonts/GeistMono-Bold.woff"),
 );
 
 export const GET: APIRoute = async ({ params }) => {
