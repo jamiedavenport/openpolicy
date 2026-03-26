@@ -36,7 +36,10 @@
 			"title": "Privacy Policy",
 			"description": "A Tailwind-styled privacy policy component powered by OpenPolicy.",
 			"docs": "https://openpolicy.sh/docs/react",
-			"registryDependencies": ["config", "policy-components"],
+			"registryDependencies": [
+				"https://openpolicy.sh/r/config.json",
+				"https://openpolicy.sh/r/policy-components.json"
+			],
 			"dependencies": ["@openpolicy/react", "@openpolicy/sdk"],
 			"files": [
 				{
@@ -52,7 +55,10 @@
 			"title": "Terms of Service",
 			"description": "A Tailwind-styled terms of service component powered by OpenPolicy.",
 			"docs": "https://openpolicy.sh/docs/react",
-			"registryDependencies": ["config", "policy-components"],
+			"registryDependencies": [
+				"https://openpolicy.sh/r/config.json",
+				"https://openpolicy.sh/r/policy-components.json"
+			],
 			"dependencies": ["@openpolicy/react", "@openpolicy/sdk"],
 			"files": [
 				{
@@ -68,7 +74,10 @@
 			"title": "Cookie Policy",
 			"description": "A Tailwind-styled cookie policy component powered by OpenPolicy.",
 			"docs": "https://openpolicy.sh/docs/react",
-			"registryDependencies": ["config", "policy-components"],
+			"registryDependencies": [
+				"https://openpolicy.sh/r/config.json",
+				"https://openpolicy.sh/r/policy-components.json"
+			],
 			"dependencies": ["@openpolicy/react", "@openpolicy/sdk"],
 			"files": [
 				{
