@@ -14,6 +14,9 @@ export default function Home() {
 				<Link href="/terms" className="text-blue-500">
 					Terms of Service
 				</Link>
+				<Link href="/cookie-banner" className="text-blue-500">
+					Cookie Banner
+				</Link>
 				<Link href="/chat" className="text-blue-500">
 					AI Legal Assistant
 				</Link>

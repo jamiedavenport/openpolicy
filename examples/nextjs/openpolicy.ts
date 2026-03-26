@@ -62,4 +62,27 @@ export default defineConfig({
 			noticePeriodDays: 30,
 		},
 	},
+	cookie: {
+		effectiveDate: "2026-03-09",
+		cookies: {
+			essential: true,
+			analytics: true,
+			functional: false,
+			marketing: false,
+		},
+		thirdParties: [
+			{
+				name: "Google Analytics",
+				purpose: "Website analytics and performance monitoring",
+				policyUrl: "https://policies.google.com/privacy",
+			},
+		],
+		trackingTechnologies: ["web beacons", "local storage"],
+		consentMechanism: {
+			hasBanner: true,
+			hasPreferencePanel: true,
+			canWithdraw: true,
+		},
+		jurisdictions: ["us"],
+	},
 });
