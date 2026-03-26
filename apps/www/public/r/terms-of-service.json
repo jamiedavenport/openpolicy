@@ -4,7 +4,10 @@
 	"title": "Terms of Service",
 	"description": "A Tailwind-styled terms of service component powered by OpenPolicy.",
 	"dependencies": ["@openpolicy/react", "@openpolicy/sdk"],
-	"registryDependencies": ["config", "policy-components"],
+	"registryDependencies": [
+		"https://openpolicy.sh/r/config.json",
+		"https://openpolicy.sh/r/policy-components.json"
+	],
 	"files": [
 		{
 			"path": "registry/terms-of-service.tsx",
