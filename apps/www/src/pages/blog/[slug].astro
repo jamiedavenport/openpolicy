@@ -17,11 +17,34 @@ const { Content } = await render(post);
   ogUrl={`https://openpolicy.sh/blog/${post.slug}`}
 >
   <section>
-    <p class="font-mono font-medium text-xs text-gray-500 mb-2">
-      {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-    </p>
+    <div class="border-b border-gray-200 pb-6 mb-8">
+      <p class="font-mono font-medium text-xs text-gray-500 mb-3">
+        {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+      </p>
+      <h1 class="font-mono font-bold text-2xl leading-snug">{post.data.title}</h1>
+    </div>
+
     <article class="prose prose-gray max-w-none">
       <Content />
     </article>
+
+    <div class="mt-16 border-t border-gray-200 pt-8 flex flex-col sm:flex-row gap-3">
+      <a
+        href="https://github.com/jamiedavenport/openpolicy"
+        target="_blank"
+        class="flex-1 flex items-center justify-center gap-2 h-12 border border-gray-200 font-mono text-sm hover:bg-gray-50 transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#eab308" stroke="#eab308" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        Star on GitHub
+      </a>
+      <a
+        href="/plus"
+        class="flex-1 flex items-center justify-center gap-2 h-12 bg-black text-white font-mono text-sm hover:bg-gray-800 transition-colors"
+      >
+        Check out Plus<sup class="ml-0.5 opacity-70">+</sup>
+      </a>
+    </div>
   </section>
 </BaseLayout>
