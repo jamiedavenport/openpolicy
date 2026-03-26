@@ -35,7 +35,7 @@
 			"type": "registry:component",
 			"title": "Privacy Policy",
 			"description": "A Tailwind-styled privacy policy component powered by OpenPolicy.",
-			"docs": "Remeber to wrap your compoents in the `<OpenPolicy>` provider. https://openpolicy.sh/docs/react",
+			"docs": "Remeber to wrap your compoents in the `<OpenPolicy>` provider. https://docs.openpolicy.sh/react",
 			"registryDependencies": [
 				"https://openpolicy.sh/r/config.json",
 				"https://openpolicy.sh/r/policy-components.json"
@@ -54,7 +54,7 @@
 			"type": "registry:component",
 			"title": "Terms of Service",
 			"description": "A Tailwind-styled terms of service component powered by OpenPolicy.",
-			"docs": "Remeber to wrap your compoents in the `<OpenPolicy>` provider. https://openpolicy.sh/docs/react",
+			"docs": "Remeber to wrap your compoents in the `<OpenPolicy>` provider. https://docs.openpolicy.sh/react",
 			"registryDependencies": [
 				"https://openpolicy.sh/r/config.json",
 				"https://openpolicy.sh/r/policy-components.json"
@@ -73,7 +73,7 @@
 			"type": "registry:component",
 			"title": "Cookie Policy",
 			"description": "A Tailwind-styled cookie policy component powered by OpenPolicy.",
-			"docs": "Remeber to wrap your compoents in the `<OpenPolicy>` provider. https://openpolicy.sh/docs/react",
+			"docs": "Remeber to wrap your compoents in the `<OpenPolicy>` provider. https://docs.openpolicy.sh/react",
 			"registryDependencies": [
 				"https://openpolicy.sh/r/config.json",
 				"https://openpolicy.sh/r/policy-components.json"
