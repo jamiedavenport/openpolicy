@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from "astro:content";
+import { Icon } from "astro-icon/components";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export async function getStaticPaths() {
@@ -9,6 +10,14 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+
+const postUrl = `https://openpolicy.sh/blog/${post.slug}`;
+const shareText = encodeURIComponent(post.data.title);
+const shareUrl = encodeURIComponent(postUrl);
+
+const xShareUrl = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
+const blueskyShareUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(post.data.title + " " + postUrl)}`;
 ---
 
 <BaseLayout
@@ -19,9 +28,28 @@ const { Content } = await render(post);
 >
   <section>
     <div class="border-b border-gray-200 pb-6 mb-8">
-      <p class="font-mono font-medium text-xs text-gray-500 mb-3">
-        {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-      </p>
+      <div class="flex items-center justify-between mb-3">
+        <p class="font-mono font-medium text-xs text-gray-500">
+          {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+        </p>
+        <div class="flex items-center gap-3">
+          <a href={xShareUrl} target="_blank" rel="noopener noreferrer"
+             aria-label="Share on X"
+             class="text-gray-400 hover:text-gray-700 transition-colors">
+            <Icon name="simple-icons:x" class="w-3.5 h-3.5" />
+          </a>
+          <a href={linkedinShareUrl} target="_blank" rel="noopener noreferrer"
+             aria-label="Share on LinkedIn"
+             class="text-gray-400 hover:text-gray-700 transition-colors">
+            <Icon name="simple-icons:linkedin" class="w-3.5 h-3.5" />
+          </a>
+          <a href={blueskyShareUrl} target="_blank" rel="noopener noreferrer"
+             aria-label="Share on Bluesky"
+             class="text-gray-400 hover:text-gray-700 transition-colors">
+            <Icon name="simple-icons:bluesky" class="w-3.5 h-3.5" />
+          </a>
+        </div>
+      </div>
       <h1 class="font-mono font-bold text-2xl leading-snug">{post.data.title}</h1>
     </div>
 
