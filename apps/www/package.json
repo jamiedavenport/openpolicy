@@ -12,10 +12,12 @@
 		"@astrojs/sitemap": "^3.7.0",
 		"@astrojs/vercel": "^9.0.4",
 		"@iconify-json/simple-icons": "^1.2.72",
+		"@resvg/resvg-js": "^2.6.2",
 		"@tailwindcss/vite": "^4.2.1",
 		"astro": "^5.17.1",
 		"astro-icon": "^1.1.5",
 		"resend": "^6.9.4",
+		"satori": "^0.26.0",
 		"tailwindcss": "^4.2.1"
 	},
 	"devDependencies": {
