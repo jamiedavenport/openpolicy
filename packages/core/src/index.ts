@@ -1,3 +1,13 @@
+export type { CookieConsent, CookieConsentStatus } from "./consent";
+export {
+	acceptAll,
+	clearConsent,
+	getConsent,
+	hasConsented,
+	rejectAll,
+	resolveStatus,
+	setConsent,
+} from "./consent";
 export type {
 	BoldNode,
 	ContentNode,
