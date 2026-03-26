@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from "astro:content";
+import { Icon } from "astro-icon/components";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export async function getStaticPaths() {
@@ -9,19 +10,70 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+
+const postUrl = `https://openpolicy.sh/blog/${post.slug}`;
+const shareText = encodeURIComponent(post.data.title);
+const shareUrl = encodeURIComponent(postUrl);
+
+const xShareUrl = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
+const blueskyShareUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(post.data.title + " " + postUrl)}`;
 ---
 
 <BaseLayout
   title={`${post.data.title} — OpenPolicy`}
   description={post.data.description}
   ogUrl={`https://openpolicy.sh/blog/${post.slug}`}
+  ogImage={`https://openpolicy.sh/og/${post.slug}.png`}
 >
   <section>
-    <p class="font-mono font-medium text-xs text-gray-500 mb-2">
-      {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-    </p>
+    <div class="border-b border-gray-200 pb-6 mb-8">
+      <div class="flex items-center justify-between mb-3">
+        <p class="font-mono font-medium text-xs text-gray-500">
+          {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+        </p>
+        <div class="flex items-center gap-3">
+          <a href={xShareUrl} target="_blank" rel="noopener noreferrer"
+             aria-label="Share on X"
+             class="text-gray-400 hover:text-gray-700 transition-colors">
+            <Icon name="simple-icons:x" class="w-3.5 h-3.5" />
+          </a>
+          <a href={linkedinShareUrl} target="_blank" rel="noopener noreferrer"
+             aria-label="Share on LinkedIn"
+             class="text-gray-400 hover:text-gray-700 transition-colors">
+            <Icon name="simple-icons:linkedin" class="w-3.5 h-3.5" />
+          </a>
+          <a href={blueskyShareUrl} target="_blank" rel="noopener noreferrer"
+             aria-label="Share on Bluesky"
+             class="text-gray-400 hover:text-gray-700 transition-colors">
+            <Icon name="simple-icons:bluesky" class="w-3.5 h-3.5" />
+          </a>
+        </div>
+      </div>
+      <h1 class="font-mono font-bold text-2xl leading-snug">{post.data.title}</h1>
+    </div>
+
     <article class="prose prose-gray max-w-none">
       <Content />
     </article>
+
+    <div class="mt-16 border-t border-gray-200 pt-8 flex flex-col sm:flex-row gap-3">
+      <a
+        href="https://github.com/jamiedavenport/openpolicy"
+        target="_blank"
+        class="flex-1 flex items-center justify-center gap-2 h-12 border border-gray-200 font-mono text-sm hover:bg-gray-50 transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#eab308" stroke="#eab308" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        Star on GitHub
+      </a>
+      <a
+        href="/plus"
+        class="flex-1 flex items-center justify-center gap-2 h-12 bg-black text-white font-mono text-sm hover:bg-gray-800 transition-colors"
+      >
+        Check out Plus<sup class="ml-0.5 opacity-70">+</sup>
+      </a>
+    </div>
   </section>
 </BaseLayout>
