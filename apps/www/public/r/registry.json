@@ -15,6 +15,68 @@
 					"type": "registry:lib"
 				}
 			]
+		},
+		{
+			"name": "policy-components",
+			"type": "registry:block",
+			"title": "Policy Components",
+			"description": "Tailwind-styled renderer components for OpenPolicy documents.",
+			"dependencies": ["@openpolicy/core", "@openpolicy/react"],
+			"files": [
+				{
+					"path": "registry/policy-components.tsx",
+					"type": "registry:block",
+					"target": "components/ui/openpolicy/policy-components.tsx"
+				}
+			]
+		},
+		{
+			"name": "privacy-policy",
+			"type": "registry:component",
+			"title": "Privacy Policy",
+			"description": "A Tailwind-styled privacy policy component powered by OpenPolicy.",
+			"docs": "https://openpolicy.sh/docs/react",
+			"registryDependencies": ["config", "policy-components"],
+			"dependencies": ["@openpolicy/react", "@openpolicy/sdk"],
+			"files": [
+				{
+					"path": "registry/privacy-policy.tsx",
+					"type": "registry:component",
+					"target": "components/ui/openpolicy/privacy-policy.tsx"
+				}
+			]
+		},
+		{
+			"name": "terms-of-service",
+			"type": "registry:component",
+			"title": "Terms of Service",
+			"description": "A Tailwind-styled terms of service component powered by OpenPolicy.",
+			"docs": "https://openpolicy.sh/docs/react",
+			"registryDependencies": ["config", "policy-components"],
+			"dependencies": ["@openpolicy/react", "@openpolicy/sdk"],
+			"files": [
+				{
+					"path": "registry/terms-of-service.tsx",
+					"type": "registry:component",
+					"target": "components/ui/openpolicy/terms-of-service.tsx"
+				}
+			]
+		},
+		{
+			"name": "cookie-policy",
+			"type": "registry:component",
+			"title": "Cookie Policy",
+			"description": "A Tailwind-styled cookie policy component powered by OpenPolicy.",
+			"docs": "https://openpolicy.sh/docs/react",
+			"registryDependencies": ["config", "policy-components"],
+			"dependencies": ["@openpolicy/react", "@openpolicy/sdk"],
+			"files": [
+				{
+					"path": "registry/cookie-policy.tsx",
+					"type": "registry:component",
+					"target": "components/ui/openpolicy/cookie-policy.tsx"
+				}
+			]
 		}
 	]
 }

@@ -1,0 +1,18 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry-item.json",
+	"name": "terms-of-service",
+	"title": "Terms of Service",
+	"description": "A Tailwind-styled terms of service component powered by OpenPolicy.",
+	"dependencies": ["@openpolicy/react", "@openpolicy/sdk"],
+	"registryDependencies": ["config", "policy-components"],
+	"files": [
+		{
+			"path": "registry/terms-of-service.tsx",
+			"content": "import { TermsOfService as TermsOfServiceBase } from \"@openpolicy/react\";\nimport type { OpenPolicyConfig, TermsOfServiceConfig } from \"@openpolicy/sdk\";\nimport {\n\tPolicyHeading,\n\tPolicyLink,\n\tPolicyList,\n\tPolicyParagraph,\n\tPolicySection,\n} from \"@/components/ui/openpolicy/policy-components\";\n\ninterface TermsOfServiceProps {\n\tconfig?: OpenPolicyConfig | TermsOfServiceConfig;\n}\n\nexport function TermsOfService({ config }: TermsOfServiceProps) {\n\treturn (\n\t\t<TermsOfServiceBase\n\t\t\tconfig={config}\n\t\t\tcomponents={{\n\t\t\t\tSection: PolicySection,\n\t\t\t\tHeading: PolicyHeading,\n\t\t\t\tParagraph: PolicyParagraph,\n\t\t\t\tList: PolicyList,\n\t\t\t\tLink: PolicyLink,\n\t\t\t}}\n\t\t/>\n\t);\n}\n",
+			"type": "registry:component",
+			"target": "components/ui/openpolicy/terms-of-service.tsx"
+		}
+	],
+	"docs": "https://openpolicy.sh/docs/react",
+	"type": "registry:component"
+}

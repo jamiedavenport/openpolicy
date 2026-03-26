@@ -25,6 +25,7 @@
 		"@types/react": "^19.0.0",
 		"@openpolicy/astro": "workspace:*",
 		"@openpolicy/core": "workspace:*",
+		"@openpolicy/react": "workspace:*",
 		"@openpolicy/sdk": "workspace:*",
 		"@openpolicy/vite": "workspace:*",
 		"@tailwindcss/typography": "^0.5.19",
