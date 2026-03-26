@@ -62,6 +62,7 @@
         "@openpolicy/sdk": "workspace:*",
         "@openpolicy/vite": "workspace:*",
         "@tailwindcss/typography": "^0.5.19",
+        "@types/react": "^19.0.0",
       },
     },
     "examples/astro": {

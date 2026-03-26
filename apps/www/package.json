@@ -21,6 +21,7 @@
 		"tailwindcss": "^4.2.1"
 	},
 	"devDependencies": {
+		"@types/react": "^19.0.0",
 		"@openpolicy/astro": "workspace:*",
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/sdk": "workspace:*",
