@@ -1,0 +1,15 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry-item.json",
+	"name": "config",
+	"title": "OpenPolicy Config",
+	"description": "Starter openpolicy.ts config file for defining your privacy policy, terms of service, and cookie policy.",
+	"dependencies": ["@openpolicy/sdk"],
+	"files": [
+		{
+			"path": "registry/openpolicy.ts",
+			"content": "import { defineConfig } from \"@openpolicy/sdk\";\n\nexport default defineConfig({\n\tcompany: {\n\t\tname: \"Your Company\",\n\t\tlegalName: \"Your Company, Inc.\",\n\t\taddress: \"123 Main St, City, State, ZIP\",\n\t\tcontact: \"privacy@yourcompany.com\",\n\t},\n\tprivacy: {\n\t\teffectiveDate: \"2025-01-01\",\n\t\tdataCollected: {\n\t\t\t\"Personal Information\": [\"Full name\", \"Email address\"],\n\t\t\t\"Usage Data\": [\"Pages visited\", \"Time spent on site\"],\n\t\t},\n\t\tlegalBasis: \"Legitimate interests and consent\",\n\t\tretention: {\n\t\t\t\"Personal data\": \"As long as your account is active\",\n\t\t},\n\t\tcookies: {\n\t\t\tessential: true,\n\t\t\tanalytics: false,\n\t\t\tmarketing: false,\n\t\t},\n\t\tthirdParties: [],\n\t\tuserRights: [\"access\", \"erasure\", \"portability\"],\n\t\tjurisdictions: [\"us\"],\n\t},\n\tterms: {\n\t\teffectiveDate: \"2025-01-01\",\n\t\tacceptance: {\n\t\t\tmethods: [\"using the service\", \"creating an account\"],\n\t\t},\n\t\teligibility: {\n\t\t\tminimumAge: 13,\n\t\t},\n\t\taccounts: {\n\t\t\tregistrationRequired: false,\n\t\t\tuserResponsibleForCredentials: true,\n\t\t\tcompanyCanTerminate: true,\n\t\t},\n\t\tprohibitedUses: [\n\t\t\t\"Violating any applicable laws or regulations\",\n\t\t\t\"Infringing on intellectual property rights\",\n\t\t],\n\t\tintellectualProperty: {\n\t\t\tcompanyOwnsService: true,\n\t\t\tusersMayNotCopy: true,\n\t\t},\n\t\ttermination: {\n\t\t\tcompanyCanTerminate: true,\n\t\t\tuserCanTerminate: true,\n\t\t},\n\t\tdisclaimers: {\n\t\t\tserviceProvidedAsIs: true,\n\t\t\tnoWarranties: true,\n\t\t},\n\t\tlimitationOfLiability: {\n\t\t\texcludesIndirectDamages: true,\n\t\t},\n\t\tgoverningLaw: {\n\t\t\tjurisdiction: \"Delaware, USA\",\n\t\t},\n\t\tchangesPolicy: {\n\t\t\tnoticeMethod: \"email or prominent notice on our website\",\n\t\t\tnoticePeriodDays: 30,\n\t\t},\n\t},\n});\n",
+			"type": "registry:lib"
+		}
+	],
+	"type": "registry:lib"
+}
