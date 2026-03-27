@@ -20,6 +20,7 @@ export { TermsOfService } from "./components/TermsOfService";
 export { OpenPolicyProvider as OpenPolicy } from "./context";
 // Hooks
 export { useCookieConsent } from "./hooks/useCookieConsent";
+export { useShouldShowCookieBanner } from "./hooks/useShouldShowCookieBanner";
 // Render
 export { renderDocument } from "./render";
 // Styles

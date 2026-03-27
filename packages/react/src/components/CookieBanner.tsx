@@ -14,6 +14,7 @@ import {
 } from "react";
 import { OpenPolicyContext } from "../context";
 import { useCookieConsent } from "../hooks/useCookieConsent";
+import { useShouldShowCookieBanner } from "../hooks/useShouldShowCookieBanner";
 import { Slot } from "./Slot";
 
 // ─── Config resolution ────────────────────────────────────────────────────────
@@ -56,12 +57,14 @@ function useCookieBannerContext(): CookieBannerContextValue {
 
 type RootProps = HTMLAttributes<HTMLDivElement> & {
 	config?: OpenPolicyConfig | CookiePolicyConfig;
+	shouldShow?: () => Promise<boolean>;
 	children?: ReactNode;
 	className?: string;
 };
 
 function Root({
 	config: configProp,
+	shouldShow,
 	children,
 	className,
 	...divProps
@@ -73,9 +76,11 @@ function Root({
 	const { status, accept, reject, update, reset } =
 		useCookieConsent(cookieConfig);
 
+	const visible = useShouldShowCookieBanner(status, shouldShow);
+
 	if (!cookieConfig) return null;
 
-	const dataState = status === "undecided" ? "open" : "closed";
+	const dataState = visible ? "open" : "closed";
 
 	return (
 		<CookieBannerContext.Provider
@@ -87,7 +92,7 @@ function Root({
 				data-state={dataState}
 				data-status={status}
 				className={className}
-				style={status !== "undecided" ? { display: "none" } : undefined}
+				style={!visible ? { display: "none" } : undefined}
 			>
 				{children}
 			</div>
@@ -301,12 +306,22 @@ function CustomizeButton({
 
 type CookieBannerProps = {
 	config?: OpenPolicyConfig | CookiePolicyConfig;
+	shouldShow?: () => Promise<boolean>;
 	onCustomize?: () => void;
 };
 
-function DefaultCookieBanner({ config, onCustomize }: CookieBannerProps) {
+function DefaultCookieBanner({
+	config,
+	shouldShow,
+	onCustomize,
+}: CookieBannerProps) {
 	return (
-		<Root config={config} role="dialog" aria-label="Cookie consent">
+		<Root
+			config={config}
+			shouldShow={shouldShow}
+			role="dialog"
+			aria-label="Cookie consent"
+		>
 			<Card>
 				<Header>
 					<Title>Cookie consent</Title>
