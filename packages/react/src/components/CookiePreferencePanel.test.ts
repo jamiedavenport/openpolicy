@@ -1,6 +1,5 @@
 import { expect, test } from "bun:test";
 import type { CookiePolicyConfig } from "@openpolicy/core";
-import type { ReactNode } from "react";
 import { createElement, isValidElement } from "react";
 import { CookiePreferencePanel } from "./CookiePreferencePanel";
 
@@ -26,16 +25,31 @@ test("CookiePreferencePanel returns a valid React element", () => {
 	expect(isValidElement(el)).toBe(true);
 });
 
-test("CookiePreferencePanel returns a valid element with render prop", () => {
-	const el = createElement(
-		CookiePreferencePanel,
-		{ config: cookieConfig },
-		(() => createElement("div", null, "custom")) as unknown as ReactNode,
-	);
+test("CookiePreferencePanel returns null when no config provided and no context", () => {
+	const el = createElement(CookiePreferencePanel, {});
 	expect(isValidElement(el)).toBe(true);
 });
 
-test("CookiePreferencePanel returns null when no config provided and no context", () => {
-	const el = createElement(CookiePreferencePanel, {});
+test("CookiePreferencePanel.Root creates a valid element", () => {
+	const el = createElement(CookiePreferencePanel.Root, {
+		config: cookieConfig,
+	});
+	expect(isValidElement(el)).toBe(true);
+});
+
+test("CookiePreferencePanel.Category creates a valid element", () => {
+	const el = createElement(CookiePreferencePanel.Category, {
+		name: "analytics",
+	});
+	expect(isValidElement(el)).toBe(true);
+});
+
+test("CookiePreferencePanel.SaveButton creates a valid element", () => {
+	const el = createElement(CookiePreferencePanel.SaveButton, {});
+	expect(isValidElement(el)).toBe(true);
+});
+
+test("CookiePreferencePanel.RejectAllButton creates a valid element", () => {
+	const el = createElement(CookiePreferencePanel.RejectAllButton, {});
 	expect(isValidElement(el)).toBe(true);
 });

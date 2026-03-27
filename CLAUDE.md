@@ -100,3 +100,4 @@ test("policy compiles to markdown", () => {
 - `moduleResolution: "bundler"` — use Bun/Vite-style imports
 - JSX is configured as `react-jsx`
 - `verbatimModuleSyntax` is on — use `import type` for type-only imports
+- Prefer `type` over `interface` for all type declarations

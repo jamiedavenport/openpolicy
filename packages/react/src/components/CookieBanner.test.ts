@@ -1,6 +1,5 @@
 import { expect, test } from "bun:test";
 import type { CookiePolicyConfig } from "@openpolicy/core";
-import type { ReactNode } from "react";
 import { createElement, isValidElement } from "react";
 import { CookieBanner } from "./CookieBanner";
 
@@ -26,14 +25,32 @@ test("CookieBanner returns a valid React element with default render", () => {
 	expect(isValidElement(el)).toBe(true);
 });
 
-test("CookieBanner returns a valid React element with render prop", () => {
-	const el = createElement(CookieBanner, { config: cookieConfig }, (() =>
-		createElement("div", null, "custom")) as unknown as ReactNode);
+test("CookieBanner returns null when no config provided and no context", () => {
+	const el = createElement(CookieBanner, {});
 	expect(isValidElement(el)).toBe(true);
 });
 
-test("CookieBanner returns null when no config provided and no context", () => {
-	const el = createElement(CookieBanner, {});
-	// The element itself is valid, but when rendered it should return null
+test("CookieBanner.Root creates a valid element", () => {
+	const el = createElement(CookieBanner.Root, { config: cookieConfig });
+	expect(isValidElement(el)).toBe(true);
+});
+
+test("CookieBanner.AcceptButton creates a valid element", () => {
+	const el = createElement(CookieBanner.AcceptButton, {});
+	expect(isValidElement(el)).toBe(true);
+});
+
+test("CookieBanner.RejectButton creates a valid element", () => {
+	const el = createElement(CookieBanner.RejectButton, {});
+	expect(isValidElement(el)).toBe(true);
+});
+
+test("CookieBanner.CustomizeButton creates a valid element", () => {
+	const el = createElement(CookieBanner.CustomizeButton, {});
+	expect(isValidElement(el)).toBe(true);
+});
+
+test("CookieBanner.Card creates a valid element", () => {
+	const el = createElement(CookieBanner.Card, {});
 	expect(isValidElement(el)).toBe(true);
 });
