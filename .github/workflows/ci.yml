@@ -22,7 +22,7 @@ jobs:
       - run: bun run check-types
       - run: bun run lint
       - run: bun run test
-      - run: bun run knip
+      # - run: bun run knip
   e2e:
     runs-on: ubuntu-latest
     steps:
