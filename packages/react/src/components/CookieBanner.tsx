@@ -31,7 +31,7 @@ function resolveCookieConfig(
 // ─── Internal context ─────────────────────────────────────────────────────────
 
 type CookieBannerContextValue = {
-	status: CookieConsentStatus | "undecided";
+	status: CookieConsentStatus;
 	accept: () => void;
 	reject: () => void;
 	update: (partial: Partial<CookieConsent>) => void;
