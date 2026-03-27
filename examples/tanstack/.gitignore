@@ -1,3 +1,4 @@
 # E2E Testing
 test-results
 node_modules
+.output
