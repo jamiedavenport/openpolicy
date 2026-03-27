@@ -2,11 +2,11 @@ pre-commit:
   commands:
     check:
       glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
-      run: bun biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
+      run: export PATH="$HOME/.bun/bin:$PATH"; bun biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
       stage_fixed: true
 
 pre-push:
   commands:
     check-types:
       glob: "*.{ts,tsx}"
-      run: bun run check-types
+      run: export PATH="$HOME/.bun/bin:$PATH"; bun run check-types
