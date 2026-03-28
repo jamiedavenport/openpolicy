@@ -13,8 +13,6 @@ export {
 } from "./components/defaults";
 export { PrivacyPolicy } from "./components/PrivacyPolicy";
 export { TermsOfService } from "./components/TermsOfService";
-// Composables
-export { useCookieConsent } from "./composables/useCookieConsent";
 // Context / Provider
 export { OpenPolicyProvider as OpenPolicy } from "./context";
 // Render
