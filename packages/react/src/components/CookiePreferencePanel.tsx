@@ -270,10 +270,22 @@ interface OverlayProps {
 }
 
 function Overlay({ asChild, className, children }: OverlayProps) {
+	const { open } = useCookiePreferencePanelContext();
+	const dataProps = open ? { "data-open": "" } : { "data-closed": "" };
 	if (asChild) {
-		return <Slot className={className}>{children}</Slot>;
+		return (
+			<Slot className={className} {...dataProps}>
+				{children}
+			</Slot>
+		);
 	}
-	return <div data-op-cookie-preferences-overlay className={className} />;
+	return (
+		<div
+			data-op-cookie-preferences-overlay
+			className={className}
+			{...dataProps}
+		/>
+	);
 }
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
@@ -285,11 +297,17 @@ interface CardProps {
 }
 
 function Card({ asChild, className, children }: CardProps) {
+	const { open } = useCookiePreferencePanelContext();
+	const dataProps = open ? { "data-open": "" } : { "data-closed": "" };
 	if (asChild) {
-		return <Slot className={className}>{children}</Slot>;
+		return (
+			<Slot className={className} {...dataProps}>
+				{children}
+			</Slot>
+		);
 	}
 	return (
-		<div data-op-cookie-preferences-card className={className}>
+		<div data-op-cookie-preferences-card className={className} {...dataProps}>
 			{children}
 		</div>
 	);

@@ -1,112 +1,131 @@
 import {
-	ConsentGate,
 	CookieBanner,
 	CookiePreferencePanel,
 	useCookieConsent,
 } from "@openpolicy/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 
 export const Route = createFileRoute("/cookie-banner")({
 	component: RouteComponent,
 });
 
-function RouteComponent() {
+function CustomCookieBanner() {
+	return (
+		<CookieBanner.Root className="fixed bottom-4 right-4 z-50 w-lg">
+			<CookieBanner.Overlay className="bg-black/50 fixed inset-0 z-40" />
+
+			<CookieBanner.Card asChild>
+				<Card className="relative z-50 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 outline-none">
+					<CookieBanner.Header asChild>
+						<CardHeader>
+							<CookieBanner.Title asChild>
+								<CardTitle>We value your privacy</CardTitle>
+							</CookieBanner.Title>
+							<CookieBanner.Description asChild>
+								<CardDescription>
+									We use cookies to improve your experience and analyse site
+									traffic.
+								</CardDescription>
+							</CookieBanner.Description>
+						</CardHeader>
+					</CookieBanner.Header>
+
+					<CookieBanner.Footer asChild>
+						<CardFooter className="gap-2">
+							<CookieBanner.CustomizeButton asChild>
+								<Button variant="outline" className="mr-auto">
+									Manage Cookies
+								</Button>
+							</CookieBanner.CustomizeButton>
+							<CookieBanner.RejectButton asChild>
+								<Button variant="outline">Necessary Only</Button>
+							</CookieBanner.RejectButton>
+							<CookieBanner.AcceptButton asChild>
+								<Button>Accept All</Button>
+							</CookieBanner.AcceptButton>
+						</CardFooter>
+					</CookieBanner.Footer>
+				</Card>
+			</CookieBanner.Card>
+		</CookieBanner.Root>
+	);
+}
+
+function CustomPreferencePanel() {
 	const [showPreferences, setShowPreferences] = useState(false);
-	const { consent, status, reset } = useCookieConsent();
 
 	return (
-		<div className="p-8 max-w-2xl mx-auto space-y-8">
-			<h1 className="text-2xl font-bold">Cookie Banner Example</h1>
-			<p className="text-muted-foreground">
-				This page demonstrates the <code>CookieBanner</code>,{" "}
-				<code>CookiePreferencePanel</code>, and <code>useCookieConsent</code>{" "}
-				hook.
-			</p>
-
-			{/* Current consent state */}
-			<div className="rounded border p-4 space-y-2">
-				<h2 className="font-semibold">Consent Status</h2>
-				<p>
-					Status: <code>{status}</code>
-				</p>
-				{consent && (
-					<pre className="text-xs bg-muted p-2 rounded">
-						{JSON.stringify(consent, null, 2)}
-					</pre>
-				)}
-				{status !== "undecided" && (
-					<button
-						type="button"
-						className="text-sm text-blue-600 underline"
-						onClick={reset}
-					>
-						Reset consent
-					</button>
-				)}
-			</div>
-
-			{/* Default unstyled banner */}
-			<CookieBanner
-				onCustomize={() => setShowPreferences(true)}
-				policyHref="/cookie-policy"
-				translations={{ learnMore: "Read cookie policy" }}
-			/>
-
-			{/* Preference panel */}
-			<CookiePreferencePanel
+		<div>
+			<Button onClick={() => setShowPreferences(true)}>Manage Cookies</Button>
+			<CookiePreferencePanel.Root
 				open={showPreferences}
 				onOpenChange={setShowPreferences}
-				translations={{
-					title: "Manage cookies",
-					save: "Save choices",
-					rejectAll: "Reject non-essential",
-				}}
-			/>
+				scrollLock
+				trapFocus
+				className="fixed inset-0 z-50 flex items-center justify-center p-4"
+			>
+				<CookiePreferencePanel.Overlay className="fixed inset-0 isolate z-40 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0" />
+				<CookiePreferencePanel.Card className="relative z-10 w-full max-w-md rounded-xl border bg-white p-6 shadow-2xl">
+					<CookiePreferencePanel.Header className="mb-5">
+						<CookiePreferencePanel.Title className="text-base font-semibold">
+							Manage cookie preferences
+						</CookiePreferencePanel.Title>
+					</CookiePreferencePanel.Header>
+					<CookiePreferencePanel.CategoryList className="space-y-3 mb-6">
+						{["essential", "analytics", "functional", "marketing"].map(
+							(key) => (
+								<CookiePreferencePanel.Category key={key} name={key}>
+									{({ checked, onCheckedChange }) => (
+										<label className="flex items-center justify-between rounded-lg border p-3 cursor-pointer hover:bg-gray-50 transition-colors">
+											<span className="text-sm capitalize">{key}</span>
+											<input
+												type="checkbox"
+												checked={checked}
+												disabled={key === "essential"}
+												onChange={(e) => onCheckedChange(e.target.checked)}
+												className="h-4 w-4 accent-black disabled:opacity-50"
+											/>
+										</label>
+									)}
+								</CookiePreferencePanel.Category>
+							),
+						)}
+					</CookiePreferencePanel.CategoryList>
+					<CookiePreferencePanel.Footer className="flex justify-end gap-2">
+						<CookiePreferencePanel.RejectAllButton asChild>
+							<Button variant="outline">Reject all</Button>
+						</CookiePreferencePanel.RejectAllButton>
+						<CookiePreferencePanel.SaveButton asChild>
+							<Button>Save preferences</Button>
+						</CookiePreferencePanel.SaveButton>
+					</CookiePreferencePanel.Footer>
+				</CookiePreferencePanel.Card>
+			</CookiePreferencePanel.Root>
+		</div>
+	);
+}
 
-			<hr />
+function RouteComponent() {
+	const { reset } = useCookieConsent();
 
-			{/* Render-prop example with custom styling */}
-			<h2 className="font-semibold">Custom Render Prop Banner</h2>
-			<CookieBanner>
-				{({ accept, reject }) => (
-					<div className="rounded-lg border bg-card p-6 shadow-sm">
-						<p className="mb-4 text-sm">
-							We use cookies for analytics. Do you accept?
-						</p>
-						<div className="flex gap-3">
-							<button
-								type="button"
-								className="rounded bg-primary px-4 py-2 text-sm text-primary-foreground"
-								onClick={accept}
-							>
-								Accept All
-							</button>
-							<button
-								type="button"
-								className="rounded border px-4 py-2 text-sm"
-								onClick={reject}
-							>
-								Reject All
-							</button>
-						</div>
-					</div>
-				)}
-			</CookieBanner>
+	return (
+		<div>
+			<p>Page Content!</p>
+			<button type="button" onClick={reset}>
+				Reset
+			</button>
 
-			<div className="rounded border p-4 space-y-2">
-				<h2 className="font-semibold text-sm">ConsentGate</h2>
-				<ConsentGate
-					requires={{ and: ["analytics"] }}
-					fallback={
-						<p className="text-xs text-muted-foreground">
-							Enable analytics to see gated content.
-						</p>
-					}
-				>
-					<p className="text-xs text-green-700">Gated content visible.</p>
-				</ConsentGate>
-			</div>
+			<CustomCookieBanner />
+			<CustomPreferencePanel />
 		</div>
 	);
 }

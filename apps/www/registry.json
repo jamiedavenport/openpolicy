@@ -86,6 +86,27 @@
 					"target": "components/ui/openpolicy/cookie-policy.tsx"
 				}
 			]
+		},
+		{
+			"name": "cookie-banner",
+			"type": "registry:component",
+			"title": "Cookie Banner",
+			"description": "A Tailwind-styled cookie banner component powered by OpenPolicy.",
+			"docs": "Remeber to wrap your compoents in the `<OpenPolicy>` provider. https://docs.openpolicy.sh/react",
+			"registryDependencies": [
+				"card",
+				"button",
+				"dialog",
+				"https://openpolicy.sh/r/config.json"
+			],
+			"dependencies": ["@openpolicy/react", "@openpolicy/sdk"],
+			"files": [
+				{
+					"path": "registry/cookie-banner.tsx",
+					"type": "registry:component",
+					"target": "components/ui/openpolicy/cookie-banner.tsx"
+				}
+			]
 		}
 	]
 }

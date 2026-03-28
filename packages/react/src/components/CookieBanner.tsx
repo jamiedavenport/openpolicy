@@ -54,6 +54,7 @@ function resolveCookieConfig(
 // ─── Internal context ─────────────────────────────────────────────────────────
 
 type CookieBannerContextValue = {
+	open: boolean;
 	status: CookieConsentStatus;
 	accept: () => void;
 	reject: () => void;
@@ -178,6 +179,7 @@ function Root({
 	return (
 		<CookieBannerContext.Provider
 			value={{
+				open: visible,
 				status,
 				accept,
 				reject,
@@ -216,10 +218,18 @@ type OverlayProps = {
 };
 
 function Overlay({ asChild, className, children }: OverlayProps) {
+	const { open } = useCookieBannerContext();
+	const dataProps = open ? { "data-open": "" } : { "data-closed": "" };
 	if (asChild) {
-		return <Slot className={className}>{children}</Slot>;
+		return (
+			<Slot className={className} {...dataProps}>
+				{children}
+			</Slot>
+		);
 	}
-	return <div data-op-cookie-banner-overlay className={className} />;
+	return (
+		<div data-op-cookie-banner-overlay className={className} {...dataProps} />
+	);
 }
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
@@ -231,11 +241,17 @@ type CardProps = {
 };
 
 function Card({ asChild, className, children }: CardProps) {
+	const { open } = useCookieBannerContext();
+	const dataProps = open ? { "data-open": "" } : { "data-closed": "" };
 	if (asChild) {
-		return <Slot className={className}>{children}</Slot>;
+		return (
+			<Slot className={className} {...dataProps}>
+				{children}
+			</Slot>
+		);
 	}
 	return (
-		<div data-op-cookie-banner-card className={className}>
+		<div data-op-cookie-banner-card className={className} {...dataProps}>
 			{children}
 		</div>
 	);
