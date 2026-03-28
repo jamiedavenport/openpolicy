@@ -72,43 +72,41 @@ function CookieBannerDemo() {
 				onOpenChange={(open) => !open && setRoute("closed")}
 			>
 				<DialogContent>
-					<CookiePreferencePanel.Card>
-						<DialogHeader>
-							<DialogTitle>Cookie preferences</DialogTitle>
-							<DialogDescription>
-								We use cookies to improve your experience and analyse site
-								traffic.
-							</DialogDescription>
-						</DialogHeader>
+					<DialogHeader>
+						<DialogTitle>Cookie preferences</DialogTitle>
+						<DialogDescription>
+							We use cookies to improve your experience and analyse site
+							traffic.
+						</DialogDescription>
+					</DialogHeader>
 
-						<FieldGroup>
-							{["essential", "analytics", "functional", "marketing"].map(
-								(key) => (
-									<CookiePreferencePanel.Category key={key} name={key}>
-										{({ checked, onCheckedChange }) => (
-											<Field orientation="horizontal">
-												<FieldTitle className="capitalize">{key}</FieldTitle>
-												<Switch
-													checked={checked}
-													disabled={key === "essential"}
-													onCheckedChange={onCheckedChange}
-												/>
-											</Field>
-										)}
-									</CookiePreferencePanel.Category>
-								),
-							)}
-						</FieldGroup>
+					<FieldGroup>
+						{["essential", "analytics", "functional", "marketing"].map(
+							(key) => (
+								<CookiePreferencePanel.Category key={key} name={key}>
+									{({ checked, onCheckedChange }) => (
+										<Field orientation="horizontal">
+											<FieldTitle className="capitalize">{key}</FieldTitle>
+											<Switch
+												checked={checked}
+												disabled={key === "essential"}
+												onCheckedChange={onCheckedChange}
+											/>
+										</Field>
+									)}
+								</CookiePreferencePanel.Category>
+							),
+						)}
+					</FieldGroup>
 
-						<DialogFooter>
-							<CookiePreferencePanel.RejectAllButton asChild>
-								<Button variant="outline">Reject all</Button>
-							</CookiePreferencePanel.RejectAllButton>
-							<CookiePreferencePanel.SaveButton asChild>
-								<Button>Save preferences</Button>
-							</CookiePreferencePanel.SaveButton>
-						</DialogFooter>
-					</CookiePreferencePanel.Card>
+					<DialogFooter>
+						<CookiePreferencePanel.RejectAllButton asChild>
+							<Button variant="outline">Reject all</Button>
+						</CookiePreferencePanel.RejectAllButton>
+						<CookiePreferencePanel.SaveButton asChild>
+							<Button>Save preferences</Button>
+						</CookiePreferencePanel.SaveButton>
+					</DialogFooter>
 				</DialogContent>
 			</Dialog>
 		</>
