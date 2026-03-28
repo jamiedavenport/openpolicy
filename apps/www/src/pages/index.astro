@@ -11,7 +11,9 @@ import installCmd from "../snippets/install.sh?raw";
 import policyTs from "../snippets/openpolicy.ts?raw";
 import privacyRoute from "../snippets/privacy-policy.tsx?raw";
 import llmPrompt from "../snippets/prompt.txt?raw";
-import auvia from "../assets/auvia.png";
+import cookies from "../assets/cookies.png";
+import document from "../assets/document.png";
+import cloud from "../assets/cloud.png";
 ---
 
 <BaseLayout
@@ -35,6 +37,36 @@ import auvia from "../assets/auvia.png";
       theme="github-light"
       class="p-4 text-sm border border-gray-200 bg-gray-100"
     />
+  </section>
+
+  <section class="border border-gray-200 divide-y divide-gray-200">
+    <div class="flex items-center gap-5 p-4">
+      <img src={cookies.src} alt="Cookies" class="h-20" />
+      <div>
+        <h2 class="font-mono">
+          <span class="text-gray-500">Open</span><span class="font-bold">Cookies</span>
+        </h2>
+        <p class="text-xs text-gray-500">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, quasi. Modi hic fuga soluta consectetur, quisquam ab veritatis aspernatur perferendis quis, corporis aut quia, facere omnis? Et ratione debitis cum.</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-5 p-4">
+      <img src={document.src} alt="Cookies" class="h-20" />
+      <div>
+        <h2 class="font-mono">
+          <span class="text-gray-500">Open</span><span class="font-bold">Terms</span>
+        </h2>
+        <p class="text-xs text-gray-500">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, quasi. Modi hic fuga soluta consectetur, quisquam ab veritatis aspernatur perferendis quis, corporis aut quia, facere omnis? Et ratione debitis cum.</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-5 p-4">
+      <img src={cloud.src} alt="Cookies" class="h-20" />
+      <div>
+        <h2 class="font-mono">
+          <span class="font-bold">Plus</span>
+        </h2>
+        <p class="text-xs text-gray-500">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, quasi. Modi hic fuga soluta consectetur, quisquam ab veritatis aspernatur perferendis quis, corporis aut quia, facere omnis? Et ratione debitis cum.</p>
+      </div>
+    </div>
   </section>
 
   <section>
