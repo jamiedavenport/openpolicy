@@ -1,10 +1,17 @@
 {
 	"$schema": "https://turborepo.dev/schema.json",
 	"ui": "tui",
+	"globalEnv": ["RESEND_API_KEY"],
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],
-			"outputs": [".next/**", "!.next/cache/**", "dist/**", ".svelte-kit/**"]
+			"outputs": [
+				".next/**",
+				"!.next/cache/**",
+				"dist/**",
+				".svelte-kit/**",
+				".output/**"
+			]
 		},
 		"check-types": {
 			"dependsOn": ["^build", "^check-types"]
