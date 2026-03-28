@@ -5,11 +5,8 @@ import { expect, test } from "@playwright/test";
 test.describe("/cookie-banner", () => {
 	test.beforeEach(async ({ page }) => {
 		// Clear the consent cookie before each test so the banner is always shown.
+		await page.context().clearCookies({ name: "op_consent" });
 		await page.goto("/cookie-banner");
-		await page.evaluate(() => {
-			document.cookie = "op_consent=; max-age=0; path=/; SameSite=Lax";
-		});
-		await page.reload();
 	});
 
 	test("banner is visible on first visit", async ({ page }) => {
