@@ -4,69 +4,59 @@ import { expect, test } from "@playwright/test";
 
 test.describe("/cookie-banner", () => {
 	test.beforeEach(async ({ page }) => {
-		// Clear the consent cookie before each test so the banner is always shown.
-		await page.context().clearCookies({ name: "op_consent" });
+		// Clear the consent from localStorage before each test so the banner is always shown.
 		await page.goto("/cookie-banner");
+		await page.evaluate(() => localStorage.removeItem("op_consent"));
+		await page.reload();
 	});
 
 	test("banner is visible on first visit", async ({ page }) => {
-		await expect(page.locator("[data-op-cookie-banner-root]")).toHaveAttribute(
-			"data-state",
-			"open",
-		);
+		await expect(page.getByText("We value your privacy")).toBeVisible();
 	});
 
 	test("Accept All closes the banner and shows accepted status", async ({
 		page,
 	}) => {
-		await page.locator("[data-op-cookie-banner-accept]").click();
-		await expect(page.locator("[data-op-cookie-banner-root]")).toHaveAttribute(
-			"data-state",
-			"closed",
-		);
+		await page.getByRole("button", { name: "Accept All" }).click();
+		await expect(page.getByText("We value your privacy")).not.toBeVisible();
 		await expect(page.getByTestId("consent-status")).toHaveText("accepted");
 	});
 
 	test("Necessary Only closes the banner and shows rejected status", async ({
 		page,
 	}) => {
-		await page.locator("[data-op-cookie-banner-reject]").click();
-		await expect(page.locator("[data-op-cookie-banner-root]")).toHaveAttribute(
-			"data-state",
-			"closed",
-		);
+		await page.getByRole("button", { name: "Necessary Only" }).click();
+		await expect(page.getByText("We value your privacy")).not.toBeVisible();
 		await expect(page.getByTestId("consent-status")).toHaveText("rejected");
 	});
 
 	test("Manage Cookies opens the preference panel", async ({ page }) => {
-		await page.locator("[data-op-cookie-banner-customize]").click();
-		await expect(
-			page.locator("[data-op-cookie-preferences-root]"),
-		).toHaveAttribute("data-state", "open");
+		await page.getByRole("button", { name: "Manage Cookies" }).click();
+		await expect(page.getByText("Cookie preferences")).toBeVisible();
 	});
 
 	test("preference panel Save sets status to custom", async ({ page }) => {
-		await page.locator("[data-op-cookie-banner-customize]").click();
+		await page.getByRole("button", { name: "Manage Cookies" }).click();
 		// Toggle analytics off (it is on by default for this config)
-		await page
-			.locator("[data-op-cookie-preferences-root] input[type=checkbox]")
-			.nth(1)
-			.click();
-		await page.locator("[data-op-cookie-preferences-save]").click();
-		await expect(
-			page.locator("[data-op-cookie-preferences-root]"),
-		).toHaveAttribute("data-state", "closed");
+		await page.getByRole("switch").nth(1).click();
+		await page.getByRole("button", { name: "Save preferences" }).click();
+		await expect(page.getByText("Cookie preferences")).not.toBeVisible();
 		await expect(page.getByTestId("consent-status")).toHaveText("custom");
 	});
 
 	test("Reset shows the banner again", async ({ page }) => {
-		await page.locator("[data-op-cookie-banner-accept]").click();
+		await page.getByRole("button", { name: "Accept All" }).click();
 		await expect(page.getByTestId("consent-status")).toHaveText("accepted");
 		await page.getByTestId("reset-consent").click();
-		await expect(page.locator("[data-op-cookie-banner-root]")).toHaveAttribute(
-			"data-state",
-			"open",
-		);
+		await expect(page.getByText("We value your privacy")).toBeVisible();
+	});
+
+	test("consent status persists after page reload", async ({ page }) => {
+		await page.getByRole("button", { name: "Accept All" }).click();
+		await expect(page.getByTestId("consent-status")).toHaveText("accepted");
+		await page.reload();
+		await expect(page.getByTestId("consent-status")).toHaveText("accepted");
+		await expect(page.getByText("We value your privacy")).not.toBeVisible();
 	});
 });
 
