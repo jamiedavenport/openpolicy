@@ -3,13 +3,10 @@ import {
 	type CookieConsent,
 	type CookieConsentStatus,
 	type CookiePolicyConfig,
-	clearConsent,
-	getConsent,
 	isOpenPolicyConfig,
 	type OpenPolicyConfig,
 	rejectAll,
 	resolveStatus,
-	setConsent,
 } from "@openpolicy/core";
 import {
 	createContext,
@@ -41,6 +38,29 @@ export type HasExpression =
 	| { or: HasExpression[] }
 	| { not: HasExpression };
 
+// ─── localStorage helpers ─────────────────────────────────────────────────────
+
+const LS_KEY = "op_consent";
+
+function getConsentFromStorage(): CookieConsent | null {
+	try {
+		const raw = localStorage.getItem(LS_KEY);
+		if (!raw) return null;
+		return JSON.parse(raw) as CookieConsent;
+	} catch {
+		return null;
+	}
+}
+
+function setConsentToStorage(consent: CookieConsent): void {
+	const value: CookieConsent = { ...consent, essential: true };
+	localStorage.setItem(LS_KEY, JSON.stringify(value));
+}
+
+function clearConsentFromStorage(): void {
+	localStorage.removeItem(LS_KEY);
+}
+
 // ─── Config resolution ────────────────────────────────────────────────────────
 
 export function resolveCookieConfig(
@@ -64,20 +84,20 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function acceptAllForConfig(config: CookiePolicyConfig): CookieConsent {
 	const consent = acceptAll(config);
-	setConsent(consent);
+	setConsentToStorage(consent);
 	return consent;
 }
 
 export function rejectAllForConfig(config?: CookiePolicyConfig): CookieConsent {
 	const consent = rejectAll(config);
-	setConsent(consent);
+	setConsentToStorage(consent);
 	return consent;
 }
 
 export function updateConsent(partial: Partial<CookieConsent>): CookieConsent {
-	const current = getConsent() ?? { essential: true };
+	const current = getConsentFromStorage() ?? { essential: true };
 	const next: CookieConsent = { ...current, ...partial, essential: true };
-	setConsent(next);
+	setConsentToStorage(next);
 	return next;
 }
 
@@ -111,13 +131,10 @@ let cachedRaw = "";
 let cachedValue: CookieConsent | null = null;
 
 export function getSnapshotCached(): CookieConsent | null {
-	const raw = document.cookie
-		.split("; ")
-		.find((c) => c.startsWith("op_consent="));
-	const rawStr = raw ?? "";
+	const rawStr = localStorage.getItem(LS_KEY) ?? "";
 	if (rawStr === cachedRaw) return cachedValue;
 	cachedRaw = rawStr;
-	cachedValue = getConsent();
+	cachedValue = getConsentFromStorage();
 	return cachedValue;
 }
 
@@ -248,7 +265,7 @@ export function OpenPolicyProvider({
 	}, []);
 
 	const reset = useCallback(() => {
-		clearConsent();
+		clearConsentFromStorage();
 		notifyListeners();
 	}, []);
 

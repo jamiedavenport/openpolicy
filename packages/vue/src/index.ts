@@ -1,8 +1,5 @@
 // Components
-export { CookieBanner } from "./components/CookieBanner";
 export { CookiePolicy } from "./components/CookiePolicy";
-export type { CookieCategory } from "./components/CookiePreferencePanel";
-export { CookiePreferencePanel } from "./components/CookiePreferencePanel";
 // Default renderers
 export {
 	DefaultBold,
