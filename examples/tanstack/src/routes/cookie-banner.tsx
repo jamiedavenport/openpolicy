@@ -21,49 +21,53 @@ export const Route = createFileRoute("/cookie-banner")({
 // Shared state controls both the banner's "Manage Cookies" button and the panel.
 function CookieBannerDemo() {
 	const [showPreferences, setShowPreferences] = useState(false);
+	const overlayClassName =
+		"fixed inset-0 z-40 bg-black/50 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0";
 
 	return (
 		<>
-			<CookieBanner.Root className="fixed bottom-4 right-4 z-50 w-lg">
-				<CookieBanner.Overlay className="bg-black/50 fixed inset-0 z-40" />
+			{!showPreferences && (
+				<CookieBanner.Root className="fixed bottom-4 right-4 z-50 w-lg">
+					<CookieBanner.Overlay className={overlayClassName} />
 
-				<CookieBanner.Card asChild>
-					<Card className="relative z-50 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 outline-none">
-						<CookieBanner.Header asChild>
-							<CardHeader>
-								<CookieBanner.Title asChild>
-									<CardTitle>We value your privacy</CardTitle>
-								</CookieBanner.Title>
-								<CookieBanner.Description asChild>
-									<CardDescription>
-										We use cookies to improve your experience and analyse site
-										traffic.
-									</CardDescription>
-								</CookieBanner.Description>
-							</CardHeader>
-						</CookieBanner.Header>
+					<CookieBanner.Card asChild>
+						<Card className="relative z-50 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 outline-none">
+							<CookieBanner.Header asChild>
+								<CardHeader>
+									<CookieBanner.Title asChild>
+										<CardTitle>We value your privacy</CardTitle>
+									</CookieBanner.Title>
+									<CookieBanner.Description asChild>
+										<CardDescription>
+											We use cookies to improve your experience and analyse site
+											traffic.
+										</CardDescription>
+									</CookieBanner.Description>
+								</CardHeader>
+							</CookieBanner.Header>
 
-						<CookieBanner.Footer asChild>
-							<CardFooter className="gap-2">
-								<CookieBanner.CustomizeButton
-									asChild
-									onClick={() => setShowPreferences(true)}
-								>
-									<Button variant="outline" className="mr-auto">
-										Manage Cookies
-									</Button>
-								</CookieBanner.CustomizeButton>
-								<CookieBanner.RejectButton asChild>
-									<Button variant="outline">Necessary Only</Button>
-								</CookieBanner.RejectButton>
-								<CookieBanner.AcceptButton asChild>
-									<Button>Accept All</Button>
-								</CookieBanner.AcceptButton>
-							</CardFooter>
-						</CookieBanner.Footer>
-					</Card>
-				</CookieBanner.Card>
-			</CookieBanner.Root>
+							<CookieBanner.Footer asChild>
+								<CardFooter className="gap-2">
+									<CookieBanner.CustomizeButton
+										asChild
+										onClick={() => setShowPreferences(true)}
+									>
+										<Button variant="outline" className="mr-auto">
+											Manage Cookies
+										</Button>
+									</CookieBanner.CustomizeButton>
+									<CookieBanner.RejectButton asChild>
+										<Button variant="outline">Necessary Only</Button>
+									</CookieBanner.RejectButton>
+									<CookieBanner.AcceptButton asChild>
+										<Button>Accept All</Button>
+									</CookieBanner.AcceptButton>
+								</CardFooter>
+							</CookieBanner.Footer>
+						</Card>
+					</CookieBanner.Card>
+				</CookieBanner.Root>
+			)}
 
 			<CookiePreferencePanel.Root
 				open={showPreferences}
@@ -72,8 +76,8 @@ function CookieBannerDemo() {
 				trapFocus
 				className="fixed inset-0 z-50 flex items-center justify-center p-4"
 			>
-				<CookiePreferencePanel.Overlay className="fixed inset-0 isolate z-40 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0" />
-				<CookiePreferencePanel.Card className="relative z-10 w-full max-w-md rounded-xl border bg-white p-6 shadow-2xl">
+				<CookiePreferencePanel.Overlay className={overlayClassName} />
+				<CookiePreferencePanel.Card className="relative z-50 w-full max-w-md rounded-xl border bg-white p-6 shadow-2xl">
 					<CookiePreferencePanel.Header className="mb-5">
 						<CookiePreferencePanel.Title className="text-base font-semibold">
 							Manage cookie preferences
