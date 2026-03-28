@@ -44,12 +44,7 @@ export default function ShadcnCookieBannerPage() {
 			</div>
 
 			{/* Banner with asChild buttons */}
-			<CookieBanner.Root
-				className="fixed bottom-0 inset-x-0 z-50 p-4"
-				scrollLock
-				trapFocus
-				translations={{ title: "We use cookies" }}
-			>
+			<CookieBanner.Root className="fixed bottom-0 inset-x-0 z-50 p-4">
 				<CookieBanner.Card className="mx-auto max-w-2xl rounded-xl border bg-white p-6 shadow-2xl">
 					<CookieBanner.Header className="mb-4">
 						<CookieBanner.Title className="text-base font-semibold">
@@ -87,8 +82,6 @@ export default function ShadcnCookieBannerPage() {
 			<CookiePreferencePanel.Root
 				open={showPreferences}
 				onOpenChange={setShowPreferences}
-				scrollLock
-				trapFocus
 				className="fixed inset-0 z-50 flex items-center justify-center p-4"
 			>
 				<CookiePreferencePanel.Overlay className="absolute inset-0 bg-black/50" />

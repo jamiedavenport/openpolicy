@@ -46,20 +46,10 @@ export default function DefaultCookieBannerPage() {
 			<CookieBanner
 				onCustomize={() => setShowPreferences(true)}
 				policyHref="/cookie-policy"
-				translations={{
-					learnMore: "Cookie policy",
-					description:
-						"We use cookies to personalise content and analyze traffic.",
-				}}
 			/>
 			<CookiePreferencePanel
 				open={showPreferences}
 				onOpenChange={setShowPreferences}
-				translations={{
-					title: "Manage cookies",
-					save: "Save choices",
-					rejectAll: "Reject non-essential",
-				}}
 			/>
 
 			<div className="mt-6 border rounded p-4 space-y-2">

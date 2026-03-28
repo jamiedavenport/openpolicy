@@ -9,9 +9,7 @@ import {
 	type HTMLAttributes,
 	type ReactNode,
 	useContext,
-	useEffect,
 	useMemo,
-	useRef,
 	useState,
 } from "react";
 import { OpenPolicyContext } from "../context";
@@ -26,18 +24,6 @@ export interface CookieCategory {
 	enabled: boolean;
 	locked: boolean;
 }
-
-export type CookiePreferencesTranslations = {
-	title: string;
-	save: string;
-	rejectAll: string;
-};
-
-const defaultTranslations: CookiePreferencesTranslations = {
-	title: "Cookie preferences",
-	save: "Save preferences",
-	rejectAll: "Reject all",
-};
 
 // ─── Config resolution ────────────────────────────────────────────────────────
 
@@ -60,15 +46,14 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 // ─── Internal context ─────────────────────────────────────────────────────────
 
-interface CookiePreferencePanelContextValue {
+type CookiePreferencePanelContextValue = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	categories: CookieCategory[];
 	toggle: (key: string) => void;
 	save: () => void;
 	rejectAll: () => void;
-	translations: CookiePreferencesTranslations;
-}
+};
 
 const CookiePreferencePanelContext =
 	createContext<CookiePreferencePanelContextValue | null>(null);
@@ -82,54 +67,22 @@ function useCookiePreferencePanelContext(): CookiePreferencePanelContextValue {
 	return ctx;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────-
-
-function trapFocusIn(node: HTMLElement) {
-	const focusable = node.querySelectorAll<HTMLElement>(
-		"a, button, input, select, textarea, [tabindex]:not([tabindex='-1'])",
-	);
-	if (focusable.length === 0) return undefined;
-	const first = focusable[0];
-	const last = focusable[focusable.length - 1];
-	if (!first || !last) return undefined;
-	const onKeyDown = (event: KeyboardEvent) => {
-		if (event.key !== "Tab") return;
-		if (event.shiftKey) {
-			if (document.activeElement === first) {
-				event.preventDefault();
-				last.focus();
-			}
-		} else if (document.activeElement === last) {
-			event.preventDefault();
-			first.focus();
-		}
-	};
-	node.addEventListener("keydown", onKeyDown);
-	return () => node.removeEventListener("keydown", onKeyDown);
-}
-
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
-interface RootProps extends HTMLAttributes<HTMLDivElement> {
+type RootProps = HTMLAttributes<HTMLDivElement> & {
 	config?: OpenPolicyConfig | CookiePolicyConfig;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	onSave?: (consent: CookieConsent) => void;
-	trapFocus?: boolean;
-	scrollLock?: boolean;
-	translations?: Partial<CookiePreferencesTranslations>;
 	children?: ReactNode;
 	className?: string;
-}
+};
 
 function Root({
 	config: configProp,
 	open = true,
 	onOpenChange,
 	onSave,
-	trapFocus = true,
-	scrollLock = false,
-	translations: translationsProp,
 	children,
 	className,
 	...divProps
@@ -138,15 +91,8 @@ function Root({
 	const raw = configProp ?? contextConfig ?? undefined;
 	const cookieConfig = useMemo(() => resolveCookieConfig(raw), [raw]);
 
-	const translations = useMemo(
-		() => ({ ...defaultTranslations, ...translationsProp }),
-		[translationsProp],
-	);
-
 	const { consent, update } = useCookieConsent(cookieConfig);
 	const [draft, setDraft] = useState<Partial<CookieConsent>>({});
-	const rootRef = useRef<HTMLDivElement | null>(null);
-	const lastActiveRef = useRef<HTMLElement | null>(null);
 
 	const categories: CookieCategory[] = cookieConfig
 		? (
@@ -203,31 +149,6 @@ function Root({
 		onOpenChange?.(false);
 	};
 
-	// Scroll lock
-	useEffect(() => {
-		if (!open || !scrollLock) return;
-		const { body } = document;
-		const previous = body.style.overflow;
-		body.style.overflow = "hidden";
-		return () => {
-			body.style.overflow = previous;
-		};
-	}, [open, scrollLock]);
-
-	// Focus trap
-	useEffect(() => {
-		const node = rootRef.current;
-		if (!node || !open || !trapFocus) return;
-		lastActiveRef.current = document.activeElement as HTMLElement | null;
-		node.tabIndex = node.tabIndex === -1 ? -1 : node.tabIndex || -1;
-		node.focus();
-		const cleanup = trapFocusIn(node);
-		return () => {
-			cleanup?.();
-			lastActiveRef.current?.focus?.();
-		};
-	}, [open, trapFocus]);
-
 	const dataState = open ? "open" : "closed";
 	if (!cookieConfig) return null;
 
@@ -240,12 +161,10 @@ function Root({
 				toggle,
 				save,
 				rejectAll,
-				translations,
 			}}
 		>
 			<div
 				{...divProps}
-				ref={rootRef}
 				data-op-cookie-preferences-root
 				data-state={dataState}
 				className={className}
@@ -253,7 +172,7 @@ function Root({
 					open ? undefined : { visibility: "hidden", pointerEvents: "none" }
 				}
 				role="dialog"
-				aria-label={translations.title}
+				aria-label="Cookie preferences"
 			>
 				{children}
 			</div>
@@ -446,7 +365,7 @@ function RejectAllButton({
 	className,
 	children,
 }: RejectAllButtonProps) {
-	const { rejectAll, translations } = useCookiePreferencePanelContext();
+	const { rejectAll } = useCookiePreferencePanelContext();
 	if (asChild) {
 		return (
 			<Slot className={className} onClick={rejectAll}>
@@ -461,7 +380,7 @@ function RejectAllButton({
 			className={className}
 			onClick={rejectAll}
 		>
-			{children ?? translations.rejectAll}
+			{children ?? "Reject all"}
 		</button>
 	);
 }
@@ -475,7 +394,7 @@ interface SaveButtonProps {
 }
 
 function SaveButton({ asChild, className, children }: SaveButtonProps) {
-	const { save, translations } = useCookiePreferencePanelContext();
+	const { save } = useCookiePreferencePanelContext();
 	if (asChild) {
 		return (
 			<Slot className={className} onClick={save}>
@@ -490,27 +409,25 @@ function SaveButton({ asChild, className, children }: SaveButtonProps) {
 			className={className}
 			onClick={save}
 		>
-			{children ?? translations.save}
+			{children ?? "Save preferences"}
 		</button>
 	);
 }
 
 // ─── Default panel ─────────────────────────────────────────────────────────---
 
-interface CookiePreferencePanelProps {
+type CookiePreferencePanelProps = {
 	config?: OpenPolicyConfig | CookiePolicyConfig;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	onSave?: (consent: CookieConsent) => void;
-	translations?: Partial<CookiePreferencesTranslations>;
-}
+};
 
 function DefaultCookiePreferencePanel({
 	config,
 	open,
 	onOpenChange,
 	onSave,
-	translations,
 }: CookiePreferencePanelProps) {
 	const cookieConfig = useMemo(() => resolveCookieConfig(config), [config]);
 	const categoryKeys = cookieConfig ? Object.keys(cookieConfig.cookies) : [];
@@ -521,13 +438,12 @@ function DefaultCookiePreferencePanel({
 			open={open}
 			onOpenChange={onOpenChange}
 			onSave={onSave}
-			translations={translations}
 			role="dialog"
 			aria-label="Cookie preferences"
 		>
 			<Card>
 				<Header>
-					<Title>{translations?.title ?? defaultTranslations.title}</Title>
+					<Title>Cookie preferences</Title>
 				</Header>
 				<CategoryList>
 					{categoryKeys.map((key) => (

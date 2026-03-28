@@ -70,13 +70,7 @@ async function mountBanner(children?: ReactNode) {
 	const root = createRoot(container);
 	await act(async () => {
 		root.render(
-			// trapFocus disabled: happy-dom manual setup doesn't fully wire Window
-			// scope, causing querySelectorAll internals to fail
-			createElement(
-				CookieBanner.Root,
-				{ config: cookieConfig, trapFocus: false },
-				children,
-			),
+			createElement(CookieBanner.Root, { config: cookieConfig }, children),
 		);
 	});
 	return {

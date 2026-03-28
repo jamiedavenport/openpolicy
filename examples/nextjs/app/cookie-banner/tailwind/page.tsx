@@ -44,8 +44,6 @@ export default function TailwindCookieBannerPage() {
 			{/* Compound banner — fixed bottom bar */}
 			<CookieBanner.Root
 				className="fixed bottom-0 inset-x-0 z-50 p-4 bg-black/10 backdrop-blur-sm"
-				scrollLock
-				trapFocus
 				shouldShow={async () => true}
 			>
 				<CookieBanner.Card className="mx-auto max-w-2xl rounded-xl border bg-white p-6 shadow-2xl">
@@ -76,8 +74,6 @@ export default function TailwindCookieBannerPage() {
 			<CookiePreferencePanel.Root
 				open={showPreferences}
 				onOpenChange={setShowPreferences}
-				scrollLock
-				trapFocus
 				className="fixed inset-0 z-50 flex items-center justify-center p-4"
 			>
 				<CookiePreferencePanel.Overlay className="absolute inset-0 bg-black/50 backdrop-blur-sm" />

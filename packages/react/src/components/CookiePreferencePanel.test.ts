@@ -75,9 +75,7 @@ async function mountPanel(
 		root.render(
 			createElement(
 				CookiePreferencePanel.Root,
-				// trapFocus disabled: happy-dom manual setup doesn't fully wire Window
-				// scope, causing querySelectorAll internals to fail
-				{ config: cookieConfig, open, trapFocus: false, ...props },
+				{ config: cookieConfig, open, ...props },
 				children,
 			),
 		);
