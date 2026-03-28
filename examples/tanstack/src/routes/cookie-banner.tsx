@@ -1,4 +1,5 @@
 import {
+	ConsentGate,
 	CookieBanner,
 	CookiePreferencePanel,
 	useCookieConsent,
@@ -147,6 +148,8 @@ function RouteComponent() {
 			<CustomCookieBanner />
 
 			<CookieBannerDemo />
+
+			<ConsentGate requires="analytics">Analyics enabled!</ConsentGate>
 		</div>
 	);
 }
