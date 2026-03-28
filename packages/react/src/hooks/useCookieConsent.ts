@@ -4,12 +4,25 @@ import {
 	type CookiePolicyConfig,
 	clearConsent,
 	getConsent,
+	isOpenPolicyConfig,
 	rejectAll,
 	resolveStatus,
 	setConsent,
 } from "@openpolicy/core";
-import { useCallback, useContext, useSyncExternalStore } from "react";
+import {
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useSyncExternalStore,
+} from "react";
 import { OpenPolicyContext } from "../context";
+
+export type HasExpression =
+	| string
+	| { and: HasExpression[] }
+	| { or: HasExpression[] }
+	| { not: HasExpression };
 
 // --- Pure helpers (testable without React) ---
 
@@ -19,17 +32,26 @@ export function acceptAllForConfig(config: CookiePolicyConfig): CookieConsent {
 	return consent;
 }
 
-export function rejectAllForConfig(): CookieConsent {
-	const consent = rejectAll();
+export function rejectAllForConfig(config?: CookiePolicyConfig): CookieConsent {
+	const consent = rejectAll(config);
 	setConsent(consent);
 	return consent;
 }
 
 export function updateConsent(partial: Partial<CookieConsent>): CookieConsent {
-	const current = getConsent() ?? rejectAll();
+	const current = getConsent() ?? { essential: true };
 	const next: CookieConsent = { ...current, ...partial, essential: true };
 	setConsent(next);
 	return next;
+}
+
+function evalHas(consent: CookieConsent | null, expr: HasExpression): boolean {
+	if (!consent) return false;
+	if (typeof expr === "string") return Boolean(consent[expr]);
+	if ("and" in expr) return expr.and.every((child) => evalHas(consent, child));
+	if ("or" in expr) return expr.or.some((child) => evalHas(consent, child));
+	if ("not" in expr) return !evalHas(consent, expr.not);
+	return false;
 }
 
 // --- Cookie change subscription for useSyncExternalStore ---
@@ -71,14 +93,17 @@ function getServerSnapshot(): CookieConsent | null {
 export function useCookieConsent(configProp?: CookiePolicyConfig) {
 	const { config: contextConfig } = useContext(OpenPolicyContext);
 
-	const rawConfig = configProp ?? contextConfig ?? undefined;
-	const cookieConfig =
-		rawConfig && "cookie" in rawConfig && rawConfig.cookie
-			? ({
-					...rawConfig.cookie,
-					company: rawConfig.company,
-				} as CookiePolicyConfig)
-			: (rawConfig as CookiePolicyConfig | undefined);
+	const cookieConfig = useMemo(() => {
+		const raw = configProp ?? contextConfig ?? undefined;
+		if (!raw) return undefined;
+		if (isOpenPolicyConfig(raw) && raw.cookie)
+			return {
+				...raw.cookie,
+				company: raw.company,
+			} as CookiePolicyConfig;
+		if (!isOpenPolicyConfig(raw)) return raw as CookiePolicyConfig;
+		return undefined;
+	}, [configProp, contextConfig]);
 
 	const consent = useSyncExternalStore(
 		subscribe,
@@ -92,6 +117,26 @@ export function useCookieConsent(configProp?: CookiePolicyConfig) {
 			? "custom"
 			: "undecided";
 
+	// Sync data attributes on document.body for CSS hooks
+	useEffect(() => {
+		const body = document.body;
+		if (status) body.dataset.status = status;
+		if (cookieConfig) {
+			for (const key of Object.keys(cookieConfig.cookies)) {
+				const value = consent ? (consent[key] ?? false) : false;
+				body.setAttribute(`data-consent-${key}`, String(Boolean(value)));
+			}
+		}
+		return () => {
+			if (body.dataset.status === status) delete body.dataset.status;
+			if (cookieConfig) {
+				for (const key of Object.keys(cookieConfig.cookies)) {
+					body.removeAttribute(`data-consent-${key}`);
+				}
+			}
+		};
+	}, [consent, cookieConfig, status]);
+
 	const accept = useCallback(() => {
 		if (!cookieConfig) return;
 		acceptAllForConfig(cookieConfig);
@@ -99,9 +144,9 @@ export function useCookieConsent(configProp?: CookiePolicyConfig) {
 	}, [cookieConfig]);
 
 	const reject = useCallback(() => {
-		rejectAllForConfig();
+		rejectAllForConfig(cookieConfig);
 		notifyListeners();
-	}, []);
+	}, [cookieConfig]);
 
 	const update = useCallback((partial: Partial<CookieConsent>) => {
 		updateConsent(partial);
@@ -113,5 +158,10 @@ export function useCookieConsent(configProp?: CookiePolicyConfig) {
 		notifyListeners();
 	}, []);
 
-	return { consent, status, accept, reject, update, reset } as const;
+	const has = useCallback(
+		(expr: HasExpression) => evalHas(consent, expr),
+		[consent],
+	);
+
+	return { consent, status, accept, reject, update, reset, has } as const;
 }

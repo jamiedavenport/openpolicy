@@ -42,15 +42,23 @@ export default function TailwindCookieBannerPage() {
 			</div>
 
 			{/* Compound banner — fixed bottom bar */}
-			<CookieBanner.Root className="fixed bottom-0 inset-x-0 z-50 p-4 bg-black/10 backdrop-blur-sm">
+			<CookieBanner.Root
+				className="fixed bottom-0 inset-x-0 z-50 p-4 bg-black/10 backdrop-blur-sm"
+				scrollLock
+				trapFocus
+				shouldShow={async () => true}
+			>
 				<CookieBanner.Card className="mx-auto max-w-2xl rounded-xl border bg-white p-6 shadow-2xl">
 					<CookieBanner.Header className="mb-4">
 						<CookieBanner.Title className="text-base font-semibold">
 							Cookie preferences
 						</CookieBanner.Title>
 						<CookieBanner.Description className="text-sm text-gray-500 mt-1">
-							We use cookies to improve your experience. Accept all or manage
-							your preferences below.
+							We use cookies to improve your experience. Read our{" "}
+							<a href="/cookie-policy" className="underline underline-offset-2">
+								cookie policy
+							</a>{" "}
+							or manage your preferences below.
 						</CookieBanner.Description>
 					</CookieBanner.Header>
 					<CookieBanner.Footer className="flex justify-end gap-2">
@@ -68,6 +76,8 @@ export default function TailwindCookieBannerPage() {
 			<CookiePreferencePanel.Root
 				open={showPreferences}
 				onOpenChange={setShowPreferences}
+				scrollLock
+				trapFocus
 				className="fixed inset-0 z-50 flex items-center justify-center p-4"
 			>
 				<CookiePreferencePanel.Overlay className="absolute inset-0 bg-black/50 backdrop-blur-sm" />

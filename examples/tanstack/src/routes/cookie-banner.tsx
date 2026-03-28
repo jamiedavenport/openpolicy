@@ -1,4 +1,5 @@
 import {
+	ConsentGate,
 	CookieBanner,
 	CookiePreferencePanel,
 	useCookieConsent,
@@ -46,12 +47,21 @@ function RouteComponent() {
 			</div>
 
 			{/* Default unstyled banner */}
-			<CookieBanner onCustomize={() => setShowPreferences(true)} />
+			<CookieBanner
+				onCustomize={() => setShowPreferences(true)}
+				policyHref="/cookie-policy"
+				translations={{ learnMore: "Read cookie policy" }}
+			/>
 
 			{/* Preference panel */}
 			<CookiePreferencePanel
 				open={showPreferences}
-				onClose={() => setShowPreferences(false)}
+				onOpenChange={setShowPreferences}
+				translations={{
+					title: "Manage cookies",
+					save: "Save choices",
+					rejectAll: "Reject non-essential",
+				}}
 			/>
 
 			<hr />
@@ -83,6 +93,20 @@ function RouteComponent() {
 					</div>
 				)}
 			</CookieBanner>
+
+			<div className="rounded border p-4 space-y-2">
+				<h2 className="font-semibold text-sm">ConsentGate</h2>
+				<ConsentGate
+					requires={{ and: ["analytics"] }}
+					fallback={
+						<p className="text-xs text-muted-foreground">
+							Enable analytics to see gated content.
+						</p>
+					}
+				>
+					<p className="text-xs text-green-700">Gated content visible.</p>
+				</ConsentGate>
+			</div>
 		</div>
 	);
 }

@@ -168,12 +168,13 @@ export default function CssCookieBannerPage() {
 			</div>
 
 			{/* Banner — styled entirely via the <style> block above */}
-			<CookieBanner.Root>
+			<CookieBanner.Root scrollLock trapFocus>
 				<CookieBanner.Card>
 					<CookieBanner.Header>
 						<CookieBanner.Title>Cookie preferences</CookieBanner.Title>
 						<CookieBanner.Description>
-							We use cookies to improve your experience.
+							We use cookies to improve your experience. See our{" "}
+							<a href="/cookie-policy">cookie policy</a>.
 						</CookieBanner.Description>
 					</CookieBanner.Header>
 					<CookieBanner.Footer>
@@ -190,6 +191,8 @@ export default function CssCookieBannerPage() {
 			<CookiePreferencePanel.Root
 				open={showPreferences}
 				onOpenChange={setShowPreferences}
+				scrollLock
+				trapFocus
 			>
 				<CookiePreferencePanel.Overlay />
 				<CookiePreferencePanel.Card>

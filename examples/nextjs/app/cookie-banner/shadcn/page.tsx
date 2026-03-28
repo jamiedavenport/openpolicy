@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	ConsentGate,
 	CookieBanner,
 	CookiePreferencePanel,
 	useCookieConsent,
@@ -43,14 +44,26 @@ export default function ShadcnCookieBannerPage() {
 			</div>
 
 			{/* Banner with asChild buttons */}
-			<CookieBanner.Root className="fixed bottom-0 inset-x-0 z-50 p-4">
+			<CookieBanner.Root
+				className="fixed bottom-0 inset-x-0 z-50 p-4"
+				scrollLock
+				trapFocus
+				translations={{ title: "We use cookies" }}
+			>
 				<CookieBanner.Card className="mx-auto max-w-2xl rounded-xl border bg-white p-6 shadow-2xl">
 					<CookieBanner.Header className="mb-4">
 						<CookieBanner.Title className="text-base font-semibold">
 							Cookie preferences
 						</CookieBanner.Title>
 						<CookieBanner.Description className="text-sm text-gray-500 mt-1">
-							We use cookies to improve your experience.
+							We use cookies to improve your experience. See our{" "}
+							<a
+								href="/cookie-policy"
+								className="underline underline-offset-2 text-blue-600"
+							>
+								cookie policy
+							</a>
+							.
 						</CookieBanner.Description>
 					</CookieBanner.Header>
 					<CookieBanner.Footer className="flex justify-end gap-2">
@@ -74,6 +87,8 @@ export default function ShadcnCookieBannerPage() {
 			<CookiePreferencePanel.Root
 				open={showPreferences}
 				onOpenChange={setShowPreferences}
+				scrollLock
+				trapFocus
 				className="fixed inset-0 z-50 flex items-center justify-center p-4"
 			>
 				<CookiePreferencePanel.Overlay className="absolute inset-0 bg-black/50" />
@@ -113,6 +128,20 @@ export default function ShadcnCookieBannerPage() {
 					</CookiePreferencePanel.Footer>
 				</CookiePreferencePanel.Card>
 			</CookiePreferencePanel.Root>
+
+			<div className="mt-6 border rounded p-4 space-y-2">
+				<h2 className="font-semibold text-sm">ConsentGate demo</h2>
+				<ConsentGate
+					requires={{ or: ["functional", "analytics"] }}
+					fallback={
+						<p className="text-xs text-gray-500">
+							Need consent to show gated UI.
+						</p>
+					}
+				>
+					<p className="text-xs text-green-700">Gated content visible.</p>
+				</ConsentGate>
+			</div>
 		</main>
 	);
 }

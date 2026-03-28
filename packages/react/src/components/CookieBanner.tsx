@@ -10,14 +10,36 @@ import {
 	type HTMLAttributes,
 	type ReactNode,
 	useContext,
+	useEffect,
 	useMemo,
+	useRef,
 } from "react";
 import { OpenPolicyContext } from "../context";
 import { useCookieConsent } from "../hooks/useCookieConsent";
 import { useShouldShowCookieBanner } from "../hooks/useShouldShowCookieBanner";
 import { Slot } from "./Slot";
 
-// ─── Config resolution ────────────────────────────────────────────────────────
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+export type CookieBannerTranslations = {
+	title: string;
+	description: string;
+	learnMore: string;
+	accept: string;
+	reject: string;
+	customize: string;
+};
+
+const defaultTranslations: CookieBannerTranslations = {
+	title: "Cookie consent",
+	description: "We use cookies to improve your experience.",
+	learnMore: "Cookie policy",
+	accept: "Accept all",
+	reject: "Reject",
+	customize: "Manage",
+};
+
+// ─── Config resolution ───────────────────────────────────────────────────────
 
 function resolveCookieConfig(
 	raw: OpenPolicyConfig | CookiePolicyConfig | null | undefined,
@@ -38,6 +60,7 @@ type CookieBannerContextValue = {
 	update: (partial: Partial<CookieConsent>) => void;
 	reset: () => void;
 	config: CookiePolicyConfig;
+	translations: CookieBannerTranslations;
 };
 
 const CookieBannerContext = createContext<CookieBannerContextValue | null>(
@@ -53,11 +76,46 @@ function useCookieBannerContext(): CookieBannerContextValue {
 	return ctx;
 }
 
+// ─── Focus helpers ───────────────────────────────────────────────────────────
+
+function trapFocusIn(node: HTMLElement) {
+	const focusable = node.querySelectorAll<HTMLElement>(
+		"a, button, input, select, textarea, [tabindex]:not([tabindex='-1'])",
+	);
+	if (focusable.length === 0) return undefined;
+	const first = focusable[0];
+	const last = focusable[focusable.length - 1];
+	if (!first || !last) return undefined;
+	const firstEl = first;
+	const lastEl = last;
+
+	function onKeyDown(event: KeyboardEvent) {
+		if (event.key !== "Tab") return;
+		if (event.shiftKey) {
+			if (document.activeElement === firstEl) {
+				event.preventDefault();
+				lastEl.focus();
+			}
+		} else {
+			if (document.activeElement === lastEl) {
+				event.preventDefault();
+				firstEl.focus();
+			}
+		}
+	}
+
+	node.addEventListener("keydown", onKeyDown);
+	return () => node.removeEventListener("keydown", onKeyDown);
+}
+
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 type RootProps = HTMLAttributes<HTMLDivElement> & {
 	config?: OpenPolicyConfig | CookiePolicyConfig;
 	shouldShow?: () => Promise<boolean>;
+	scrollLock?: boolean;
+	trapFocus?: boolean;
+	translations?: Partial<CookieBannerTranslations>;
 	children?: ReactNode;
 	className?: string;
 };
@@ -65,6 +123,9 @@ type RootProps = HTMLAttributes<HTMLDivElement> & {
 function Root({
 	config: configProp,
 	shouldShow,
+	scrollLock = false,
+	trapFocus = true,
+	translations: translationsProp,
 	children,
 	className,
 	...divProps
@@ -73,26 +134,72 @@ function Root({
 	const raw = configProp ?? contextConfig ?? undefined;
 	const cookieConfig = useMemo(() => resolveCookieConfig(raw), [raw]);
 
+	const mergedTranslations = useMemo(
+		() => ({ ...defaultTranslations, ...translationsProp }),
+		[translationsProp],
+	);
+
 	const { status, accept, reject, update, reset } =
 		useCookieConsent(cookieConfig);
 
 	const visible = useShouldShowCookieBanner(status, shouldShow);
 
-	if (!cookieConfig) return null;
-
 	const dataState = visible ? "open" : "closed";
+	const rootRef = useRef<HTMLDivElement | null>(null);
+	const lastActiveRef = useRef<HTMLElement | null>(null);
+
+	// Scroll lock
+	useEffect(() => {
+		if (!visible || !scrollLock) return;
+		const { body } = document;
+		const previous = body.style.overflow;
+		body.style.overflow = "hidden";
+		return () => {
+			body.style.overflow = previous;
+		};
+	}, [visible, scrollLock]);
+
+	// Focus trap + return focus
+	useEffect(() => {
+		const node = rootRef.current;
+		if (!node || !visible || !trapFocus) return;
+		lastActiveRef.current = document.activeElement as HTMLElement | null;
+		node.tabIndex = node.tabIndex === -1 ? -1 : node.tabIndex || -1;
+		node.focus();
+		const cleanupTrap = trapFocusIn(node);
+		return () => {
+			cleanupTrap?.();
+			lastActiveRef.current?.focus?.();
+		};
+	}, [visible, trapFocus]);
+
+	if (!cookieConfig) return null;
 
 	return (
 		<CookieBannerContext.Provider
-			value={{ status, accept, reject, update, reset, config: cookieConfig }}
+			value={{
+				status,
+				accept,
+				reject,
+				update,
+				reset,
+				config: cookieConfig,
+				translations: mergedTranslations,
+			}}
 		>
 			<div
 				{...divProps}
+				ref={rootRef}
 				data-op-cookie-banner-root
 				data-state={dataState}
 				data-status={status}
 				className={className}
-				style={!visible ? { display: "none" } : undefined}
+				aria-hidden={visible ? undefined : true}
+				style={
+					visible ? undefined : { visibility: "hidden", pointerEvents: "none" }
+				}
+				role="dialog"
+				aria-label={mergedTranslations.title}
 			>
 				{children}
 			</div>
@@ -219,7 +326,7 @@ type AcceptButtonProps = {
 };
 
 function AcceptButton({ asChild, className, children }: AcceptButtonProps) {
-	const { accept } = useCookieBannerContext();
+	const { accept, translations } = useCookieBannerContext();
 	if (asChild) {
 		return (
 			<Slot className={className} onClick={accept}>
@@ -234,7 +341,7 @@ function AcceptButton({ asChild, className, children }: AcceptButtonProps) {
 			className={className}
 			onClick={accept}
 		>
-			{children ?? "Accept all"}
+			{children ?? translations.accept}
 		</button>
 	);
 }
@@ -248,7 +355,7 @@ type RejectButtonProps = {
 };
 
 function RejectButton({ asChild, className, children }: RejectButtonProps) {
-	const { reject } = useCookieBannerContext();
+	const { reject, translations } = useCookieBannerContext();
 	if (asChild) {
 		return (
 			<Slot className={className} onClick={reject}>
@@ -263,7 +370,7 @@ function RejectButton({ asChild, className, children }: RejectButtonProps) {
 			className={className}
 			onClick={reject}
 		>
-			{children ?? "Reject"}
+			{children ?? translations.reject}
 		</button>
 	);
 }
@@ -283,6 +390,7 @@ function CustomizeButton({
 	children,
 	onClick,
 }: CustomizeButtonProps) {
+	const { translations } = useCookieBannerContext();
 	if (asChild) {
 		return (
 			<Slot className={className} onClick={onClick}>
@@ -297,7 +405,7 @@ function CustomizeButton({
 			className={className}
 			onClick={onClick}
 		>
-			{children ?? "Manage"}
+			{children ?? translations.customize}
 		</button>
 	);
 }
@@ -308,24 +416,32 @@ type CookieBannerProps = {
 	config?: OpenPolicyConfig | CookiePolicyConfig;
 	shouldShow?: () => Promise<boolean>;
 	onCustomize?: () => void;
+	policyHref?: string;
+	translations?: Partial<CookieBannerTranslations>;
 };
 
 function DefaultCookieBanner({
 	config,
 	shouldShow,
 	onCustomize,
+	policyHref = "/cookie-policy",
+	translations,
 }: CookieBannerProps) {
+	const link = (
+		<a href={policyHref} className="op-cookie-policy-link">
+			{translations?.learnMore ?? defaultTranslations.learnMore}
+		</a>
+	);
+
 	return (
-		<Root
-			config={config}
-			shouldShow={shouldShow}
-			role="dialog"
-			aria-label="Cookie consent"
-		>
+		<Root config={config} shouldShow={shouldShow} translations={translations}>
 			<Card>
 				<Header>
-					<Title>Cookie consent</Title>
-					<Description>We use cookies to improve your experience.</Description>
+					<Title>{translations?.title ?? defaultTranslations.title}</Title>
+					<Description>
+						{translations?.description ?? defaultTranslations.description}{" "}
+						{link}
+					</Description>
 				</Header>
 				<Footer>
 					<RejectButton />

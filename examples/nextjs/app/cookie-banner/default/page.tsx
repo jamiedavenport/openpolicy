@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	ConsentGate,
 	CookieBanner,
 	CookiePreferencePanel,
 	useCookieConsent,
@@ -42,11 +43,43 @@ export default function DefaultCookieBannerPage() {
 				)}
 			</div>
 
-			<CookieBanner onCustomize={() => setShowPreferences(true)} />
+			<CookieBanner
+				onCustomize={() => setShowPreferences(true)}
+				policyHref="/cookie-policy"
+				translations={{
+					learnMore: "Cookie policy",
+					description:
+						"We use cookies to personalise content and analyze traffic.",
+				}}
+			/>
 			<CookiePreferencePanel
 				open={showPreferences}
 				onOpenChange={setShowPreferences}
+				translations={{
+					title: "Manage cookies",
+					save: "Save choices",
+					rejectAll: "Reject non-essential",
+				}}
 			/>
+
+			<div className="mt-6 border rounded p-4 space-y-2">
+				<h2 className="font-semibold">ConsentGate demo</h2>
+				<p className="text-sm text-gray-600">
+					The section below only renders when analytics is allowed.
+				</p>
+				<ConsentGate
+					requires="analytics"
+					fallback={
+						<p className="text-xs text-gray-500">
+							Enable analytics to see this content.
+						</p>
+					}
+				>
+					<div className="text-xs bg-green-50 border border-green-200 p-3 rounded">
+						Analytics widgets would render here.
+					</div>
+				</ConsentGate>
+			</div>
 		</main>
 	);
 }

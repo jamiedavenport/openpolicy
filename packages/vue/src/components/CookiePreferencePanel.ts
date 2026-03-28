@@ -9,7 +9,7 @@ import { useCookieConsent } from "../composables/useCookieConsent";
 import { OpenPolicyContextKey } from "../context";
 
 export interface CookieCategory {
-	key: keyof Omit<CookieConsent, "essential"> | "essential";
+	key: string;
 	label: string;
 	enabled: boolean;
 	locked: boolean;
@@ -69,15 +69,20 @@ export const CookiePreferencePanel = defineComponent({
 				>
 			)
 				.filter((key) => cookieConfig.cookies[key])
-				.map((key) => ({
-					key,
-					label: CATEGORY_LABELS[key] ?? key,
-					enabled:
-						key === "essential"
-							? true
-							: (draft.value[key] ?? consent.value?.[key] ?? false),
-					locked: key === "essential",
-				}));
+				.map((key) => {
+					const categoryKey = String(key);
+					return {
+						key: categoryKey,
+						label: CATEGORY_LABELS[categoryKey] ?? categoryKey,
+						enabled:
+							categoryKey === "essential"
+								? true
+								: (draft.value[categoryKey] ??
+									consent.value?.[categoryKey] ??
+									false),
+						locked: categoryKey === "essential",
+					};
+				});
 
 			const toggle = (key: string) => {
 				if (key === "essential") return;

@@ -9,7 +9,9 @@ import {
 	type HTMLAttributes,
 	type ReactNode,
 	useContext,
+	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import { OpenPolicyContext } from "../context";
@@ -24,6 +26,18 @@ export interface CookieCategory {
 	enabled: boolean;
 	locked: boolean;
 }
+
+export type CookiePreferencesTranslations = {
+	title: string;
+	save: string;
+	rejectAll: string;
+};
+
+const defaultTranslations: CookiePreferencesTranslations = {
+	title: "Cookie preferences",
+	save: "Save preferences",
+	rejectAll: "Reject all",
+};
 
 // ─── Config resolution ────────────────────────────────────────────────────────
 
@@ -53,6 +67,7 @@ interface CookiePreferencePanelContextValue {
 	toggle: (key: string) => void;
 	save: () => void;
 	rejectAll: () => void;
+	translations: CookiePreferencesTranslations;
 }
 
 const CookiePreferencePanelContext =
@@ -67,13 +82,42 @@ function useCookiePreferencePanelContext(): CookiePreferencePanelContextValue {
 	return ctx;
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────-
+
+function trapFocusIn(node: HTMLElement) {
+	const focusable = node.querySelectorAll<HTMLElement>(
+		"a, button, input, select, textarea, [tabindex]:not([tabindex='-1'])",
+	);
+	if (focusable.length === 0) return undefined;
+	const first = focusable[0];
+	const last = focusable[focusable.length - 1];
+	if (!first || !last) return undefined;
+	const onKeyDown = (event: KeyboardEvent) => {
+		if (event.key !== "Tab") return;
+		if (event.shiftKey) {
+			if (document.activeElement === first) {
+				event.preventDefault();
+				last.focus();
+			}
+		} else if (document.activeElement === last) {
+			event.preventDefault();
+			first.focus();
+		}
+	};
+	node.addEventListener("keydown", onKeyDown);
+	return () => node.removeEventListener("keydown", onKeyDown);
+}
+
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 interface RootProps extends HTMLAttributes<HTMLDivElement> {
 	config?: OpenPolicyConfig | CookiePolicyConfig;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
+	onSave?: (consent: CookieConsent) => void;
 	trapFocus?: boolean;
+	scrollLock?: boolean;
+	translations?: Partial<CookiePreferencesTranslations>;
 	children?: ReactNode;
 	className?: string;
 }
@@ -82,7 +126,10 @@ function Root({
 	config: configProp,
 	open = true,
 	onOpenChange,
-	trapFocus: _trapFocus,
+	onSave,
+	trapFocus = true,
+	scrollLock = false,
+	translations: translationsProp,
 	children,
 	className,
 	...divProps
@@ -91,25 +138,33 @@ function Root({
 	const raw = configProp ?? contextConfig ?? undefined;
 	const cookieConfig = useMemo(() => resolveCookieConfig(raw), [raw]);
 
+	const translations = useMemo(
+		() => ({ ...defaultTranslations, ...translationsProp }),
+		[translationsProp],
+	);
+
 	const { consent, update } = useCookieConsent(cookieConfig);
 	const [draft, setDraft] = useState<Partial<CookieConsent>>({});
+	const rootRef = useRef<HTMLDivElement | null>(null);
+	const lastActiveRef = useRef<HTMLElement | null>(null);
 
-	if (!cookieConfig) return null;
-	if (!open) return null;
-
-	const categories: CookieCategory[] = (
-		Object.keys(cookieConfig.cookies) as Array<
-			keyof typeof cookieConfig.cookies
-		>
-	)
-		.filter((key) => cookieConfig.cookies[key])
-		.map((key) => ({
-			key,
-			label: CATEGORY_LABELS[key] ?? key,
-			enabled:
-				key === "essential" ? true : (draft[key] ?? consent?.[key] ?? false),
-			locked: key === "essential",
-		}));
+	const categories: CookieCategory[] = cookieConfig
+		? (
+				Object.keys(cookieConfig.cookies) as Array<
+					keyof typeof cookieConfig.cookies
+				>
+			)
+				.filter((key) => cookieConfig.cookies[key])
+				.map((key) => ({
+					key,
+					label: CATEGORY_LABELS[String(key)] ?? String(key),
+					enabled:
+						key === "essential"
+							? true
+							: (draft[key] ?? consent?.[key] ?? false),
+					locked: key === "essential",
+				}))
+		: [];
 
 	const toggle = (key: string) => {
 		if (key === "essential") return;
@@ -124,24 +179,57 @@ function Root({
 	};
 
 	const save = () => {
-		const next = { ...consent, ...draft, essential: true } as CookieConsent;
+		const next = {
+			...(consent ?? {}),
+			...draft,
+			essential: true,
+		} as CookieConsent;
 		update(next);
 		setDraft({});
+		onSave?.(next);
 		onOpenChange?.(false);
 	};
 
 	const rejectAll = () => {
-		const next = { ...consent, essential: true } as CookieConsent;
-		// Set all non-essential to false
+		if (!cookieConfig) return;
+		const next: CookieConsent = { essential: true };
 		for (const key of Object.keys(cookieConfig.cookies)) {
 			if (key !== "essential") {
-				(next as Record<string, boolean>)[key] = false;
+				next[key] = false;
 			}
 		}
 		update(next);
 		setDraft({});
 		onOpenChange?.(false);
 	};
+
+	// Scroll lock
+	useEffect(() => {
+		if (!open || !scrollLock) return;
+		const { body } = document;
+		const previous = body.style.overflow;
+		body.style.overflow = "hidden";
+		return () => {
+			body.style.overflow = previous;
+		};
+	}, [open, scrollLock]);
+
+	// Focus trap
+	useEffect(() => {
+		const node = rootRef.current;
+		if (!node || !open || !trapFocus) return;
+		lastActiveRef.current = document.activeElement as HTMLElement | null;
+		node.tabIndex = node.tabIndex === -1 ? -1 : node.tabIndex || -1;
+		node.focus();
+		const cleanup = trapFocusIn(node);
+		return () => {
+			cleanup?.();
+			lastActiveRef.current?.focus?.();
+		};
+	}, [open, trapFocus]);
+
+	const dataState = open ? "open" : "closed";
+	if (!cookieConfig) return null;
 
 	return (
 		<CookiePreferencePanelContext.Provider
@@ -152,13 +240,20 @@ function Root({
 				toggle,
 				save,
 				rejectAll,
+				translations,
 			}}
 		>
 			<div
 				{...divProps}
+				ref={rootRef}
 				data-op-cookie-preferences-root
-				data-state={open ? "open" : "closed"}
+				data-state={dataState}
 				className={className}
+				style={
+					open ? undefined : { visibility: "hidden", pointerEvents: "none" }
+				}
+				role="dialog"
+				aria-label={translations.title}
 			>
 				{children}
 			</div>
@@ -166,7 +261,7 @@ function Root({
 	);
 }
 
-// ─── Overlay ──────────────────────────────────────────────────────────────────
+// ─── Overlay ─────────────────────────────────────────────────────────────────-
 
 interface OverlayProps {
 	asChild?: boolean;
@@ -219,7 +314,7 @@ function Header({ asChild, className, children }: HeaderProps) {
 	);
 }
 
-// ─── Title ────────────────────────────────────────────────────────────────────
+// ─── Title ─────────────────────────────────────────────────────────────────---
 
 interface TitleProps {
 	asChild?: boolean;
@@ -238,14 +333,16 @@ function Title({ asChild, className, children }: TitleProps) {
 	);
 }
 
-// ─── CategoryList ─────────────────────────────────────────────────────────────
+// ─── CategoryList ─────────────────────────────────────────────────────────----
 
 interface CategoryListProps {
 	className?: string;
+	asChild?: boolean;
 	children?: ReactNode;
 }
 
-function CategoryList({ className, children }: CategoryListProps) {
+function CategoryList({ className, asChild, children }: CategoryListProps) {
+	if (asChild) return <Slot className={className}>{children}</Slot>;
 	return (
 		<div data-op-cookie-preferences-category-list className={className}>
 			{children}
@@ -262,31 +359,31 @@ interface CategoryRenderProps {
 
 interface CategoryProps {
 	name: string;
+	asChild?: boolean;
+	className?: string;
 	children?: (props: CategoryRenderProps) => ReactNode;
 }
 
-function Category({ name, children }: CategoryProps) {
+function Category({ name, asChild, className, children }: CategoryProps) {
 	const { categories, toggle } = useCookiePreferencePanelContext();
 	const cat = categories.find((c) => c.key === name);
 	if (!cat) return null;
 
-	const onCheckedChange = (checked: boolean) => {
+	const onCheckedChange = (_checked: boolean) => {
 		if (!cat.locked) toggle(name);
 	};
 
 	if (children) {
-		return (
-			<>
-				{children({
-					checked: cat.enabled,
-					onCheckedChange,
-				})}
-			</>
-		);
+		const rendered = children({
+			checked: cat.enabled,
+			onCheckedChange,
+		});
+		if (asChild) return <Slot className={className}>{rendered}</Slot>;
+		return rendered;
 	}
 
-	return (
-		<fieldset data-op-cookie-category>
+	const fieldset = (
+		<fieldset data-op-cookie-category className={className}>
 			<legend>{cat.label}</legend>
 			<input
 				type="checkbox"
@@ -296,9 +393,10 @@ function Category({ name, children }: CategoryProps) {
 			/>
 		</fieldset>
 	);
+	return asChild ? <Slot className={className}>{fieldset}</Slot> : fieldset;
 }
 
-// ─── Footer ───────────────────────────────────────────────────────────────────
+// ─── Footer ─────────────────────────────────────────────────────────────────--
 
 interface FooterProps {
 	asChild?: boolean;
@@ -317,7 +415,7 @@ function Footer({ asChild, className, children }: FooterProps) {
 	);
 }
 
-// ─── RejectAllButton ──────────────────────────────────────────────────────────
+// ─── RejectAllButton ─────────────────────────────────────────────────---------
 
 interface RejectAllButtonProps {
 	asChild?: boolean;
@@ -330,7 +428,7 @@ function RejectAllButton({
 	className,
 	children,
 }: RejectAllButtonProps) {
-	const { rejectAll } = useCookiePreferencePanelContext();
+	const { rejectAll, translations } = useCookiePreferencePanelContext();
 	if (asChild) {
 		return (
 			<Slot className={className} onClick={rejectAll}>
@@ -345,12 +443,12 @@ function RejectAllButton({
 			className={className}
 			onClick={rejectAll}
 		>
-			{children ?? "Reject all"}
+			{children ?? translations.rejectAll}
 		</button>
 	);
 }
 
-// ─── SaveButton ───────────────────────────────────────────────────────────────
+// ─── SaveButton ─────────────────────────────────────────────────────────------
 
 interface SaveButtonProps {
 	asChild?: boolean;
@@ -359,7 +457,7 @@ interface SaveButtonProps {
 }
 
 function SaveButton({ asChild, className, children }: SaveButtonProps) {
-	const { save } = useCookiePreferencePanelContext();
+	const { save, translations } = useCookiePreferencePanelContext();
 	if (asChild) {
 		return (
 			<Slot className={className} onClick={save}>
@@ -374,39 +472,47 @@ function SaveButton({ asChild, className, children }: SaveButtonProps) {
 			className={className}
 			onClick={save}
 		>
-			{children ?? "Save preferences"}
+			{children ?? translations.save}
 		</button>
 	);
 }
 
-// ─── Default panel ────────────────────────────────────────────────────────────
+// ─── Default panel ─────────────────────────────────────────────────────────---
 
 interface CookiePreferencePanelProps {
 	config?: OpenPolicyConfig | CookiePolicyConfig;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	onSave?: (consent: CookieConsent) => void;
+	translations?: Partial<CookiePreferencesTranslations>;
 }
 
 function DefaultCookiePreferencePanel({
 	config,
 	open,
 	onOpenChange,
+	onSave,
+	translations,
 }: CookiePreferencePanelProps) {
+	const cookieConfig = useMemo(() => resolveCookieConfig(config), [config]);
+	const categoryKeys = cookieConfig ? Object.keys(cookieConfig.cookies) : [];
+
 	return (
 		<Root
 			config={config}
 			open={open}
 			onOpenChange={onOpenChange}
+			onSave={onSave}
+			translations={translations}
 			role="dialog"
 			aria-label="Cookie preferences"
 		>
 			<Card>
 				<Header>
-					<Title>Cookie preferences</Title>
+					<Title>{translations?.title ?? defaultTranslations.title}</Title>
 				</Header>
 				<CategoryList>
-					{["essential", "analytics", "functional", "marketing"].map((key) => (
+					{categoryKeys.map((key) => (
 						<Category key={key} name={key} />
 					))}
 				</CategoryList>
@@ -419,7 +525,7 @@ function DefaultCookiePreferencePanel({
 	);
 }
 
-// ─── Export ───────────────────────────────────────────────────────────────────
+// ─── Export ─────────────────────────────────────────────────────────────────--
 
 export const CookiePreferencePanel = Object.assign(
 	DefaultCookiePreferencePanel,

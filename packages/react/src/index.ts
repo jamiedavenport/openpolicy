@@ -1,5 +1,8 @@
 // Components
+
+export { ConsentGate } from "./components/ConsentGate";
 export { CookieBanner } from "./components/CookieBanner";
+
 export { CookiePolicy } from "./components/CookiePolicy";
 export type { CookieCategory } from "./components/CookiePreferencePanel";
 export { CookiePreferencePanel } from "./components/CookiePreferencePanel";
@@ -16,8 +19,9 @@ export {
 } from "./components/defaults";
 export { PrivacyPolicy } from "./components/PrivacyPolicy";
 export { TermsOfService } from "./components/TermsOfService";
-// Context / Provider
 export { OpenPolicyProvider as OpenPolicy } from "./context";
+// Context / Provider
+export type { HasExpression } from "./hooks/useCookieConsent";
 // Hooks
 export { useCookieConsent } from "./hooks/useCookieConsent";
 export { useShouldShowCookieBanner } from "./hooks/useShouldShowCookieBanner";
