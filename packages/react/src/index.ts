@@ -19,8 +19,9 @@ export {
 } from "./components/defaults";
 export { PrivacyPolicy } from "./components/PrivacyPolicy";
 export { TermsOfService } from "./components/TermsOfService";
-export { OpenPolicyProvider as OpenPolicy } from "./context";
 // Context / Provider
+export type { CookieRoute } from "./context";
+export { OpenPolicyProvider as OpenPolicy, useCookieRoute } from "./context";
 export type { HasExpression } from "./hooks/useCookieConsent";
 // Hooks
 export { useCookieConsent } from "./hooks/useCookieConsent";

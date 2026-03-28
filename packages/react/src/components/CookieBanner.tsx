@@ -1,118 +1,7 @@
-import {
-	type CookieConsent,
-	type CookieConsentStatus,
-	type CookiePolicyConfig,
-	isOpenPolicyConfig,
-	type OpenPolicyConfig,
-} from "@openpolicy/core";
-import {
-	createContext,
-	type HTMLAttributes,
-	type ReactNode,
-	useContext,
-	useMemo,
-} from "react";
-import { OpenPolicyContext } from "../context";
-import { useCookieConsent } from "../hooks/useCookieConsent";
-import { useShouldShowCookieBanner } from "../hooks/useShouldShowCookieBanner";
+import type { CookiePolicyConfig, OpenPolicyConfig } from "@openpolicy/core";
+import { type ReactNode, useContext } from "react";
+import { OpenPolicyContext, OpenPolicyProvider } from "../context";
 import { Slot } from "./Slot";
-
-// ─── Config resolution ───────────────────────────────────────────────────────
-
-function resolveCookieConfig(
-	raw: OpenPolicyConfig | CookiePolicyConfig | null | undefined,
-): CookiePolicyConfig | undefined {
-	if (!raw) return undefined;
-	if (isOpenPolicyConfig(raw) && raw.cookie)
-		return { ...raw.cookie, company: raw.company } as CookiePolicyConfig;
-	if (!isOpenPolicyConfig(raw)) return raw as CookiePolicyConfig;
-	return undefined;
-}
-
-// ─── Internal context ─────────────────────────────────────────────────────────
-
-type CookieBannerContextValue = {
-	open: boolean;
-	status: CookieConsentStatus;
-	accept: () => void;
-	reject: () => void;
-	update: (partial: Partial<CookieConsent>) => void;
-	reset: () => void;
-	config: CookiePolicyConfig;
-};
-
-const CookieBannerContext = createContext<CookieBannerContextValue | null>(
-	null,
-);
-
-function useCookieBannerContext(): CookieBannerContextValue {
-	const ctx = useContext(CookieBannerContext);
-	if (!ctx)
-		throw new Error(
-			"CookieBanner sub-components must be used inside CookieBanner.Root",
-		);
-	return ctx;
-}
-
-// ─── Root ─────────────────────────────────────────────────────────────────────
-
-type RootProps = HTMLAttributes<HTMLDivElement> & {
-	config?: OpenPolicyConfig | CookiePolicyConfig;
-	shouldShow?: () => Promise<boolean>;
-	children?: ReactNode;
-	className?: string;
-};
-
-function Root({
-	config: configProp,
-	shouldShow,
-	children,
-	className,
-	...divProps
-}: RootProps) {
-	const { config: contextConfig } = useContext(OpenPolicyContext);
-	const raw = configProp ?? contextConfig ?? undefined;
-	const cookieConfig = useMemo(() => resolveCookieConfig(raw), [raw]);
-
-	const { status, accept, reject, update, reset } =
-		useCookieConsent(cookieConfig);
-
-	const visible = useShouldShowCookieBanner(status, shouldShow);
-
-	const dataState = visible ? "open" : "closed";
-
-	if (!cookieConfig) return null;
-
-	return (
-		<CookieBannerContext.Provider
-			value={{
-				open: visible,
-				status,
-				accept,
-				reject,
-				update,
-				reset,
-				config: cookieConfig,
-			}}
-		>
-			<div
-				{...divProps}
-				data-op-cookie-banner-root
-				data-state={dataState}
-				data-status={status}
-				className={className}
-				aria-hidden={visible ? undefined : true}
-				style={
-					visible ? undefined : { visibility: "hidden", pointerEvents: "none" }
-				}
-				role="dialog"
-				aria-label="Cookie consent"
-			>
-				{children}
-			</div>
-		</CookieBannerContext.Provider>
-	);
-}
 
 // ─── Overlay ──────────────────────────────────────────────────────────────────
 
@@ -123,7 +12,8 @@ type OverlayProps = {
 };
 
 function Overlay({ asChild, className, children }: OverlayProps) {
-	const { open } = useCookieBannerContext();
+	const { route } = useContext(OpenPolicyContext);
+	const open = route === "cookie";
 	const dataProps = open ? { "data-open": "" } : { "data-closed": "" };
 	if (asChild) {
 		return (
@@ -146,17 +36,24 @@ type CardProps = {
 };
 
 function Card({ asChild, className, children }: CardProps) {
-	const { open } = useCookieBannerContext();
+	const { route } = useContext(OpenPolicyContext);
+	const open = route === "cookie";
+	const dataState = open ? "open" : "closed";
 	const dataProps = open ? { "data-open": "" } : { "data-closed": "" };
 	if (asChild) {
 		return (
-			<Slot className={className} {...dataProps}>
+			<Slot className={className} data-state={dataState} {...dataProps}>
 				{children}
 			</Slot>
 		);
 	}
 	return (
-		<div data-op-cookie-banner-card className={className} {...dataProps}>
+		<div
+			data-op-cookie-banner-card
+			className={className}
+			data-state={dataState}
+			{...dataProps}
+		>
 			{children}
 		</div>
 	);
@@ -247,7 +144,7 @@ type AcceptButtonProps = {
 };
 
 function AcceptButton({ asChild, className, children }: AcceptButtonProps) {
-	const { accept } = useCookieBannerContext();
+	const { accept } = useContext(OpenPolicyContext);
 	if (asChild) {
 		return (
 			<Slot className={className} onClick={accept}>
@@ -276,7 +173,7 @@ type RejectButtonProps = {
 };
 
 function RejectButton({ asChild, className, children }: RejectButtonProps) {
-	const { reject } = useCookieBannerContext();
+	const { reject } = useContext(OpenPolicyContext);
 	if (asChild) {
 		return (
 			<Slot className={className} onClick={reject}>
@@ -311,9 +208,11 @@ function CustomizeButton({
 	children,
 	onClick,
 }: CustomizeButtonProps) {
+	const { setRoute } = useContext(OpenPolicyContext);
+	const handleClick = onClick ?? (() => setRoute("preferences"));
 	if (asChild) {
 		return (
-			<Slot className={className} onClick={onClick}>
+			<Slot className={className} onClick={handleClick}>
 				{children}
 			</Slot>
 		);
@@ -323,7 +222,7 @@ function CustomizeButton({
 			data-op-cookie-banner-customize
 			type="button"
 			className={className}
-			onClick={onClick}
+			onClick={handleClick}
 		>
 			{children ?? "Manage"}
 		</button>
@@ -351,29 +250,38 @@ function DefaultCookieBanner({
 		</a>
 	);
 
-	return (
-		<Root config={config} shouldShow={shouldShow}>
-			<Card>
-				<Header>
-					<Title>Cookie consent</Title>
-					<Description>
-						We use cookies to improve your experience. {link}
-					</Description>
-				</Header>
-				<Footer>
-					<RejectButton />
-					{onCustomize && <CustomizeButton onClick={onCustomize} />}
-					<AcceptButton />
-				</Footer>
-			</Card>
-		</Root>
+	const content = (
+		<Card>
+			<Header>
+				<Title>Cookie consent</Title>
+				<Description>
+					We use cookies to improve your experience. {link}
+				</Description>
+			</Header>
+			<Footer>
+				<RejectButton />
+				{onCustomize && <CustomizeButton onClick={onCustomize} />}
+				<AcceptButton />
+			</Footer>
+		</Card>
 	);
+
+	if (config && "company" in config) {
+		return (
+			<OpenPolicyProvider
+				config={config as OpenPolicyConfig}
+				shouldShow={shouldShow}
+			>
+				{content}
+			</OpenPolicyProvider>
+		);
+	}
+	return content;
 }
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export const CookieBanner = Object.assign(DefaultCookieBanner, {
-	Root,
 	Overlay,
 	Card,
 	Header,

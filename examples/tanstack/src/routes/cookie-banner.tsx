@@ -2,9 +2,9 @@ import {
 	CookieBanner,
 	CookiePreferencePanel,
 	useCookieConsent,
+	useCookieRoute,
 } from "@openpolicy/react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -20,7 +20,6 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Field, FieldGroup, FieldTitle } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
@@ -29,59 +28,51 @@ export const Route = createFileRoute("/cookie-banner")({
 	component: RouteComponent,
 });
 
-// Shared state controls both the banner's "Manage Cookies" button and the panel.
 function CookieBannerDemo() {
-	const [showPreferences, setShowPreferences] = useState(false);
+	const { route, setRoute } = useCookieRoute();
 
 	return (
 		<>
-			{!showPreferences && (
-				<CookieBanner.Root className="fixed bottom-4 right-4 z-50 w-lg">
-					<CookieBanner.Card asChild>
-						<Card className="relative z-50 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 outline-none">
-							<CookieBanner.Header asChild>
-								<CardHeader>
-									<CookieBanner.Title asChild>
-										<CardTitle>We value your privacy</CardTitle>
-									</CookieBanner.Title>
-									<CookieBanner.Description asChild>
-										<CardDescription>
-											We use cookies to improve your experience and analyse site
-											traffic.
-										</CardDescription>
-									</CookieBanner.Description>
-								</CardHeader>
-							</CookieBanner.Header>
+			<CookieBanner.Card asChild>
+				<Card className="fixed bottom-4 right-4 z-50 w-lg data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 outline-none">
+					<CookieBanner.Header asChild>
+						<CardHeader>
+							<CookieBanner.Title asChild>
+								<CardTitle>We value your privacy</CardTitle>
+							</CookieBanner.Title>
+							<CookieBanner.Description asChild>
+								<CardDescription>
+									We use cookies to improve your experience and analyse site
+									traffic.
+								</CardDescription>
+							</CookieBanner.Description>
+						</CardHeader>
+					</CookieBanner.Header>
 
-							<CookieBanner.Footer asChild>
-								<CardFooter className="gap-2">
-									<CookieBanner.CustomizeButton
-										asChild
-										onClick={() => setShowPreferences(true)}
-									>
-										<Button variant="outline" className="mr-auto">
-											Manage Cookies
-										</Button>
-									</CookieBanner.CustomizeButton>
-									<CookieBanner.RejectButton asChild>
-										<Button variant="outline">Necessary Only</Button>
-									</CookieBanner.RejectButton>
-									<CookieBanner.AcceptButton asChild>
-										<Button>Accept All</Button>
-									</CookieBanner.AcceptButton>
-								</CardFooter>
-							</CookieBanner.Footer>
-						</Card>
-					</CookieBanner.Card>
-				</CookieBanner.Root>
-			)}
+					<CookieBanner.Footer asChild>
+						<CardFooter className="gap-2">
+							<CookieBanner.CustomizeButton asChild>
+								<Button variant="outline" className="mr-auto">
+									Manage Cookies
+								</Button>
+							</CookieBanner.CustomizeButton>
+							<CookieBanner.RejectButton asChild>
+								<Button variant="outline">Necessary Only</Button>
+							</CookieBanner.RejectButton>
+							<CookieBanner.AcceptButton asChild>
+								<Button>Accept All</Button>
+							</CookieBanner.AcceptButton>
+						</CardFooter>
+					</CookieBanner.Footer>
+				</Card>
+			</CookieBanner.Card>
 
-			<Dialog open={showPreferences} onOpenChange={setShowPreferences}>
+			<Dialog
+				open={route === "preferences"}
+				onOpenChange={(open) => !open && setRoute("closed")}
+			>
 				<DialogContent>
-					<CookiePreferencePanel.Root
-						open={showPreferences}
-						onOpenChange={setShowPreferences}
-					>
+					<CookiePreferencePanel.Card>
 						<DialogHeader>
 							<DialogTitle>Cookie preferences</DialogTitle>
 							<DialogDescription>
@@ -89,6 +80,7 @@ function CookieBannerDemo() {
 								traffic.
 							</DialogDescription>
 						</DialogHeader>
+
 						<FieldGroup>
 							{["essential", "analytics", "functional", "marketing"].map(
 								(key) => (
@@ -107,6 +99,7 @@ function CookieBannerDemo() {
 								),
 							)}
 						</FieldGroup>
+
 						<DialogFooter>
 							<CookiePreferencePanel.RejectAllButton asChild>
 								<Button variant="outline">Reject all</Button>
@@ -115,7 +108,7 @@ function CookieBannerDemo() {
 								<Button>Save preferences</Button>
 							</CookiePreferencePanel.SaveButton>
 						</DialogFooter>
-					</CookiePreferencePanel.Root>
+					</CookiePreferencePanel.Card>
 				</DialogContent>
 			</Dialog>
 		</>

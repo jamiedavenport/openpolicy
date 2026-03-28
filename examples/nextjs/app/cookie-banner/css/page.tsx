@@ -4,20 +4,20 @@ import {
 	CookieBanner,
 	CookiePreferencePanel,
 	useCookieConsent,
+	useCookieRoute,
 } from "@openpolicy/react";
-import { useState } from "react";
 
 export default function CssCookieBannerPage() {
-	const [showPreferences, setShowPreferences] = useState(false);
+	const { route, setRoute } = useCookieRoute();
 	const { consent, status, reset } = useCookieConsent();
 
 	return (
 		<main>
 			<style>{`
-        [data-op-cookie-banner-root][data-state="closed"] {
+        [data-op-cookie-banner-card][data-state="closed"] {
           display: none;
         }
-        [data-op-cookie-banner-root][data-state="open"] {
+        [data-op-cookie-banner-card][data-state="open"] {
           position: fixed;
           bottom: 0;
           left: 0;
@@ -75,10 +75,10 @@ export default function CssCookieBannerPage() {
         [data-op-cookie-banner-customize]:hover { background: #f9fafb; }
 
         /* Preference panel */
-        [data-op-cookie-preferences-root][data-state="closed"] {
+        [data-op-cookie-preferences-card][data-state="closed"] {
           display: none;
         }
-        [data-op-cookie-preferences-root][data-state="open"] {
+        [data-op-cookie-preferences-card][data-state="open"] {
           position: fixed;
           inset: 0;
           z-index: 50;
@@ -168,79 +168,66 @@ export default function CssCookieBannerPage() {
 			</div>
 
 			{/* Banner — styled entirely via the <style> block above */}
-			<CookieBanner.Root scrollLock trapFocus>
-				<CookieBanner.Card>
-					<CookieBanner.Header>
-						<CookieBanner.Title>Cookie preferences</CookieBanner.Title>
-						<CookieBanner.Description>
-							We use cookies to improve your experience. See our{" "}
-							<a href="/cookie-policy">cookie policy</a>.
-						</CookieBanner.Description>
-					</CookieBanner.Header>
-					<CookieBanner.Footer>
-						<CookieBanner.RejectButton />
-						<CookieBanner.CustomizeButton
-							onClick={() => setShowPreferences(true)}
-						/>
-						<CookieBanner.AcceptButton />
-					</CookieBanner.Footer>
-				</CookieBanner.Card>
-			</CookieBanner.Root>
+			<CookieBanner.Card>
+				<CookieBanner.Header>
+					<CookieBanner.Title>Cookie preferences</CookieBanner.Title>
+					<CookieBanner.Description>
+						We use cookies to improve your experience. See our{" "}
+						<a href="/cookie-policy">cookie policy</a>.
+					</CookieBanner.Description>
+				</CookieBanner.Header>
+				<CookieBanner.Footer>
+					<CookieBanner.RejectButton />
+					<CookieBanner.CustomizeButton />
+					<CookieBanner.AcceptButton />
+				</CookieBanner.Footer>
+			</CookieBanner.Card>
 
 			{/* Preference panel */}
-			<CookiePreferencePanel.Root
-				open={showPreferences}
-				onOpenChange={setShowPreferences}
-				scrollLock
-				trapFocus
-			>
-				<CookiePreferencePanel.Overlay />
-				<CookiePreferencePanel.Card>
-					<CookiePreferencePanel.Header>
-						<CookiePreferencePanel.Title>
-							Manage cookie preferences
-						</CookiePreferencePanel.Title>
-					</CookiePreferencePanel.Header>
-					<CookiePreferencePanel.CategoryList>
-						{["essential", "analytics", "functional", "marketing"].map(
-							(key) => (
-								<CookiePreferencePanel.Category key={key} name={key}>
-									{({ checked, onCheckedChange }) => (
-										<label
-											style={{
-												display: "flex",
-												alignItems: "center",
-												justifyContent: "space-between",
-												padding: "0.5rem 0",
-												borderBottom: "1px solid #f3f4f6",
-											}}
-										>
-											<span
-												style={{
-													fontSize: "0.875rem",
-													textTransform: "capitalize",
-												}}
-											>
-												{key}
-											</span>
-											<input
-												type="checkbox"
-												checked={checked}
-												disabled={key === "essential"}
-												onChange={(e) => onCheckedChange(e.target.checked)}
-											/>
-										</label>
-									)}
-								</CookiePreferencePanel.Category>
-							),
-						)}
-					</CookiePreferencePanel.CategoryList>
-					<CookiePreferencePanel.Footer>
-						<CookiePreferencePanel.RejectAllButton />
-						<CookiePreferencePanel.SaveButton />
-					</CookiePreferencePanel.Footer>
-				</CookiePreferencePanel.Card>
-			</CookiePreferencePanel.Root>
+			<CookiePreferencePanel.Card>
+				<CookiePreferencePanel.Overlay onClick={() => setRoute("closed")} />
+				<CookiePreferencePanel.Header>
+					<CookiePreferencePanel.Title>
+						Manage cookie preferences
+					</CookiePreferencePanel.Title>
+				</CookiePreferencePanel.Header>
+				<CookiePreferencePanel.CategoryList>
+					{["essential", "analytics", "functional", "marketing"].map((key) => (
+						<CookiePreferencePanel.Category key={key} name={key}>
+							{({ checked, onCheckedChange }) => (
+								<label
+									style={{
+										display: "flex",
+										alignItems: "center",
+										justifyContent: "space-between",
+										padding: "0.5rem 0",
+										borderBottom: "1px solid #f3f4f6",
+									}}
+								>
+									<span
+										style={{
+											fontSize: "0.875rem",
+											textTransform: "capitalize",
+										}}
+									>
+										{key}
+									</span>
+									<input
+										type="checkbox"
+										checked={checked}
+										disabled={key === "essential"}
+										onChange={(e) => onCheckedChange(e.target.checked)}
+									/>
+								</label>
+							)}
+						</CookiePreferencePanel.Category>
+					))}
+				</CookiePreferencePanel.CategoryList>
+				<CookiePreferencePanel.Footer>
+					<CookiePreferencePanel.RejectAllButton />
+					<CookiePreferencePanel.SaveButton />
+				</CookiePreferencePanel.Footer>
+			</CookiePreferencePanel.Card>
 		</main>
 	);
 }

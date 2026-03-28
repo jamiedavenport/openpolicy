@@ -3,6 +3,8 @@ import type { CookieConsent, CookiePolicyConfig } from "@openpolicy/core";
 import { clearConsent } from "@openpolicy/core";
 import { act, createElement, isValidElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
+import { OpenPolicyProvider } from "../context";
+import { CookieBanner } from "./CookieBanner";
 import { CookiePreferencePanel } from "./CookiePreferencePanel";
 
 const cookieConfig: CookiePolicyConfig = {
@@ -22,20 +24,22 @@ const cookieConfig: CookiePolicyConfig = {
 	jurisdictions: ["us"],
 };
 
+const openPolicyConfig = {
+	company: cookieConfig.company,
+	cookie: {
+		effectiveDate: cookieConfig.effectiveDate,
+		cookies: cookieConfig.cookies,
+		jurisdictions: cookieConfig.jurisdictions,
+	},
+} as Parameters<typeof OpenPolicyProvider>[0]["config"];
+
 test("CookiePreferencePanel returns a valid React element", () => {
-	const el = createElement(CookiePreferencePanel, { config: cookieConfig });
+	const el = createElement(CookiePreferencePanel, { config: openPolicyConfig });
 	expect(isValidElement(el)).toBe(true);
 });
 
 test("CookiePreferencePanel returns null when no config provided and no context", () => {
 	const el = createElement(CookiePreferencePanel, {});
-	expect(isValidElement(el)).toBe(true);
-});
-
-test("CookiePreferencePanel.Root creates a valid element", () => {
-	const el = createElement(CookiePreferencePanel.Root, {
-		config: cookieConfig,
-	});
 	expect(isValidElement(el)).toBe(true);
 });
 
@@ -63,39 +67,55 @@ afterEach(() => {
 	document.body.innerHTML = "";
 });
 
-async function mountPanel(
-	open = true,
-	props: Record<string, unknown> = {},
-	children?: ReactNode,
-) {
+// Mounts with OpenPolicyProvider + a CustomizeButton to navigate to preferences route.
+// Pass navigateToPreferences=true to click CustomizeButton before returning.
+async function mountPanel(navigateToPreferences = true, children?: ReactNode) {
 	const container = document.createElement("div");
 	document.body.appendChild(container);
 	const root = createRoot(container);
 	await act(async () => {
 		root.render(
 			createElement(
-				CookiePreferencePanel.Root,
-				{ config: cookieConfig, open, ...props },
-				children,
+				OpenPolicyProvider,
+				{ config: openPolicyConfig },
+				createElement(
+					"div",
+					null,
+					// CustomizeButton to set route='preferences'
+					createElement(CookieBanner.CustomizeButton, {
+						"data-test-customize": "",
+					} as Record<string, unknown>),
+					// Panel card + children
+					createElement(CookiePreferencePanel.Card, null, children),
+				),
 			),
 		);
 	});
+
+	if (navigateToPreferences) {
+		const btn = container.querySelector(
+			"[data-op-cookie-banner-customize]",
+		) as HTMLButtonElement;
+		await act(async () => btn.click());
+	}
+
 	return {
 		container,
 		cleanup: () => act(async () => root.unmount()),
 	};
 }
 
-test("CookiePreferencePanel.Root with open=true has data-state=open", async () => {
+test("CookiePreferencePanel.Card with route=preferences has data-state=open", async () => {
 	const { container, cleanup } = await mountPanel(true);
-	const el = container.querySelector("[data-op-cookie-preferences-root]");
+	const el = container.querySelector("[data-op-cookie-preferences-card]");
 	expect(el?.getAttribute("data-state")).toBe("open");
 	await cleanup();
 });
 
-test("CookiePreferencePanel.Root with open=false has data-state=closed", async () => {
+test("CookiePreferencePanel.Card with route=cookie has data-state=closed", async () => {
+	// Don't navigate to preferences — stays on cookie route
 	const { container, cleanup } = await mountPanel(false);
-	const el = container.querySelector("[data-op-cookie-preferences-root]");
+	const el = container.querySelector("[data-op-cookie-preferences-card]");
 	expect(el?.getAttribute("data-state")).toBe("closed");
 	await cleanup();
 });
@@ -104,12 +124,11 @@ test("SaveButton click calls onSave with consent object", async () => {
 	let savedConsent: CookieConsent | undefined;
 	const { container, cleanup } = await mountPanel(
 		true,
-		{
+		createElement(CookiePreferencePanel.SaveButton, {
 			onSave: (c: CookieConsent) => {
 				savedConsent = c;
 			},
-		},
-		createElement(CookiePreferencePanel.SaveButton, null),
+		}),
 	);
 	const btn = container.querySelector(
 		"[data-op-cookie-preferences-save]",
@@ -120,22 +139,17 @@ test("SaveButton click calls onSave with consent object", async () => {
 	await cleanup();
 });
 
-test("RejectAllButton click calls onOpenChange(false)", async () => {
-	let openValue: boolean | undefined;
+test("RejectAllButton click closes panel (data-state=closed)", async () => {
 	const { container, cleanup } = await mountPanel(
 		true,
-		{
-			onOpenChange: (v: boolean) => {
-				openValue = v;
-			},
-		},
 		createElement(CookiePreferencePanel.RejectAllButton, null),
 	);
 	const btn = container.querySelector(
 		"[data-op-cookie-preferences-reject-all]",
 	) as HTMLButtonElement;
 	await act(async () => btn.click());
-	expect(openValue).toBe(false);
+	const el = container.querySelector("[data-op-cookie-preferences-card]");
+	expect(el?.getAttribute("data-state")).toBe("closed");
 	await cleanup();
 });
 
@@ -144,7 +158,6 @@ test("Category render prop provides checked and onCheckedChange", async () => {
 	let capturedOnChange: ((v: boolean) => void) | undefined;
 	await mountPanel(
 		true,
-		{},
 		createElement(CookiePreferencePanel.Category, {
 			name: "analytics",
 			// biome-ignore lint/correctness/noChildrenProp: Category.children is a render-prop function, not JSX children
@@ -165,7 +178,6 @@ test("Category render prop provides checked and onCheckedChange", async () => {
 test("SaveButton with asChild renders child element not a button", async () => {
 	const { container, cleanup } = await mountPanel(
 		true,
-		{},
 		createElement(
 			CookiePreferencePanel.SaveButton,
 			{ asChild: true },

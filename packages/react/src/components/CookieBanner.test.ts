@@ -3,6 +3,7 @@ import type { CookiePolicyConfig } from "@openpolicy/core";
 import { clearConsent } from "@openpolicy/core";
 import { act, createElement, isValidElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
+import { OpenPolicyProvider } from "../context";
 import { CookieBanner } from "./CookieBanner";
 
 const cookieConfig: CookiePolicyConfig = {
@@ -22,18 +23,23 @@ const cookieConfig: CookiePolicyConfig = {
 	jurisdictions: ["us"],
 };
 
+// OpenPolicyConfig shape for the provider (wraps the cookie config)
+const openPolicyConfig = {
+	company: cookieConfig.company,
+	cookie: {
+		effectiveDate: cookieConfig.effectiveDate,
+		cookies: cookieConfig.cookies,
+		jurisdictions: cookieConfig.jurisdictions,
+	},
+} as Parameters<typeof OpenPolicyProvider>[0]["config"];
+
 test("CookieBanner returns a valid React element with default render", () => {
-	const el = createElement(CookieBanner, { config: cookieConfig });
+	const el = createElement(CookieBanner, { config: openPolicyConfig });
 	expect(isValidElement(el)).toBe(true);
 });
 
 test("CookieBanner returns null when no config provided and no context", () => {
 	const el = createElement(CookieBanner, {});
-	expect(isValidElement(el)).toBe(true);
-});
-
-test("CookieBanner.Root creates a valid element", () => {
-	const el = createElement(CookieBanner.Root, { config: cookieConfig });
 	expect(isValidElement(el)).toBe(true);
 });
 
@@ -70,7 +76,11 @@ async function mountBanner(children?: ReactNode) {
 	const root = createRoot(container);
 	await act(async () => {
 		root.render(
-			createElement(CookieBanner.Root, { config: cookieConfig }, children),
+			createElement(
+				OpenPolicyProvider,
+				{ config: openPolicyConfig },
+				createElement(CookieBanner.Card, null, children),
+			),
 		);
 	});
 	return {
@@ -79,9 +89,9 @@ async function mountBanner(children?: ReactNode) {
 	};
 }
 
-test("CookieBanner.Root has data-state=open when status is undecided", async () => {
+test("CookieBanner.Card has data-state=open when status is undecided", async () => {
 	const { container, cleanup } = await mountBanner();
-	const el = container.querySelector("[data-op-cookie-banner-root]");
+	const el = container.querySelector("[data-op-cookie-banner-card]");
 	expect(el?.getAttribute("data-state")).toBe("open");
 	await cleanup();
 });
@@ -94,7 +104,7 @@ test("AcceptButton click sets data-state to closed", async () => {
 		"[data-op-cookie-banner-accept]",
 	) as HTMLButtonElement;
 	await act(async () => btn.click());
-	const el = container.querySelector("[data-op-cookie-banner-root]");
+	const el = container.querySelector("[data-op-cookie-banner-card]");
 	expect(el?.getAttribute("data-state")).toBe("closed");
 	await cleanup();
 });
@@ -107,7 +117,7 @@ test("RejectButton click sets data-state to closed", async () => {
 		"[data-op-cookie-banner-reject]",
 	) as HTMLButtonElement;
 	await act(async () => btn.click());
-	const el = container.querySelector("[data-op-cookie-banner-root]");
+	const el = container.querySelector("[data-op-cookie-banner-card]");
 	expect(el?.getAttribute("data-state")).toBe("closed");
 	await cleanup();
 });
