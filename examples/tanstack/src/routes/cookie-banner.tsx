@@ -18,54 +18,53 @@ export const Route = createFileRoute("/cookie-banner")({
 	component: RouteComponent,
 });
 
-function CustomCookieBanner() {
-	return (
-		<CookieBanner.Root className="fixed bottom-4 right-4 z-50 w-lg">
-			<CookieBanner.Overlay className="bg-black/50 fixed inset-0 z-40" />
-
-			<CookieBanner.Card asChild>
-				<Card className="relative z-50 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 outline-none">
-					<CookieBanner.Header asChild>
-						<CardHeader>
-							<CookieBanner.Title asChild>
-								<CardTitle>We value your privacy</CardTitle>
-							</CookieBanner.Title>
-							<CookieBanner.Description asChild>
-								<CardDescription>
-									We use cookies to improve your experience and analyse site
-									traffic.
-								</CardDescription>
-							</CookieBanner.Description>
-						</CardHeader>
-					</CookieBanner.Header>
-
-					<CookieBanner.Footer asChild>
-						<CardFooter className="gap-2">
-							<CookieBanner.CustomizeButton asChild>
-								<Button variant="outline" className="mr-auto">
-									Manage Cookies
-								</Button>
-							</CookieBanner.CustomizeButton>
-							<CookieBanner.RejectButton asChild>
-								<Button variant="outline">Necessary Only</Button>
-							</CookieBanner.RejectButton>
-							<CookieBanner.AcceptButton asChild>
-								<Button>Accept All</Button>
-							</CookieBanner.AcceptButton>
-						</CardFooter>
-					</CookieBanner.Footer>
-				</Card>
-			</CookieBanner.Card>
-		</CookieBanner.Root>
-	);
-}
-
-function CustomPreferencePanel() {
+// Shared state controls both the banner's "Manage Cookies" button and the panel.
+function CookieBannerDemo() {
 	const [showPreferences, setShowPreferences] = useState(false);
 
 	return (
-		<div>
-			<Button onClick={() => setShowPreferences(true)}>Manage Cookies</Button>
+		<>
+			<CookieBanner.Root className="fixed bottom-4 right-4 z-50 w-lg">
+				<CookieBanner.Overlay className="bg-black/50 fixed inset-0 z-40" />
+
+				<CookieBanner.Card asChild>
+					<Card className="relative z-50 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 outline-none">
+						<CookieBanner.Header asChild>
+							<CardHeader>
+								<CookieBanner.Title asChild>
+									<CardTitle>We value your privacy</CardTitle>
+								</CookieBanner.Title>
+								<CookieBanner.Description asChild>
+									<CardDescription>
+										We use cookies to improve your experience and analyse site
+										traffic.
+									</CardDescription>
+								</CookieBanner.Description>
+							</CardHeader>
+						</CookieBanner.Header>
+
+						<CookieBanner.Footer asChild>
+							<CardFooter className="gap-2">
+								<CookieBanner.CustomizeButton
+									asChild
+									onClick={() => setShowPreferences(true)}
+								>
+									<Button variant="outline" className="mr-auto">
+										Manage Cookies
+									</Button>
+								</CookieBanner.CustomizeButton>
+								<CookieBanner.RejectButton asChild>
+									<Button variant="outline">Necessary Only</Button>
+								</CookieBanner.RejectButton>
+								<CookieBanner.AcceptButton asChild>
+									<Button>Accept All</Button>
+								</CookieBanner.AcceptButton>
+							</CardFooter>
+						</CookieBanner.Footer>
+					</Card>
+				</CookieBanner.Card>
+			</CookieBanner.Root>
+
 			<CookiePreferencePanel.Root
 				open={showPreferences}
 				onOpenChange={setShowPreferences}
@@ -110,22 +109,44 @@ function CustomPreferencePanel() {
 					</CookiePreferencePanel.Footer>
 				</CookiePreferencePanel.Card>
 			</CookiePreferencePanel.Root>
-		</div>
+		</>
 	);
 }
 
 function RouteComponent() {
-	const { reset } = useCookieConsent();
+	const { status, reset } = useCookieConsent();
 
 	return (
-		<div>
-			<p>Page Content!</p>
-			<button type="button" onClick={reset}>
-				Reset
-			</button>
+		<div className="p-8 max-w-xl mx-auto">
+			<h1 className="text-2xl font-bold mb-2">Cookie Banner</h1>
+			<p className="text-muted-foreground mb-6">
+				Demonstrates the composable cookie consent UI built with shadcn/ui.
+				Click <strong>Manage Cookies</strong> inside the banner to open the
+				preference panel.
+			</p>
 
-			<CustomCookieBanner />
-			<CustomPreferencePanel />
+			<Card className="mb-4">
+				<CardHeader>
+					<CardTitle>Current consent status</CardTitle>
+					<CardDescription>
+						Stored in the <code>op_consent</code> cookie.
+					</CardDescription>
+				</CardHeader>
+				<CardFooter>
+					<code
+						className="bg-muted px-2 py-1 rounded text-sm"
+						data-testid="consent-status"
+					>
+						{status}
+					</code>
+				</CardFooter>
+			</Card>
+
+			<Button variant="outline" onClick={reset} data-testid="reset-consent">
+				Reset consent (show banner again)
+			</Button>
+
+			<CookieBannerDemo />
 		</div>
 	);
 }
