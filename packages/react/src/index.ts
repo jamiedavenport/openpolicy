@@ -17,11 +17,9 @@ export {
 export { PrivacyPolicy } from "./components/PrivacyPolicy";
 export { TermsOfService } from "./components/TermsOfService";
 // Context / Provider
-export type { CookieCategory, CookieRoute } from "./context";
-export { OpenPolicyProvider as OpenPolicy } from "./context";
-export type { HasExpression } from "./hooks/useCookieConsent";
+export type { CookieCategory, CookieRoute, HasExpression } from "./context";
 // Hooks
-export { useCookieConsent } from "./hooks/useCookieConsent";
+export { OpenPolicyProvider as OpenPolicy, useCookieConsent } from "./context";
 export { useCookies } from "./hooks/useCookies";
 export { useShouldShowCookieBanner } from "./hooks/useShouldShowCookieBanner";
 // Render

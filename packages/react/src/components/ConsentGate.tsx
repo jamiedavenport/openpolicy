@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import type { HasExpression } from "../hooks/useCookieConsent";
-import { useCookieConsent } from "../hooks/useCookieConsent";
+import type { HasExpression } from "../context";
+import { useCookieConsent } from "../context";
 
 interface ConsentGateProps {
 	requires: HasExpression;

@@ -6,7 +6,7 @@ import {
 	getSnapshotCached,
 	rejectAllForConfig,
 	updateConsent,
-} from "./useCookieConsent";
+} from "../context";
 
 const cookieConfig: CookiePolicyConfig = {
 	effectiveDate: "2026-01-01",

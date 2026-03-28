@@ -1,24 +1,23 @@
 import { useContext } from "react";
 import type { CookieCategory, CookieRoute } from "../context";
 import { OpenPolicyContext } from "../context";
-import { type HasExpression, useCookieConsent } from "./useCookieConsent";
 
 export type { CookieCategory, CookieRoute };
-export type { HasExpression };
 
 export function useCookies() {
 	const {
 		route,
 		setRoute,
 		status,
+		consent,
 		accept,
 		rejectAll,
 		categories,
 		toggle,
 		save,
 		reset,
+		has,
 	} = useContext(OpenPolicyContext);
-	const { consent, has } = useCookieConsent();
 
 	return {
 		status,
