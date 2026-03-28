@@ -8,7 +8,6 @@ import {
 import {
 	createContext,
 	type ReactNode,
-	useContext,
 	useEffect,
 	useMemo,
 	useState,
@@ -210,11 +209,4 @@ export function OpenPolicyProvider({
 			</OpenPolicyContext.Provider>
 		</>
 	);
-}
-
-// ─── Hook ─────────────────────────────────────────────────────────────────────
-
-export function useCookieRoute() {
-	const { route, setRoute } = useContext(OpenPolicyContext);
-	return { route, setRoute };
 }

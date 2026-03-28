@@ -1,8 +1,4 @@
-import {
-	CookieBanner as CookieBannerPrimitive,
-	CookiePreferencePanel,
-	useCookieRoute,
-} from "@openpolicy/react";
+import { useCookies } from "@openpolicy/react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -24,7 +20,7 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 export function CookieBanner() {
-	const { route } = useCookieRoute();
+	const { route, setRoute, acceptAll, acceptNecessary } = useCookies();
 
 	if (route !== "cookie") return null;
 
@@ -42,24 +38,25 @@ export function CookieBanner() {
 			</CardHeader>
 
 			<CardFooter className="gap-2">
-				<CookieBannerPrimitive.CustomizeButton asChild>
-					<Button variant="outline" className="mr-auto">
-						Manage Cookies
-					</Button>
-				</CookieBannerPrimitive.CustomizeButton>
-				<CookieBannerPrimitive.RejectButton asChild>
-					<Button variant="outline">Necessary Only</Button>
-				</CookieBannerPrimitive.RejectButton>
-				<CookieBannerPrimitive.AcceptButton asChild>
-					<Button>Accept All</Button>
-				</CookieBannerPrimitive.AcceptButton>
+				<Button
+					variant="outline"
+					className="mr-auto"
+					onClick={() => setRoute("preferences")}
+				>
+					Manage Cookies
+				</Button>
+				<Button variant="outline" onClick={acceptNecessary}>
+					Necessary Only
+				</Button>
+				<Button onClick={acceptAll}>Accept All</Button>
 			</CardFooter>
 		</Card>
 	);
 }
 
 export function CookiePreferences() {
-	const { route, setRoute } = useCookieRoute();
+	const { route, setRoute, categories, toggle, save, acceptNecessary } =
+		useCookies();
 
 	return (
 		<Dialog
@@ -75,29 +72,23 @@ export function CookiePreferences() {
 				</DialogHeader>
 
 				<FieldGroup>
-					{["essential", "analytics", "functional", "marketing"].map((key) => (
-						<CookiePreferencePanel.Category key={key} name={key}>
-							{({ checked, onCheckedChange }) => (
-								<Field orientation="horizontal">
-									<FieldTitle className="capitalize">{key}</FieldTitle>
-									<Switch
-										checked={checked}
-										disabled={key === "essential"}
-										onCheckedChange={onCheckedChange}
-									/>
-								</Field>
-							)}
-						</CookiePreferencePanel.Category>
+					{categories.map(({ key, enabled, locked }) => (
+						<Field key={key} orientation="horizontal">
+							<FieldTitle className="capitalize">{key}</FieldTitle>
+							<Switch
+								checked={enabled}
+								disabled={locked}
+								onCheckedChange={() => toggle(key)}
+							/>
+						</Field>
 					))}
 				</FieldGroup>
 
 				<DialogFooter>
-					<CookiePreferencePanel.RejectAllButton asChild>
-						<Button variant="outline">Reject all</Button>
-					</CookiePreferencePanel.RejectAllButton>
-					<CookiePreferencePanel.SaveButton asChild>
-						<Button>Save preferences</Button>
-					</CookiePreferencePanel.SaveButton>
+					<Button variant="outline" onClick={acceptNecessary}>
+						Reject all
+					</Button>
+					<Button onClick={() => save()}>Save preferences</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
