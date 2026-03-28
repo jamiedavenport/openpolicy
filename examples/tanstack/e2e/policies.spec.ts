@@ -1,5 +1,78 @@
 import { expect, test } from "@playwright/test";
 
+// ─── Cookie Banner route ──────────────────────────────────────────────────────
+
+test.describe("/cookie-banner", () => {
+	test.beforeEach(async ({ page }) => {
+		// Clear the consent cookie before each test so the banner is always shown.
+		await page.goto("/cookie-banner");
+		await page.evaluate(() => {
+			document.cookie = "op_consent=; max-age=0; path=/; SameSite=Lax";
+		});
+		await page.reload();
+	});
+
+	test("banner is visible on first visit", async ({ page }) => {
+		await expect(page.locator("[data-op-cookie-banner-root]")).toHaveAttribute(
+			"data-state",
+			"open",
+		);
+	});
+
+	test("Accept All closes the banner and shows accepted status", async ({
+		page,
+	}) => {
+		await page.locator("[data-op-cookie-banner-accept]").click();
+		await expect(page.locator("[data-op-cookie-banner-root]")).toHaveAttribute(
+			"data-state",
+			"closed",
+		);
+		await expect(page.getByTestId("consent-status")).toHaveText("accepted");
+	});
+
+	test("Necessary Only closes the banner and shows rejected status", async ({
+		page,
+	}) => {
+		await page.locator("[data-op-cookie-banner-reject]").click();
+		await expect(page.locator("[data-op-cookie-banner-root]")).toHaveAttribute(
+			"data-state",
+			"closed",
+		);
+		await expect(page.getByTestId("consent-status")).toHaveText("rejected");
+	});
+
+	test("Manage Cookies opens the preference panel", async ({ page }) => {
+		await page.locator("[data-op-cookie-banner-customize]").click();
+		await expect(
+			page.locator("[data-op-cookie-preferences-root]"),
+		).toHaveAttribute("data-state", "open");
+	});
+
+	test("preference panel Save sets status to custom", async ({ page }) => {
+		await page.locator("[data-op-cookie-banner-customize]").click();
+		// Toggle analytics off (it is on by default for this config)
+		await page
+			.locator("[data-op-cookie-preferences-root] input[type=checkbox]")
+			.nth(1)
+			.click();
+		await page.locator("[data-op-cookie-preferences-save]").click();
+		await expect(
+			page.locator("[data-op-cookie-preferences-root]"),
+		).toHaveAttribute("data-state", "closed");
+		await expect(page.getByTestId("consent-status")).toHaveText("custom");
+	});
+
+	test("Reset shows the banner again", async ({ page }) => {
+		await page.locator("[data-op-cookie-banner-accept]").click();
+		await expect(page.getByTestId("consent-status")).toHaveText("accepted");
+		await page.getByTestId("reset-consent").click();
+		await expect(page.locator("[data-op-cookie-banner-root]")).toHaveAttribute(
+			"data-state",
+			"open",
+		);
+	});
+});
+
 const ROUTES = ["/tailwind", "/shadcn", "/css-vars"];
 
 for (const route of ROUTES) {
