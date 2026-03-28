@@ -13,6 +13,17 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import { Field, FieldGroup, FieldTitle } from "@/components/ui/field";
+import { Switch } from "@/components/ui/switch";
 
 export const Route = createFileRoute("/cookie-banner")({
 	component: RouteComponent,
@@ -21,15 +32,11 @@ export const Route = createFileRoute("/cookie-banner")({
 // Shared state controls both the banner's "Manage Cookies" button and the panel.
 function CookieBannerDemo() {
 	const [showPreferences, setShowPreferences] = useState(false);
-	const overlayClassName =
-		"fixed inset-0 z-40 bg-black/50 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0";
 
 	return (
 		<>
 			{!showPreferences && (
 				<CookieBanner.Root className="fixed bottom-4 right-4 z-50 w-lg">
-					<CookieBanner.Overlay className={overlayClassName} />
-
 					<CookieBanner.Card asChild>
 						<Card className="relative z-50 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 outline-none">
 							<CookieBanner.Header asChild>
@@ -69,48 +76,48 @@ function CookieBannerDemo() {
 				</CookieBanner.Root>
 			)}
 
-			<CookiePreferencePanel.Root
-				open={showPreferences}
-				onOpenChange={setShowPreferences}
-				className="fixed inset-0 z-50 flex items-center justify-center p-4"
-			>
-				<CookiePreferencePanel.Overlay className={overlayClassName} />
-				<CookiePreferencePanel.Card className="relative z-50 w-full max-w-md rounded-xl border bg-white p-6 shadow-2xl">
-					<CookiePreferencePanel.Header className="mb-5">
-						<CookiePreferencePanel.Title className="text-base font-semibold">
-							Manage cookie preferences
-						</CookiePreferencePanel.Title>
-					</CookiePreferencePanel.Header>
-					<CookiePreferencePanel.CategoryList className="space-y-3 mb-6">
-						{["essential", "analytics", "functional", "marketing"].map(
-							(key) => (
-								<CookiePreferencePanel.Category key={key} name={key}>
-									{({ checked, onCheckedChange }) => (
-										<label className="flex items-center justify-between rounded-lg border p-3 cursor-pointer hover:bg-gray-50 transition-colors">
-											<span className="text-sm capitalize">{key}</span>
-											<input
-												type="checkbox"
-												checked={checked}
-												disabled={key === "essential"}
-												onChange={(e) => onCheckedChange(e.target.checked)}
-												className="h-4 w-4 accent-black disabled:opacity-50"
-											/>
-										</label>
-									)}
-								</CookiePreferencePanel.Category>
-							),
-						)}
-					</CookiePreferencePanel.CategoryList>
-					<CookiePreferencePanel.Footer className="flex justify-end gap-2">
-						<CookiePreferencePanel.RejectAllButton asChild>
-							<Button variant="outline">Reject all</Button>
-						</CookiePreferencePanel.RejectAllButton>
-						<CookiePreferencePanel.SaveButton asChild>
-							<Button>Save preferences</Button>
-						</CookiePreferencePanel.SaveButton>
-					</CookiePreferencePanel.Footer>
-				</CookiePreferencePanel.Card>
-			</CookiePreferencePanel.Root>
+			<Dialog open={showPreferences} onOpenChange={setShowPreferences}>
+				<DialogContent>
+					<CookiePreferencePanel.Root
+						open={showPreferences}
+						onOpenChange={setShowPreferences}
+					>
+						<DialogHeader>
+							<DialogTitle>Cookie preferences</DialogTitle>
+							<DialogDescription>
+								We use cookies to improve your experience and analyse site
+								traffic.
+							</DialogDescription>
+						</DialogHeader>
+						<FieldGroup>
+							{["essential", "analytics", "functional", "marketing"].map(
+								(key) => (
+									<CookiePreferencePanel.Category key={key} name={key}>
+										{({ checked, onCheckedChange }) => (
+											<Field orientation="horizontal">
+												<FieldTitle className="capitalize">{key}</FieldTitle>
+												<Switch
+													checked={checked}
+													disabled={key === "essential"}
+													onCheckedChange={onCheckedChange}
+												/>
+											</Field>
+										)}
+									</CookiePreferencePanel.Category>
+								),
+							)}
+						</FieldGroup>
+						<DialogFooter>
+							<CookiePreferencePanel.RejectAllButton asChild>
+								<Button variant="outline">Reject all</Button>
+							</CookiePreferencePanel.RejectAllButton>
+							<CookiePreferencePanel.SaveButton asChild>
+								<Button>Save preferences</Button>
+							</CookiePreferencePanel.SaveButton>
+						</DialogFooter>
+					</CookiePreferencePanel.Root>
+				</DialogContent>
+			</Dialog>
 		</>
 	);
 }

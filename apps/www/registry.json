@@ -97,6 +97,8 @@
 				"card",
 				"button",
 				"dialog",
+				"switch",
+				"field",
 				"https://openpolicy.sh/r/config.json"
 			],
 			"dependencies": ["@openpolicy/react", "@openpolicy/sdk"],
