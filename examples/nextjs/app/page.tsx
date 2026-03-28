@@ -1,29 +1,5 @@
 import Link from "next/link";
 
-const cookieExamples = [
-	{
-		href: "/cookie-banner/default",
-		title: "Default",
-		description: "Zero-config drop-in banner — no styling required.",
-	},
-	{
-		href: "/cookie-banner/tailwind",
-		title: "Tailwind",
-		description: "Compound components styled with Tailwind utility classes.",
-	},
-	{
-		href: "/cookie-banner/shadcn",
-		title: "shadcn/ui",
-		description: "asChild integration with shadcn/ui Button variants.",
-	},
-	{
-		href: "/cookie-banner/css",
-		title: "CSS",
-		description:
-			"CSS transitions driven by data-state attributes — no Tailwind.",
-	},
-];
-
 export default function Home() {
 	return (
 		<main>
@@ -42,22 +18,6 @@ export default function Home() {
 					AI Legal Assistant
 				</Link>
 			</nav>
-
-			<section>
-				<h2 className="text-lg font-semibold mb-3">Cookie Banner Examples</h2>
-				<div className="grid gap-4 sm:grid-cols-2">
-					{cookieExamples.map(({ href, title, description }) => (
-						<Link
-							key={href}
-							href={href}
-							className="block rounded-lg border p-4 hover:bg-gray-50 transition-colors"
-						>
-							<h3 className="font-medium mb-1">{title}</h3>
-							<p className="text-sm text-gray-500">{description}</p>
-						</Link>
-					))}
-				</div>
-			</section>
 
 			<p className="text-gray-500 mt-6 text-sm">
 				Ask our AI assistant about your rights and what our policies mean for

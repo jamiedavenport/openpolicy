@@ -1,13 +1,10 @@
 import {
-	CookieBanner,
 	CookiePolicy,
-	CookiePreferencePanel,
 	OpenPolicy,
 	PrivacyPolicy,
 	TermsOfService,
-	useCookieConsent,
 } from "@openpolicy/vue";
-import { createApp, defineComponent, h, ref } from "vue";
+import { createApp, defineComponent, h } from "vue";
 import {
 	createRouter,
 	createWebHistory,
@@ -23,7 +20,6 @@ const nav = () =>
 		h(RouterLink, { to: "/privacy" }, () => "Privacy"),
 		h(RouterLink, { to: "/terms" }, () => "Terms"),
 		h(RouterLink, { to: "/cookie" }, () => "Cookie"),
-		h(RouterLink, { to: "/cookie-banner" }, () => "Cookie Banner"),
 	]);
 
 const HomePage = defineComponent({
@@ -79,39 +75,6 @@ const CookiePage = defineComponent({
 	},
 });
 
-const CookieBannerPage = defineComponent({
-	name: "CookieBannerPage",
-	setup() {
-		const showPreferences = ref(false);
-		const { consent, status, reset } = useCookieConsent();
-
-		return () =>
-			h("main", { class: "page" }, [
-				nav(),
-				h(OpenPolicy, { config: openpolicy }, () => [
-					h("h2", "Cookie Banner Example"),
-					h("div", { class: "card" }, [
-						h("p", `Status: ${status.value}`),
-						consent.value && h("pre", JSON.stringify(consent.value, null, 2)),
-						status.value !== "undecided" &&
-							h("button", { onClick: reset }, "Reset consent"),
-					]),
-					h(CookieBanner, {
-						onCustomize: () => {
-							showPreferences.value = true;
-						},
-					}),
-					h(CookiePreferencePanel, {
-						open: showPreferences.value,
-						onClose: () => {
-							showPreferences.value = false;
-						},
-					}),
-				]),
-			]);
-	},
-});
-
 const router = createRouter({
 	history: createWebHistory(),
 	routes: [
@@ -119,7 +82,6 @@ const router = createRouter({
 		{ path: "/privacy", component: PrivacyPage },
 		{ path: "/terms", component: TermsPage },
 		{ path: "/cookie", component: CookiePage },
-		{ path: "/cookie-banner", component: CookieBannerPage },
 	],
 });
 

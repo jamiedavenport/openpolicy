@@ -8,6 +8,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
+	CardContent,
 	CardDescription,
 	CardFooter,
 	CardHeader,
@@ -23,93 +24,90 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldGroup, FieldTitle } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/cookie-banner")({
 	component: RouteComponent,
 });
 
+function CustomCookieBanner() {
+	const { route } = useCookieRoute();
+
+	if (route !== "cookie") return null;
+
+	return (
+		<Card
+			className={cn(
+				"fixed bottom-4 right-4 z-50 w-lg animate-in fade-in-0 zoom-in-95 outline-none",
+			)}
+		>
+			<CardHeader>
+				<CardTitle>We value your privacy</CardTitle>
+				<CardDescription>
+					We use cookies to improve your experience and analyse site traffic.
+				</CardDescription>
+			</CardHeader>
+
+			<CardFooter className="gap-2">
+				<CookieBanner.CustomizeButton asChild>
+					<Button variant="outline" className="mr-auto">
+						Manage Cookies
+					</Button>
+				</CookieBanner.CustomizeButton>
+				<CookieBanner.RejectButton asChild>
+					<Button variant="outline">Necessary Only</Button>
+				</CookieBanner.RejectButton>
+				<CookieBanner.AcceptButton asChild>
+					<Button>Accept All</Button>
+				</CookieBanner.AcceptButton>
+			</CardFooter>
+		</Card>
+	);
+}
+
 function CookieBannerDemo() {
 	const { route, setRoute } = useCookieRoute();
 
 	return (
-		<>
-			<CookieBanner.Card asChild>
-				<Card className="fixed bottom-4 right-4 z-50 w-lg data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 outline-none">
-					<CookieBanner.Header asChild>
-						<CardHeader>
-							<CookieBanner.Title asChild>
-								<CardTitle>We value your privacy</CardTitle>
-							</CookieBanner.Title>
-							<CookieBanner.Description asChild>
-								<CardDescription>
-									We use cookies to improve your experience and analyse site
-									traffic.
-								</CardDescription>
-							</CookieBanner.Description>
-						</CardHeader>
-					</CookieBanner.Header>
+		<Dialog
+			open={route === "preferences"}
+			onOpenChange={(open) => !open && setRoute("closed")}
+		>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Cookie preferences</DialogTitle>
+					<DialogDescription>
+						We use cookies to improve your experience and analyse site traffic.
+					</DialogDescription>
+				</DialogHeader>
 
-					<CookieBanner.Footer asChild>
-						<CardFooter className="gap-2">
-							<CookieBanner.CustomizeButton asChild>
-								<Button variant="outline" className="mr-auto">
-									Manage Cookies
-								</Button>
-							</CookieBanner.CustomizeButton>
-							<CookieBanner.RejectButton asChild>
-								<Button variant="outline">Necessary Only</Button>
-							</CookieBanner.RejectButton>
-							<CookieBanner.AcceptButton asChild>
-								<Button>Accept All</Button>
-							</CookieBanner.AcceptButton>
-						</CardFooter>
-					</CookieBanner.Footer>
-				</Card>
-			</CookieBanner.Card>
+				<FieldGroup>
+					{["essential", "analytics", "functional", "marketing"].map((key) => (
+						<CookiePreferencePanel.Category key={key} name={key}>
+							{({ checked, onCheckedChange }) => (
+								<Field orientation="horizontal">
+									<FieldTitle className="capitalize">{key}</FieldTitle>
+									<Switch
+										checked={checked}
+										disabled={key === "essential"}
+										onCheckedChange={onCheckedChange}
+									/>
+								</Field>
+							)}
+						</CookiePreferencePanel.Category>
+					))}
+				</FieldGroup>
 
-			<Dialog
-				open={route === "preferences"}
-				onOpenChange={(open) => !open && setRoute("closed")}
-			>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Cookie preferences</DialogTitle>
-						<DialogDescription>
-							We use cookies to improve your experience and analyse site
-							traffic.
-						</DialogDescription>
-					</DialogHeader>
-
-					<FieldGroup>
-						{["essential", "analytics", "functional", "marketing"].map(
-							(key) => (
-								<CookiePreferencePanel.Category key={key} name={key}>
-									{({ checked, onCheckedChange }) => (
-										<Field orientation="horizontal">
-											<FieldTitle className="capitalize">{key}</FieldTitle>
-											<Switch
-												checked={checked}
-												disabled={key === "essential"}
-												onCheckedChange={onCheckedChange}
-											/>
-										</Field>
-									)}
-								</CookiePreferencePanel.Category>
-							),
-						)}
-					</FieldGroup>
-
-					<DialogFooter>
-						<CookiePreferencePanel.RejectAllButton asChild>
-							<Button variant="outline">Reject all</Button>
-						</CookiePreferencePanel.RejectAllButton>
-						<CookiePreferencePanel.SaveButton asChild>
-							<Button>Save preferences</Button>
-						</CookiePreferencePanel.SaveButton>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
-		</>
+				<DialogFooter>
+					<CookiePreferencePanel.RejectAllButton asChild>
+						<Button variant="outline">Reject all</Button>
+					</CookiePreferencePanel.RejectAllButton>
+					<CookiePreferencePanel.SaveButton asChild>
+						<Button>Save preferences</Button>
+					</CookiePreferencePanel.SaveButton>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
 	);
 }
 
@@ -145,6 +143,8 @@ function RouteComponent() {
 			<Button variant="outline" onClick={reset} data-testid="reset-consent">
 				Reset consent (show banner again)
 			</Button>
+
+			<CustomCookieBanner />
 
 			<CookieBannerDemo />
 		</div>
