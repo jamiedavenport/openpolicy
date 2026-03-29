@@ -1,0 +1,97 @@
+---
+title: ConsentGate
+description: Conditionally render content based on cookie consent
+---
+
+`ConsentGate` renders its children only when the user has consented to the required cookie categories. Use it to guard analytics scripts, embedded widgets, or any content that requires explicit consent before loading.
+
+```tsx
+import { ConsentGate } from "@openpolicy/react";
+```
+
+## Basic usage
+
+Pass a category key as the `requires` prop. The children render only after the user has consented to that category:
+
+```tsx
+<ConsentGate requires="analytics">
+  <GoogleAnalytics />
+</ConsentGate>
+```
+
+The category key must match one of the `cookies` keys defined in your `openpolicy.ts` config (e.g. `"essential"`, `"analytics"`, `"functional"`, `"marketing"`).
+
+## Compound expressions
+
+Use `{ and: [...] }` or `{ or: [...] }` to require multiple categories:
+
+```tsx
+{/* Require both analytics AND marketing consent */}
+<ConsentGate requires={{ and: ["analytics", "marketing"] }}>
+  <RetargetingPixel />
+</ConsentGate>
+
+{/* Require analytics OR functional consent */}
+<ConsentGate requires={{ or: ["analytics", "functional"] }}>
+  <LiveChat />
+</ConsentGate>
+```
+
+## Fallback
+
+The `fallback` prop renders alternative content when consent has not been granted — useful for showing a placeholder or a prompt to enable a feature:
+
+```tsx
+<ConsentGate
+  requires="analytics"
+  fallback={
+    <p>
+      Enable analytics cookies to see your usage statistics.
+    </p>
+  }
+>
+  <UsageDashboard />
+</ConsentGate>
+```
+
+When `fallback` is not provided, `ConsentGate` renders nothing (`null`) when consent is absent.
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `requires` | `string \| ConsentExpr` | — | Required. Category key or consent expression |
+| `fallback` | `ReactNode` | `null` | Content to render when consent is not granted |
+| `children` | `ReactNode` | — | Content to render when consent is granted |
+
+## Expression reference
+
+| Expression | Type | Behavior |
+|---|---|---|
+| `"analytics"` | `string` | Matches if the named category is consented |
+| `{ and: ["analytics", "marketing"] }` | `{ and: string[] }` | Matches if **all** listed categories are consented |
+| `{ or: ["analytics", "functional"] }` | `{ or: string[] }` | Matches if **any** listed category is consented |
+
+Expressions are evaluated against the current consent state each time it changes. If the user updates their preferences, `ConsentGate` re-evaluates immediately.
+
+## Custom gates with useCookies
+
+For more complex scenarios — like imperatively loading a script or conditionally fetching data — use the `has()` function from [`useCookies`](/docs/cookies/use-cookies) directly:
+
+```tsx
+import { useCookies } from "@openpolicy/react";
+
+function AnalyticsLoader() {
+  const { has } = useCookies();
+
+  useEffect(() => {
+    if (has("analytics")) {
+      loadAnalyticsScript();
+    }
+  }, [has]);
+
+  return null;
+}
+```
+
+See [useCookies →](/docs/cookies/use-cookies) for the full hook API.
