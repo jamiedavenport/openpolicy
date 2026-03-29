@@ -6,10 +6,8 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.5",
 		"@changesets/cli": "^2.30.0",
-		"@happy-dom/global-registrator": "^20.8.9",
 		"@types/bun": "latest",
 		"@types/node": "^25.5.0",
-		"happy-dom": "^20.8.9",
 		"knip": "^5.86.0",
 		"lefthook": "^2.1.2",
 		"rolldown": "^1.0.0-rc.7",

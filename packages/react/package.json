@@ -36,7 +36,6 @@
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
 		"@types/react": "^19.0.0",
-		"happy-dom": "^20.8.9",
 		"react": "^19.0.0"
 	},
 	"publishConfig": {
