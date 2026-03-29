@@ -1,7 +1,7 @@
 ---
 title: "Announcing Cookie Banners"
 description: "Add a cookie banner to your React app in one command. Styled with Tailwind, wired to your OpenPolicy config, and fully yours to edit."
-pubDate: 2026-03-31
+pubDate: 2026-03-29
 author: "OpenPolicy Team"
 ---
 
