@@ -1,0 +1,84 @@
+---
+title: useCookies
+description: React hook for reading and managing cookie consent state
+---
+
+`useCookies` is the low-level hook that powers `CookieBanner`, `CookiePreferences`, and `ConsentGate`. Use it directly when building a custom consent UI or when you need to read or change consent state in application code.
+
+```tsx
+import { useCookies } from "@openpolicy/react";
+```
+
+The hook must be called inside an `<OpenPolicy>` provider.
+
+## Usage
+
+```tsx
+import { useCookies } from "@openpolicy/react";
+
+function CustomBanner() {
+  const { route, categories, acceptAll, acceptNecessary, open } = useCookies();
+
+  if (route !== "cookie") return null;
+
+  return (
+    <div>
+      <p>We use cookies to improve your experience.</p>
+      <button onClick={acceptAll}>Accept all</button>
+      <button onClick={acceptNecessary}>Accept necessary only</button>
+      <button onClick={() => open("preferences")}>Preferences</button>
+    </div>
+  );
+}
+```
+
+## Return value
+
+| Property | Type | Description |
+|---|---|---|
+| `route` | `"cookie" \| "preferences" \| "closed"` | Which UI screen to show. `"cookie"` = initial banner, `"preferences"` = settings panel, `"closed"` = no UI |
+| `categories` | `{ key: string; label: string; enabled: boolean; locked: boolean }[]` | Consent categories derived from your config. `locked: true` means the category is always enabled (e.g. essential cookies) |
+| `acceptAll` | `() => void` | Enable all categories and close the banner |
+| `acceptNecessary` | `() => void` | Enable only essential (locked) categories and close |
+| `toggle` | `(key: string) => void` | Toggle a single category on or off in the preferences panel. Does not save until `save()` is called |
+| `save` | `() => void` | Persist the current toggle state and close |
+| `reject` | `() => void` | Disable all non-essential categories and close |
+| `open` | `(screen?: "cookie" \| "preferences") => void` | Programmatically show the banner or preferences panel. Defaults to `"cookie"` |
+| `has` | `(expr: string \| ConsentExpr) => boolean` | Check whether consent is granted for a category or expression. Useful for conditional logic outside of `ConsentGate` |
+
+## Consent storage
+
+Consent decisions are stored in `localStorage` under the key `op_consent`. The stored value is a JSON object mapping category keys to booleans:
+
+```json
+{
+  "essential": true,
+  "analytics": true,
+  "functional": false,
+  "marketing": false
+}
+```
+
+On first visit (no stored value), `route` is `"cookie"` and no categories are enabled except those marked `locked`. After the user makes a choice, `route` becomes `"closed"` and the decision is persisted.
+
+## Reopening preferences
+
+To let users update their consent after the initial decision — for example, from a footer link — call `open("preferences")`:
+
+```tsx
+import { useCookies } from "@openpolicy/react";
+
+function Footer() {
+  const { open } = useCookies();
+
+  return (
+    <footer>
+      <button onClick={() => open("preferences")}>Cookie preferences</button>
+    </footer>
+  );
+}
+```
+
+## Declarative alternative
+
+For rendering content conditionally based on consent, prefer [`ConsentGate`](/docs/cookies/consent-gate) over calling `has()` in JSX — it handles re-renders and fallback content automatically.

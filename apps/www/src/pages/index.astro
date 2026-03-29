@@ -31,43 +31,24 @@ import cloud from "../assets/cloud.png";
       other legal agreements directly from code—making them fast,
       accurate, and easy to maintain.
     </p>
-    <Code
-      code={installCmd}
-      lang="bash"
-      theme="github-light"
-      class="p-4 text-sm border border-gray-200 bg-gray-100"
-    />
-  </section>
+    <div class="border border-gray-200 mb-4 bg-gray-100">
+      <div class="flex border-b border-gray-200">
+        <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
+          openpolicy.ts
+        </div>
+      </div>
+      <Code code={policyTs} lang="ts" theme="github-light" class="p-4 text-sm" />
+    </div>
 
-  <!-- <section class="border border-gray-200 divide-y divide-gray-200">
-    <div class="flex items-center gap-5 p-4">
-      <img src={cookies.src} alt="Cookies" class="h-20" />
-      <div>
-        <h2 class="font-mono">
-          <span class="text-gray-500">Open</span><span class="font-bold">Cookies</span>
-        </h2>
-        <p class="text-xs text-gray-500">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, quasi. Modi hic fuga soluta consectetur, quisquam ab veritatis aspernatur perferendis quis, corporis aut quia, facere omnis? Et ratione debitis cum.</p>
+    <div class="border border-gray-200 mb-4 bg-gray-100">
+      <div class="flex border-b border-gray-200">
+        <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
+          pages/privacy-policy.tsx
+        </div>
       </div>
+      <Code code={privacyRoute} lang="tsx" theme="github-light" class="p-4 text-sm" />
     </div>
-    <div class="flex items-center gap-5 p-4">
-      <img src={document.src} alt="Cookies" class="h-20" />
-      <div>
-        <h2 class="font-mono">
-          <span class="text-gray-500">Open</span><span class="font-bold">Terms</span>
-        </h2>
-        <p class="text-xs text-gray-500">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, quasi. Modi hic fuga soluta consectetur, quisquam ab veritatis aspernatur perferendis quis, corporis aut quia, facere omnis? Et ratione debitis cum.</p>
-      </div>
-    </div>
-    <div class="flex items-center gap-5 p-4">
-      <img src={cloud.src} alt="Cookies" class="h-20" />
-      <div>
-        <h2 class="font-mono">
-          <span class="font-bold">Plus</span>
-        </h2>
-        <p class="text-xs text-gray-500">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, quasi. Modi hic fuga soluta consectetur, quisquam ab veritatis aspernatur perferendis quis, corporis aut quia, facere omnis? Et ratione debitis cum.</p>
-      </div>
-    </div>
-  </section> -->
+  </section>
 
   <section>
     <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
@@ -143,50 +124,6 @@ import cloud from "../assets/cloud.png";
       </section>
     );
   })()}
-
-  <section>
-    <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
-      GETTING-STARTED.md
-    </h2>
-    <p class="mb-4">
-      Define your policies in TypeScript, then render them as React components — fully headless, styled however you want.
-    </p>
-
-    <div class="border border-gray-200 mb-4 bg-gray-100">
-      <div class="flex border-b border-gray-200">
-        <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
-          openpolicy.ts
-        </div>
-      </div>
-      <Code code={policyTs} lang="ts" theme="github-light" class="p-4 text-sm" />
-    </div>
-
-    <div class="border border-gray-200 mb-4 bg-gray-100">
-      <div class="flex border-b border-gray-200">
-        <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
-          pages/privacy-policy.tsx
-        </div>
-      </div>
-      <Code code={privacyRoute} lang="tsx" theme="github-light" class="p-4 text-sm" />
-    </div>
-  </section>
-
-  <section>
-    <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
-      LLMS.md
-    </h2>
-    <p class="mb-4">
-      OpenPolicy ships an <code>llms.txt</code> so AI coding assistants — Claude, Cursor, Copilot — understand the SDK. Paste this prompt into your assistant to generate an <code>openpolicy.ts</code> from your existing codebase:
-    </p>
-    <div class="border border-gray-200 bg-gray-100">
-      <div class="flex items-center justify-between border-b border-gray-200">
-        <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
-          prompt.txt
-        </div>
-      </div>
-      <Code code={llmPrompt} lang="text" theme="github-light" class="p-4 text-sm" />
-    </div>
-  </section>
 
   <section>
     <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">

@@ -1,3 +1,11 @@
 {
-	"pages": ["index", "react", "vue", "generative", "reference", "examples"]
+	"pages": [
+		"index",
+		"react",
+		"cookies",
+		"vue",
+		"generative",
+		"reference",
+		"examples"
+	]
 }
