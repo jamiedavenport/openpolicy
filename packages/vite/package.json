@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/vite",
-	"version": "0.0.16",
+	"version": "0.0.17",
 	"type": "module",
 	"description": "Vite plugin for compiling OpenPolicy privacy policy documents at build time",
 	"license": "GPL-3.0-only",
