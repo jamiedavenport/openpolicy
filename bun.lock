@@ -21,6 +21,7 @@
     "apps/docs": {
       "name": "docs",
       "dependencies": {
+        "@databuddy/sdk": "^2.4.0",
         "@takumi-rs/image-response": "^0.69.5",
         "fumadocs-core": "16.6.9",
         "fumadocs-mdx": "14.2.9",
@@ -178,22 +179,22 @@
     },
     "packages/astro": {
       "name": "@openpolicy/astro",
-      "version": "0.0.16",
+      "version": "0.0.17",
       "devDependencies": {
         "@openpolicy/tooling": "workspace:*",
         "@openpolicy/vite": "workspace:*",
         "astro": "^5.0.0",
       },
       "peerDependencies": {
-        "@openpolicy/core": ">=0.0.16",
-        "@openpolicy/sdk": ">=0.0.16",
-        "@openpolicy/vite": ">=0.0.16",
+        "@openpolicy/core": ">=0.0.17",
+        "@openpolicy/sdk": ">=0.0.17",
+        "@openpolicy/vite": ">=0.0.17",
         "astro": ">=4.0.0",
       },
     },
     "packages/cli": {
       "name": "@openpolicy/cli",
-      "version": "0.0.16",
+      "version": "0.0.17",
       "bin": {
         "openpolicy": "./src/cli.ts",
       },
@@ -209,14 +210,14 @@
     },
     "packages/core": {
       "name": "@openpolicy/core",
-      "version": "0.0.16",
+      "version": "0.0.17",
       "devDependencies": {
         "@openpolicy/tooling": "workspace:*",
       },
     },
     "packages/react": {
       "name": "@openpolicy/react",
-      "version": "0.0.16",
+      "version": "0.0.17",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
@@ -242,7 +243,7 @@
     },
     "packages/sdk": {
       "name": "@openpolicy/sdk",
-      "version": "0.0.16",
+      "version": "0.0.17",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
@@ -250,7 +251,7 @@
     },
     "packages/vite": {
       "name": "@openpolicy/vite",
-      "version": "0.0.16",
+      "version": "0.0.17",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/renderers": "workspace:*",
@@ -263,7 +264,7 @@
     },
     "packages/vue": {
       "name": "@openpolicy/vue",
-      "version": "0.0.16",
+      "version": "0.0.17",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
@@ -444,6 +445,8 @@
     "@chevrotain/types": ["@chevrotain/types@11.1.2", "", {}, "sha512-U+HFai5+zmJCkK86QsaJtoITlboZHBqrVketcO2ROv865xfCMSFpELQoz1GkX5GzME8pTa+3kbKrZHQtI0gdbw=="],
 
     "@chevrotain/utils": ["@chevrotain/utils@11.1.2", "", {}, "sha512-4mudFAQ6H+MqBTfqLmU7G1ZwRzCLfJEooL/fsF6rCX5eePMbGhoy5n4g+G4vlh2muDcsCTJtL+uKbOzWxs5LHA=="],
+
+    "@databuddy/sdk": ["@databuddy/sdk@2.4.0", "", { "peerDependencies": { "msw": "^2.11.5", "react": ">=18", "vue": ">=3" }, "optionalPeers": ["msw", "react", "vue"] }, "sha512-s+G8q/xX+p1gijkOrX9s19GSrjYs9GIoi8t9ktcgkmCnLftipKjMbXnLDAB59vH1KZZdJ59GDttWbFBnuu4uTA=="],
 
     "@dotenvx/dotenvx": ["@dotenvx/dotenvx@1.55.1", "", { "dependencies": { "commander": "^11.1.0", "dotenv": "^17.2.1", "eciesjs": "^0.4.10", "execa": "^5.1.1", "fdir": "^6.2.0", "ignore": "^5.3.0", "object-treeify": "1.1.33", "picomatch": "^4.0.2", "which": "^4.0.0" }, "bin": { "dotenvx": "src/cli/dotenvx.js" } }, "sha512-WEuKyoe9CA7dfcFBnNbL0ndbCNcptaEYBygfFo9X1qEG+HD7xku4CYIplw6sbAHJavesZWbVBHeRSpvri0eKqw=="],
 
