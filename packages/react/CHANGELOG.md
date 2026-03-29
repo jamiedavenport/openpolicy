@@ -1,5 +1,11 @@
 # @openpolicy/react
 
+## 0.0.17
+
+### Patch Changes
+
+- efa565b: Cookie Banner
+
 ## 0.0.16
 
 ## 0.0.15
