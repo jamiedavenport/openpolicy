@@ -6,7 +6,7 @@ OpenPolicy turns TypeScript config files into privacy policies, terms of service
 
 - [Homepage](https://openpolicy.sh)
 - [Blog](https://openpolicy.sh/blog)
-- [Documentation](https://openpolicy.sh/docs)
+- [Documentation](https://docs.openpolicy.sh)
 
 # Contributors
 
