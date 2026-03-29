@@ -1,4 +1,4 @@
-import { ConsentGate, useCookieConsent, useCookies } from "@openpolicy/react";
+import { ConsentGate, useCookies } from "@openpolicy/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -101,7 +101,7 @@ function CookieBannerDemo() {
 }
 
 function RouteComponent() {
-	const { status, reset } = useCookieConsent();
+	const { status, reset } = useCookies();
 
 	return (
 		<div className="p-8 max-w-xl mx-auto">

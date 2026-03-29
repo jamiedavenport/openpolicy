@@ -14,20 +14,16 @@ test.describe("/cookie-banner", () => {
 		await expect(page.getByText("We value your privacy")).toBeVisible();
 	});
 
-	test("Accept All closes the banner and shows accepted status", async ({
-		page,
-	}) => {
+	test("Accept All closes the banner", async ({ page }) => {
 		await page.getByRole("button", { name: "Accept All" }).click();
 		await expect(page.getByText("We value your privacy")).not.toBeVisible();
-		await expect(page.getByTestId("consent-status")).toHaveText("accepted");
+		await expect(page.getByTestId("consent-status")).toHaveText("completed");
 	});
 
-	test("Necessary Only closes the banner and shows rejected status", async ({
-		page,
-	}) => {
+	test("Necessary Only closes the banner", async ({ page }) => {
 		await page.getByRole("button", { name: "Necessary Only" }).click();
 		await expect(page.getByText("We value your privacy")).not.toBeVisible();
-		await expect(page.getByTestId("consent-status")).toHaveText("rejected");
+		await expect(page.getByTestId("consent-status")).toHaveText("completed");
 	});
 
 	test("Manage Cookies opens the preference panel", async ({ page }) => {
@@ -35,27 +31,27 @@ test.describe("/cookie-banner", () => {
 		await expect(page.getByText("Cookie preferences")).toBeVisible();
 	});
 
-	test("preference panel Save sets status to custom", async ({ page }) => {
+	test("preference panel Save closes the panel", async ({ page }) => {
 		await page.getByRole("button", { name: "Manage Cookies" }).click();
 		// Toggle analytics off (it is on by default for this config)
 		await page.getByRole("switch").nth(1).click();
 		await page.getByRole("button", { name: "Save preferences" }).click();
 		await expect(page.getByText("Cookie preferences")).not.toBeVisible();
-		await expect(page.getByTestId("consent-status")).toHaveText("custom");
+		await expect(page.getByTestId("consent-status")).toHaveText("completed");
 	});
 
 	test("Reset shows the banner again", async ({ page }) => {
 		await page.getByRole("button", { name: "Accept All" }).click();
-		await expect(page.getByTestId("consent-status")).toHaveText("accepted");
+		await expect(page.getByTestId("consent-status")).toHaveText("completed");
 		await page.getByTestId("reset-consent").click();
 		await expect(page.getByText("We value your privacy")).toBeVisible();
 	});
 
 	test("consent status persists after page reload", async ({ page }) => {
 		await page.getByRole("button", { name: "Accept All" }).click();
-		await expect(page.getByTestId("consent-status")).toHaveText("accepted");
+		await expect(page.getByTestId("consent-status")).toHaveText("completed");
 		await page.reload();
-		await expect(page.getByTestId("consent-status")).toHaveText("accepted");
+		await expect(page.getByTestId("consent-status")).toHaveText("completed");
 		await expect(page.getByText("We value your privacy")).not.toBeVisible();
 	});
 });

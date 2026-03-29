@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { HasExpression } from "../context";
-import { useCookieConsent } from "../context";
+import { useCookies } from "../hooks/useCookies";
 
 interface ConsentGateProps {
 	requires: HasExpression;
@@ -13,6 +13,6 @@ export function ConsentGate({
 	fallback = null,
 	children,
 }: ConsentGateProps) {
-	const { has } = useCookieConsent();
+	const { has } = useCookies();
 	return has(requires) ? children : fallback;
 }

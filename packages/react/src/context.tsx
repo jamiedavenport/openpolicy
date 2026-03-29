@@ -6,7 +6,6 @@ import {
 	isOpenPolicyConfig,
 	type OpenPolicyConfig,
 	rejectAll,
-	resolveStatus,
 } from "@openpolicy/core";
 import {
 	createContext,
@@ -204,11 +203,7 @@ export function OpenPolicyProvider({
 		getServerSnapshot,
 	);
 
-	const status: CookieConsentStatus = cookieConfig
-		? resolveStatus(consent, cookieConfig)
-		: consent
-			? "custom"
-			: "undecided";
+	const status: CookieConsentStatus = consent ? "completed" : "undecided";
 
 	// Sync data attributes on document.body for CSS hooks
 	useEffect(() => {
@@ -361,12 +356,4 @@ export function OpenPolicyProvider({
 			</OpenPolicyContext.Provider>
 		</>
 	);
-}
-
-// ─── useCookieConsent ─────────────────────────────────────────────────────────
-
-export function useCookieConsent() {
-	const { consent, status, accept, reject, update, reset, has } =
-		useContext(OpenPolicyContext);
-	return { consent, status, accept, reject, update, reset, has } as const;
 }
