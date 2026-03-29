@@ -82,15 +82,15 @@ export type TermsOfServiceConfig = {
 	privacyPolicyUrl?: string;
 };
 
+export type CookiePolicyCookies = {
+	essential: boolean;
+	[key: string]: boolean;
+};
+
 export type CookiePolicyConfig = {
 	effectiveDate: string;
 	company: CompanyConfig;
-	cookies: {
-		essential: boolean;
-		analytics: boolean;
-		functional: boolean;
-		marketing: boolean;
-	};
+	cookies: CookiePolicyCookies;
 	thirdParties?: { name: string; purpose: string; policyUrl?: string }[];
 	trackingTechnologies?: string[];
 	consentMechanism?: {

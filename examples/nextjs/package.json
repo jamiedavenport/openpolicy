@@ -3,9 +3,9 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "next dev",
+		"dev": "next dev -p 3001",
 		"build": "next build",
-		"start": "next start"
+		"start": "next start -p 3001"
 	},
 	"dependencies": {
 		"@ai-sdk/anthropic": "^2.0.0",
@@ -23,7 +23,7 @@
 		"clsx": "^2.1.1",
 		"lucide-react": "^0.577.0",
 		"nanoid": "^5.1.7",
-		"next": "16.1.6",
+		"next": "16.1.7",
 		"radix-ui": "^1.4.3",
 		"react": "19.2.3",
 		"react-dom": "19.2.3",

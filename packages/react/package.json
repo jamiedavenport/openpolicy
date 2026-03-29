@@ -22,7 +22,7 @@
 		"./styles.css": "./styles.css"
 	},
 	"scripts": {
-		"dev": "rolldown -c --watch",
+		"dev": "rolldown --watch -c",
 		"build": "rolldown -c",
 		"check-types": "tsc --noEmit",
 		"test": "bun test"
