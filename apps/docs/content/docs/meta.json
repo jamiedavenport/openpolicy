@@ -1,11 +1,25 @@
 {
 	"pages": [
 		"index",
-		"react",
-		"cookies",
-		"vue",
-		"generative",
-		"reference",
-		"examples"
+		"configuration",
+		"---Policies---",
+		"policies/overview",
+		"policies/quick-start",
+		"policies/terms",
+		"policies/privacy",
+		"policies/cookies",
+		"---Cookies---",
+		"cookies/overview",
+		"cookies/quick-start",
+		"cookies/hooks",
+		"cookies/banner",
+		"cookies/preferences",
+		"---Generation---",
+		"generation/overview",
+		"generation/cli",
+		"generation/vite",
+		"generation/astro",
+		"---References---",
+		"references/examples"
 	]
 }

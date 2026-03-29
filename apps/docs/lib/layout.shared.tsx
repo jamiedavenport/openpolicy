@@ -9,7 +9,10 @@ export const gitConfig = {
 export function baseOptions(): BaseLayoutProps {
 	return {
 		nav: {
-			title: "OpenPolicy",
+			title: (
+				// biome-ignore lint/performance/noImgElement: todo
+				<img src="/logo-wide.svg" className="h-3 w-auto" alt="OpenPolicy" />
+			),
 		},
 		githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
 	};
