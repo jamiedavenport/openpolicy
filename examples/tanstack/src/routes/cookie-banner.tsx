@@ -101,7 +101,7 @@ function CookieBannerDemo() {
 }
 
 function RouteComponent() {
-	const { status, reset } = useCookies();
+	const { reset } = useCookies();
 
 	return (
 		<div className="p-8 max-w-xl mx-auto">
@@ -112,23 +112,6 @@ function RouteComponent() {
 				preference panel.
 			</p>
 
-			<Card className="mb-4">
-				<CardHeader>
-					<CardTitle>Current consent status</CardTitle>
-					<CardDescription>
-						Stored in the <code>op_consent</code> cookie.
-					</CardDescription>
-				</CardHeader>
-				<CardFooter>
-					<code
-						className="bg-muted px-2 py-1 rounded text-sm"
-						data-testid="consent-status"
-					>
-						{status}
-					</code>
-				</CardFooter>
-			</Card>
-
 			<Button variant="outline" onClick={reset} data-testid="reset-consent">
 				Reset consent (show banner again)
 			</Button>
@@ -136,8 +119,6 @@ function RouteComponent() {
 			<CustomCookieBanner />
 
 			<CookieBannerDemo />
-
-			<ConsentGate requires="analytics">Analyics enabled!</ConsentGate>
 		</div>
 	);
 }
