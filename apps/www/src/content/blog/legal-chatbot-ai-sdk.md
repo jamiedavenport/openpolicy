@@ -124,4 +124,4 @@ if (!success) return new Response("Too many requests", { status: 429 });
 
 **You still get traditional policy pages too.** The chatbot doesn't replace your `/privacy` and `/terms` routes — it sits alongside them. `<PrivacyPolicy />` and `<TermsOfService />` render the full documents directly into your Next.js app from the same config object. Users who want to read the full text still can; users who just want a quick answer can ask. Both outputs, one source of truth.
 
-The [live demo](https://nextjs.openpolicy.sh) and the [full example](https://github.com/jamiedavenport/openpolicy/tree/main/examples/nextjs) have all of it wired together — policy pages, the chat route, and the UI.
+Check out the [full example](https://github.com/jamiedavenport/openpolicy/tree/main/examples/nextjs).
