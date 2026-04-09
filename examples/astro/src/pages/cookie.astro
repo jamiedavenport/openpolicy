@@ -1,6 +1,18 @@
 ---
-import { Content } from "../policies/cookie-policy.md";
 import "../styles/site.css";
+import openpolicy from "../lib/openpolicy";
+import { compile, expandOpenPolicyConfig } from "@openpolicy/core";
+import { renderHTML } from "@openpolicy/renderers";
+
+const policies = expandOpenPolicyConfig(openpolicy);
+
+const cookiePolicy = policies.find((p) => p.type === "cookie");
+
+if (!cookiePolicy) {
+	throw new Error("Cookie policy not found in config");
+}
+
+const policy = renderHTML(compile(cookiePolicy));
 ---
 
 <html lang="en">
@@ -20,7 +32,8 @@ import "../styles/site.css";
 				<a href="/terms">Terms</a>
 				<a href="/cookie">Cookie</a>
 			</nav>
-			<Content />
+
+			<div set:html={policy} />
 		</main>
 	</body>
 </html>
