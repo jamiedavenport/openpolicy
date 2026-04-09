@@ -65,7 +65,7 @@ export default defineConfig({
 });
 ```
 
-See the [full config schema](/docs/configuration) for all available fields.
+See the [full config schema](https://docs.openpolicy.sh/configuration) for all available fields.
 
 The fastest way to fill this out is to paste your existing privacy page (or just describe your app) into Claude and ask it to generate the config. Because the output is deterministic — the same config always produces the same policy — Claude is only configuring, not writing legal text. You review the inputs, OpenPolicy handles the rest.
 
@@ -130,3 +130,7 @@ The plugin approach generated intermediate files that lived in your `src/` direc
 The output is the same as before: statically rendered HTML with no client-side JavaScript. The difference is that the compilation happens inline, in the page that uses it, rather than as a side-effect of a plugin watching your filesystem.
 
 The full working example is in the [examples/astro](https://github.com/jamiedavenport/openpolicy/tree/main/examples/astro) directory of the repo.
+
+## Going further with OpenPolicy+
+
+If you need more than static generation, [OpenPolicy+](/plus) extends the core library with cloud-based consent tracking, PR automation (policy linting, compliance checks on every pull request), and hands-on onboarding from our team. [Book a demo](https://cal.eu/jamie-openpolicy/openpolicy-chat-demo) and we'll help you get set up.
