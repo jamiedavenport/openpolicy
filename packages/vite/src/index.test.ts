@@ -33,7 +33,7 @@ export default {
   privacy: {
     effectiveDate: "2026-01-01",
     dataCollected: { "Usage Data": ["Page views", "Session duration"] },
-    legalBasis: "Legitimate interests",
+    legalBasis: "legitimate_interests",
     retention: { "Usage Data": "90 days" },
     cookies: { essential: true, analytics: true, marketing: false },
     thirdParties: [],
@@ -105,7 +105,7 @@ export default {
   privacy: {
     effectiveDate: "2026-01-01",
     dataCollected: { "Account Information": ["Name", "Email"] },
-    legalBasis: "Legitimate interests",
+    legalBasis: "legitimate_interests",
     retention: { "Account data": "Until deletion" },
     cookies: { essential: true, analytics: false, marketing: false },
     thirdParties: [],

@@ -13,7 +13,7 @@ export default defineConfig({
 			"Account Information": ["Name", "Email address"],
 			"Session Data": ["IP address", "User agent"],
 		},
-		legalBasis: "Legitimate interests and consent",
+		legalBasis: ["legitimate_interests", "consent"],
 		retention: {
 			"Account information": "Until account deletion",
 			"Session data": "Until session expiry",

@@ -36,11 +36,13 @@ export type {
 	CookiePolicyConfig,
 	DisputeResolutionMethod,
 	Jurisdiction,
+	LegalBasis,
 	OpenPolicyConfig,
 	OutputFormat,
 	PolicyInput,
 	PrivacyPolicyConfig,
 	TermsOfServiceConfig,
+	UserRight,
 	ValidationIssue,
 } from "./types";
 export { isOpenPolicyConfig } from "./types";

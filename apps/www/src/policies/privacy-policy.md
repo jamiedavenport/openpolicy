@@ -21,7 +21,7 @@ We collect the following categories of information:
 
 ## Legal Basis for Processing
 
-Legitimate interests and consent
+
 
 ---
 

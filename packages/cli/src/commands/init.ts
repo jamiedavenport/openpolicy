@@ -17,7 +17,7 @@ export function getOpenPolicyTemplate(
 		dataCollected: {
 			"Personal Information": ["Email address"],
 		},
-		legalBasis: "Legitimate interests",
+		legalBasis: "legitimate_interests",
 		retention: {
 			"All personal data": "As long as necessary for the purposes described in this policy",
 		},

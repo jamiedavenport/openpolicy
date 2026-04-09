@@ -13,7 +13,7 @@ export default defineConfig({
 			"Personal Information": ["Full name", "Email address"],
 			"Usage Data": ["Pages visited", "Time spent on site"],
 		},
-		legalBasis: "Legitimate interests and consent",
+		legalBasis: ["legitimate_interests", "consent"],
 		retention: {
 			"Personal data": "As long as your account is active",
 		},

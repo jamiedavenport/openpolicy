@@ -2,6 +2,15 @@ import type { PrivacyPolicyConfig } from "../types";
 import { bold, heading, li, link, p, section, ul } from "./helpers";
 import type { DocumentSection } from "./types";
 
+const LEGAL_BASIS_LABELS: Record<string, string> = {
+	consent: "Consent (Article 6(1)(a))",
+	contract: "Performance of a contract (Article 6(1)(b))",
+	legal_obligation: "Compliance with a legal obligation (Article 6(1)(c))",
+	vital_interests: "Protection of vital interests (Article 6(1)(d))",
+	public_task: "Performance of a public task (Article 6(1)(e))",
+	legitimate_interests: "Legitimate interests (Article 6(1)(f))",
+};
+
 const RIGHTS_LABELS: Record<string, string> = {
 	access: "Right to access your personal data",
 	rectification: "Right to correct inaccurate data",
@@ -61,11 +70,15 @@ function buildDataCollected(config: PrivacyPolicyConfig): DocumentSection {
 
 function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
 	if (!config.jurisdictions.includes("eu")) return null;
+	const bases = Array.isArray(config.legalBasis)
+		? config.legalBasis
+		: [config.legalBasis];
+	const labelled = bases.map((b) => LEGAL_BASIS_LABELS[b] ?? b);
 	return section("legal-basis", [
 		heading("Legal Basis for Processing", {
 			reason: "Required by GDPR Article 13",
 		}),
-		p([config.legalBasis]),
+		p([labelled.join(" and ")]),
 	]);
 }
 
@@ -117,7 +130,13 @@ function buildThirdParties(config: PrivacyPolicyConfig): DocumentSection {
 		heading("Third-Party Services"),
 		p(["We share data with the following third-party services:"]),
 		ul(
-			config.thirdParties.map((t) => li([bold(t.name), " \u2014 ", t.purpose])),
+			config.thirdParties.map((t) =>
+				li([
+					t.policyUrl ? link(t.policyUrl, t.name) : bold(t.name),
+					" \u2014 ",
+					t.purpose,
+				]),
+			),
 		),
 	]);
 }
