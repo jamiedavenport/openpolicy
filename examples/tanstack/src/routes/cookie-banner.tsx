@@ -101,7 +101,7 @@ function CookieBannerDemo() {
 }
 
 function RouteComponent() {
-	const { reset } = useCookies();
+	const { reset, status } = useCookies();
 
 	return (
 		<div className="p-8 max-w-xl mx-auto">
@@ -111,6 +111,8 @@ function RouteComponent() {
 				Click <strong>Manage Cookies</strong> inside the banner to open the
 				preference panel.
 			</p>
+
+			<div data-testid="consent-status">{status}</div>
 
 			<Button variant="outline" onClick={reset} data-testid="reset-consent">
 				Reset consent (show banner again)
