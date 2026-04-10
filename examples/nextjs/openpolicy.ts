@@ -12,7 +12,7 @@ export default defineConfig({
 		dataCollected: {
 			"Personal Information": ["Full name", "Email address"],
 		},
-		legalBasis: "Legitimate interests and consent",
+		legalBasis: "legitimate_interests",
 		retention: {
 			"All personal data":
 				"As long as necessary for the purposes described in this policy",
