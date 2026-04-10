@@ -10,7 +10,8 @@
 				"!.next/cache/**",
 				"dist/**",
 				".svelte-kit/**",
-				".output/**"
+				".output/**",
+				".vercel/output/**"
 			]
 		},
 		"check-types": {
