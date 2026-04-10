@@ -4,6 +4,24 @@ export type CompileOptions = { formats: OutputFormat[] };
 
 export type Jurisdiction = "us" | "eu" | "ca" | "au" | "nz" | "other";
 
+export type UserRight =
+	| "access"
+	| "rectification"
+	| "erasure"
+	| "portability"
+	| "restriction"
+	| "objection"
+	| "opt_out_sale"
+	| "non_discrimination";
+
+export type LegalBasis =
+	| "consent"
+	| "contract"
+	| "legal_obligation"
+	| "vital_interests"
+	| "public_task"
+	| "legitimate_interests";
+
 export type CompanyConfig = {
 	name: string;
 	legalName: string;
@@ -15,11 +33,11 @@ export type PrivacyPolicyConfig = {
 	effectiveDate: string;
 	company: CompanyConfig;
 	dataCollected: Record<string, string[]>;
-	legalBasis: string;
+	legalBasis: LegalBasis | LegalBasis[];
 	retention: Record<string, string>;
 	cookies: { essential: boolean; analytics: boolean; marketing: boolean };
-	thirdParties: { name: string; purpose: string }[];
-	userRights: string[];
+	thirdParties: { name: string; purpose: string; policyUrl?: string }[];
+	userRights: UserRight[];
 	jurisdictions: Jurisdiction[];
 	// optional children-specific policy
 	children?: {

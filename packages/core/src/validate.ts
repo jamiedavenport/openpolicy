@@ -29,7 +29,10 @@ export function validatePrivacyPolicy(
 
 	// GDPR checks
 	if (config.jurisdictions.includes("eu")) {
-		if (!config.legalBasis)
+		const basisArray = Array.isArray(config.legalBasis)
+			? config.legalBasis
+			: [config.legalBasis];
+		if (basisArray.length === 0 || (basisArray.length === 1 && !basisArray[0]))
 			issues.push({ level: "error", message: "GDPR requires a legalBasis" });
 		for (const right of [
 			"access",
@@ -38,7 +41,7 @@ export function validatePrivacyPolicy(
 			"portability",
 			"restriction",
 			"objection",
-		]) {
+		] as const) {
 			if (!config.userRights.includes(right))
 				issues.push({
 					level: "warning",
@@ -54,7 +57,7 @@ export function validatePrivacyPolicy(
 			"erasure",
 			"opt_out_sale",
 			"non_discrimination",
-		]) {
+		] as const) {
 			if (!config.userRights.includes(right))
 				issues.push({
 					level: "warning",

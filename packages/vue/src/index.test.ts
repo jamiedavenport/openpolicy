@@ -15,11 +15,11 @@ const privacyConfig: PrivacyPolicyConfig = {
 	effectiveDate: "2026-01-01",
 	company,
 	dataCollected: { account: ["email", "name"] },
-	legalBasis: "Consent",
+	legalBasis: "consent",
 	retention: { account: "2 years" },
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
-	userRights: ["access", "deletion"],
+	userRights: ["access", "erasure"],
 	jurisdictions: ["us"],
 };
 

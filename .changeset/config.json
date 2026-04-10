@@ -10,7 +10,8 @@
 			"@openpolicy/cli",
 			"@openpolicy/astro",
 			"@openpolicy/react",
-			"@openpolicy/vue"
+			"@openpolicy/vue",
+			"@openpolicy/renderers"
 		]
 	],
 	"linked": [],

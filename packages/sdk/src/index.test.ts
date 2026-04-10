@@ -12,7 +12,7 @@ const unifiedFixture: OpenPolicyConfig = {
 	privacy: {
 		effectiveDate: "2026-01-01",
 		dataCollected: { "Account Information": ["Name", "Email"] },
-		legalBasis: "Legitimate interests",
+		legalBasis: "legitimate_interests",
 		retention: { "Account data": "Until deletion" },
 		cookies: { essential: true, analytics: false, marketing: false },
 		thirdParties: [],

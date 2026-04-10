@@ -12,7 +12,7 @@ const input: PolicyInput = {
 		contact: "privacy@acme.com",
 	},
 	dataCollected: { "Account Information": ["Name", "Email"] },
-	legalBasis: "Legitimate interests",
+	legalBasis: "legitimate_interests",
 	retention: { "Account data": "Until deletion" },
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
@@ -32,7 +32,7 @@ const unifiedConfig: OpenPolicyConfig = {
 	privacy: {
 		effectiveDate: "2026-01-01",
 		dataCollected: { "Account Information": ["Name", "Email"] },
-		legalBasis: "Legitimate interests",
+		legalBasis: "legitimate_interests",
 		retention: { "Account data": "Until deletion" },
 		cookies: { essential: true, analytics: false, marketing: false },
 		thirdParties: [],

@@ -12,7 +12,7 @@ const minimalPrivacyConfig: PrivacyPolicyConfig = {
 		contact: "privacy@acme.com",
 	},
 	dataCollected: { "Account Information": ["Name", "Email address"] },
-	legalBasis: "Legitimate interests and consent",
+	legalBasis: ["legitimate_interests", "consent"],
 	retention: { "Account data": "Until account deletion" },
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
