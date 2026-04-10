@@ -1,41 +1,36 @@
 [![OpenPolicy](https://openpolicy.sh/og.png)](https://openpolicy.sh)
 
-# Landing Page Example — Astro + OpenPolicy
+# Astro Example — OpenPolicy
 
-A minimal Astro static site showing how to integrate OpenPolicy using the `@openpolicy/astro` integration. Policy documents are compiled at build time.
+A minimal Astro static site showing how to render privacy, terms, and cookie policies using `@openpolicy/core` directly in page frontmatter. No Astro integration, no generated files.
 
 ## What it demonstrates
 
-- Configuring the `@openpolicy/astro` integration inside `astro.config.mjs`
-- Defining a Privacy Policy and Terms of Service using `@openpolicy/sdk`
-- Generating Markdown and HTML output to `src/policies/` at build time
-- (Bonus) Using `openpolicy generate` via the CLI as an alternative one-off generation step
+- Defining a unified policy config with `@openpolicy/sdk`
+- Splitting it into individual policies with `expandOpenPolicyConfig`
+- Compiling and rendering each policy to HTML with `compile` + `renderHTML`
+- Rendering the output in Astro pages using `set:html`
 
 ## Project structure
 
 ```
-astro.config.mjs      ← openPolicy() plugin configured here
-policy.config.ts      ← defineConfig() — privacy policy definition
-terms.config.ts       ← defineConfig() — terms of service definition
-src/policies/         ← generated output (privacy-policy.{md,html}, terms-of-service.{md,html})
+src/lib/openpolicy.ts   ← defineConfig() — all policy definitions
+src/pages/privacy.astro ← privacy policy page
+src/pages/terms.astro   ← terms of service page
+src/pages/cookie.astro  ← cookie policy page
+astro.config.mjs        ← empty — no integrations needed
 ```
 
 ## Running locally
 
 ```sh
 bun install
-bun run dev      # start dev server — policies are generated on startup
-bun run build    # production build
-```
-
-To regenerate policies without starting the dev server:
-
-```sh
-bun run generate:policy
+bun run dev
+bun run build
 ```
 
 ## Learn more
 
-- [OpenPolicy docs](https://openpolicy.dev/docs)
-- [`@openpolicy/astro` integration](https://openpolicy.dev/docs/astro)
-- [`@openpolicy/sdk` reference](https://openpolicy.dev/docs/sdk)
+- [Blog post: Zero-build privacy policies with Astro](https://openpolicy.sh/blog/no-build-astro)
+- [OpenPolicy docs](https://openpolicy.sh/docs)
+- [`@openpolicy/sdk` reference](https://openpolicy.sh/docs/configuration)

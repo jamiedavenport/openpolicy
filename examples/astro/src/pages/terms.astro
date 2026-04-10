@@ -1,6 +1,18 @@
 ---
-import { Content } from "../policies/terms-of-service.md";
 import "../styles/site.css";
+import openpolicy from "../lib/openpolicy";
+import { compile, expandOpenPolicyConfig } from "@openpolicy/core";
+import { renderHTML } from "@openpolicy/renderers";
+
+const policies = expandOpenPolicyConfig(openpolicy);
+
+const termsPolicy = policies.find((p) => p.type === "terms");
+
+if (!termsPolicy) {
+	throw new Error("Terms of service not found in config");
+}
+
+const policy = renderHTML(compile(termsPolicy));
 ---
 
 <html lang="en">
@@ -20,7 +32,8 @@ import "../styles/site.css";
 				<a href="/terms">Terms</a>
 				<a href="/cookie">Cookie</a>
 			</nav>
-			<Content />
+
+			<div set:html={policy} />
 		</main>
 	</body>
 </html>
