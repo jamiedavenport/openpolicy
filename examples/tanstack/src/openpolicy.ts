@@ -1,4 +1,4 @@
-import { defineConfig } from "@openpolicy/sdk";
+import { autoCollected, defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -10,10 +10,11 @@ export default defineConfig({
 	privacy: {
 		effectiveDate: "2026-03-03",
 		dataCollected: {
-			"Account Information": ["Name", "Email address"],
+			...autoCollected,
+			// Static entries are still allowed alongside scanned ones:
 			"Usage Data": ["Pages visited", "Browser type", "IP address"],
 		},
-		legalBasis: "Legitimate interests and consent",
+		legalBasis: "legitimate_interests",
 		retention: {
 			"Account data": "Until account deletion",
 			"Usage logs": "90 days",

@@ -1,15 +1,17 @@
 {
-	"name": "@openpolicy/core",
+	"name": "@openpolicy/vite-auto-collect",
 	"version": "0.0.17",
 	"type": "module",
-	"description": "Core package for OpenPolicy",
+	"description": "Vite plugin that scans source files for @openpolicy/sdk collecting() calls and populates autoCollected() at build time",
 	"license": "GPL-3.0-only",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/jamiedavenport/openpolicy",
-		"directory": "packages/core"
+		"directory": "packages/vite-auto-collect"
 	},
-	"sideEffects": false,
+	"keywords": [
+		"vite-plugin"
+	],
 	"files": [
 		"dist",
 		"README.md"
@@ -26,7 +28,15 @@
 		"check-types": "tsc --noEmit",
 		"test": "bun test"
 	},
+	"peerDependencies": {
+		"vite": ">=4.0.0"
+	},
+	"dependencies": {
+		"oxc-parser": "^0.124.0"
+	},
 	"devDependencies": {
-		"@openpolicy/tooling": "workspace:*"
+		"@openpolicy/sdk": "workspace:*",
+		"@openpolicy/tooling": "workspace:*",
+		"vite": "catalog:"
 	}
 }
