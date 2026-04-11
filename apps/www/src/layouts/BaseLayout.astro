@@ -7,21 +7,21 @@ import Nav from "../components/nav.astro";
 import { Icon } from "astro-icon/components";
 
 interface Props {
-  title: string;
-  description: string;
-  ogUrl?: string;
-  ogImage?: string;
-  ctaHref?: string;
-  ctaText?: string;
+	title: string;
+	description: string;
+	ogUrl?: string;
+	ogImage?: string;
+	ctaHref?: string;
+	ctaText?: string;
 }
 
 const {
-  title,
-  description,
-  ogUrl = "https://openpolicy.sh",
-  ogImage = "https://openpolicy.sh/og.png",
-  ctaHref = "https://docs.openpolicy.sh",
-  ctaText = "Documentation",
+	title,
+	description,
+	ogUrl = "https://openpolicy.sh",
+	ogImage = "https://openpolicy.sh/og.png",
+	ctaHref = "https://docs.openpolicy.sh",
+	ctaText = "Documentation",
 } = Astro.props;
 ---
 

@@ -2,9 +2,9 @@
 @plugin "@tailwindcss/typography";
 
 @theme inline {
-    --font-mono: var(--font-geist-mono);
+	--font-mono: var(--font-geist-mono);
 }
 
 code {
-    font-size: inherit;
+	font-size: inherit;
 }

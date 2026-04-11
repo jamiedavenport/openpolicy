@@ -56,7 +56,6 @@ const demos = [
 function RouteComponent() {
 	return (
 		<main className="mx-auto max-w-6xl px-6 py-16">
-			{/* Hero */}
 			<div className="mb-16 max-w-2xl">
 				<div className="mb-4 inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3 py-1 text-xs text-muted-foreground">
 					<span className="size-1.5 rounded-full bg-green-500" />
