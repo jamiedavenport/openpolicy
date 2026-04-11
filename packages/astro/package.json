@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/astro",
-	"version": "0.0.17",
+	"version": "1.0.0",
 	"type": "module",
 	"description": "Astro integration for compiling OpenPolicy documents at build time",
 	"license": "GPL-3.0-only",
@@ -32,9 +32,9 @@
 	},
 	"peerDependencies": {
 		"astro": ">=4.0.0",
-		"@openpolicy/vite": ">=0.0.17",
-		"@openpolicy/sdk": ">=0.0.17",
-		"@openpolicy/core": ">=0.0.17"
+		"@openpolicy/vite": ">=1.0.0",
+		"@openpolicy/sdk": ">=1.0.0",
+		"@openpolicy/core": ">=1.0.0"
 	},
 	"devDependencies": {
 		"@openpolicy/tooling": "workspace:*",

@@ -1,5 +1,7 @@
 # @openpolicy/core
 
+## 1.0.0
+
 ## 0.0.17
 
 ### Patch Changes

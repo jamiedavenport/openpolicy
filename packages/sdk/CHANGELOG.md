@@ -1,5 +1,12 @@
 # @openpolicy/sdk
 
+## 1.0.0
+
+### Minor Changes
+
+- 82e7df7: Add `autoCollected` sentinel to `@openpolicy/sdk` and new `@openpolicy/vite-auto-collect` Vite plugin that scans source files for `collecting()` calls and inlines the discovered categories into the sentinel at build time. Spread `autoCollected` into `dataCollected` in your `openpolicy.ts` — the plugin composes cleanly without requiring `@openpolicy/vite`.
+- 82e7df7: Add `collecting()` runtime wrapper for declaring data collection at the point of storage
+
 ## 0.0.17
 
 ## 0.0.16

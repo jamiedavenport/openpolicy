@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/vue",
-	"version": "0.0.17",
+	"version": "1.0.0",
 	"type": "module",
 	"description": "Vue components for OpenPolicy",
 	"license": "GPL-3.0-only",
