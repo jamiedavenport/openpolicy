@@ -1,43 +1,23 @@
 import { expect, test } from "bun:test";
 import { extractCollecting } from "./analyse";
 
-test("canonical case: string-literal keys in concise arrow body", () => {
+test("canonical case: string literal values in object literal", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
-		collecting("Account Information", { name, email }, (v) => ({
-			"Name": v.name,
-			"Email address": v.email,
-		}));
+		collecting("Account Information", { name, email }, {
+			name: "Name",
+			email: "Email address",
+		});
 	`;
 	expect(extractCollecting("a.ts", code)).toEqual({
 		"Account Information": ["Name", "Email address"],
 	});
 });
 
-test("shorthand / unquoted identifier keys", () => {
-	const code = `
-		import { collecting } from "@openpolicy/sdk";
-		collecting("Cat", v, (v) => ({ Name: v.a, Email: v.b }));
-	`;
-	expect(extractCollecting("a.ts", code)).toEqual({
-		Cat: ["Name", "Email"],
-	});
-});
-
 test("renamed import", () => {
 	const code = `
 		import { collecting as col } from "@openpolicy/sdk";
-		col("Cat", v, (v) => ({ Name: v.a }));
-	`;
-	expect(extractCollecting("a.ts", code)).toEqual({ Cat: ["Name"] });
-});
-
-test("block-body arrow function with explicit return", () => {
-	const code = `
-		import { collecting } from "@openpolicy/sdk";
-		collecting("Cat", v, (v) => {
-			return { "Name": v.a };
-		});
+		col("Cat", v, { a: "Name" });
 	`;
 	expect(extractCollecting("a.ts", code)).toEqual({ Cat: ["Name"] });
 });
@@ -45,7 +25,7 @@ test("block-body arrow function with explicit return", () => {
 test("ignores collecting imported from a non-SDK module", () => {
 	const code = `
 		import { collecting } from "./local-collecting";
-		collecting("Cat", v, (v) => ({ Name: v.a }));
+		collecting("Cat", v, { a: "Name" });
 	`;
 	expect(extractCollecting("a.ts", code)).toEqual({});
 });
@@ -53,7 +33,7 @@ test("ignores collecting imported from a non-SDK module", () => {
 test("ignores local `collecting` not imported from anywhere", () => {
 	const code = `
 		function collecting(a, b, c) { return b; }
-		collecting("Cat", v, (v) => ({ Name: v.a }));
+		collecting("Cat", v, { a: "Name" });
 	`;
 	expect(extractCollecting("a.ts", code)).toEqual({});
 });
@@ -61,7 +41,7 @@ test("ignores local `collecting` not imported from anywhere", () => {
 test("ignores type-only imports", () => {
 	const code = `
 		import type { collecting } from "@openpolicy/sdk";
-		collecting("Cat", v, (v) => ({ Name: v.a }));
+		collecting("Cat", v, { a: "Name" });
 	`;
 	expect(extractCollecting("a.ts", code)).toEqual({});
 });
@@ -69,21 +49,24 @@ test("ignores type-only imports", () => {
 test("skips template-literal category silently", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
-		collecting(\`Cat\`, v, (v) => ({ Name: v.a }));
+		collecting(\`Cat\`, v, { a: "Name" });
 	`;
 	expect(extractCollecting("a.ts", code)).toEqual({});
 });
 
-test("drops computed and spread keys but keeps the rest", () => {
+test("non-string values skipped silently, string values kept", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
-		const KEY = "X";
+		collecting("Cat", v, { a: 42, b: "Kept", c: true });
+	`;
+	expect(extractCollecting("a.ts", code)).toEqual({ Cat: ["Kept"] });
+});
+
+test("spread elements skipped silently", () => {
+	const code = `
+		import { collecting } from "@openpolicy/sdk";
 		const rest = {};
-		collecting("Cat", v, (v) => ({
-			[KEY]: v.a,
-			...rest,
-			Kept: v.b,
-		}));
+		collecting("Cat", v, { ...rest, b: "Kept" });
 	`;
 	expect(extractCollecting("a.ts", code)).toEqual({ Cat: ["Kept"] });
 });
@@ -91,7 +74,7 @@ test("drops computed and spread keys but keeps the rest", () => {
 test("malformed source returns {} without throwing", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
-		collecting("Cat", v, (v) => ({ Name: v.a }
+		collecting("Cat", v, { a: "Name"
 	`;
 	const originalWarn = console.warn;
 	console.warn = () => {}; // suppress expected parse-error log
@@ -109,16 +92,16 @@ test("malformed source returns {} without throwing", () => {
 test("merges multiple calls with the same category", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
-		collecting("Cat", v, (v) => ({ A: v.a }));
-		collecting("Cat", w, (w) => ({ B: w.b, A: w.a2 }));
+		collecting("Cat", v, { a: "A" });
+		collecting("Cat", w, { b: "B", a2: "A" });
 	`;
 	expect(extractCollecting("a.ts", code)).toEqual({ Cat: ["A", "B"] });
 });
 
-test("deduplicates repeated labels across and within calls", () => {
+test("deduplicates repeated label values across and within calls", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
-		collecting("Cat", v, (v) => ({ A: v.a, A: v.a2 }));
+		collecting("Cat", v, { a: "A", a2: "A" });
 	`;
 	expect(extractCollecting("a.ts", code)).toEqual({ Cat: ["A"] });
 });
@@ -131,11 +114,19 @@ test("skips calls with fewer than three arguments", () => {
 	expect(extractCollecting("a.ts", code)).toEqual({});
 });
 
-test("skips calls whose third arg is not an arrow function", () => {
+test("skips calls whose third arg is a variable reference", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
-		const fn = (v) => ({ Name: v.a });
-		collecting("Cat", v, fn);
+		const labels = { a: "Name" };
+		collecting("Cat", v, labels);
+	`;
+	expect(extractCollecting("a.ts", code)).toEqual({});
+});
+
+test("skips calls whose third arg is an arrow function", () => {
+	const code = `
+		import { collecting } from "@openpolicy/sdk";
+		collecting("Cat", v, (v) => ({ Name: v.a }));
 	`;
 	expect(extractCollecting("a.ts", code)).toEqual({});
 });
@@ -149,10 +140,10 @@ test("calls nested inside other functions are still extracted", () => {
 		import { collecting } from "@openpolicy/sdk";
 		export function createUser(name: string, email: string) {
 			return db.insert(users).values(
-				collecting("Account Information", { name, email }, (v) => ({
-					Name: v.name,
-					"Email address": v.email,
-				})),
+				collecting("Account Information", { name, email }, {
+					name: "Name",
+					email: "Email address",
+				}),
 			);
 		}
 	`;

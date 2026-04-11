@@ -126,48 +126,25 @@ function extractStringLiteral(node: AnyNode | undefined): string | null {
 }
 
 /**
- * Extract the keys from a `(v) => ({ ... })` or `(v) => { return { ... } }`
- * arrow function body. Returns an array of key names, deduped while
+ * Extract the string values from a plain `{ fieldName: "Human Label" }`
+ * object literal. Returns an array of label strings, deduped while
  * preserving insertion order. Returns `null` if the shape doesn't match.
  */
 function extractLabelKeys(node: AnyNode | undefined): string[] | null {
-	if (!node || node.type !== "ArrowFunctionExpression") return null;
-	let body = node.body as AnyNode | undefined;
-	// Unwrap oxc's ParenthesizedExpression around concise-return arrow bodies.
-	while (body && body.type === "ParenthesizedExpression") {
-		body = body.expression as AnyNode | undefined;
-	}
-	if (body && body.type === "BlockStatement") {
-		const statements = body.body as AnyNode[] | undefined;
-		if (!statements) return null;
-		const ret = statements.find((s) => s.type === "ReturnStatement");
-		if (!ret) return null;
-		body = ret.argument as AnyNode | undefined;
-		while (body && body.type === "ParenthesizedExpression") {
-			body = body.expression as AnyNode | undefined;
-		}
-	}
-	if (!body || body.type !== "ObjectExpression") return null;
-	const properties = body.properties as AnyNode[] | undefined;
+	if (!node || node.type !== "ObjectExpression") return null;
+	const properties = node.properties as AnyNode[] | undefined;
 	if (!properties) return null;
 
 	const labels: string[] = [];
 	const seen = new Set<string>();
 	for (const prop of properties) {
 		if (prop.type !== "Property") continue; // drop SpreadElement silently
-		if (prop.computed === true) continue; // drop computed keys
-		const key = prop.key as AnyNode | undefined;
-		if (!key) continue;
-		let label: string | undefined;
-		if (key.type === "Identifier") {
-			label = key.name as string;
-		} else if (key.type === "Literal" && typeof key.value === "string") {
-			label = key.value;
-		}
-		if (label === undefined) continue;
-		if (seen.has(label)) continue;
-		seen.add(label);
-		labels.push(label);
+		const val = prop.value as AnyNode | undefined;
+		if (!val || val.type !== "Literal" || typeof val.value !== "string")
+			continue;
+		if (seen.has(val.value)) continue;
+		seen.add(val.value);
+		labels.push(val.value);
 	}
 	return labels;
 }

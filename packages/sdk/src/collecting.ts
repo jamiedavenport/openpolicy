@@ -4,17 +4,18 @@
  * to `collecting()` at build time and merge the declarations into the
  * compiled privacy policy.
  *
- * The third argument is a label function mapping the stored value to a
- * record whose **keys** describe what each field represents in
- * human-readable terms. Only those keys are used by the analyser; the
- * function body is never executed at runtime. This shape lets you:
+ * The third argument is a plain object literal whose **keys** are field names
+ * matching your stored value (for convenient access without a typed callback)
+ * and whose **values** are the human-readable labels used in the compiled
+ * policy. Only the string values are used by the analyser; the object is
+ * never evaluated at runtime. This shape lets you:
  *   - keep `value` matching your ORM/table schema exactly,
  *   - describe fields with friendly labels for the policy,
  *   - omit fields from the policy by leaving them out of the label record
  *     (e.g. `hashedPassword`).
  *
- * The category argument and the keys of the label record must be string
- * literals — dynamic values are silently skipped by the analyser.
+ * The category argument and the string values of the label record must be
+ * string literals — dynamic values are silently skipped by the analyser.
  *
  * @example
  * ```ts
@@ -25,10 +26,7 @@
  *     collecting(
  *       "Account Information",
  *       { name, email }, // real ORM columns — returned unchanged
- *       (v) => ({
- *         Name: v.name,
- *         "Email address": v.email,
- *       }),
+ *       { name: "Name", email: "Email address" },
  *     ),
  *   );
  * }
@@ -37,7 +35,7 @@
 export function collecting<T>(
 	_category: string,
 	value: T,
-	_label: (v: T) => Record<string, unknown>,
+	_label: Partial<Record<keyof T, string>>,
 ): T {
 	return value;
 }

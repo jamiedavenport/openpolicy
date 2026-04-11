@@ -50,11 +50,11 @@ const AUTO_COLLECTED_SPECIFIER = /^\.\/auto-collected(?:\.js)?$/;
 /**
  * Vite plugin that scans source files for `@openpolicy/sdk` `collecting()`
  * calls at the start of each build and inlines the discovered categories into
- * the SDK's `autoCollected` sentinel.
+ * the SDK's `dataCollected` sentinel.
  *
  * Internally the plugin intercepts `@openpolicy/sdk`'s own relative import of
  * `./auto-collected` and redirects it to a virtual module whose body is a
- * literal `export const autoCollected = { ... }`. Because the replacement
+ * literal `export const dataCollected = { ... }`. Because the replacement
  * becomes part of the consumer's own module graph, the scanned data survives
  * any downstream bundler boundary (e.g. nitro's SSR output), which a shared
  * module-level registry would not.
@@ -106,7 +106,7 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 	/**
 	 * Re-runs the scan and, if anything changed, invalidates the virtual
 	 * module and triggers a full page reload. A full reload is used because
-	 * `autoCollected` is spread into `dataCollected` at module-evaluation
+	 * `dataCollected` is spread into the policy config at module-evaluation
 	 * time and the result is captured by the React tree as a prop — there's
 	 * no clean way to hot-swap it in place.
 	 */
@@ -166,7 +166,7 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 		},
 		load(id) {
 			if (id !== RESOLVED_VIRTUAL_ID) return null;
-			return `export const autoCollected = ${JSON.stringify(scanned)};\n`;
+			return `export const dataCollected = ${JSON.stringify(scanned)};\n`;
 		},
 	};
 }

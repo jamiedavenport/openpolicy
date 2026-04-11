@@ -1,4 +1,4 @@
-import { autoCollected, defineConfig } from "@openpolicy/sdk";
+import { dataCollected, defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -10,7 +10,7 @@ export default defineConfig({
 	privacy: {
 		effectiveDate: "2026-03-03",
 		dataCollected: {
-			...autoCollected,
+			...dataCollected,
 			// Static entries are still allowed alongside scanned ones:
 			"Usage Data": ["Pages visited", "Browser type", "IP address"],
 		},

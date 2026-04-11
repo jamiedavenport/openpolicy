@@ -7,16 +7,16 @@
  *
  * @example
  * ```ts
- * import { autoCollected, defineConfig } from "@openpolicy/sdk";
+ * import { dataCollected, defineConfig } from "@openpolicy/sdk";
  *
  * export default defineConfig({
  *   privacy: {
  *     dataCollected: {
- *       ...autoCollected,
+ *       ...dataCollected,
  *       "Manually-tracked Category": ["Field A"],
  *     },
  *   },
  * });
  * ```
  */
-export const autoCollected: Record<string, string[]> = {};
+export const dataCollected: Record<string, string[]> = {};

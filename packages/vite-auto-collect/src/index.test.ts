@@ -142,61 +142,16 @@ function createStubServer(): StubServer {
 	};
 }
 
-/**
- * Invokes the plugin's `configureServer` hook with the given stub. Handles
- * both the plain-function and object-hook shapes that Vite allows.
- */
-function runConfigureServer(
-	plugin: PluginInstance,
-	// biome-ignore lint/suspicious/noExplicitAny: see StubServer.
-	server: any,
-): void | Promise<void> {
-	const hook = plugin.configureServer as unknown;
-	if (typeof hook === "function") {
-		return (hook as (s: unknown) => void | Promise<void>)(server);
-	}
-	if (hook && typeof (hook as { handler?: unknown }).handler === "function") {
-		return (hook as { handler: (s: unknown) => void | Promise<void> }).handler(
-			server,
-		);
-	}
-	throw new Error("plugin has no configureServer hook");
-}
-
-/**
- * Calls the plugin's `resolveId` hook with a stubbed Vite context whose
- * `this.resolve` returns a fixed fake resolution.
- */
-async function callResolveId(
-	plugin: PluginInstance,
-	source: string,
-	importer: string | undefined,
-	fakeResolved: { id: string } | null,
-): Promise<string | null> {
-	const hook = plugin.resolveId as unknown as (
-		this: { resolve: () => Promise<{ id: string } | null> },
-		source: string,
-		importer: string | undefined,
-		options: Record<string, unknown>,
-	) => Promise<string | null>;
-	const context = {
-		async resolve(): Promise<{ id: string } | null> {
-			return fakeResolved;
-		},
-	};
-	return hook.call(context, source, importer, {});
-}
-
 test("load hook returns scanned categories after buildStart", async () => {
 	await touch(
 		"src/lib/db.ts",
 		`
 		import { collecting } from "@openpolicy/sdk";
 		export function createUser(name: string, email: string) {
-			return collecting("Account Information", { name, email }, (v) => ({
-				Name: v.name,
-				"Email address": v.email,
-			}));
+			return collecting("Account Information", { name, email }, {
+				name: "Name",
+				email: "Email address",
+			});
 		}
 		`,
 	);
@@ -216,15 +171,15 @@ test("merges calls across multiple files", async () => {
 		"src/a-users.ts",
 		`
 		import { collecting } from "@openpolicy/sdk";
-		collecting("Account Information", v, (v) => ({ Name: v.a, Email: v.b }));
+		collecting("Account Information", v, { a: "Name", b: "Email" });
 		`,
 	);
 	await touch(
 		"src/b-pages.ts",
 		`
 		import { collecting } from "@openpolicy/sdk";
-		collecting("Usage Data", v, (v) => ({ "Pages visited": v.p }));
-		collecting("Account Information", v, (v) => ({ Phone: v.c }));
+		collecting("Usage Data", v, { p: "Pages visited" });
+		collecting("Account Information", v, { c: "Phone" });
 		`,
 	);
 
@@ -242,14 +197,14 @@ test("ignores files outside the configured srcDir", async () => {
 		"src/ok.ts",
 		`
 		import { collecting } from "@openpolicy/sdk";
-		collecting("In", v, (v) => ({ X: v.x }));
+		collecting("In", v, { x: "X" });
 		`,
 	);
 	await touch(
 		"other/nope.ts",
 		`
 		import { collecting } from "@openpolicy/sdk";
-		collecting("Out", v, (v) => ({ X: v.x }));
+		collecting("Out", v, { x: "X" });
 		`,
 	);
 
@@ -264,7 +219,7 @@ test("respects a custom srcDir", async () => {
 		"app/foo.ts",
 		`
 		import { collecting } from "@openpolicy/sdk";
-		collecting("Cat", v, (v) => ({ X: v.x }));
+		collecting("Cat", v, { x: "X" });
 		`,
 	);
 
@@ -296,7 +251,7 @@ test("scans .tsx files by default", async () => {
 		`
 		import { collecting } from "@openpolicy/sdk";
 		export function Widget() {
-			collecting("Widget", v, (v) => ({ X: v.x }));
+			collecting("Widget", v, { x: "X" });
 			return null;
 		}
 		`,
@@ -372,7 +327,7 @@ test("dev watcher re-scans and triggers a full reload when a tracked file change
 		"src/lib/db.ts",
 		`
 		import { collecting } from "@openpolicy/sdk";
-		collecting("Initial", v, (v) => ({ X: v.x }));
+		collecting("Initial", v, { x: "X" });
 		`,
 	);
 
@@ -389,8 +344,8 @@ test("dev watcher re-scans and triggers a full reload when a tracked file change
 		"src/lib/db.ts",
 		`
 		import { collecting } from "@openpolicy/sdk";
-		collecting("Initial", v, (v) => ({ X: v.x }));
-		collecting("Added", v, (v) => ({ Y: v.y }));
+		collecting("Initial", v, { x: "X" });
+		collecting("Added", v, { y: "Y" });
 		`,
 	);
 	await stub.runHandler("change", join(tmp, "src/lib/db.ts"));
@@ -415,7 +370,7 @@ test("dev watcher picks up newly-created source files", async () => {
 		"src/new.ts",
 		`
 		import { collecting } from "@openpolicy/sdk";
-		collecting("Brand New", v, (v) => ({ Z: v.z }));
+		collecting("Brand New", v, { z: "Z" });
 		`,
 	);
 	await stub.runHandler("add", join(tmp, "src/new.ts"));
@@ -429,7 +384,7 @@ test("dev watcher drops categories when a file is deleted", async () => {
 		"src/gone.ts",
 		`
 		import { collecting } from "@openpolicy/sdk";
-		collecting("Temporary", v, (v) => ({ X: v.x }));
+		collecting("Temporary", v, { x: "X" });
 		`,
 	);
 
@@ -480,7 +435,7 @@ test("dev watcher skips invalidation when the scan output is unchanged", async (
 		"src/a.ts",
 		`
 		import { collecting } from "@openpolicy/sdk";
-		collecting("A", v, (v) => ({ X: v.x }));
+		collecting("A", v, { x: "X" });
 		`,
 	);
 
@@ -496,7 +451,7 @@ test("dev watcher skips invalidation when the scan output is unchanged", async (
 		`
 		// comment added
 		import { collecting } from "@openpolicy/sdk";
-		collecting("A", v, (v) => ({ X: v.x }));
+		collecting("A", v, { x: "X" });
 		`,
 	);
 	await stub.runHandler("change", join(tmp, "src/a.ts"));
@@ -504,3 +459,48 @@ test("dev watcher skips invalidation when the scan output is unchanged", async (
 	expect(stub.invalidatedIds).toHaveLength(0);
 	expect(stub.sentMessages).toHaveLength(0);
 });
+
+/**
+ * Calls the plugin's `resolveId` hook with a stubbed Vite context whose
+ * `this.resolve` returns a fixed fake resolution.
+ */
+async function callResolveId(
+	plugin: PluginInstance,
+	source: string,
+	importer: string | undefined,
+	fakeResolved: { id: string } | null,
+): Promise<string | null> {
+	const hook = plugin.resolveId as unknown as (
+		this: { resolve: () => Promise<{ id: string } | null> },
+		source: string,
+		importer: string | undefined,
+		options: Record<string, unknown>,
+	) => Promise<string | null>;
+	const context = {
+		async resolve(): Promise<{ id: string } | null> {
+			return fakeResolved;
+		},
+	};
+	return hook.call(context, source, importer, {});
+}
+
+/**
+ * Invokes the plugin's `configureServer` hook with the given stub. Handles
+ * both the plain-function and object-hook shapes that Vite allows.
+ */
+function runConfigureServer(
+	plugin: PluginInstance,
+	// biome-ignore lint/suspicious/noExplicitAny: see StubServer.
+	server: any,
+): void | Promise<void> {
+	const hook = plugin.configureServer as unknown;
+	if (typeof hook === "function") {
+		return (hook as (s: unknown) => void | Promise<void>)(server);
+	}
+	if (hook && typeof (hook as { handler?: unknown }).handler === "function") {
+		return (hook as { handler: (s: unknown) => void | Promise<void> }).handler(
+			server,
+		);
+	}
+	throw new Error("plugin has no configureServer hook");
+}

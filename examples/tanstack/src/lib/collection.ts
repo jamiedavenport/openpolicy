@@ -7,15 +7,23 @@ import { collecting } from "@openpolicy/sdk";
  * `value` argument unchanged, so it's safe to drop in at any write site.
  */
 export function fakeCreateUser(name: string, email: string) {
-	return collecting("Account Information", { name, email }, (v) => ({
-		Name: v.name,
-		"Email address": v.email,
-	}));
+	return collecting(
+		"Account Information",
+		{ name, email },
+		{
+			name: "Name",
+			email: "Email",
+		},
+	);
 }
 
 export function fakeRecordPageView(path: string, userAgent: string) {
-	return collecting("Usage Data", { path, userAgent }, (v) => ({
-		"Pages visited": v.path,
-		"Browser type": v.userAgent,
-	}));
+	return collecting(
+		"Usage Data",
+		{ path, userAgent },
+		{
+			path: "Pages visited",
+			userAgent: "Browser type",
+		},
+	);
 }
