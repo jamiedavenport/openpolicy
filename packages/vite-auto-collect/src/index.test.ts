@@ -63,6 +63,106 @@ function loadScanned(plugin: PluginInstance): Record<string, string[]> {
 	return JSON.parse(match[1]);
 }
 
+type WatcherEvent = "change" | "add" | "unlink";
+type WatcherHandler = (file: string) => void | Promise<void>;
+
+type StubServer = {
+	watcherAdded: string[];
+	invalidatedIds: string[];
+	sentMessages: Array<{ type: string }>;
+	loggedErrors: string[];
+	runHandler: (event: WatcherEvent, file: string) => Promise<void>;
+	// biome-ignore lint/suspicious/noExplicitAny: ad-hoc ViteDevServer stub.
+	server: any;
+};
+
+/**
+ * Builds a minimal stand-in for `ViteDevServer` that captures everything the
+ * plugin touches: watcher registrations, module-graph invalidations, WS
+ * messages, and logger errors. `runHandler` invokes a registered watcher
+ * listener and awaits its async body so tests can assert post-state without
+ * a sleep or a microtask dance.
+ */
+function createStubServer(): StubServer {
+	const handlers: Record<WatcherEvent, WatcherHandler[]> = {
+		change: [],
+		add: [],
+		unlink: [],
+	};
+	const watcherAdded: string[] = [];
+	const invalidatedIds: string[] = [];
+	const sentMessages: Array<{ type: string }> = [];
+	const loggedErrors: string[] = [];
+
+	// biome-ignore lint/suspicious/noExplicitAny: see StubServer.
+	const server: any = {
+		watcher: {
+			add(path: string): void {
+				watcherAdded.push(path);
+			},
+			on(event: WatcherEvent, cb: WatcherHandler): void {
+				handlers[event].push(cb);
+			},
+		},
+		moduleGraph: {
+			getModuleById(id: string): { id: string } {
+				return { id };
+			},
+			invalidateModule(mod: { id: string }): void {
+				invalidatedIds.push(mod.id);
+			},
+		},
+		ws: {
+			send(msg: { type: string }): void {
+				sentMessages.push(msg);
+			},
+		},
+		config: {
+			logger: {
+				error(msg: string): void {
+					loggedErrors.push(msg);
+				},
+			},
+		},
+	};
+
+	async function runHandler(event: WatcherEvent, file: string): Promise<void> {
+		for (const cb of handlers[event]) {
+			await cb(file);
+		}
+	}
+
+	return {
+		watcherAdded,
+		invalidatedIds,
+		sentMessages,
+		loggedErrors,
+		runHandler,
+		server,
+	};
+}
+
+/**
+ * Invokes the plugin's `configureServer` hook with the given stub. Handles
+ * both the plain-function and object-hook shapes that Vite allows.
+ */
+function runConfigureServer(
+	plugin: PluginInstance,
+	// biome-ignore lint/suspicious/noExplicitAny: see StubServer.
+	server: any,
+): void | Promise<void> {
+	const hook = plugin.configureServer as unknown;
+	if (typeof hook === "function") {
+		return (hook as (s: unknown) => void | Promise<void>)(server);
+	}
+	if (hook && typeof (hook as { handler?: unknown }).handler === "function") {
+		return (hook as { handler: (s: unknown) => void | Promise<void> }).handler(
+			server,
+		);
+	}
+	throw new Error("plugin has no configureServer hook");
+}
+
 /**
  * Calls the plugin's `resolveId` hook with a stubbed Vite context whose
  * `this.resolve` returns a fixed fake resolution.
@@ -255,4 +355,152 @@ test("resolveId ignores specifiers other than ./auto-collected", async () => {
 		{ id: "/repo/packages/sdk/src/something-else.ts" },
 	);
 	expect(result).toBeNull();
+});
+
+test("configureServer adds resolvedSrcDir to the chokidar watch set", async () => {
+	const plugin = autoCollect();
+	await runPluginBuildStart(plugin, tmp);
+
+	const stub = createStubServer();
+	await runConfigureServer(plugin, stub.server);
+
+	expect(stub.watcherAdded).toContain(join(tmp, "src"));
+});
+
+test("dev watcher re-scans and triggers a full reload when a tracked file changes", async () => {
+	await touch(
+		"src/lib/db.ts",
+		`
+		import { collecting } from "@openpolicy/sdk";
+		collecting("Initial", v, (v) => ({ X: v.x }));
+		`,
+	);
+
+	const plugin = autoCollect();
+	await runPluginBuildStart(plugin, tmp);
+	expect(loadScanned(plugin)).toEqual({ Initial: ["X"] });
+
+	const stub = createStubServer();
+	await runConfigureServer(plugin, stub.server);
+
+	// User adds a second collecting() call — simulate both the file write
+	// and the watcher event chokidar would emit.
+	await touch(
+		"src/lib/db.ts",
+		`
+		import { collecting } from "@openpolicy/sdk";
+		collecting("Initial", v, (v) => ({ X: v.x }));
+		collecting("Added", v, (v) => ({ Y: v.y }));
+		`,
+	);
+	await stub.runHandler("change", join(tmp, "src/lib/db.ts"));
+
+	expect(loadScanned(plugin)).toEqual({
+		Initial: ["X"],
+		Added: ["Y"],
+	});
+	expect(stub.invalidatedIds).toContain(RESOLVED_VIRTUAL_ID);
+	expect(stub.sentMessages).toContainEqual({ type: "full-reload" });
+});
+
+test("dev watcher picks up newly-created source files", async () => {
+	const plugin = autoCollect();
+	await runPluginBuildStart(plugin, tmp);
+	expect(loadScanned(plugin)).toEqual({});
+
+	const stub = createStubServer();
+	await runConfigureServer(plugin, stub.server);
+
+	await touch(
+		"src/new.ts",
+		`
+		import { collecting } from "@openpolicy/sdk";
+		collecting("Brand New", v, (v) => ({ Z: v.z }));
+		`,
+	);
+	await stub.runHandler("add", join(tmp, "src/new.ts"));
+
+	expect(loadScanned(plugin)).toEqual({ "Brand New": ["Z"] });
+	expect(stub.sentMessages).toContainEqual({ type: "full-reload" });
+});
+
+test("dev watcher drops categories when a file is deleted", async () => {
+	await touch(
+		"src/gone.ts",
+		`
+		import { collecting } from "@openpolicy/sdk";
+		collecting("Temporary", v, (v) => ({ X: v.x }));
+		`,
+	);
+
+	const plugin = autoCollect();
+	await runPluginBuildStart(plugin, tmp);
+	expect(loadScanned(plugin)).toEqual({ Temporary: ["X"] });
+
+	const stub = createStubServer();
+	await runConfigureServer(plugin, stub.server);
+
+	await rm(join(tmp, "src/gone.ts"));
+	await stub.runHandler("unlink", join(tmp, "src/gone.ts"));
+
+	expect(loadScanned(plugin)).toEqual({});
+	expect(stub.sentMessages).toContainEqual({ type: "full-reload" });
+});
+
+test("dev watcher ignores events for files outside srcDir", async () => {
+	const plugin = autoCollect();
+	await runPluginBuildStart(plugin, tmp);
+
+	const stub = createStubServer();
+	await runConfigureServer(plugin, stub.server);
+
+	await touch("other/x.ts", `export const x = 1;\n`);
+	await stub.runHandler("change", join(tmp, "other/x.ts"));
+
+	expect(stub.invalidatedIds).toHaveLength(0);
+	expect(stub.sentMessages).toHaveLength(0);
+});
+
+test("dev watcher ignores events for files with untracked extensions", async () => {
+	const plugin = autoCollect();
+	await runPluginBuildStart(plugin, tmp);
+
+	const stub = createStubServer();
+	await runConfigureServer(plugin, stub.server);
+
+	await touch("src/README.md", `# hello\n`);
+	await stub.runHandler("change", join(tmp, "src/README.md"));
+
+	expect(stub.invalidatedIds).toHaveLength(0);
+	expect(stub.sentMessages).toHaveLength(0);
+});
+
+test("dev watcher skips invalidation when the scan output is unchanged", async () => {
+	await touch(
+		"src/a.ts",
+		`
+		import { collecting } from "@openpolicy/sdk";
+		collecting("A", v, (v) => ({ X: v.x }));
+		`,
+	);
+
+	const plugin = autoCollect();
+	await runPluginBuildStart(plugin, tmp);
+
+	const stub = createStubServer();
+	await runConfigureServer(plugin, stub.server);
+
+	// Touch the file with a harmless edit that preserves collecting() shape.
+	await touch(
+		"src/a.ts",
+		`
+		// comment added
+		import { collecting } from "@openpolicy/sdk";
+		collecting("A", v, (v) => ({ X: v.x }));
+		`,
+	);
+	await stub.runHandler("change", join(tmp, "src/a.ts"));
+
+	expect(stub.invalidatedIds).toHaveLength(0);
+	expect(stub.sentMessages).toHaveLength(0);
 });

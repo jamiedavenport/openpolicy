@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
-import type { Plugin } from "vite";
+import { relative, resolve } from "node:path";
+import type { Plugin, ViteDevServer } from "vite";
 import { extractCollecting } from "./analyse";
 import { walkSources } from "./scan";
 
@@ -92,6 +92,33 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 		return merged;
 	}
 
+	/**
+	 * Returns true when `file` lives inside `resolvedSrcDir` and has one of
+	 * the tracked extensions. Used by the dev-server watcher to skip events
+	 * for unrelated files (configs, public assets, other packages, etc.).
+	 */
+	function isTrackedSource(file: string): boolean {
+		const rel = relative(resolvedSrcDir, file);
+		if (!rel || rel.startsWith("..")) return false;
+		return extensions.some((ext) => file.endsWith(ext));
+	}
+
+	/**
+	 * Re-runs the scan and, if anything changed, invalidates the virtual
+	 * module and triggers a full page reload. A full reload is used because
+	 * `autoCollected` is spread into `dataCollected` at module-evaluation
+	 * time and the result is captured by the React tree as a prop — there's
+	 * no clean way to hot-swap it in place.
+	 */
+	async function rescanAndRefresh(server: ViteDevServer): Promise<void> {
+		const next = await scanAndMerge();
+		if (JSON.stringify(next) === JSON.stringify(scanned)) return;
+		scanned = next;
+		const mod = server.moduleGraph.getModuleById(RESOLVED_VIRTUAL_ID);
+		if (mod) server.moduleGraph.invalidateModule(mod);
+		server.ws.send({ type: "full-reload" });
+	}
+
 	return {
 		name: "openpolicy-auto-collect",
 		enforce: "pre",
@@ -100,6 +127,30 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 		},
 		async buildStart() {
 			scanned = await scanAndMerge();
+		},
+		configureServer(server) {
+			// Make sure chokidar watches the whole src tree, not just files
+			// already in the module graph. Without this, creating a brand-new
+			// source file that nothing imports yet wouldn't fire a watcher
+			// event — the very case we most need to re-scan on.
+			server.watcher.add(resolvedSrcDir);
+
+			const handler = async (file: string): Promise<void> => {
+				if (!isTrackedSource(file)) return;
+				// Surface errors via the logger but don't rethrow — an
+				// unhandled rejection would crash the watcher process.
+				try {
+					await rescanAndRefresh(server);
+				} catch (error) {
+					server.config.logger.error(
+						`[openpolicy-auto-collect] rescan failed: ${error}`,
+					);
+				}
+			};
+
+			server.watcher.on("change", handler);
+			server.watcher.on("add", handler);
+			server.watcher.on("unlink", handler);
 		},
 		async resolveId(source, importer, resolveOptions) {
 			if (!importer || !AUTO_COLLECTED_SPECIFIER.test(source)) return null;
