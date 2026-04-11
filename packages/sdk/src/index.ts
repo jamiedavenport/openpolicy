@@ -9,6 +9,7 @@ export type {
 	UserRight,
 } from "@openpolicy/core";
 
+export { collecting } from "./collecting";
 export { Compliance } from "./compliance";
 export { DataCategories, LegalBases, Retention, Rights } from "./data";
 export { Providers } from "./providers";
