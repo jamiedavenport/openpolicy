@@ -3,7 +3,7 @@
 </svelte:head>
 
 <script lang="ts">
-	import policy from '$lib/policies/cookie-policy.html?raw';
+import policy from "$lib/policies/cookie-policy.html?raw";
 </script>
 
 <main>

@@ -1,13 +1,16 @@
 ---
 let stars: number | null = null;
 try {
-  const res = await fetch("https://api.github.com/repos/jamiedavenport/openpolicy", {
-    headers: { Accept: "application/vnd.github+json" },
-  });
-  if (res.ok) {
-    const data = await res.json();
-    stars = data.stargazers_count;
-  }
+	const res = await fetch(
+		"https://api.github.com/repos/jamiedavenport/openpolicy",
+		{
+			headers: { Accept: "application/vnd.github+json" },
+		},
+	);
+	if (res.ok) {
+		const data = await res.json();
+		stars = data.stargazers_count;
+	}
 } catch {}
 ---
 

@@ -9,6 +9,10 @@ export type {
 	UserRight,
 } from "@openpolicy/core";
 
+export {
+	__setAutoCollectedRegistry,
+	autoCollected,
+} from "./auto-collected";
 export { collecting } from "./collecting";
 export { Compliance } from "./compliance";
 export { DataCategories, LegalBases, Retention, Rights } from "./data";

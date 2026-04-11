@@ -1,30 +1,30 @@
 /* @openpolicy/vue/styles.css — opt-in default styles */
 :root {
-  --op-font-family: system-ui, sans-serif;
-  --op-font-size-body: 1rem;
-  --op-font-size-heading: 1.25rem;
-  --op-heading-color: #111;
-  --op-body-color: #444;
-  --op-section-gap: 2rem;
-  --op-border-color: #e5e5e5;
-  --op-border-radius: 0.25rem;
-  --op-line-height: 1.6;
+	--op-font-family: system-ui, sans-serif;
+	--op-font-size-body: 1rem;
+	--op-font-size-heading: 1.25rem;
+	--op-heading-color: #111;
+	--op-body-color: #444;
+	--op-section-gap: 2rem;
+	--op-border-color: #e5e5e5;
+	--op-border-radius: 0.25rem;
+	--op-line-height: 1.6;
 }
 
 [data-op-policy] {
-  font-family: var(--op-font-family);
-  color: var(--op-body-color);
+	font-family: var(--op-font-family);
+	color: var(--op-body-color);
 }
 
 [data-op-section] {
-  margin-bottom: var(--op-section-gap);
+	margin-bottom: var(--op-section-gap);
 }
 
 [data-op-heading] {
-  color: var(--op-heading-color);
-  font-size: var(--op-font-size-heading);
+	color: var(--op-heading-color);
+	font-size: var(--op-font-size-heading);
 }
 
 [data-op-body] {
-  line-height: var(--op-line-height);
+	line-height: var(--op-line-height);
 }

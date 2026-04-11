@@ -3,7 +3,7 @@
 </svelte:head>
 
 <script lang="ts">
-	import policy from '$lib/policies/terms-of-service.html?raw';
+import policy from "$lib/policies/terms-of-service.html?raw";
 </script>
 
 <main>

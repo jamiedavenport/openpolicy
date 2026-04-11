@@ -4,8 +4,11 @@ import { Icon } from "astro-icon/components";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export async function getStaticPaths() {
-  const guides = await getCollection("frameworks");
-  return guides.map((guide) => ({ params: { slug: guide.slug }, props: { guide } }));
+	const guides = await getCollection("frameworks");
+	return guides.map((guide) => ({
+		params: { slug: guide.slug },
+		props: { guide },
+	}));
 }
 
 const { guide } = Astro.props;

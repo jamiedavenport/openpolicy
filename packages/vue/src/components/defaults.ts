@@ -75,7 +75,11 @@ export function DefaultList({
 	children?: VNodeChild;
 }) {
 	const tag = node.ordered ? "ol" : "ul";
-	return h(tag, { "data-op-list": "", class: "op-list" }, children ?? undefined);
+	return h(
+		tag,
+		{ "data-op-list": "", class: "op-list" },
+		children ?? undefined,
+	);
 }
 
 export function renderNode(
@@ -85,7 +89,9 @@ export function renderNode(
 ): VNodeChild {
 	switch (node.type) {
 		case "document":
-			return node.sections.map((section, i) => renderNode(section, components, i));
+			return node.sections.map((section, i) =>
+				renderNode(section, components, i),
+			);
 
 		case "section": {
 			const SectionComp = components.Section ?? DefaultSection;
@@ -105,7 +111,9 @@ export function renderNode(
 		}
 
 		case "paragraph": {
-			const children = node.children.map((n, i) => renderNode(n, components, i));
+			const children = node.children.map((n, i) =>
+				renderNode(n, components, i),
+			);
 			if (components.Paragraph) {
 				return h(
 					components.Paragraph,
@@ -115,11 +123,17 @@ export function renderNode(
 					},
 				);
 			}
-			return h("p", { key, "data-op-paragraph": "", class: "op-paragraph" }, children);
+			return h(
+				"p",
+				{ key, "data-op-paragraph": "", class: "op-paragraph" },
+				children,
+			);
 		}
 
 		case "list": {
-			const children = node.items.map((item, i) => renderNode(item, components, i));
+			const children = node.items.map((item, i) =>
+				renderNode(item, components, i),
+			);
 			if (components.List) {
 				return h(
 					components.List,
@@ -130,7 +144,11 @@ export function renderNode(
 				);
 			}
 			const ListTag = node.ordered ? "ol" : "ul";
-			return h(ListTag, { key, "data-op-list": "", class: "op-list" }, children);
+			return h(
+				ListTag,
+				{ key, "data-op-list": "", class: "op-list" },
+				children,
+			);
 		}
 
 		case "listItem":
