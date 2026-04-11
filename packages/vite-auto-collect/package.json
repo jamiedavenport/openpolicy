@@ -32,10 +32,10 @@
 		"vite": ">=4.0.0"
 	},
 	"dependencies": {
-		"@openpolicy/sdk": "workspace:*",
 		"oxc-parser": "^0.124.0"
 	},
 	"devDependencies": {
+		"@openpolicy/sdk": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
 		"vite": "catalog:"
 	}
