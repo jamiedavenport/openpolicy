@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/renderers",
-	"version": "0.0.14",
+	"version": "0.0.18",
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts"
