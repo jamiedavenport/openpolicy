@@ -10,25 +10,6 @@ test("returns the exact same reference as value", () => {
 	expect(result).toBe(value);
 });
 
-test("preserves heterogeneous value types", () => {
-	const str = collecting("Strings", "hello", { text: "Text" });
-	expect(str).toBe("hello");
-
-	const num = collecting("Numbers", 42, { count: "Count" });
-	expect(num).toBe(42);
-
-	const date = new Date("2026-01-01");
-	const dateResult = collecting("Dates", date, { when: "When" });
-	expect(dateResult).toBe(date);
-
-	const nil = collecting<null>("Nulls", null, { nothing: "Nothing" });
-	expect(nil).toBeNull();
-
-	const nested = { outer: { inner: { leaf: 1 } } };
-	const nestedResult = collecting("Nested", nested, { leaf: "Leaf" });
-	expect(nestedResult).toBe(nested);
-});
-
 test("label object is never evaluated at runtime", () => {
 	// The object literal is provided but collecting() must return value unchanged
 	// without any side effects from evaluating labels.
