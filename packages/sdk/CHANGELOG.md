@@ -1,5 +1,11 @@
 # @openpolicy/sdk
 
+## 0.0.20
+
+### Patch Changes
+
+- a4cd5ad: Add `@tanstack/intent` skill files for AI coding agents. Run `npx @tanstack/intent@latest install` to load OpenPolicy skills into your agent.
+
 ## 0.0.19
 
 ### Patch Changes
