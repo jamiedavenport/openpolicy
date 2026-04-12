@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import type { ThirdPartyEntry } from "./analyse";
 import { autoCollect } from "./index";
 
 /**
@@ -46,21 +47,42 @@ async function runPluginBuildStart(
 	if (buildStart) await buildStart.call({});
 }
 
+type ScannedResult = {
+	dataCollected: Record<string, string[]>;
+	thirdParties: ThirdPartyEntry[];
+};
+
 /**
- * Calls the plugin's `load` hook with the virtual ID and parses the scanned
- * object out of the emitted JS source. Going through `JSON.parse` means the
- * assertions don't depend on the serialiser's output format.
+ * Calls the plugin's `load` hook with the virtual ID and parses both exports
+ * out of the emitted JS source.
  */
-function loadScanned(plugin: PluginInstance): Record<string, string[]> {
+function loadScanned(plugin: PluginInstance): ScannedResult {
 	const load = plugin.load as
 		| ((id: string) => string | null | undefined)
 		| undefined;
 	if (!load) throw new Error("plugin has no load hook");
 	const source = load.call({}, RESOLVED_VIRTUAL_ID);
 	if (!source) throw new Error("load returned falsy");
-	const match = source.match(/= (\{[\s\S]*?\});/);
-	if (!match?.[1]) throw new Error(`could not parse load output: ${source}`);
-	return JSON.parse(match[1]);
+
+	const dcStart =
+		source.indexOf("dataCollected = ") + "dataCollected = ".length;
+	const dcEnd = source.indexOf(";\n", dcStart);
+	if (dcStart < "dataCollected = ".length || dcEnd === -1)
+		throw new Error(`could not parse dataCollected from: ${source}`);
+	const dataCollected = JSON.parse(source.slice(dcStart, dcEnd)) as Record<
+		string,
+		string[]
+	>;
+
+	const tpStart = source.indexOf("thirdParties = ") + "thirdParties = ".length;
+	const tpEnd = source.indexOf(";\n", tpStart);
+	if (tpStart < "thirdParties = ".length || tpEnd === -1)
+		throw new Error(`could not parse thirdParties from: ${source}`);
+	const thirdParties = JSON.parse(
+		source.slice(tpStart, tpEnd),
+	) as ThirdPartyEntry[];
+
+	return { dataCollected, thirdParties };
 }
 
 type WatcherEvent = "change" | "add" | "unlink";
@@ -159,7 +181,7 @@ test("load hook returns scanned categories after buildStart", async () => {
 	const plugin = autoCollect();
 	await runPluginBuildStart(plugin, tmp);
 
-	expect(loadScanned(plugin)).toEqual({
+	expect(loadScanned(plugin).dataCollected).toEqual({
 		"Account Information": ["Name", "Email address"],
 	});
 });
@@ -186,7 +208,7 @@ test("merges calls across multiple files", async () => {
 	const plugin = autoCollect();
 	await runPluginBuildStart(plugin, tmp);
 
-	expect(loadScanned(plugin)).toEqual({
+	expect(loadScanned(plugin).dataCollected).toEqual({
 		"Account Information": ["Name", "Email", "Phone"],
 		"Usage Data": ["Pages visited"],
 	});
@@ -211,7 +233,7 @@ test("ignores files outside the configured srcDir", async () => {
 	const plugin = autoCollect({ srcDir: "src" });
 	await runPluginBuildStart(plugin, tmp);
 
-	expect(loadScanned(plugin)).toEqual({ In: ["X"] });
+	expect(loadScanned(plugin).dataCollected).toEqual({ In: ["X"] });
 });
 
 test("respects a custom srcDir", async () => {
@@ -226,7 +248,7 @@ test("respects a custom srcDir", async () => {
 	const plugin = autoCollect({ srcDir: "app" });
 	await runPluginBuildStart(plugin, tmp);
 
-	expect(loadScanned(plugin)).toEqual({ Cat: ["X"] });
+	expect(loadScanned(plugin).dataCollected).toEqual({ Cat: ["X"] });
 });
 
 test("emits an empty object when srcDir contains no collecting() calls", async () => {
@@ -235,14 +257,14 @@ test("emits an empty object when srcDir contains no collecting() calls", async (
 	const plugin = autoCollect();
 	await runPluginBuildStart(plugin, tmp);
 
-	expect(loadScanned(plugin)).toEqual({});
+	expect(loadScanned(plugin).dataCollected).toEqual({});
 });
 
 test("emits an empty object when srcDir is missing entirely", async () => {
 	const plugin = autoCollect({ srcDir: "missing" });
 	await runPluginBuildStart(plugin, tmp);
 
-	expect(loadScanned(plugin)).toEqual({});
+	expect(loadScanned(plugin).dataCollected).toEqual({});
 });
 
 test("scans .tsx files by default", async () => {
@@ -260,7 +282,7 @@ test("scans .tsx files by default", async () => {
 	const plugin = autoCollect();
 	await runPluginBuildStart(plugin, tmp);
 
-	expect(loadScanned(plugin)).toEqual({ Widget: ["X"] });
+	expect(loadScanned(plugin).dataCollected).toEqual({ Widget: ["X"] });
 });
 
 test("resolveId redirects ./auto-collected when importer is inside @openpolicy/sdk", async () => {
@@ -333,7 +355,7 @@ test("dev watcher re-scans and triggers a full reload when a tracked file change
 
 	const plugin = autoCollect();
 	await runPluginBuildStart(plugin, tmp);
-	expect(loadScanned(plugin)).toEqual({ Initial: ["X"] });
+	expect(loadScanned(plugin).dataCollected).toEqual({ Initial: ["X"] });
 
 	const stub = createStubServer();
 	await runConfigureServer(plugin, stub.server);
@@ -350,7 +372,7 @@ test("dev watcher re-scans and triggers a full reload when a tracked file change
 	);
 	await stub.runHandler("change", join(tmp, "src/lib/db.ts"));
 
-	expect(loadScanned(plugin)).toEqual({
+	expect(loadScanned(plugin).dataCollected).toEqual({
 		Initial: ["X"],
 		Added: ["Y"],
 	});
@@ -361,7 +383,7 @@ test("dev watcher re-scans and triggers a full reload when a tracked file change
 test("dev watcher picks up newly-created source files", async () => {
 	const plugin = autoCollect();
 	await runPluginBuildStart(plugin, tmp);
-	expect(loadScanned(plugin)).toEqual({});
+	expect(loadScanned(plugin).dataCollected).toEqual({});
 
 	const stub = createStubServer();
 	await runConfigureServer(plugin, stub.server);
@@ -375,7 +397,7 @@ test("dev watcher picks up newly-created source files", async () => {
 	);
 	await stub.runHandler("add", join(tmp, "src/new.ts"));
 
-	expect(loadScanned(plugin)).toEqual({ "Brand New": ["Z"] });
+	expect(loadScanned(plugin).dataCollected).toEqual({ "Brand New": ["Z"] });
 	expect(stub.sentMessages).toContainEqual({ type: "full-reload" });
 });
 
@@ -390,7 +412,7 @@ test("dev watcher drops categories when a file is deleted", async () => {
 
 	const plugin = autoCollect();
 	await runPluginBuildStart(plugin, tmp);
-	expect(loadScanned(plugin)).toEqual({ Temporary: ["X"] });
+	expect(loadScanned(plugin).dataCollected).toEqual({ Temporary: ["X"] });
 
 	const stub = createStubServer();
 	await runConfigureServer(plugin, stub.server);
@@ -398,7 +420,7 @@ test("dev watcher drops categories when a file is deleted", async () => {
 	await rm(join(tmp, "src/gone.ts"));
 	await stub.runHandler("unlink", join(tmp, "src/gone.ts"));
 
-	expect(loadScanned(plugin)).toEqual({});
+	expect(loadScanned(plugin).dataCollected).toEqual({});
 	expect(stub.sentMessages).toContainEqual({ type: "full-reload" });
 });
 
@@ -458,6 +480,91 @@ test("dev watcher skips invalidation when the scan output is unchanged", async (
 
 	expect(stub.invalidatedIds).toHaveLength(0);
 	expect(stub.sentMessages).toHaveLength(0);
+});
+
+// ---------------------------------------------------------------------------
+// thirdParty() integration tests
+// ---------------------------------------------------------------------------
+
+test("thirdParty() calls are scanned and appear in virtual module thirdParties export", async () => {
+	await touch(
+		"src/payments.ts",
+		`
+		import { thirdParty } from "@openpolicy/sdk";
+		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
+		`,
+	);
+
+	const plugin = autoCollect();
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).thirdParties).toEqual([
+		{
+			name: "Stripe",
+			purpose: "Payments",
+			policyUrl: "https://stripe.com/privacy",
+		},
+	]);
+});
+
+test("thirdParty() deduplication across files — same name in two files yields one entry", async () => {
+	// Files are walked in sorted order: a-file.ts before b-file.ts.
+	// First occurrence wins.
+	await touch(
+		"src/a-file.ts",
+		`
+		import { thirdParty } from "@openpolicy/sdk";
+		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
+		`,
+	);
+	await touch(
+		"src/b-file.ts",
+		`
+		import { thirdParty } from "@openpolicy/sdk";
+		thirdParty("Stripe", "Billing", "https://stripe.com/other");
+		`,
+	);
+
+	const plugin = autoCollect();
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).thirdParties).toEqual([
+		{
+			name: "Stripe",
+			purpose: "Payments",
+			policyUrl: "https://stripe.com/privacy",
+		},
+	]);
+});
+
+test("dev watcher triggers reload when thirdParty() call is added", async () => {
+	await touch("src/payments.ts", `export const x = 1;\n`);
+
+	const plugin = autoCollect();
+	await runPluginBuildStart(plugin, tmp);
+	expect(loadScanned(plugin).thirdParties).toEqual([]);
+
+	const stub = createStubServer();
+	await runConfigureServer(plugin, stub.server);
+
+	await touch(
+		"src/payments.ts",
+		`
+		import { thirdParty } from "@openpolicy/sdk";
+		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
+		`,
+	);
+	await stub.runHandler("change", join(tmp, "src/payments.ts"));
+
+	expect(loadScanned(plugin).thirdParties).toEqual([
+		{
+			name: "Stripe",
+			purpose: "Payments",
+			policyUrl: "https://stripe.com/privacy",
+		},
+	]);
+	expect(stub.invalidatedIds).toContain(RESOLVED_VIRTUAL_ID);
+	expect(stub.sentMessages).toContainEqual({ type: "full-reload" });
 });
 
 /**

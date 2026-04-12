@@ -9,11 +9,12 @@ export type {
 	UserRight,
 } from "@openpolicy/core";
 
-export { dataCollected } from "./auto-collected";
+export { dataCollected, thirdParties } from "./auto-collected";
 export { collecting } from "./collecting";
 export { Compliance } from "./compliance";
 export { DataCategories, LegalBases, Retention, Rights } from "./data";
 export { Providers } from "./providers";
+export { thirdParty } from "./third-parties";
 
 export function defineConfig(config: OpenPolicyConfig): OpenPolicyConfig {
 	return config;

@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
-import { extractCollecting } from "./analyse";
+import { extractFromFile, type ThirdPartyEntry } from "./analyse";
 import { walkSources } from "./scan";
 
 export type AutoCollectOptions = {
@@ -64,11 +64,16 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 	const extensions = options.extensions ?? [".ts", ".tsx"];
 	const ignore = options.ignore ?? [];
 	let resolvedSrcDir: string;
-	let scanned: Record<string, string[]> = {};
+	let scanned: {
+		dataCollected: Record<string, string[]>;
+		thirdParties: ThirdPartyEntry[];
+	} = { dataCollected: {}, thirdParties: [] };
 
-	async function scanAndMerge(): Promise<Record<string, string[]>> {
+	async function scanAndMerge(): Promise<typeof scanned> {
 		const files = await walkSources(resolvedSrcDir, extensions, ignore);
-		const merged: Record<string, string[]> = {};
+		const mergedData: Record<string, string[]> = {};
+		const mergedParties: ThirdPartyEntry[] = [];
+		const seenParties = new Set<string>();
 		for (const file of files) {
 			let code: string;
 			try {
@@ -76,9 +81,11 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 			} catch {
 				continue;
 			}
-			const extracted = extractCollecting(file, code);
-			for (const [category, labels] of Object.entries(extracted)) {
-				const existing = merged[category] ?? [];
+			const extracted = extractFromFile(file, code);
+			for (const [category, labels] of Object.entries(
+				extracted.dataCollected,
+			)) {
+				const existing = mergedData[category] ?? [];
 				const seen = new Set(existing);
 				for (const label of labels) {
 					if (!seen.has(label)) {
@@ -86,10 +93,16 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 						seen.add(label);
 					}
 				}
-				merged[category] = existing;
+				mergedData[category] = existing;
+			}
+			for (const entry of extracted.thirdParties) {
+				if (!seenParties.has(entry.name)) {
+					seenParties.add(entry.name);
+					mergedParties.push(entry);
+				}
 			}
 		}
-		return merged;
+		return { dataCollected: mergedData, thirdParties: mergedParties };
 	}
 
 	/**
@@ -166,7 +179,10 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 		},
 		load(id) {
 			if (id !== RESOLVED_VIRTUAL_ID) return null;
-			return `export const dataCollected = ${JSON.stringify(scanned)};\n`;
+			return (
+				`export const dataCollected = ${JSON.stringify(scanned.dataCollected)};\n` +
+				`export const thirdParties = ${JSON.stringify(scanned.thirdParties)};\n`
+			);
 		},
 	};
 }
