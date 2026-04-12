@@ -12,7 +12,8 @@
 	"files": [
 		"dist",
 		"styles.css",
-		"README.md"
+		"README.md",
+		"skills"
 	],
 	"exports": {
 		".": {
@@ -36,7 +37,8 @@
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
 		"@types/react": "^19.0.0",
-		"react": "^19.0.0"
+		"react": "^19.0.0",
+		"@tanstack/intent": "workspace:*"
 	},
 	"publishConfig": {
 		"exports": {
@@ -46,5 +48,8 @@
 			},
 			"./styles.css": "./styles.css"
 		}
-	}
+	},
+	"keywords": [
+		"tanstack-intent"
+	]
 }
