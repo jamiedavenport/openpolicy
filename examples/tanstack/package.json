@@ -12,6 +12,7 @@
 	"dependencies": {
 		"@fontsource-variable/geist": "^5.2.8",
 		"@openpolicy/react": "workspace:*",
+		"resend": "^4.0.0",
 		"@tanstack/react-router": "^1.166.2",
 		"@tanstack/react-start": "^1.166.2",
 		"clsx": "^2.1.1",
