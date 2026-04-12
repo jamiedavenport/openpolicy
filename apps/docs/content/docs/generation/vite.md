@@ -44,3 +44,22 @@ openPolicy({
 | `configPath` | `string` | `"openpolicy.ts"` | Path to your config file |
 | `formats` | `OutputFormat[]` | `["markdown"]` | One or more output formats |
 | `outDir` | `string` | `"public/policies"` | Directory to write files into |
+
+## With auto-collect
+
+If you use `autoCollect()` to scan source files for data collection annotations, add it before `openPolicy()` in your plugin array so the scan completes before the policy config is imported.
+
+```ts
+// vite.config.ts
+import { autoCollect } from "@openpolicy/vite-auto-collect";
+import { openPolicy } from "@openpolicy/vite";
+
+export default defineConfig({
+  plugins: [
+    autoCollect(),
+    openPolicy(),
+  ],
+});
+```
+
+See [Auto-collect](/policies/auto-collect) for full setup and options.
