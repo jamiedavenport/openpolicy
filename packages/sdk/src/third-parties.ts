@@ -1,6 +1,3 @@
-/**
- * TODO
- */
 export function thirdParty(
 	_name: string,
 	_purpose: string,

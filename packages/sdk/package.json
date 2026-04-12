@@ -11,7 +11,8 @@
 	},
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"skills"
 	],
 	"exports": {
 		".": {
@@ -28,6 +29,10 @@
 	"dependencies": {},
 	"devDependencies": {
 		"@openpolicy/core": "workspace:*",
-		"@openpolicy/tooling": "workspace:*"
-	}
+		"@openpolicy/tooling": "workspace:*",
+		"@tanstack/intent": "^0.0.29"
+	},
+	"keywords": [
+		"tanstack-intent"
+	]
 }

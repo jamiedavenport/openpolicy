@@ -6,6 +6,10 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.5",
 		"@changesets/cli": "^2.30.0",
+		"@openpolicy/react": "workspace:*",
+		"@openpolicy/sdk": "workspace:*",
+		"@openpolicy/vite-auto-collect": "workspace:*",
+		"@tanstack/intent": "^0.0.29",
 		"@types/bun": "latest",
 		"@types/node": "^25.5.0",
 		"knip": "^5.86.0",

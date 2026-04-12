@@ -88,6 +88,16 @@ The SDK exports types and helper functions for _defining_ policies. To compile t
 
 Full field reference and guides: [openpolicy.sh/docs](https://openpolicy.sh/docs)
 
+## AI Agents
+
+If you use an AI coding agent (Claude Code, Cursor, Copilot, etc.), run:
+
+```sh
+npx @tanstack/intent@latest install
+```
+
+This installs skill files that give your agent accurate, up-to-date guidance for OpenPolicy APIs.
+
 ## Links
 
 - [GitHub](https://github.com/jamiedavenport/openpolicy)

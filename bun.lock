@@ -6,6 +6,10 @@
       "devDependencies": {
         "@biomejs/biome": "^2.4.5",
         "@changesets/cli": "^2.30.0",
+        "@openpolicy/react": "workspace:*",
+        "@openpolicy/sdk": "workspace:*",
+        "@openpolicy/vite-auto-collect": "workspace:*",
+        "@tanstack/intent": "^0.0.29",
         "@types/bun": "latest",
         "@types/node": "^25.5.0",
         "knip": "^5.86.0",
@@ -180,22 +184,22 @@
     },
     "packages/astro": {
       "name": "@openpolicy/astro",
-      "version": "0.0.18",
+      "version": "0.0.19",
       "devDependencies": {
         "@openpolicy/tooling": "workspace:*",
         "@openpolicy/vite": "workspace:*",
         "astro": "^5.0.0",
       },
       "peerDependencies": {
-        "@openpolicy/core": ">=0.0.18",
-        "@openpolicy/sdk": ">=0.0.18",
-        "@openpolicy/vite": ">=0.0.18",
+        "@openpolicy/core": ">=0.0.19",
+        "@openpolicy/sdk": ">=0.0.19",
+        "@openpolicy/vite": ">=0.0.19",
         "astro": ">=4.0.0",
       },
     },
     "packages/cli": {
       "name": "@openpolicy/cli",
-      "version": "0.0.18",
+      "version": "0.0.19",
       "bin": {
         "openpolicy": "./src/cli.ts",
       },
@@ -211,17 +215,18 @@
     },
     "packages/core": {
       "name": "@openpolicy/core",
-      "version": "0.0.18",
+      "version": "0.0.19",
       "devDependencies": {
         "@openpolicy/tooling": "workspace:*",
       },
     },
     "packages/react": {
       "name": "@openpolicy/react",
-      "version": "0.0.18",
+      "version": "0.0.19",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
+        "@tanstack/intent": "^0.0.29",
         "@types/react": "^19.0.0",
         "react": "^19.0.0",
       },
@@ -232,7 +237,7 @@
     },
     "packages/renderers": {
       "name": "@openpolicy/renderers",
-      "version": "0.0.18",
+      "version": "0.0.19",
       "dependencies": {
         "pdfkit": "^0.18.0",
       },
@@ -244,15 +249,16 @@
     },
     "packages/sdk": {
       "name": "@openpolicy/sdk",
-      "version": "0.0.18",
+      "version": "0.0.19",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
+        "@tanstack/intent": "^0.0.29",
       },
     },
     "packages/vite": {
       "name": "@openpolicy/vite",
-      "version": "0.0.18",
+      "version": "0.0.19",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/renderers": "workspace:*",
@@ -265,13 +271,14 @@
     },
     "packages/vite-auto-collect": {
       "name": "@openpolicy/vite-auto-collect",
-      "version": "0.0.18",
+      "version": "0.0.19",
       "dependencies": {
         "oxc-parser": "^0.124.0",
       },
       "devDependencies": {
         "@openpolicy/sdk": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
+        "@tanstack/intent": "^0.0.29",
         "vite": "catalog:",
       },
       "peerDependencies": {
@@ -280,7 +287,7 @@
     },
     "packages/vue": {
       "name": "@openpolicy/vue",
-      "version": "0.0.18",
+      "version": "0.0.19",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
@@ -1146,6 +1153,8 @@
 
     "@tanstack/history": ["@tanstack/history@1.161.4", "", {}, "sha512-Kp/WSt411ZWYvgXy6uiv5RmhHrz9cAml05AQPrtdAp7eUqvIDbMGPnML25OKbzR3RJ1q4wgENxDTvlGPa9+Mww=="],
 
+    "@tanstack/intent": ["@tanstack/intent@0.0.29", "", { "dependencies": { "cac": "^6.7.14", "yaml": "^2.7.0" }, "bin": { "intent": "dist/cli.mjs", "intent-library": "dist/intent-library.mjs" } }, "sha512-tJcWapEkXGRLHE7mQYvQS0xIWrzKm2n7fQ/lOy4LCdR1hX0Yxb9QnwRwd0oqmmr54ObP9/5sfiD8vELxL/r30g=="],
+
     "@tanstack/react-router": ["@tanstack/react-router@1.166.2", "", { "dependencies": { "@tanstack/history": "1.161.4", "@tanstack/react-store": "^0.9.1", "@tanstack/router-core": "1.166.2", "isbot": "^5.1.22", "tiny-invariant": "^1.3.3", "tiny-warning": "^1.0.3" }, "peerDependencies": { "react": ">=18.0.0 || >=19.0.0", "react-dom": ">=18.0.0 || >=19.0.0" } }, "sha512-pKhUtrvVLlhjWhsHkJSuIzh1J4LcP+8ErbIqRLORX9Js8dUFMKoT0+8oFpi+P8QRpuhm/7rzjYiWfcyTsqQZtA=="],
 
     "@tanstack/react-start": ["@tanstack/react-start@1.166.2", "", { "dependencies": { "@tanstack/react-router": "1.166.2", "@tanstack/react-start-client": "1.166.2", "@tanstack/react-start-server": "1.166.2", "@tanstack/router-utils": "^1.161.4", "@tanstack/start-client-core": "1.166.2", "@tanstack/start-plugin-core": "1.166.2", "@tanstack/start-server-core": "1.166.2", "pathe": "^2.0.3" }, "peerDependencies": { "react": ">=18.0.0 || >=19.0.0", "react-dom": ">=18.0.0 || >=19.0.0", "vite": ">=7.0.0" } }, "sha512-ryeDIITTVmGmOkTrdg4dL4Sl+LXK5w8BZtzLtsr3YxNhQaPwxqX4r69iuBt5M8jyXEsWwbJJdToN3xLr7CO5XQ=="],
@@ -1441,6 +1450,8 @@
     "bundle-name": ["bundle-name@4.1.0", "", { "dependencies": { "run-applescript": "^7.0.0" } }, "sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q=="],
 
     "bytes": ["bytes@3.1.2", "", {}, "sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg=="],
+
+    "cac": ["cac@6.7.14", "", {}, "sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ=="],
 
     "call-bind-apply-helpers": ["call-bind-apply-helpers@1.0.2", "", { "dependencies": { "es-errors": "^1.3.0", "function-bind": "^1.1.2" } }, "sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ=="],
 

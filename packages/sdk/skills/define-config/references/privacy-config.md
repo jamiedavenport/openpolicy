@@ -1,0 +1,153 @@
+# PrivacyPolicyConfig Field Reference
+
+When used inside `defineConfig()`, `company` is omitted — it lives at the top level of `OpenPolicyConfig`. All other fields below are on `privacy: Omit<PrivacyPolicyConfig, "company">`.
+
+## PrivacyPolicyConfig
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `effectiveDate` | `string` | Yes | ISO date string (e.g. `"2026-01-01"`). Validation fails if empty. |
+| `dataCollected` | `Record<string, string[]>` | Yes | At least one entry required. Keys are category labels; values are arrays of data point labels. Use `DataCategories.*` presets or spread `dataCollected` sentinel. |
+| `legalBasis` | `LegalBasis \| LegalBasis[]` | Yes (GDPR) | Required when `"eu"` is in `jurisdictions`. Accepts a single value or array. |
+| `retention` | `Record<string, string>` | Yes | Keys should match `dataCollected` categories. Use `Retention.*` preset strings. |
+| `cookies` | `{ essential: boolean; analytics: boolean; marketing: boolean }` | Yes | All three booleans required. Drives cookie policy sections. |
+| `thirdParties` | `{ name: string; purpose: string; policyUrl?: string }[]` | Yes | Can be empty array. Use `Providers.*` presets or spread `thirdParties` sentinel. |
+| `userRights` | `UserRight[]` | Yes | Empty array triggers a warning. GDPR recommends 6 rights; CCPA recommends 4. |
+| `jurisdictions` | `Jurisdiction[]` | Yes | Controls which jurisdiction-specific sections appear. See values below. |
+| `children` | `{ underAge: number; noticeUrl?: string }` | No | Include when service is directed at children. `underAge` must be a positive integer. |
+
+### LegalBasis values
+
+| Constant | String value |
+|---|---|
+| `LegalBases.Consent` | `"consent"` |
+| `LegalBases.Contract` | `"contract"` |
+| `LegalBases.LegalObligation` | `"legal_obligation"` |
+| `LegalBases.VitalInterests` | `"vital_interests"` |
+| `LegalBases.PublicTask` | `"public_task"` |
+| `LegalBases.LegitimateInterests` | `"legitimate_interests"` |
+
+### Jurisdiction values
+
+| Value | Region |
+|---|---|
+| `"us"` | United States |
+| `"eu"` | European Union (triggers GDPR sections) |
+| `"ca"` | California, USA (triggers CCPA sections) |
+| `"au"` | Australia |
+| `"nz"` | New Zealand |
+| `"other"` | Other / unspecified |
+
+### UserRight values
+
+| Constant | String value | Required by |
+|---|---|---|
+| `Rights.Access` | `"access"` | GDPR, CCPA |
+| `Rights.Rectification` | `"rectification"` | GDPR |
+| `Rights.Erasure` | `"erasure"` | GDPR, CCPA |
+| `Rights.Portability` | `"portability"` | GDPR |
+| `Rights.Restriction` | `"restriction"` | GDPR |
+| `Rights.Objection` | `"objection"` | GDPR |
+| `Rights.OptOutSale` | `"opt_out_sale"` | CCPA |
+| `Rights.NonDiscrimination` | `"non_discrimination"` | CCPA |
+
+### DataCategories presets
+
+Each entry is a `Record<string, string[]>` safe to spread into `dataCollected`:
+
+| Constant | Category label | Data points |
+|---|---|---|
+| `DataCategories.AccountInfo` | `"Account Information"` | Name, Email address |
+| `DataCategories.SessionData` | `"Session Data"` | IP address, User agent, Browser type |
+| `DataCategories.PaymentInfo` | `"Payment Information"` | Card last 4 digits, Billing name, Billing address |
+| `DataCategories.UsageData` | `"Usage Data"` | Pages visited, Features used, Time spent |
+| `DataCategories.DeviceInfo` | `"Device Information"` | Device type, Operating system, Browser version |
+| `DataCategories.LocationData` | `"Location Data"` | Country, City, Timezone |
+| `DataCategories.Communications` | `"Communications"` | Email content, Support tickets |
+
+### Retention presets
+
+| Constant | String value |
+|---|---|
+| `Retention.UntilAccountDeletion` | `"Until account deletion"` |
+| `Retention.UntilSessionExpiry` | `"Until session expiry"` |
+| `Retention.ThirtyDays` | `"30 days"` |
+| `Retention.NinetyDays` | `"90 days"` |
+| `Retention.OneYear` | `"1 year"` |
+| `Retention.ThreeYears` | `"3 years"` |
+| `Retention.AsRequiredByLaw` | `"As required by applicable law"` |
+
+### Providers presets
+
+Each entry is a `{ name: string; purpose: string; policyUrl: string }` safe to use in `thirdParties`:
+
+**Payments:** `Providers.Stripe`, `Providers.Paddle`, `Providers.LemonSqueezy`, `Providers.PayPal`
+
+**Analytics:** `Providers.GoogleAnalytics`, `Providers.PostHog`, `Providers.Plausible`, `Providers.Mixpanel`
+
+**Infrastructure:** `Providers.Vercel`, `Providers.Cloudflare`, `Providers.AWS`
+
+**Auth:** `Providers.Auth0`, `Providers.Clerk`
+
+**Email:** `Providers.Resend`, `Providers.Postmark`, `Providers.SendGrid`, `Providers.Loops`
+
+**Monitoring:** `Providers.Sentry`, `Providers.Datadog`
+
+### Compliance presets
+
+| Preset | Expands to |
+|---|---|
+| `Compliance.GDPR` | `{ jurisdictions: ["eu"], legalBasis: ["legitimate_interests"], userRights: ["access", "rectification", "erasure", "portability", "restriction", "objection"] }` |
+| `Compliance.CCPA` | `{ jurisdictions: ["ca"], userRights: ["access", "erasure", "opt_out_sale", "non_discrimination"] }` |
+
+### Validation behavior
+
+- `effectiveDate` empty → fatal error
+- `company.*` fields empty → fatal error per field
+- `dataCollected` has zero keys → fatal error
+- `userRights` empty → warning only
+- `"eu"` in jurisdictions + no `legalBasis` → fatal error
+- `"eu"` in jurisdictions + missing GDPR right → warning per right
+- `"ca"` in jurisdictions + missing CCPA right → warning per right
+- `children.underAge` ≤ 0 → fatal error
+
+Source: `packages/core/src/validate.ts`
+
+---
+
+## CookiePolicyConfig
+
+When used inside `defineConfig()`, supply as `cookie: Omit<CookiePolicyConfig, "company">`.
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `effectiveDate` | `string` | Yes | ISO date string. |
+| `cookies` | `CookiePolicyCookies` | Yes | `essential: boolean` is required; all other keys are `boolean` and treated as additional cookie categories. |
+| `jurisdictions` | `Jurisdiction[]` | Yes | Same values as `PrivacyPolicyConfig.jurisdictions`. |
+| `thirdParties` | `{ name: string; purpose: string; policyUrl?: string }[]` | No | Use `Providers.*` presets. |
+| `trackingTechnologies` | `string[]` | No | e.g. `["cookies", "localStorage", "sessionStorage", "pixel"]` |
+| `consentMechanism` | `{ hasBanner: boolean; hasPreferencePanel: boolean; canWithdraw: boolean }` | No | Required when `"eu"` in jurisdictions for GDPR compliance. |
+
+### CookiePolicyCookies shape
+
+```ts
+type CookiePolicyCookies = {
+  essential: boolean;   // required
+  [key: string]: boolean; // additional categories
+};
+```
+
+Example with custom categories:
+
+```ts
+cookie: {
+  effectiveDate: "2026-01-01",
+  cookies: {
+    essential: true,
+    analytics: true,
+    marketing: false,
+    preferences: true,
+  },
+  jurisdictions: ["eu", "us"],
+}
+```

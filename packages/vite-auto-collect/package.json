@@ -10,11 +10,13 @@
 		"directory": "packages/vite-auto-collect"
 	},
 	"keywords": [
-		"vite-plugin"
+		"vite-plugin",
+		"tanstack-intent"
 	],
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"skills"
 	],
 	"exports": {
 		".": {
@@ -37,6 +39,7 @@
 	"devDependencies": {
 		"@openpolicy/sdk": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
-		"vite": "catalog:"
+		"vite": "catalog:",
+		"@tanstack/intent": "^0.0.29"
 	}
 }
