@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/sdk",
-	"version": "0.0.18",
+	"version": "0.0.19",
 	"type": "module",
 	"description": "Public API for defining privacy policies with OpenPolicy",
 	"license": "GPL-3.0-only",

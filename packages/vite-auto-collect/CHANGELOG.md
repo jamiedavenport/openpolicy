@@ -1,5 +1,12 @@
 # @openpolicy/vite-auto-collect
 
+## 0.0.19
+
+### Patch Changes
+
+- 165ae2e: Add `thirdParty()` auto-collect support. Call `thirdParty(name, purpose, policyUrl)` next to the code that uses a third-party service; the `autoCollect` Vite plugin now scans these calls and populates the `thirdParties` sentinel exported from `@openpolicy/sdk`.
+- 165ae2e: Add `usePackageJson` option to `autoCollect()` that cross-references `package.json` dependencies against a built-in registry of known npm packages (Stripe, Sentry, PostHog, Datadog, and ~12 others) to auto-populate `thirdParties` without requiring source-code annotations. Explicit `thirdParty()` calls always take precedence over auto-detected entries.
+
 ## 0.0.18
 
 ### Patch Changes
