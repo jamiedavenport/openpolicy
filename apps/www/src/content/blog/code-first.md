@@ -72,7 +72,7 @@ With policies defined in code, every change goes through the same review process
 
 That auditability matters more than it sounds. If you're ever asked to demonstrate that your policy was accurate on a particular date — by a regulator, an auditor, or a data subject request — you have a precise, tamper-evident record. With a static page or a third-party embed, you have nothing.
 
-In **[OpenPolicy+](/plus)**, we're taking this further with a PR bot that reviews policy changes automatically before they reach production. It flags missing required fields, detects jurisdiction mismatches, and surfaces clauses that may need legal review — directly in the PR, before anything ships. The same way a linter catches type errors before code review, the bot catches compliance issues before the policy goes live.
+In **[OpenPolicy+](https://plus.openpolicy.sh)**, we're taking this further with a PR bot that reviews policy changes automatically before they reach production. It flags missing required fields, detects jurisdiction mismatches, and surfaces clauses that may need legal review — directly in the PR, before anything ships. The same way a linter catches type errors before code review, the bot catches compliance issues before the policy goes live.
 
 ## Privacy is a trust opportunity, not a checkbox
 

@@ -1,7 +1,7 @@
 ---
 title: "Your privacy policy should know what your code does"
 description: "Annotate your data storage and third-party calls once. Auto-collect keeps your policy in sync automatically."
-pubDate: 2026-04-12
+pubDate: 2026-04-13
 author: "OpenPolicy Team"
 ---
 
@@ -26,6 +26,16 @@ There's also a zero-annotation path for common packages, covered below. But thes
 ## `collecting()` — annotate at the point of storage
 
 Somewhere in your app, you're writing data to a database. That's the right place to say what category it belongs to and what fields it includes. Not in a separate config file — right there, where the write happens.
+
+Before:
+
+```ts
+export async function createUser(name: string, email: string) {
+  return db.insert(users).values({ name, email });
+}
+```
+
+After:
 
 ```ts
 import { collecting } from "@openpolicy/sdk";
@@ -76,14 +86,13 @@ Enable `usePackageJson: true` in the plugin config and the plugin reads your `de
 ```ts
 // vite.config.ts
 import { autoCollect } from "@openpolicy/vite-auto-collect";
-import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [autoCollect({ thirdParties: { usePackageJson: true } }), openPolicy()],
+  plugins: [autoCollect({ thirdParties: { usePackageJson: true } })],
 });
 ```
 
-The registry covers services like Stripe, Sentry, PostHog, Datadog, Vercel Analytics, Intercom, and more — see the [full list in the docs](/docs/policies/auto-collect). If your `package.json` already has these as dependencies, your policy will include them without any annotations required.
+The registry covers services like Stripe, Sentry, PostHog, Datadog, Vercel Analytics, Intercom, and more — see the [full list in the docs](https://docs.openpolicy.sh/policies/auto-collect). If your `package.json` already has these as dependencies, your policy will include them without any annotations required.
 
 Explicit `thirdParty()` calls always take precedence over auto-detected entries. If you need a custom description or privacy URL for a known package, annotate it directly and the registry entry is ignored.
 
@@ -98,14 +107,11 @@ bun add -D @openpolicy/vite-auto-collect
 ```ts
 // vite.config.ts
 import { autoCollect } from "@openpolicy/vite-auto-collect";
-import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [autoCollect({ thirdParties: { usePackageJson: true } }), openPolicy()],
+  plugins: [autoCollect({ thirdParties: { usePackageJson: true } })],
 });
 ```
-
-Order matters. `autoCollect()` must come before `openPolicy()` in the plugins array. The scan runs during `buildStart`, and the policy config import happens after — so the populated registry needs to be in place before `openPolicy` evaluates your config.
 
 ## The policy that doesn't drift
 
@@ -117,4 +123,8 @@ The discipline-based version of "keep your policy accurate" works until it doesn
 
 ---
 
-Full docs at [/docs/policies/auto-collect](/docs/policies/auto-collect). Examples in the [GitHub repo](https://github.com/jamiedavenport/openpolicy/tree/main/examples).
+Full docs at [docs.openpolicy.sh/policies/auto-collect](https://docs.openpolicy.sh/policies/auto-collect). Examples in the [GitHub repo](https://github.com/jamiedavenport/openpolicy/tree/main/examples).
+
+If you have feedback or ideas, [open an issue on GitHub](https://github.com/jamiedavenport/openpolicy/issues) — we read everything.
+
+If you're integrating OpenPolicy and want a hand, [book a demo call](https://cal.eu/jamie-openpolicy/openpolicy-chat-demo) and we'd be happy to help.

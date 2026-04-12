@@ -133,4 +133,4 @@ The full working example is in the [examples/astro](https://github.com/jamiedave
 
 ## Going further with OpenPolicy+
 
-If you need more than static generation, [OpenPolicy+](/plus) extends the core library with cloud-based consent tracking, PR automation (policy linting, compliance checks on every pull request), and hands-on onboarding from our team. [Book a demo](https://cal.eu/jamie-openpolicy/openpolicy-chat-demo) and we'll help you get set up.
+If you need more than static generation, [OpenPolicy+](https://plus.openpolicy.sh) extends the core library with cloud-based consent tracking, PR automation (policy linting, compliance checks on every pull request), and hands-on onboarding from our team. [Book a demo](https://cal.eu/jamie-openpolicy/openpolicy-chat-demo) and we'll help you get set up.
