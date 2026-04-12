@@ -567,6 +567,108 @@ test("dev watcher triggers reload when thirdParty() call is added", async () => 
 	expect(stub.sentMessages).toContainEqual({ type: "full-reload" });
 });
 
+// ---------------------------------------------------------------------------
+// usePackageJson tests
+// ---------------------------------------------------------------------------
+
+test("usePackageJson is disabled by default — package.json with stripe does not add entries", async () => {
+	await touch(
+		"package.json",
+		JSON.stringify({ dependencies: { stripe: "^14.0.0" } }),
+	);
+
+	const plugin = autoCollect();
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).thirdParties).toEqual([]);
+});
+
+test("usePackageJson: known package is detected and added as ThirdPartyEntry", async () => {
+	await touch(
+		"package.json",
+		JSON.stringify({ dependencies: { stripe: "^14.0.0" } }),
+	);
+
+	const plugin = autoCollect({ thirdParties: { usePackageJson: true } });
+	await runPluginBuildStart(plugin, tmp);
+
+	const { thirdParties } = loadScanned(plugin);
+	expect(thirdParties).toHaveLength(1);
+	expect(thirdParties[0]?.name).toBe("Stripe");
+	expect(thirdParties[0]?.purpose).toBe("Payment processing");
+});
+
+test("usePackageJson: unknown package is silently ignored", async () => {
+	await touch(
+		"package.json",
+		JSON.stringify({ dependencies: { "some-unknown-pkg": "^1.0.0" } }),
+	);
+
+	const plugin = autoCollect({ thirdParties: { usePackageJson: true } });
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).thirdParties).toEqual([]);
+});
+
+test("usePackageJson: multiple packages mapping to same service yield one entry", async () => {
+	await touch(
+		"package.json",
+		JSON.stringify({
+			dependencies: { stripe: "^14.0.0", "@stripe/stripe-js": "^3.0.0" },
+		}),
+	);
+
+	const plugin = autoCollect({ thirdParties: { usePackageJson: true } });
+	await runPluginBuildStart(plugin, tmp);
+
+	const { thirdParties } = loadScanned(plugin);
+	expect(thirdParties.filter((e) => e.name === "Stripe")).toHaveLength(1);
+});
+
+test("usePackageJson: manual thirdParty() call wins over auto-detected entry", async () => {
+	await touch(
+		"package.json",
+		JSON.stringify({ dependencies: { stripe: "^14.0.0" } }),
+	);
+	await touch(
+		"src/payments.ts",
+		`
+		import { thirdParty } from "@openpolicy/sdk";
+		thirdParty("Stripe", "Custom billing purpose", "https://stripe.com/custom");
+		`,
+	);
+
+	const plugin = autoCollect({ thirdParties: { usePackageJson: true } });
+	await runPluginBuildStart(plugin, tmp);
+
+	const { thirdParties } = loadScanned(plugin);
+	const stripeEntries = thirdParties.filter((e) => e.name === "Stripe");
+	expect(stripeEntries).toHaveLength(1);
+	expect(stripeEntries[0]?.purpose).toBe("Custom billing purpose");
+	expect(stripeEntries[0]?.policyUrl).toBe("https://stripe.com/custom");
+});
+
+test("usePackageJson: graceful when package.json is missing", async () => {
+	await touch(
+		"src/payments.ts",
+		`
+		import { thirdParty } from "@openpolicy/sdk";
+		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
+		`,
+	);
+
+	const plugin = autoCollect({ thirdParties: { usePackageJson: true } });
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).thirdParties).toEqual([
+		{
+			name: "Stripe",
+			purpose: "Payments",
+			policyUrl: "https://stripe.com/privacy",
+		},
+	]);
+});
+
 /**
  * Calls the plugin's `resolveId` hook with a stubbed Vite context whose
  * `this.resolve` returns a fixed fake resolution.

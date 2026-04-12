@@ -14,7 +14,7 @@ export default defineConfig({
 	plugins: [
 		tailwindcss(),
 		tsConfigPaths(),
-		autoCollect({ srcDir: "./src" }),
+		autoCollect({ srcDir: "./src", thirdParties: { usePackageJson: true } }),
 		tanstackStart(),
 		nitro(),
 		// react's vite plugin must come after start's vite plugin
