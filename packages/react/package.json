@@ -38,7 +38,7 @@
 		"@openpolicy/tooling": "workspace:*",
 		"@types/react": "^19.0.0",
 		"react": "^19.0.0",
-		"@tanstack/intent": "workspace:*"
+		"@tanstack/intent": "^0.0.29"
 	},
 	"publishConfig": {
 		"exports": {

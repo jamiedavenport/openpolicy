@@ -30,7 +30,7 @@
 	"devDependencies": {
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
-		"@tanstack/intent": "workspace:*"
+		"@tanstack/intent": "^0.0.29"
 	},
 	"keywords": [
 		"tanstack-intent"

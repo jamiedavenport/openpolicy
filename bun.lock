@@ -6,9 +6,9 @@
       "devDependencies": {
         "@biomejs/biome": "^2.4.5",
         "@changesets/cli": "^2.30.0",
-        "@openpolicy/react": "^0.0.19",
-        "@openpolicy/sdk": "^0.0.19",
-        "@openpolicy/vite-auto-collect": "^0.0.19",
+        "@openpolicy/react": "workspace:*",
+        "@openpolicy/sdk": "workspace:*",
+        "@openpolicy/vite-auto-collect": "workspace:*",
         "@tanstack/intent": "^0.0.29",
         "@types/bun": "latest",
         "@types/node": "^25.5.0",
@@ -226,6 +226,7 @@
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
+        "@tanstack/intent": "^0.0.29",
         "@types/react": "^19.0.0",
         "react": "^19.0.0",
       },
@@ -252,6 +253,7 @@
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
+        "@tanstack/intent": "^0.0.29",
       },
     },
     "packages/vite": {
@@ -276,6 +278,7 @@
       "devDependencies": {
         "@openpolicy/sdk": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
+        "@tanstack/intent": "^0.0.29",
         "vite": "catalog:",
       },
       "peerDependencies": {

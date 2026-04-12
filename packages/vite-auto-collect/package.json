@@ -40,6 +40,6 @@
 		"@openpolicy/sdk": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
 		"vite": "catalog:",
-		"@tanstack/intent": "workspace:*"
+		"@tanstack/intent": "^0.0.29"
 	}
 }
