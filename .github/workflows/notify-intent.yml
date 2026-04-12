@@ -44,7 +44,6 @@ jobs:
       - name: Dispatch to intent repo
         uses: peter-evans/repository-dispatch@v3
         with:
-          token: ${{ secrets.INTENT_NOTIFY_TOKEN }}
           repository: ${{ github.repository }}
           event-type: skill-check
           client-payload: |
