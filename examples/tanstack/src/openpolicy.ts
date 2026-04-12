@@ -1,4 +1,4 @@
-import { dataCollected, defineConfig } from "@openpolicy/sdk";
+import { dataCollected, defineConfig, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -24,7 +24,7 @@ export default defineConfig({
 			analytics: false,
 			marketing: false,
 		},
-		thirdParties: [],
+		thirdParties,
 		userRights: ["access", "erasure"],
 		jurisdictions: ["us", "eu"],
 		children: { underAge: 16, noticeUrl: "https://acme.com/parental-notice" },
@@ -37,13 +37,7 @@ export default defineConfig({
 			functional: false,
 			marketing: false,
 		},
-		thirdParties: [
-			{
-				name: "Google Analytics",
-				purpose: "Website analytics and performance monitoring",
-				policyUrl: "https://policies.google.com/privacy",
-			},
-		],
+		thirdParties,
 		trackingTechnologies: ["web beacons", "local storage"],
 		consentMechanism: {
 			hasBanner: true,

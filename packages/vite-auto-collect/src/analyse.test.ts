@@ -1,5 +1,9 @@
 import { expect, test } from "bun:test";
-import { extractCollecting } from "./analyse";
+import { extractFromFile } from "./analyse";
+
+// ---------------------------------------------------------------------------
+// collecting() tests
+// ---------------------------------------------------------------------------
 
 test("canonical case: string literal values in object literal", () => {
 	const code = `
@@ -9,7 +13,7 @@ test("canonical case: string literal values in object literal", () => {
 			email: "Email address",
 		});
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
 		"Account Information": ["Name", "Email address"],
 	});
 });
@@ -19,7 +23,9 @@ test("renamed import", () => {
 		import { collecting as col } from "@openpolicy/sdk";
 		col("Cat", v, { a: "Name" });
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({ Cat: ["Name"] });
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
+		Cat: ["Name"],
+	});
 });
 
 test("ignores collecting imported from a non-SDK module", () => {
@@ -27,7 +33,7 @@ test("ignores collecting imported from a non-SDK module", () => {
 		import { collecting } from "./local-collecting";
 		collecting("Cat", v, { a: "Name" });
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({});
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
 });
 
 test("ignores local `collecting` not imported from anywhere", () => {
@@ -35,7 +41,7 @@ test("ignores local `collecting` not imported from anywhere", () => {
 		function collecting(a, b, c) { return b; }
 		collecting("Cat", v, { a: "Name" });
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({});
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
 });
 
 test("ignores type-only imports", () => {
@@ -43,7 +49,7 @@ test("ignores type-only imports", () => {
 		import type { collecting } from "@openpolicy/sdk";
 		collecting("Cat", v, { a: "Name" });
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({});
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
 });
 
 test("skips template-literal category silently", () => {
@@ -51,7 +57,7 @@ test("skips template-literal category silently", () => {
 		import { collecting } from "@openpolicy/sdk";
 		collecting(\`Cat\`, v, { a: "Name" });
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({});
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
 });
 
 test("non-string values skipped silently, string values kept", () => {
@@ -59,7 +65,9 @@ test("non-string values skipped silently, string values kept", () => {
 		import { collecting } from "@openpolicy/sdk";
 		collecting("Cat", v, { a: 42, b: "Kept", c: true });
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({ Cat: ["Kept"] });
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
+		Cat: ["Kept"],
+	});
 });
 
 test("spread elements skipped silently", () => {
@@ -68,10 +76,12 @@ test("spread elements skipped silently", () => {
 		const rest = {};
 		collecting("Cat", v, { ...rest, b: "Kept" });
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({ Cat: ["Kept"] });
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
+		Cat: ["Kept"],
+	});
 });
 
-test("malformed source returns {} without throwing", () => {
+test("malformed source returns empty without throwing", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
 		collecting("Cat", v, { a: "Name"
@@ -79,10 +89,10 @@ test("malformed source returns {} without throwing", () => {
 	const originalWarn = console.warn;
 	console.warn = () => {}; // suppress expected parse-error log
 	try {
-		expect(() => extractCollecting("a.ts", code)).not.toThrow();
+		expect(() => extractFromFile("a.ts", code)).not.toThrow();
 		// Parser still produces a partial AST that may or may not contain the
 		// call, but the function must never throw and must return an object.
-		const out = extractCollecting("a.ts", code);
+		const out = extractFromFile("a.ts", code);
 		expect(typeof out).toBe("object");
 	} finally {
 		console.warn = originalWarn;
@@ -95,7 +105,9 @@ test("merges multiple calls with the same category", () => {
 		collecting("Cat", v, { a: "A" });
 		collecting("Cat", w, { b: "B", a2: "A" });
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({ Cat: ["A", "B"] });
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
+		Cat: ["A", "B"],
+	});
 });
 
 test("deduplicates repeated label values across and within calls", () => {
@@ -103,7 +115,7 @@ test("deduplicates repeated label values across and within calls", () => {
 		import { collecting } from "@openpolicy/sdk";
 		collecting("Cat", v, { a: "A", a2: "A" });
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({ Cat: ["A"] });
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({ Cat: ["A"] });
 });
 
 test("skips calls with fewer than three arguments", () => {
@@ -111,7 +123,7 @@ test("skips calls with fewer than three arguments", () => {
 		import { collecting } from "@openpolicy/sdk";
 		collecting("Cat", v);
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({});
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
 });
 
 test("skips calls whose third arg is a variable reference", () => {
@@ -120,7 +132,7 @@ test("skips calls whose third arg is a variable reference", () => {
 		const labels = { a: "Name" };
 		collecting("Cat", v, labels);
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({});
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
 });
 
 test("skips calls whose third arg is an arrow function", () => {
@@ -128,11 +140,13 @@ test("skips calls whose third arg is an arrow function", () => {
 		import { collecting } from "@openpolicy/sdk";
 		collecting("Cat", v, (v) => ({ Name: v.a }));
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({});
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
 });
 
-test("empty source returns {}", () => {
-	expect(extractCollecting("a.ts", "")).toEqual({});
+test("empty source returns empty", () => {
+	const result = extractFromFile("a.ts", "");
+	expect(result.dataCollected).toEqual({});
+	expect(result.thirdParties).toEqual([]);
 });
 
 test("calls nested inside other functions are still extracted", () => {
@@ -147,7 +161,132 @@ test("calls nested inside other functions are still extracted", () => {
 			);
 		}
 	`;
-	expect(extractCollecting("a.ts", code)).toEqual({
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
 		"Account Information": ["Name", "Email address"],
 	});
+});
+
+// ---------------------------------------------------------------------------
+// thirdParty() tests
+// ---------------------------------------------------------------------------
+
+test("thirdParty: canonical case with 3 string literal args", () => {
+	const code = `
+		import { thirdParty } from "@openpolicy/sdk";
+		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
+	`;
+	expect(extractFromFile("a.ts", code).thirdParties).toEqual([
+		{
+			name: "Stripe",
+			purpose: "Payments",
+			policyUrl: "https://stripe.com/privacy",
+		},
+	]);
+});
+
+test("thirdParty: renamed import", () => {
+	const code = `
+		import { thirdParty as tp } from "@openpolicy/sdk";
+		tp("Stripe", "Payments", "https://stripe.com/privacy");
+	`;
+	expect(extractFromFile("a.ts", code).thirdParties).toEqual([
+		{
+			name: "Stripe",
+			purpose: "Payments",
+			policyUrl: "https://stripe.com/privacy",
+		},
+	]);
+});
+
+test("thirdParty: ignored if imported from non-SDK module", () => {
+	const code = `
+		import { thirdParty } from "./local-third-party";
+		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
+	`;
+	expect(extractFromFile("a.ts", code).thirdParties).toEqual([]);
+});
+
+test("thirdParty: ignored if fewer than 3 args", () => {
+	const code = `
+		import { thirdParty } from "@openpolicy/sdk";
+		thirdParty("Stripe", "Payments");
+	`;
+	expect(extractFromFile("a.ts", code).thirdParties).toEqual([]);
+});
+
+test("thirdParty: ignored if first arg is non-literal", () => {
+	const code = `
+		import { thirdParty } from "@openpolicy/sdk";
+		const name = "Stripe";
+		thirdParty(name, "Payments", "https://stripe.com/privacy");
+	`;
+	expect(extractFromFile("a.ts", code).thirdParties).toEqual([]);
+});
+
+test("thirdParty: ignored if second arg is non-literal", () => {
+	const code = `
+		import { thirdParty } from "@openpolicy/sdk";
+		thirdParty("Stripe", getPurpose(), "https://stripe.com/privacy");
+	`;
+	expect(extractFromFile("a.ts", code).thirdParties).toEqual([]);
+});
+
+test("thirdParty: ignored if third arg is non-literal", () => {
+	const code = `
+		import { thirdParty } from "@openpolicy/sdk";
+		thirdParty("Stripe", "Payments", STRIPE_POLICY_URL);
+	`;
+	expect(extractFromFile("a.ts", code).thirdParties).toEqual([]);
+});
+
+test("thirdParty: deduplication — same name in same file appears once", () => {
+	const code = `
+		import { thirdParty } from "@openpolicy/sdk";
+		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
+		thirdParty("Stripe", "Billing", "https://stripe.com/other");
+	`;
+	expect(extractFromFile("a.ts", code).thirdParties).toEqual([
+		{
+			name: "Stripe",
+			purpose: "Payments",
+			policyUrl: "https://stripe.com/privacy",
+		},
+	]);
+});
+
+test("thirdParty: multiple distinct entries", () => {
+	const code = `
+		import { thirdParty } from "@openpolicy/sdk";
+		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
+		thirdParty("Sentry", "Error tracking", "https://sentry.io/privacy");
+	`;
+	expect(extractFromFile("a.ts", code).thirdParties).toEqual([
+		{
+			name: "Stripe",
+			purpose: "Payments",
+			policyUrl: "https://stripe.com/privacy",
+		},
+		{
+			name: "Sentry",
+			purpose: "Error tracking",
+			policyUrl: "https://sentry.io/privacy",
+		},
+	]);
+});
+
+test("collecting and thirdParty can coexist in the same file", () => {
+	const code = `
+		import { collecting, thirdParty } from "@openpolicy/sdk";
+		collecting("Account Information", v, { name: "Name" });
+		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
+	`;
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({ "Account Information": ["Name"] });
+	expect(result.thirdParties).toEqual([
+		{
+			name: "Stripe",
+			purpose: "Payments",
+			policyUrl: "https://stripe.com/privacy",
+		},
+	]);
 });

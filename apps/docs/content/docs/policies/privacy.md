@@ -27,6 +27,8 @@ privacy: {
 },
 ```
 
+The `dataCollected` and `thirdParties` fields can be populated automatically — see [Auto-collect](/policies/auto-collect).
+
 Then render it:
 
 ```tsx

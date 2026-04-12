@@ -2,33 +2,43 @@ import { parseSync } from "oxc-parser";
 
 const SDK_SPECIFIER = "@openpolicy/sdk";
 const COLLECTING_NAME = "collecting";
+const THIRD_PARTY_NAME = "thirdParty";
 
 type AnyNode = { type: string; [key: string]: unknown };
 
+export type ThirdPartyEntry = {
+	name: string;
+	purpose: string;
+	policyUrl: string;
+};
+
+export type ExtractResult = {
+	dataCollected: Record<string, string[]>;
+	thirdParties: ThirdPartyEntry[];
+};
+
 /**
- * Extract `collecting()` call metadata from a single source file.
+ * Extract `collecting()` and `thirdParty()` call metadata from a single source file.
  *
- * Returns a `Record<category, labels[]>` for every detected call whose
- * arguments match the analysable shape. Files with no matching calls — or
- * that fail to parse — return `{}`.
+ * Returns an `ExtractResult` with `dataCollected` (category → labels) and
+ * `thirdParties` (array of third-party entries). Files with no matching calls
+ * — or that fail to parse — return empty defaults.
  *
  * The analyser runs in two phases:
- * 1. Collect local names bound to `collecting` imported from `@openpolicy/sdk`
- *    (handles renamed imports, skips type-only imports, ignores look-alikes
- *    imported from other modules).
+ * 1. Collect local names bound to `collecting` / `thirdParty` imported from
+ *    `@openpolicy/sdk` (handles renamed imports, skips type-only imports,
+ *    ignores look-alikes imported from other modules).
  * 2. Walk the program body and inspect every `CallExpression` whose callee
  *    is one of those tracked local names.
  */
-export function extractCollecting(
-	filename: string,
-	code: string,
-): Record<string, string[]> {
+export function extractFromFile(filename: string, code: string): ExtractResult {
+	const empty: ExtractResult = { dataCollected: {}, thirdParties: [] };
 	let result: ReturnType<typeof parseSync>;
 	try {
 		result = parseSync(filename, code);
 	} catch {
 		console.warn(`[openpolicy-auto-collect] parse error in ${filename}`);
-		return {};
+		return empty;
 	}
 
 	if (result.errors.length > 0) {
@@ -37,49 +47,65 @@ export function extractCollecting(
 		const fatal = result.errors.some((e) => e.severity === ("Error" as never));
 		if (fatal) {
 			console.warn(`[openpolicy-auto-collect] parse error in ${filename}`);
-			return {};
+			return empty;
 		}
 	}
 
 	const program = result.program as unknown as AnyNode;
-	const localNames = collectSdkCollectingBindings(program);
-	if (localNames.size === 0) return {};
+	const collectingNames = collectSdkBindings(program, COLLECTING_NAME);
+	const thirdPartyNames = collectSdkBindings(program, THIRD_PARTY_NAME);
+	if (collectingNames.size === 0 && thirdPartyNames.size === 0) return empty;
 
-	const out: Record<string, string[]> = {};
+	const dataCollected: Record<string, string[]> = {};
+	const thirdParties: ThirdPartyEntry[] = [];
+	const seenThirdParties = new Set<string>();
+
 	walk(program, (node) => {
 		if (node.type !== "CallExpression") return;
 		const callee = node.callee as AnyNode | undefined;
 		if (!callee || callee.type !== "Identifier") return;
-		if (!localNames.has(callee.name as string)) return;
-
+		const calleeName = callee.name as string;
 		const args = node.arguments as AnyNode[] | undefined;
-		if (!args || args.length < 3) return;
 
-		const category = extractStringLiteral(args[0]);
-		if (category === null) return;
-
-		const labels = extractLabelKeys(args[2]);
-		if (labels === null) return;
-
-		const existing = out[category] ?? [];
-		const seen = new Set(existing);
-		for (const label of labels) {
-			if (!seen.has(label)) {
-				existing.push(label);
-				seen.add(label);
+		if (collectingNames.has(calleeName)) {
+			if (!args || args.length < 3) return;
+			const category = extractStringLiteral(args[0]);
+			if (category === null) return;
+			const labels = extractLabelKeys(args[2]);
+			if (labels === null) return;
+			const existing = dataCollected[category] ?? [];
+			const seen = new Set(existing);
+			for (const label of labels) {
+				if (!seen.has(label)) {
+					existing.push(label);
+					seen.add(label);
+				}
 			}
+			dataCollected[category] = existing;
+		} else if (thirdPartyNames.has(calleeName)) {
+			if (!args || args.length < 3) return;
+			const name = extractStringLiteral(args[0]);
+			if (name === null) return;
+			const purpose = extractStringLiteral(args[1]);
+			if (purpose === null) return;
+			const policyUrl = extractStringLiteral(args[2]);
+			if (policyUrl === null) return;
+			// Deduplicate by name — first occurrence wins (files walked in sorted order)
+			if (seenThirdParties.has(name)) return;
+			seenThirdParties.add(name);
+			thirdParties.push({ name, purpose, policyUrl });
 		}
-		out[category] = existing;
 	});
-	return out;
+
+	return { dataCollected, thirdParties };
 }
 
 /**
- * Walk `ImportDeclaration` nodes and return the local names bound to
- * `collecting` imported from `@openpolicy/sdk`. Skips type-only imports and
- * specifiers whose imported name isn't literally `collecting`.
+ * Walk `ImportDeclaration` nodes and return the local names bound to the given
+ * `exportName` imported from `@openpolicy/sdk`. Skips type-only imports and
+ * specifiers whose imported name doesn't match.
  */
-function collectSdkCollectingBindings(program: AnyNode): Set<string> {
+function collectSdkBindings(program: AnyNode, exportName: string): Set<string> {
 	const names = new Set<string>();
 	const body = program.body as AnyNode[] | undefined;
 	if (!body) return names;
@@ -105,7 +131,7 @@ function collectSdkCollectingBindings(program: AnyNode): Set<string> {
 							? imported.value
 							: undefined
 						: undefined;
-			if (importedName !== COLLECTING_NAME) continue;
+			if (importedName !== exportName) continue;
 			const local = spec.local as AnyNode | undefined;
 			if (!local || local.type !== "Identifier") continue;
 			names.add(local.name as string);

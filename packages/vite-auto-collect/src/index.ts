@@ -1,7 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
-import { extractCollecting } from "./analyse";
+import { extractFromFile, type ThirdPartyEntry } from "./analyse";
+import { KNOWN_PACKAGES } from "./known-packages";
 import { walkSources } from "./scan";
 
 export type AutoCollectOptions = {
@@ -20,6 +21,10 @@ export type AutoCollectOptions = {
 	 * `.svelte-kit`, `.cache`).
 	 */
 	ignore?: string[];
+
+	thirdParties?: {
+		usePackageJson?: boolean;
+	};
 };
 
 /**
@@ -63,12 +68,53 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 	const srcDirOpt = options.srcDir ?? "src";
 	const extensions = options.extensions ?? [".ts", ".tsx"];
 	const ignore = options.ignore ?? [];
+	const usePackageJsonOpt = options.thirdParties?.usePackageJson ?? false;
+	let resolvedRoot: string;
 	let resolvedSrcDir: string;
-	let scanned: Record<string, string[]> = {};
+	let scanned: {
+		dataCollected: Record<string, string[]>;
+		thirdParties: ThirdPartyEntry[];
+	} = { dataCollected: {}, thirdParties: [] };
 
-	async function scanAndMerge(): Promise<Record<string, string[]>> {
+	async function detectFromPackageJson(
+		root: string,
+	): Promise<ThirdPartyEntry[]> {
+		let raw: string;
+		try {
+			raw = await readFile(resolve(root, "package.json"), "utf8");
+		} catch {
+			return [];
+		}
+		let pkg: {
+			dependencies?: Record<string, string>;
+			devDependencies?: Record<string, string>;
+		};
+		try {
+			pkg = JSON.parse(raw) as typeof pkg;
+		} catch {
+			return [];
+		}
+		const allDeps = {
+			...pkg.dependencies,
+			...pkg.devDependencies,
+		};
+		const entries: ThirdPartyEntry[] = [];
+		const seenNames = new Set<string>();
+		for (const pkgName of Object.keys(allDeps)) {
+			const entry = KNOWN_PACKAGES.get(pkgName);
+			if (entry && !seenNames.has(entry.name)) {
+				seenNames.add(entry.name);
+				entries.push(entry);
+			}
+		}
+		return entries;
+	}
+
+	async function scanAndMerge(): Promise<typeof scanned> {
 		const files = await walkSources(resolvedSrcDir, extensions, ignore);
-		const merged: Record<string, string[]> = {};
+		const mergedData: Record<string, string[]> = {};
+		const mergedParties: ThirdPartyEntry[] = [];
+		const seenParties = new Set<string>();
 		for (const file of files) {
 			let code: string;
 			try {
@@ -76,9 +122,11 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 			} catch {
 				continue;
 			}
-			const extracted = extractCollecting(file, code);
-			for (const [category, labels] of Object.entries(extracted)) {
-				const existing = merged[category] ?? [];
+			const extracted = extractFromFile(file, code);
+			for (const [category, labels] of Object.entries(
+				extracted.dataCollected,
+			)) {
+				const existing = mergedData[category] ?? [];
 				const seen = new Set(existing);
 				for (const label of labels) {
 					if (!seen.has(label)) {
@@ -86,10 +134,25 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 						seen.add(label);
 					}
 				}
-				merged[category] = existing;
+				mergedData[category] = existing;
+			}
+			for (const entry of extracted.thirdParties) {
+				if (!seenParties.has(entry.name)) {
+					seenParties.add(entry.name);
+					mergedParties.push(entry);
+				}
 			}
 		}
-		return merged;
+		if (usePackageJsonOpt) {
+			const pkgEntries = await detectFromPackageJson(resolvedRoot);
+			for (const entry of pkgEntries) {
+				if (!seenParties.has(entry.name)) {
+					seenParties.add(entry.name);
+					mergedParties.push(entry);
+				}
+			}
+		}
+		return { dataCollected: mergedData, thirdParties: mergedParties };
 	}
 
 	/**
@@ -123,6 +186,7 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 		name: "openpolicy-auto-collect",
 		enforce: "pre",
 		configResolved(config) {
+			resolvedRoot = config.root;
 			resolvedSrcDir = resolve(config.root, srcDirOpt);
 		},
 		async buildStart() {
@@ -166,7 +230,12 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 		},
 		load(id) {
 			if (id !== RESOLVED_VIRTUAL_ID) return null;
-			return `export const dataCollected = ${JSON.stringify(scanned)};\n`;
+			return (
+				`export const dataCollected = ${JSON.stringify(
+					scanned.dataCollected,
+				)};\n` +
+				`export const thirdParties = ${JSON.stringify(scanned.thirdParties)};\n`
+			);
 		},
 	};
 }
