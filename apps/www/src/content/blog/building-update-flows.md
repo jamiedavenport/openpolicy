@@ -1,15 +1,29 @@
 ---
-title: "Building custom update flows with OpenPolicy Plus"
-description: "A look at how to use the OpenPolicy Plus API to build update flows that work for your product and your users."
+title: "How to notify users about privacy policy changes without spamming everyone"
+description: "Privacy policies change. The hard part isn't updating the document — it's knowing which users need to know, what changed for them specifically, and how to tell them without crying wolf."
 pubDate: 2026-04-15
 author: "OpenPolicy Team"
 ---
 
-One of the core ideas behind OpenPolicy is that your privacy policy should stay in sync with your product. When you start collecting new data, your policy updates to reflect that.
+Privacy policies change. That's fine — it means your product is evolving. But every update creates a problem: how do you tell your users without blasting every single one of them with a wall of legalese they'll immediately dismiss?
 
-That's useful, but it introduces a question: how do you keep your users informed without overwhelming them? A one-word change to a data retention clause probably doesn't warrant an email blast to your entire user base. A new section on biometric data collection probably does.
+The naive answer is "send everyone an email every time anything changes." The result is users who tune out your policy emails entirely — which means when you actually need them to re-consent to something material, nobody's reading it.
 
-OpenPolicy Plus gives you two primitives to build whatever flow makes sense for your product.
+OpenPolicy Plus gives you two primitives for building sane, user-friendly policy update flows without building your own consent-tracking system.
+
+<!-- IMAGE: Diagram showing the lifecycle — policy version A → user consents → policy updates to version B → changes() returns only the diff relevant to that user → user re-consents → version recorded. Annotate which parts OP handles vs. which parts the developer builds. -->
+
+## The problem with doing this yourself
+
+Before getting into the API, it's worth being specific about what "building your own" actually involves:
+
+- Storing which version of your policy each user last accepted
+- Versioning your policy document as it changes over time
+- Computing a diff between two versions of a legal document
+- Filtering that diff by jurisdiction — because a GDPR clause change is irrelevant to a user in California, and vice versa
+- Keeping all of this consistent as your policy evolves across multiple updates
+
+None of these are hard individually. Together they're a low-priority, high-surface-area maintenance burden that quietly grows as your user base and jurisdictions expand.
 
 ## The API
 
@@ -21,23 +35,72 @@ import { client } from "@openpolicy/plus";
 await client.consent("user_123");
 ```
 
-**`changes(userId)`** returns the diff between your current policy and the version that user last consented to.
+**`changes(userId)`** returns everything that's changed in your policy since that user last consented — structured by section, with the old and new text, so you can render it however you want.
 
 ```ts
 import { client } from "@openpolicy/plus";
 
 const changes = await client.changes("user_123");
+// [
+//   { section: "data_retention", previous: "90 days", current: "30 days" },
+//   { section: "third_party_sharing", previous: null, current: "We share data with..." }
+// ]
 ```
 
-`changes()` is jurisdiction-aware — it only returns changes that are relevant to that user based on where they are. A GDPR-specific update won't show up for a user in California, and vice versa.
+`changes()` is jurisdiction-aware. A GDPR-specific update won't appear for a user in California. A CCPA-specific update won't appear for a user in Germany. You get only the changes that are actually relevant to each user — which is what makes targeted notification possible in the first place.
 
-Those two calls are the foundation. Everything else is up to you.
+Those two calls are the foundation for every flow below.
 
-## Some examples of what you can build
+## Building the right flow for your product
 
-### Email digest on a cron
+There's no single right way to notify users. The right approach depends on how significant the change is, how sensitive your product is, and what your relationship with your users looks like. Here are four patterns, from lightest to heaviest.
 
-The simplest flow: run a job on a schedule, check for users with pending changes, and send them an email with a link back to your app to review and accept.
+### 1. In-app banner for minor updates
+
+For a small wording change or a clarification, a non-blocking banner on next login is usually enough. Users who care will read it; users who don't won't be interrupted.
+
+<!-- IMAGE: Screenshot mockup of a subtle top-of-page banner reading "We've updated our privacy policy — here's what changed" with a "Review & accept" link and an X to dismiss. -->
+
+```ts
+import { client } from "@openpolicy/plus";
+
+// On session start
+const changes = await client.changes(session.userId);
+
+if (changes.length > 0) {
+  showPolicyUpdateBanner({
+    changes,
+    onAccept: () => client.consent(session.userId),
+  });
+}
+```
+
+### 2. Modal for material changes
+
+When something genuinely significant has changed — new data categories, a new third-party integration, updated retention periods — a modal that requires acknowledgement is appropriate. This is also what regulators expect for material changes to consent.
+
+<!-- IMAGE: Screenshot mockup of a modal dialog: "We've updated how we handle your data" with a short bulleted summary of changes and a "I understand, continue" button. The background app is blurred/darkened. -->
+
+```ts
+import { client } from "@openpolicy/plus";
+
+const changes = await client.changes(session.userId);
+const materialChanges = changes.filter(
+  (c) => c.section !== "definitions" && c.section !== "contact_info"
+);
+
+if (materialChanges.length > 0) {
+  showPolicyModal({
+    changes: materialChanges,
+    onAccept: () => client.consent(session.userId),
+    blocking: true, // user must accept to continue
+  });
+}
+```
+
+### 3. Email digest on a schedule
+
+For products where users don't log in frequently, or where you want a paper trail of notification, email is more reliable than hoping the user hits the banner.
 
 ```ts
 import { client } from "@openpolicy/plus";
@@ -61,9 +124,9 @@ for (const user of users) {
 
 When the user clicks through and accepts, call `consent()` to record it.
 
-### Human-readable summaries via LLM
+### 4. Plain-English summaries via LLM
 
-The raw diff is useful for building UIs, but it's not always the most readable thing to put in front of a user. You can pipe `changes` into an LLM to generate a plain-language summary in the tone of your product.
+A structured diff is exactly what you need for building notification UIs. It's not what most users want to read. You can pipe `changes` into an LLM to turn the structured data into a 2–3 sentence summary in the tone of your product — something a human would actually read.
 
 ```ts
 import { client } from "@openpolicy/plus";
@@ -86,38 +149,12 @@ const message = await anthropic.messages.create({
 const summary = message.content[0].type === "text" ? message.content[0].text : "";
 ```
 
-### In-app banner or modal
+## What OpenPolicy is doing underneath
 
-Not every update needs an email. For minor changes you might prefer a non-blocking banner the next time the user logs in.
+The flows above look simple from the outside. That's the point — but it's worth being clear about what's actually happening so you understand what you're not building.
 
-```ts
-import { client } from "@openpolicy/plus";
+Every time your policy changes, OpenPolicy versions the document and records what changed in each section. When you call `changes(userId)`, it looks up which version that user last consented to, computes the diff against your current policy, and filters it to the changes that apply in that user's jurisdiction — across every user, every update, as your policy continues to evolve.
 
-// On session start
-const changes = await client.changes(session.userId);
+If you were tracking this yourself, you'd eventually have a users-to-versions table, a policy versions table, a diff-computation job, a jurisdiction mapping, and something to keep all of it consistent when you push an update. It's the kind of infrastructure that seems manageable at first and quietly becomes a maintenance problem as your user base grows.
 
-if (changes.length > 0) {
-  showPolicyUpdateBanner({ changes, onAccept: () => client.consent(session.userId) });
-}
-```
-
-### Filtering by significance
-
-You don't have to notify users about every change. The `changes` response gives you enough information to apply your own business logic — only show a prompt when there are more than a handful of changes, or only when specific sections are affected.
-
-```ts
-import { client } from "@openpolicy/plus";
-
-const changes = await client.changes("user_123");
-const significantChanges = changes.filter((c) => c.section !== "definitions");
-
-if (significantChanges.length >= 3) {
-  // prompt the user
-}
-```
-
-## The part you don't have to build
-
-The flows above are straightforward to put together. What's less obvious is everything OpenPolicy is handling underneath: tracking which version each user consented to, computing the right diff for their jurisdiction, and keeping that state consistent as your policy evolves.
-
-That's the part that's easy to underestimate when you're building it yourself — and the part that OpenPolicy Plus takes off your plate so you can focus on the experience you want to build for your users.
+That's what OpenPolicy Plus takes off your plate. The notification experience — when to show it, how to style it, how much to explain — is yours to build.
