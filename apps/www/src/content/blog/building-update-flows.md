@@ -11,8 +11,6 @@ The naive answer is "send everyone an email every time anything changes." The re
 
 OpenPolicy Plus gives you two primitives for building sane, user-friendly policy update flows without building your own consent-tracking system.
 
-<!-- IMAGE: Diagram showing the lifecycle — policy version A → user consents → policy updates to version B → changes() returns only the diff relevant to that user → user re-consents → version recorded. Annotate which parts OP handles vs. which parts the developer builds. -->
-
 ## The problem with doing this yourself
 
 Before getting into the API, it's worth being specific about what "building your own" actually involves:
@@ -78,8 +76,6 @@ if (changes.length > 0) {
 ### 2. Modal for material changes
 
 When something genuinely significant has changed — new data categories, a new third-party integration, updated retention periods — a modal that requires acknowledgement is appropriate. This is also what regulators expect for material changes to consent.
-
-<!-- IMAGE: Screenshot mockup of a modal dialog: "We've updated how we handle your data" with a short bulleted summary of changes and a "I understand, continue" button. The background app is blurred/darkened. -->
 
 ```ts
 import { client } from "@openpolicy/plus";
