@@ -1,5 +1,7 @@
 # @openpolicy/react
 
+## 1.0.0
+
 ## 0.0.21
 
 ### Patch Changes
