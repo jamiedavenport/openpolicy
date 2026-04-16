@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { collecting } from "./collecting";
+import { collecting, Ignore } from "./collecting";
 
 test("returns the exact same reference as value", () => {
 	const value = { name: "Ada", email: "ada@example.com" };
@@ -45,6 +45,24 @@ test("preserves branded/opaque row types without degrading inference", () => {
 	const result: UserRow = collecting("Account Information", row, {
 		name: "Name",
 		email: "Email address",
+		__brand: "Brand",
 	});
 	expect(result).toBe(row);
+});
+
+test("accepts Ignore sentinel for fields excluded from the policy", () => {
+	const value = { name: "Ada", hashedPassword: "hunter2" };
+	const result = collecting("Account Information", value, {
+		name: "Name",
+		hashedPassword: Ignore,
+	});
+	expect(result).toBe(value);
+});
+
+test("omitting a key of value from the label record is a type error", () => {
+	const value = { name: "Ada", hashedPassword: "hunter2" };
+	// @ts-expect-error — every key of `value` must be labelled (or explicitly
+	// marked with `Ignore`); omitting `hashedPassword` is no longer allowed.
+	const result = collecting("Account Information", value, { name: "Name" });
+	expect(result).toBe(value);
 });

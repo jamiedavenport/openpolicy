@@ -149,6 +149,60 @@ test("empty source returns empty", () => {
 	expect(result.thirdParties).toEqual([]);
 });
 
+test("Ignore sentinel omits the field but keeps other string-literal labels", () => {
+	const code = `
+		import { collecting, Ignore } from "@openpolicy/sdk";
+		collecting("Account Information", { name, hashedPassword }, {
+			name: "Name",
+			hashedPassword: Ignore,
+		});
+	`;
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
+		"Account Information": ["Name"],
+	});
+});
+
+test("Ignore recognised under a renamed import", () => {
+	const code = `
+		import { collecting, Ignore as Skip } from "@openpolicy/sdk";
+		collecting("Cat", v, {
+			a: "Name",
+			b: Skip,
+		});
+	`;
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
+		Cat: ["Name"],
+	});
+});
+
+test("Ignore imported from a non-SDK module is not recognised", () => {
+	// The local `Ignore` here is unrelated to the SDK sentinel; its Identifier
+	// value falls through the conservative silent-skip path so the field is
+	// absent from labels (same observable result, but no special treatment).
+	const code = `
+		import { collecting } from "@openpolicy/sdk";
+		import { Ignore } from "./somewhere-else";
+		collecting("Cat", v, {
+			a: "Name",
+			b: Ignore,
+		});
+	`;
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
+		Cat: ["Name"],
+	});
+});
+
+test("all properties marked Ignore yields an empty label array for the category", () => {
+	const code = `
+		import { collecting, Ignore } from "@openpolicy/sdk";
+		collecting("Cat", v, {
+			a: Ignore,
+			b: Ignore,
+		});
+	`;
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({ Cat: [] });
+});
+
 test("calls nested inside other functions are still extracted", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";

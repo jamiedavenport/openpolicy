@@ -3,6 +3,7 @@ import { parseSync } from "oxc-parser";
 const SDK_SPECIFIER = "@openpolicy/sdk";
 const COLLECTING_NAME = "collecting";
 const THIRD_PARTY_NAME = "thirdParty";
+const IGNORE_NAME = "Ignore";
 
 type AnyNode = { type: string; [key: string]: unknown };
 
@@ -54,6 +55,7 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 	const program = result.program as unknown as AnyNode;
 	const collectingNames = collectSdkBindings(program, COLLECTING_NAME);
 	const thirdPartyNames = collectSdkBindings(program, THIRD_PARTY_NAME);
+	const ignoreNames = collectSdkBindings(program, IGNORE_NAME);
 	if (collectingNames.size === 0 && thirdPartyNames.size === 0) return empty;
 
 	const dataCollected: Record<string, string[]> = {};
@@ -71,7 +73,7 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 			if (!args || args.length < 3) return;
 			const category = extractStringLiteral(args[0]);
 			if (category === null) return;
-			const labels = extractLabelKeys(args[2]);
+			const labels = extractLabelKeys(args[2], ignoreNames);
 			if (labels === null) return;
 			const existing = dataCollected[category] ?? [];
 			const seen = new Set(existing);
@@ -155,8 +157,16 @@ function extractStringLiteral(node: AnyNode | undefined): string | null {
  * Extract the string values from a plain `{ fieldName: "Human Label" }`
  * object literal. Returns an array of label strings, deduped while
  * preserving insertion order. Returns `null` if the shape doesn't match.
+ *
+ * Properties whose value is an `Identifier` matching a tracked local name
+ * bound to the SDK's `Ignore` export are treated as explicit opt-outs and
+ * skipped silently — producing the same observable result as omitting the
+ * field from the record did before.
  */
-function extractLabelKeys(node: AnyNode | undefined): string[] | null {
+function extractLabelKeys(
+	node: AnyNode | undefined,
+	ignoreNames: Set<string>,
+): string[] | null {
 	if (!node || node.type !== "ObjectExpression") return null;
 	const properties = node.properties as AnyNode[] | undefined;
 	if (!properties) return null;
@@ -166,11 +176,21 @@ function extractLabelKeys(node: AnyNode | undefined): string[] | null {
 	for (const prop of properties) {
 		if (prop.type !== "Property") continue; // drop SpreadElement silently
 		const val = prop.value as AnyNode | undefined;
-		if (!val || val.type !== "Literal" || typeof val.value !== "string")
+		if (!val) continue;
+		if (val.type === "Literal" && typeof val.value === "string") {
+			if (seen.has(val.value)) continue;
+			seen.add(val.value);
+			labels.push(val.value);
 			continue;
-		if (seen.has(val.value)) continue;
-		seen.add(val.value);
-		labels.push(val.value);
+		}
+		if (
+			val.type === "Identifier" &&
+			typeof val.name === "string" &&
+			ignoreNames.has(val.name as string)
+		) {
+		}
+		// Any other value (template literals, variable references, etc.) is
+		// skipped silently to preserve the analyser's conservative posture.
 	}
 	return labels;
 }
