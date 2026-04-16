@@ -8,7 +8,7 @@ export default defineConfig({
 		contact: "privacy@yourcompany.com",
 	},
 	privacy: {
-		effectiveDate: "2025-01-01",
+		effectiveDate: "2026-01-01",
 		dataCollected: {
 			"Personal Information": ["Full name", "Email address"],
 			"Usage Data": ["Pages visited", "Time spent on site"],
@@ -24,46 +24,15 @@ export default defineConfig({
 		},
 		thirdParties: [],
 		userRights: ["access", "erasure", "portability"],
-		jurisdictions: ["us"],
+		jurisdictions: ["us", "eu"],
 	},
-	terms: {
-		effectiveDate: "2025-01-01",
-		acceptance: {
-			methods: ["using the service", "creating an account"],
+	cookie: {
+		effectiveDate: "2026-01-01",
+		cookies: {
+			essential: true,
+			analytics: false,
+			marketing: false,
 		},
-		eligibility: {
-			minimumAge: 13,
-		},
-		accounts: {
-			registrationRequired: false,
-			userResponsibleForCredentials: true,
-			companyCanTerminate: true,
-		},
-		prohibitedUses: [
-			"Violating any applicable laws or regulations",
-			"Infringing on intellectual property rights",
-		],
-		intellectualProperty: {
-			companyOwnsService: true,
-			usersMayNotCopy: true,
-		},
-		termination: {
-			companyCanTerminate: true,
-			userCanTerminate: true,
-		},
-		disclaimers: {
-			serviceProvidedAsIs: true,
-			noWarranties: true,
-		},
-		limitationOfLiability: {
-			excludesIndirectDamages: true,
-		},
-		governingLaw: {
-			jurisdiction: "Delaware, USA",
-		},
-		changesPolicy: {
-			noticeMethod: "email or prominent notice on our website",
-			noticePeriodDays: 30,
-		},
+		jurisdictions: ["us", "eu"],
 	},
 });
