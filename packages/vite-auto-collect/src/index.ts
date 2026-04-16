@@ -185,6 +185,25 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 	return {
 		name: "openpolicy-auto-collect",
 		enforce: "pre",
+		/**
+		 * Opt `@openpolicy/sdk` out of Vite's dep pre-bundler so our `resolveId`/
+		 * `load` hooks get a chance to intercept the SDK's internal
+		 * `./auto-collected.js` relative import in dev mode. Without this, esbuild
+		 * resolves that import during pre-bundling and inlines the empty fallback
+		 * from `auto-collected.ts` into the optimised dep bundle, which is why
+		 * `dataCollected` / `thirdParties` came out empty under `vite dev`
+		 * (OSS-7 / #57). `vite build` is unaffected because Rollup runs the whole
+		 * graph through the plugin pipeline. The SDK has no runtime deps of its
+		 * own, so excluding it from pre-bundling is cheap. Applied to both the
+		 * browser and the SSR dep optimizer for frameworks like TanStack Start /
+		 * Nitro (see `examples/tanstack/vite.config.ts`).
+		 */
+		config() {
+			return {
+				optimizeDeps: { exclude: ["@openpolicy/sdk"] },
+				ssr: { optimizeDeps: { exclude: ["@openpolicy/sdk"] } },
+			};
+		},
 		configResolved(config) {
 			resolvedRoot = config.root;
 			resolvedSrcDir = resolve(config.root, srcDirOpt);

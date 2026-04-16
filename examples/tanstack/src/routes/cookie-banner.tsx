@@ -66,7 +66,7 @@ function CookieBannerDemo() {
 	return (
 		<Dialog
 			open={route === "preferences"}
-			onOpenChange={(open) => !open && setRoute("closed")}
+			onOpenChange={(open) => !open && setRoute("cookie")}
 		>
 			<DialogContent>
 				<DialogHeader>
