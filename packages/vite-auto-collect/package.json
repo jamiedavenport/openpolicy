@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/vite-auto-collect",
-	"version": "0.0.20",
+	"version": "0.0.21",
 	"type": "module",
 	"description": "Vite plugin that scans source files for @openpolicy/sdk collecting() calls and populates autoCollected() at build time",
 	"license": "GPL-3.0-only",
