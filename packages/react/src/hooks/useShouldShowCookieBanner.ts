@@ -23,5 +23,6 @@ export function useShouldShowCookieBanner(
 		};
 	}, [status]);
 
+	if (status !== "undecided") return false;
 	return visible;
 }

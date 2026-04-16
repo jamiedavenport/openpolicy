@@ -236,12 +236,12 @@ export function OpenPolicyProvider({
 	const [draft, setDraft] = useState<Partial<CookieConsent>>({});
 
 	useEffect(() => {
-		if (visible) {
-			setRoute((prev) => (prev === "closed" ? "cookie" : prev));
-		} else {
+		if (visible && route === "closed") {
+			setRoute("cookie");
+		} else if (!visible && route !== "closed") {
 			setRoute("closed");
 		}
-	}, [visible]);
+	}, [visible, route]);
 
 	const rawAccept = useCallback(() => {
 		if (!cookieConfig) return;

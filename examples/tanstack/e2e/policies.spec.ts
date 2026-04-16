@@ -40,6 +40,17 @@ test.describe("/cookie-banner", () => {
 		await expect(page.getByTestId("consent-status")).toHaveText("completed");
 	});
 
+	test("closing preferences panel via X keeps the banner visible", async ({
+		page,
+	}) => {
+		await page.getByRole("button", { name: "Manage Cookies" }).click();
+		await expect(page.getByText("Cookie preferences")).toBeVisible();
+		await page.getByRole("button", { name: "Close" }).click();
+		await expect(page.getByText("Cookie preferences")).not.toBeVisible();
+		await expect(page.getByText("We value your privacy")).toBeVisible();
+		await expect(page.getByTestId("consent-status")).toHaveText("undecided");
+	});
+
 	test("Reset shows the banner again", async ({ page }) => {
 		await page.getByRole("button", { name: "Accept All" }).click();
 		await expect(page.getByTestId("consent-status")).toHaveText("completed");
