@@ -10,7 +10,7 @@ export type {
 } from "@openpolicy/core";
 
 export { dataCollected, thirdParties } from "./auto-collected";
-export { collecting } from "./collecting";
+export { collecting, Ignore } from "./collecting";
 export { Compliance } from "./compliance";
 export { DataCategories, LegalBases, Retention, Rights } from "./data";
 export { Providers } from "./providers";

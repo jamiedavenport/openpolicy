@@ -65,8 +65,34 @@ export async function createUser(name: string, email: string) {
 **Constraints:**
 
 - The `category` string and all label **values** must be string literals. Dynamic values (variables, template literals) are silently skipped by the analyser.
-- Fields omitted from the label record are excluded from the policy — use this to hide internal fields like `hashedPassword`.
+- Every key of `value` must appear in the label record. To exclude a field from the policy — for example an internal column like `hashedPassword` — use the `Ignore` sentinel re-exported from `@openpolicy/sdk`.
 - Multiple `collecting()` calls with the same category are merged; duplicate labels are deduplicated.
+
+### Excluding sensitive fields with `Ignore`
+
+```ts
+import { collecting, Ignore } from "@openpolicy/sdk";
+
+export async function createUser(
+  name: string,
+  email: string,
+  hashedPassword: string,
+) {
+  return db.insert(users).values(
+    collecting(
+      "Account Information",
+      { name, email, hashedPassword },
+      {
+        name: "Name",
+        email: "Email address",
+        hashedPassword: Ignore, // excluded from the compiled policy
+      },
+    ),
+  );
+}
+```
+
+Using `Ignore` forces each exclusion to be explicit, so a reviewer can see at a glance which fields are intentionally hidden from the policy.
 
 ## `thirdParty()`
 
