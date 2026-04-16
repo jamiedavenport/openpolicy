@@ -1,5 +1,7 @@
 # @openpolicy/renderers
 
+## 1.0.0
+
 ## 0.0.21
 
 ## 0.0.20

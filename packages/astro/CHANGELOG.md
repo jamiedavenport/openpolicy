@@ -1,5 +1,14 @@
 # @openpolicy/astro
 
+## 1.0.0
+
+### Patch Changes
+
+- Updated dependencies [6b635d3]
+  - @openpolicy/sdk@1.0.0
+  - @openpolicy/core@1.0.0
+  - @openpolicy/vite@1.0.0
+
 ## 0.0.21
 
 ### Patch Changes
