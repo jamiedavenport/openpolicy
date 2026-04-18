@@ -197,11 +197,26 @@ export function autoCollect(options: AutoCollectOptions = {}): Plugin {
 		 * own, so excluding it from pre-bundling is cheap. Applied to both the
 		 * browser and the SSR dep optimizer for frameworks like TanStack Start /
 		 * Nitro (see `examples/tanstack/vite.config.ts`).
+		 *
+		 * Also pin the SDK to `ssr.noExternal` so Vite bundles it into the SSR
+		 * output instead of externalising it. Workspace packages resolved from
+		 * `node_modules` are externalised by default in SSR builds; Node's ESM
+		 * loader then resolves the SDK's internal `./auto-collected.js` to the
+		 * empty fallback at runtime, bypassing the plugin's `resolveId` hook
+		 * entirely. That asymmetry caused `dataCollected` / `thirdParties` to
+		 * arrive empty for server-side consumers such as `@openpolicy/plus`'s
+		 * `client.consent()` called from server functions, and produced a
+		 * hydration flash of empty privacy data (OP-170). Bundling the SDK
+		 * server-side routes its internal imports through the plugin pipeline
+		 * the same way they already go through it on the client.
 		 */
 		config() {
 			return {
 				optimizeDeps: { exclude: ["@openpolicy/sdk"] },
-				ssr: { optimizeDeps: { exclude: ["@openpolicy/sdk"] } },
+				ssr: {
+					optimizeDeps: { exclude: ["@openpolicy/sdk"] },
+					noExternal: ["@openpolicy/sdk"],
+				},
 			};
 		},
 		configResolved(config) {
