@@ -1,5 +1,13 @@
 # @openpolicy/astro
 
+## 0.0.22
+
+### Patch Changes
+
+- @openpolicy/sdk@0.0.22
+- @openpolicy/core@0.0.22
+- @openpolicy/vite@0.0.22
+
 ## 1.0.0
 
 ### Patch Changes
