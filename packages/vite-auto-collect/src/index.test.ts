@@ -334,12 +334,15 @@ test("resolveId ignores specifiers other than ./auto-collected", async () => {
 	expect(result).toBeNull();
 });
 
-test("config hook excludes @openpolicy/sdk from dep pre-bundling (client + ssr)", () => {
+test("config hook excludes @openpolicy/sdk from dep pre-bundling and pins it to ssr.noExternal", () => {
 	const plugin = autoCollect();
 	const configHook = plugin.config as unknown as
 		| (() => {
 				optimizeDeps?: { exclude?: string[] };
-				ssr?: { optimizeDeps?: { exclude?: string[] } };
+				ssr?: {
+					optimizeDeps?: { exclude?: string[] };
+					noExternal?: string[] | true;
+				};
 		  } | void)
 		| undefined;
 	if (!configHook) throw new Error("plugin has no config hook");
@@ -347,6 +350,7 @@ test("config hook excludes @openpolicy/sdk from dep pre-bundling (client + ssr)"
 	const result = configHook();
 	expect(result?.optimizeDeps?.exclude).toContain("@openpolicy/sdk");
 	expect(result?.ssr?.optimizeDeps?.exclude).toContain("@openpolicy/sdk");
+	expect(result?.ssr?.noExternal).toContain("@openpolicy/sdk");
 });
 
 test("configureServer adds resolvedSrcDir to the chokidar watch set", async () => {
