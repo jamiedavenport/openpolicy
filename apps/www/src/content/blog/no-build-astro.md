@@ -46,17 +46,14 @@ export default defineConfig({
     legalName: "Acme, Inc.",
     // ...
   },
-  privacy: {
-    effectiveDate: "2026-04-01",
-    dataCollected: { /* ... */ },
-    jurisdictions: ["us", "eu"],
-    // ...
-  },
-  cookie: {
-    effectiveDate: "2026-04-01",
-    cookies: [ /* ... */ ],
-    // ...
-  },
+  effectiveDate: "2026-04-01",
+  jurisdictions: ["us", "eu"],
+  // Privacy policy fields — auto-detected from field presence
+  dataCollected: { /* ... */ },
+  // ...
+  // Cookie policy fields — auto-detected from field presence
+  cookies: { /* ... */ },
+  // ...
 });
 ```
 

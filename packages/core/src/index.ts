@@ -31,37 +31,97 @@ export {
 	ul,
 } from "./documents";
 export type {
+	ChildrenConfig,
 	CompanyConfig,
 	CompileOptions,
+	ConsentMechanism,
 	CookiePolicyConfig,
+	CookiePolicyCookies,
+	DataCollection,
+	EffectiveDate,
 	Jurisdiction,
 	LegalBasis,
 	OpenPolicyConfig,
 	OutputFormat,
+	PolicyCategory,
 	PolicyInput,
 	PrivacyPolicyConfig,
+	Retention,
+	ThirdParty,
+	TrackingTechnology,
 	UserRight,
 	ValidationIssue,
 } from "./types";
 export { isOpenPolicyConfig } from "./types";
 export { validatePrivacyPolicy } from "./validate";
+export { validateOpenPolicyConfig } from "./validate-config";
 export { validateCookiePolicy } from "./validate-cookie";
 
-import type { OpenPolicyConfig, PolicyInput } from "./types";
+import type {
+	CookiePolicyCookies,
+	OpenPolicyConfig,
+	PolicyCategory,
+	PolicyInput,
+} from "./types";
+
+const PRIVACY_FIELDS = [
+	"dataCollected",
+	"legalBasis",
+	"retention",
+	"userRights",
+	"children",
+] as const;
+
+function hasAnyPrivacyField(config: OpenPolicyConfig): boolean {
+	return PRIVACY_FIELDS.some((field) => config[field] !== undefined);
+}
+
+function hasCookieField(config: OpenPolicyConfig): boolean {
+	return config.cookies !== undefined;
+}
+
+export function shouldEmit(
+	category: PolicyCategory,
+	config: OpenPolicyConfig,
+): boolean {
+	if (config.policies) return config.policies.includes(category);
+	return category === "privacy"
+		? hasAnyPrivacyField(config)
+		: hasCookieField(config);
+}
+
+const EMPTY_COOKIES: CookiePolicyCookies = { essential: true };
 
 export function expandOpenPolicyConfig(
 	config: OpenPolicyConfig,
 ): PolicyInput[] {
 	const inputs: PolicyInput[] = [];
-	if (config.privacy) {
+	if (shouldEmit("privacy", config)) {
 		inputs.push({
 			type: "privacy",
 			company: config.company,
-			...config.privacy,
+			effectiveDate: config.effectiveDate,
+			jurisdictions: config.jurisdictions,
+			dataCollected: config.dataCollected ?? {},
+			legalBasis: config.legalBasis ?? [],
+			retention: config.retention ?? {},
+			cookies: config.cookies ?? EMPTY_COOKIES,
+			thirdParties: config.thirdParties ?? [],
+			userRights: config.userRights ?? [],
+			children: config.children,
 		});
 	}
-	if (config.cookie) {
-		inputs.push({ type: "cookie", company: config.company, ...config.cookie });
+	if (shouldEmit("cookie", config)) {
+		inputs.push({
+			type: "cookie",
+			company: config.company,
+			effectiveDate: config.effectiveDate,
+			jurisdictions: config.jurisdictions,
+			cookies: config.cookies ?? EMPTY_COOKIES,
+			thirdParties: config.thirdParties ?? [],
+			trackingTechnologies: config.trackingTechnologies,
+			consentMechanism: config.consentMechanism,
+		});
 	}
 	return inputs;
 }

@@ -73,37 +73,35 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    // GDPR + CCPA: spread both presets, then union the array fields
-    ...Compliance.GDPR,
-    jurisdictions: [
-      ...Compliance.GDPR.jurisdictions,
-      ...Compliance.CCPA.jurisdictions,
-    ],
-    userRights: [
-      ...Compliance.GDPR.userRights,
-      ...Compliance.CCPA.userRights,
-    ],
-    dataCollected: {
-      ...dataCollected,
-      ...DataCategories.AccountInfo,
-      ...DataCategories.PaymentInfo,
-      ...DataCategories.UsageData,
-      ...DataCategories.DeviceInfo,
-    },
-    retention: {
-      "Account Information": Retention.UntilAccountDeletion,
-      "Usage Data": Retention.NinetyDays,
-      "Payment Information": Retention.ThreeYears,
-    },
-    cookies: { essential: true, analytics: true, marketing: false },
-    thirdParties: [
-      ...thirdParties,
-      Providers.GoogleAnalytics,
-      Providers.Stripe,
-    ],
+  effectiveDate: "2026-01-01",
+  // GDPR + CCPA: spread both presets, then union the array fields
+  ...Compliance.GDPR,
+  jurisdictions: [
+    ...Compliance.GDPR.jurisdictions,
+    ...Compliance.CCPA.jurisdictions,
+  ],
+  userRights: [
+    ...Compliance.GDPR.userRights,
+    ...Compliance.CCPA.userRights,
+  ],
+  dataCollected: {
+    ...dataCollected,
+    ...DataCategories.AccountInfo,
+    ...DataCategories.PaymentInfo,
+    ...DataCategories.UsageData,
+    ...DataCategories.DeviceInfo,
   },
+  retention: {
+    "Account Information": Retention.UntilAccountDeletion,
+    "Usage Data": Retention.NinetyDays,
+    "Payment Information": Retention.ThreeYears,
+  },
+  thirdParties: [
+    ...thirdParties,
+    Providers.GoogleAnalytics,
+    Providers.Stripe,
+  ],
+  cookies: { essential: true, analytics: true, marketing: false },
 });
 ```
 
@@ -218,21 +216,23 @@ OpenPolicy generates all human-readable sentences from the config structure. Pas
 
 Wrong:
 ```ts
-privacy: {
+defineConfig({
+  company: { /* ... */ },
   dataCollected: {
     // WRONG: prose sentence passed as a field label
     "Data": ["We collect information you provide when you register for an account, including your name and email address."],
   },
-}
+})
 ```
 
 Correct:
 ```ts
-privacy: {
+defineConfig({
+  company: { /* ... */ },
   dataCollected: {
     "Account Information": ["Name", "Email address"],
   },
-}
+})
 ```
 
 Source: `packages/core/src/types.ts`

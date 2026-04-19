@@ -33,14 +33,12 @@ export default defineConfig({
     legalName: "Acme, Inc.",
     contact: "legal@acme.com",
   },
-  privacy: {
-    dataCollected: {
-      "Account Information": ["Full name", "Email address"],
-      "Usage Data": ["Pages visited", "Feature usage"],
-    },
-    userRights: ["access", "erasure", "portability"],
-    jurisdictions: ["us", "eu"],
+  jurisdictions: ["us", "eu"],
+  dataCollected: {
+    "Account Information": ["Full name", "Email address"],
+    "Usage Data": ["Pages visited", "Feature usage"],
   },
+  userRights: ["access", "erasure", "portability"],
 });
 ```
 

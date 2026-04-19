@@ -1,6 +1,6 @@
 # PrivacyPolicyConfig Field Reference
 
-When used inside `defineConfig()`, `company` is omitted — it lives at the top level of `OpenPolicyConfig`. All other fields below are on `privacy: Omit<PrivacyPolicyConfig, "company">`.
+All fields below live at the top level of `OpenPolicyConfig` (the object passed to `defineConfig()`) alongside `company`. OpenPolicy auto-detects the privacy policy from the presence of privacy-specific fields.
 
 ## PrivacyPolicyConfig
 
@@ -117,14 +117,14 @@ Source: `packages/core/src/validate.ts`
 
 ## CookiePolicyConfig
 
-When used inside `defineConfig()`, supply as `cookie: Omit<CookiePolicyConfig, "company">`.
+All fields below live at the top level of `OpenPolicyConfig` (the object passed to `defineConfig()`) alongside `company`. OpenPolicy auto-detects the cookie policy from the presence of `cookies`, `consentMechanism`, or `trackingTechnologies`.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `effectiveDate` | `string` | Yes | ISO date string. |
+| `effectiveDate` | `string` | Yes | ISO date string. Shared with privacy policy. |
 | `cookies` | `CookiePolicyCookies` | Yes | `essential: boolean` is required; all other keys are `boolean` and treated as additional cookie categories. |
-| `jurisdictions` | `Jurisdiction[]` | Yes | Same values as `PrivacyPolicyConfig.jurisdictions`. |
-| `thirdParties` | `{ name: string; purpose: string; policyUrl?: string }[]` | No | Use `Providers.*` presets. |
+| `jurisdictions` | `Jurisdiction[]` | Yes | Same values as the privacy policy. Shared at the top level. |
+| `thirdParties` | `{ name: string; purpose: string; policyUrl?: string }[]` | No | Use `Providers.*` presets. Shared with privacy policy. |
 | `trackingTechnologies` | `string[]` | No | e.g. `["cookies", "localStorage", "sessionStorage", "pixel"]` |
 | `consentMechanism` | `{ hasBanner: boolean; hasPreferencePanel: boolean; canWithdraw: boolean }` | No | Required when `"eu"` in jurisdictions for GDPR compliance. |
 
@@ -140,14 +140,15 @@ type CookiePolicyCookies = {
 Example with custom categories:
 
 ```ts
-cookie: {
+defineConfig({
+  company: { /* ... */ },
   effectiveDate: "2026-01-01",
+  jurisdictions: ["eu", "us"],
   cookies: {
     essential: true,
     analytics: true,
     marketing: false,
     preferences: true,
   },
-  jurisdictions: ["eu", "us"],
-}
+})
 ```

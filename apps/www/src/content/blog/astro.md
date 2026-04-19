@@ -55,28 +55,26 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-03-05",
-    dataCollected: {
-      "Account information": ["Email address", "Display name"],
-      "Usage data": ["Pages visited", "Session duration"],
-    },
-    legalBasis: "Legitimate interests and user consent",
-    retention: {
-      "Account data": "Until account deletion",
-      "Analytics data": "13 months",
-    },
-    cookies: {
-      essential: true,
-      analytics: true,
-      marketing: false,
-    },
-    thirdParties: [
-      { name: "Vercel", purpose: "Hosting and edge delivery" },
-      { name: "Plausible", purpose: "Privacy-friendly analytics" },
-    ],
-    userRights: ["access", "erasure", "portability", "objection"],
-    jurisdictions: ["us", "eu"],
+  effectiveDate: "2026-03-05",
+  jurisdictions: ["us", "eu"],
+  dataCollected: {
+    "Account information": ["Email address", "Display name"],
+    "Usage data": ["Pages visited", "Session duration"],
+  },
+  legalBasis: ["legitimate_interests", "consent"],
+  retention: {
+    "Account data": "Until account deletion",
+    "Analytics data": "13 months",
+  },
+  userRights: ["access", "erasure", "portability", "objection"],
+  thirdParties: [
+    { name: "Vercel", purpose: "Hosting and edge delivery" },
+    { name: "Plausible", purpose: "Privacy-friendly analytics" },
+  ],
+  cookies: {
+    essential: true,
+    analytics: true,
+    marketing: false,
   },
 });
 ```

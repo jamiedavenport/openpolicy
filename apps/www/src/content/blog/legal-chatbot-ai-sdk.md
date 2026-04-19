@@ -29,11 +29,9 @@ export default defineConfig({
     legalName: "Your Company, Inc.",
     contact: "privacy@yourcompany.com",
   },
-  privacy: {
-    dataCollected: { "Personal Information": ["Full name", "Email address"] },
-    userRights: ["access", "erasure"],
-    jurisdictions: ["us"],
-  },
+  jurisdictions: ["us"],
+  dataCollected: { "Personal Information": ["Full name", "Email address"] },
+  userRights: ["access", "erasure"],
 });
 ```
 

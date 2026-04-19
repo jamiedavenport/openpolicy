@@ -24,28 +24,21 @@ export default defineConfig({
     address: "123 Main St, Springfield, USA",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: {
-      "Account Information": ["Name", "Email address"],
-      "Usage Data": ["Pages visited", "IP address"],
-    },
-    legalBasis: "Legitimate interests and consent",
-    retention: { "Account data": "Until account deletion" },
-    cookies: { essential: true, analytics: false, marketing: false },
-    thirdParties: [],
-    userRights: ["access", "erasure"],
-    jurisdictions: ["us", "eu"],
+  effectiveDate: "2026-01-01",
+  jurisdictions: ["us", "eu"],
+  dataCollected: {
+    "Account Information": ["Name", "Email address"],
+    "Usage Data": ["Pages visited", "IP address"],
   },
-  cookie: {
-    effectiveDate: "2026-01-01",
-    cookies: { essential: true, analytics: false, marketing: false },
-    jurisdictions: ["us", "eu"],
-  },
+  legalBasis: ["legitimate_interests", "consent"],
+  retention: { "Account data": "Until account deletion" },
+  userRights: ["access", "erasure"],
+  thirdParties: [],
+  cookies: { essential: true, analytics: false, marketing: false },
 });
 ```
 
-The `company` block is required and shared across all policy types. Each policy section (`privacy`, `cookie`) is optional — only the sections you define will produce output.
+The `company` block is required and shared across all policy types. All other fields live at the top level: `effectiveDate` and `jurisdictions` are shared, and OpenPolicy auto-detects which policies to generate from the fields you provide — include privacy-specific fields (like `dataCollected`, `legalBasis`, `userRights`) for a privacy policy, and cookie-specific fields (like `cookies`, `consentMechanism`) for a cookie policy.
 
 ## Using AI
 

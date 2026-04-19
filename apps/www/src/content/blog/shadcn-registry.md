@@ -46,10 +46,8 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "legal@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-03-27",
-    // ... fill in your data practices
-  },
+  effectiveDate: "2026-03-27",
+  // ... fill in your data practices
 });
 ```
 

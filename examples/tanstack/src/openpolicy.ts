@@ -7,43 +7,30 @@ export default defineConfig({
 		address: "123 Main St, Springfield, USA",
 		contact: "privacy@acme.com",
 	},
-	privacy: {
-		effectiveDate: "2026-03-03",
-		dataCollected: {
-			...dataCollected,
-			// Static entries are still allowed alongside scanned ones:
-			"Usage Data": ["Pages visited", "Browser type", "IP address"],
-		},
-		legalBasis: "legitimate_interests",
-		retention: {
-			"Account data": "Until account deletion",
-			"Usage logs": "90 days",
-		},
-		cookies: {
-			essential: true,
-			analytics: false,
-			marketing: false,
-		},
-		thirdParties,
-		userRights: ["access", "erasure"],
-		jurisdictions: ["us", "eu"],
-		children: { underAge: 16, noticeUrl: "https://acme.com/parental-notice" },
+	effectiveDate: "2026-03-03",
+	jurisdictions: ["us", "eu"],
+	dataCollected: {
+		...dataCollected,
+		"Usage Data": ["Pages visited", "Browser type", "IP address"],
 	},
-	cookie: {
-		effectiveDate: "2026-03-03",
-		cookies: {
-			essential: true,
-			analytics: true,
-			functional: false,
-			marketing: false,
-		},
-		thirdParties,
-		trackingTechnologies: ["web beacons", "local storage"],
-		consentMechanism: {
-			hasBanner: true,
-			hasPreferencePanel: true,
-			canWithdraw: true,
-		},
-		jurisdictions: ["us", "eu"],
+	legalBasis: "legitimate_interests",
+	retention: {
+		"Account data": "Until account deletion",
+		"Usage logs": "90 days",
 	},
+	cookies: {
+		essential: true,
+		analytics: true,
+		functional: false,
+		marketing: false,
+	},
+	thirdParties,
+	trackingTechnologies: ["web beacons", "local storage"],
+	consentMechanism: {
+		hasBanner: true,
+		hasPreferencePanel: true,
+		canWithdraw: true,
+	},
+	userRights: ["access", "erasure"],
+	children: { underAge: 16, noticeUrl: "https://acme.com/parental-notice" },
 });

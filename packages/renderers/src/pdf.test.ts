@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
-import { compile } from "@openpolicy/core";
+import { compile, type PolicyInput } from "@openpolicy/core";
 import { renderPDF } from "./pdf";
 
-const input = {
-	type: "privacy" as const,
+const input: PolicyInput = {
+	type: "privacy",
 	effectiveDate: "2026-01-01",
 	company: {
 		name: "Acme Inc.",

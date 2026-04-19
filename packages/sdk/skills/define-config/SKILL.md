@@ -29,20 +29,18 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: { ...dataCollected },
-    legalBasis: "legitimate_interests",
-    retention: { "Account Information": "Until account deletion" },
-    cookies: { essential: true, analytics: false, marketing: false },
-    thirdParties: [...thirdParties],
-    userRights: ["access", "erasure"],
-    jurisdictions: ["us"],
-  },
+  effectiveDate: "2026-01-01",
+  jurisdictions: ["us"],
+  dataCollected: { ...dataCollected },
+  legalBasis: "legitimate_interests",
+  retention: { "Account Information": "Until account deletion" },
+  userRights: ["access", "erasure"],
+  thirdParties: [...thirdParties],
+  cookies: { essential: true, analytics: false, marketing: false },
 });
 ```
 
-`company` is declared once at the top level — do not repeat it inside `privacy` or `cookie`.
+All policy fields live at the top level of `OpenPolicyConfig`. OpenPolicy auto-detects which policies to generate from the fields you provide: privacy-specific fields (like `dataCollected`, `legalBasis`, `userRights`) produce a privacy policy, and cookie-specific fields (like `cookies`, `consentMechanism`) produce a cookie policy. `effectiveDate` and `jurisdictions` are shared across both.
 
 ## Core Patterns
 
@@ -68,22 +66,20 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    ...Compliance.GDPR,
-    dataCollected: {
-      ...dataCollected,
-      ...DataCategories.AccountInfo,
-      ...DataCategories.UsageData,
-    },
-    retention: {
-      "Account Information": Retention.UntilAccountDeletion,
-      "Usage Data": Retention.NinetyDays,
-    },
-    cookies: { essential: true, analytics: true, marketing: false },
-    thirdParties: [...thirdParties, Providers.Stripe, Providers.PostHog],
-    children: { underAge: 13 },
+  effectiveDate: "2026-01-01",
+  ...Compliance.GDPR,
+  dataCollected: {
+    ...dataCollected,
+    ...DataCategories.AccountInfo,
+    ...DataCategories.UsageData,
   },
+  retention: {
+    "Account Information": Retention.UntilAccountDeletion,
+    "Usage Data": Retention.NinetyDays,
+  },
+  thirdParties: [...thirdParties, Providers.Stripe, Providers.PostHog],
+  children: { underAge: 13 },
+  cookies: { essential: true, analytics: true, marketing: false },
 });
 ```
 
@@ -91,21 +87,21 @@ export default defineConfig({
 
 ### 2. Using Compliance presets
 
-`Compliance.GDPR` and `Compliance.CCPA` are objects safe to spread into `privacy`:
+`Compliance.GDPR` and `Compliance.CCPA` are objects safe to spread directly into `defineConfig()`:
 
 ```ts
-import { Compliance } from "@openpolicy/sdk";
+import { Compliance, defineConfig } from "@openpolicy/sdk";
 
 // GDPR only
-privacy: { ...Compliance.GDPR, ... }
+defineConfig({ ...Compliance.GDPR, /* ... */ })
 
 // Both (array values merge correctly via spread — userRights and jurisdictions union)
-privacy: {
+defineConfig({
   ...Compliance.GDPR,
   jurisdictions: [...Compliance.GDPR.jurisdictions, ...Compliance.CCPA.jurisdictions],
   userRights: [...Compliance.GDPR.userRights, ...Compliance.CCPA.userRights],
-  ...
-}
+  // ...
+})
 ```
 
 `Compliance.CCPA` does not include `legalBasis` — it provides only `jurisdictions: ["ca"]` and `userRights: ["access", "erasure", "opt_out_sale", "non_discrimination"]`.
@@ -126,30 +122,28 @@ Available preset groups from `@openpolicy/sdk`:
 ```ts
 export default defineConfig({
   company: { ... },
-  cookie: {
-    effectiveDate: "2026-01-01",
-    cookies: { essential: true, analytics: true, marketing: false },
-    jurisdictions: ["eu", "us"],
-    consentMechanism: {
-      hasBanner: true,
-      hasPreferencePanel: true,
-      canWithdraw: true,
-    },
-    trackingTechnologies: ["localStorage", "sessionStorage", "cookies"],
-    thirdParties: [Providers.GoogleAnalytics, Providers.Cloudflare],
+  effectiveDate: "2026-01-01",
+  jurisdictions: ["eu", "us"],
+  cookies: { essential: true, analytics: true, marketing: false },
+  consentMechanism: {
+    hasBanner: true,
+    hasPreferencePanel: true,
+    canWithdraw: true,
   },
+  trackingTechnologies: ["localStorage", "sessionStorage", "cookies"],
+  thirdParties: [Providers.GoogleAnalytics, Providers.Cloudflare],
 });
 ```
 
-`CookiePolicyCookies` requires `essential: boolean` — all other keys are `boolean` and are treated as additional cookie categories.
+The `cookies` field requires `essential: boolean` — all other keys are `boolean` and are treated as additional cookie categories. Presence of `cookies`, `consentMechanism`, or `trackingTechnologies` auto-detects a cookie policy.
 
 ## Common Mistakes
 
-### HIGH — Using standalone PrivacyPolicyConfig instead of nested OpenPolicyConfig
+### HIGH — Using standalone PrivacyPolicyConfig instead of flat OpenPolicyConfig
 
 Wrong:
 ```ts
-// WRONG: standalone shape, company repeated inside the policy object
+// WRONG: standalone shape
 import type { PrivacyPolicyConfig } from "@openpolicy/sdk";
 
 const config: PrivacyPolicyConfig = {
@@ -167,21 +161,19 @@ const config: PrivacyPolicyConfig = {
 
 Correct:
 ```ts
-// correct: nested OpenPolicyConfig via defineConfig()
+// correct: flat OpenPolicyConfig via defineConfig()
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
   company: { name: "Acme", legalName: "Acme, Inc.", address: "...", contact: "privacy@acme.com" },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: {},
-    legalBasis: "consent",
-    retention: {},
-    cookies: { essential: true, analytics: false, marketing: false },
-    thirdParties: [],
-    userRights: [],
-    jurisdictions: [],
-  },
+  effectiveDate: "2026-01-01",
+  jurisdictions: [],
+  dataCollected: {},
+  legalBasis: "consent",
+  retention: {},
+  userRights: [],
+  thirdParties: [],
+  cookies: { essential: true, analytics: false, marketing: false },
 });
 ```
 
@@ -196,23 +188,25 @@ Source: `packages/core/src/types.ts`
 Wrong:
 ```ts
 // WRONG: jurisdictions missing — legalBasis section and GDPR/CCPA content will not appear
-privacy: {
+defineConfig({
+  company: { /* ... */ },
   legalBasis: "legitimate_interests",
   userRights: ["access", "erasure"],
   // jurisdictions omitted
-}
+})
 ```
 
 Correct:
 ```ts
-privacy: {
+defineConfig({
+  company: { /* ... */ },
   legalBasis: "legitimate_interests",
   userRights: ["access", "erasure"],
   jurisdictions: ["eu", "us"],
-}
+})
 ```
 
-Section builders for GDPR (`eu`) and CCPA (`ca`) content check `config.jurisdictions` before generating output. Omitting `jurisdictions` (or passing an empty array) causes those sections to be silently skipped with no warning. `Compliance.GDPR` and `Compliance.CCPA` include the correct `jurisdictions` values when spread.
+Section builders for GDPR (`eu`) and CCPA (`ca`) content check the top-level `jurisdictions` field before generating output. Omitting `jurisdictions` (or passing an empty array) causes those sections to be silently skipped with no warning. `Compliance.GDPR` and `Compliance.CCPA` include the correct `jurisdictions` values when spread.
 
 Source: `packages/core/src/templates/privacy/`
 

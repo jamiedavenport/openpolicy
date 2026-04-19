@@ -9,32 +9,25 @@ export function getOpenPolicyTemplate(
 	policies: string[],
 ): string {
 	const today = new Date().toISOString().slice(0, 10);
+	const wantPrivacy = policies.includes("privacy");
+	const wantCookie = policies.includes("cookie");
 
-	const privacySection = policies.includes("privacy")
+	const privacyFields = wantPrivacy
 		? `
-	privacy: {
-		effectiveDate: "${today}",
-		dataCollected: {
-			"Personal Information": ["Email address"],
-		},
-		legalBasis: "legitimate_interests",
-		retention: {
-			"All personal data": "As long as necessary for the purposes described in this policy",
-		},
-		cookies: { essential: true, analytics: false, marketing: false },
-		thirdParties: [],
-		userRights: ["access", "erasure"],
-		jurisdictions: ["us"],
-	},`
+	dataCollected: {
+		"Personal Information": ["Email address"],
+	},
+	legalBasis: "legitimate_interests",
+	retention: {
+		"All personal data": "As long as necessary for the purposes described in this policy",
+	},
+	userRights: ["access", "erasure"],
+	thirdParties: [],`
 		: "";
 
-	const cookieSection = policies.includes("cookie")
+	const cookieFields = wantCookie
 		? `
-	cookie: {
-		effectiveDate: "${today}",
-		cookies: { essential: true, analytics: false, functional: false, marketing: false },
-		jurisdictions: ["us"],
-	},`
+	cookies: { essential: true, analytics: false, functional: false, marketing: false },`
 		: "";
 
 	return `import { defineConfig } from "@openpolicy/sdk";
@@ -45,7 +38,9 @@ export default defineConfig({
 		legalName: "${companyName}",
 		address: "",
 		contact: "${contactEmail}",
-	},${privacySection}${cookieSection}
+	},
+	effectiveDate: "${today}",
+	jurisdictions: ["us"],${privacyFields}${cookieFields}
 });
 `;
 }

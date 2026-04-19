@@ -31,50 +31,36 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-03-13",
-    dataCollected: {
-      "Account information": ["Email address", "Display name"],
-      "Usage data": ["Pages visited", "Session duration"],
-    },
-    legalBasis: "Legitimate interests and user consent",
-    retention: {
-      "Account data": "Until account deletion",
-      "Analytics data": "13 months",
-    },
-    cookies: {
-      essential: true,
-      analytics: true,
-      marketing: false,
-    },
-    thirdParties: [
-      { name: "Vercel", purpose: "Hosting and edge delivery" },
-      { name: "Plausible", purpose: "Privacy-friendly analytics" },
-    ],
-    userRights: ["access", "erasure", "portability", "objection"],
-    jurisdictions: ["us", "eu"],
+  effectiveDate: "2026-03-13",
+  jurisdictions: ["us", "eu"],
+  dataCollected: {
+    "Account information": ["Email address", "Display name"],
+    "Usage data": ["Pages visited", "Session duration"],
   },
-  cookie: {
-    effectiveDate: "2026-03-13",
-    cookies: {
-      essential: true,
-      analytics: true,
-      functional: false,
-      marketing: false,
+  legalBasis: ["legitimate_interests", "consent"],
+  retention: {
+    "Account data": "Until account deletion",
+    "Analytics data": "13 months",
+  },
+  userRights: ["access", "erasure", "portability", "objection"],
+  thirdParties: [
+    {
+      name: "Plausible",
+      purpose: "Privacy-friendly analytics",
+      policyUrl: "https://plausible.io/privacy",
     },
-    thirdParties: [
-      {
-        name: "Plausible",
-        purpose: "Privacy-friendly analytics",
-        policyUrl: "https://plausible.io/privacy",
-      },
-    ],
-    consentMechanism: {
-      hasBanner: true,
-      hasPreferencePanel: false,
-      canWithdraw: true,
-    },
-    jurisdictions: ["us", "eu"],
+    { name: "Vercel", purpose: "Hosting and edge delivery" },
+  ],
+  cookies: {
+    essential: true,
+    analytics: true,
+    functional: false,
+    marketing: false,
+  },
+  consentMechanism: {
+    hasBanner: true,
+    hasPreferencePanel: false,
+    canWithdraw: true,
   },
 });
 ```
@@ -110,7 +96,7 @@ src/lib/policies/
   cookie-policy.html
 ```
 
-A single `defineConfig()` with `privacy` and `cookie` sections compiles both in one pass.
+A single `defineConfig()` compiles both policies in one pass — OpenPolicy auto-detects which to generate from the fields you provide.
 
 ## Render on dedicated routes
 

@@ -24,25 +24,32 @@ test("template includes company fields", () => {
 	expect(output).toContain('contact: "legal@acme.com"');
 });
 
-test("template includes selected policy sections", () => {
+test("template includes privacy fields when privacy selected", () => {
 	const output = getOpenPolicyTemplate("Acme", "hi@acme.com", ["privacy"]);
-	expect(output).toContain("privacy:");
-	expect(output).not.toContain("cookie:");
+	expect(output).toContain("dataCollected:");
+	expect(output).toContain("legalBasis:");
+	expect(output).not.toContain("cookies:");
 });
 
-test("template includes cookie section when selected", () => {
+test("template includes cookies field when cookie selected", () => {
 	const output = getOpenPolicyTemplate("Widgets Co", "hi@widgets.co", [
 		"cookie",
 	]);
-	expect(output).toContain("cookie:");
-	expect(output).not.toContain("privacy:");
+	expect(output).toContain("cookies:");
+	expect(output).not.toContain("dataCollected:");
 });
 
-test("template includes all sections when all selected", () => {
+test("template includes all fields when both selected", () => {
 	const output = getOpenPolicyTemplate("Acme", "hi@acme.com", [
 		"privacy",
 		"cookie",
 	]);
-	expect(output).toContain("privacy:");
-	expect(output).toContain("cookie:");
+	expect(output).toContain("dataCollected:");
+	expect(output).toContain("cookies:");
+});
+
+test("template always has top-level effectiveDate and jurisdictions", () => {
+	const output = getOpenPolicyTemplate("Acme", "hi@acme.com", ["privacy"]);
+	expect(output).toContain("effectiveDate:");
+	expect(output).toContain("jurisdictions:");
 });

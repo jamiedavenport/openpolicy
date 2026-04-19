@@ -1,10 +1,19 @@
 import type { OpenPolicyConfig } from "@openpolicy/core";
 
 export type {
-	CookiePolicyConfig,
+	ChildrenConfig,
+	CompanyConfig,
+	ConsentMechanism,
+	CookiePolicyCookies,
+	DataCollection,
+	EffectiveDate,
+	Jurisdiction,
 	LegalBasis,
 	OpenPolicyConfig,
-	PrivacyPolicyConfig,
+	PolicyCategory,
+	Retention as RetentionMap,
+	ThirdParty,
+	TrackingTechnology,
 	UserRight,
 } from "@openpolicy/core";
 

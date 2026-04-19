@@ -16,6 +16,7 @@ const validConfig: CookiePolicyConfig = {
 		functional: false,
 		marketing: false,
 	},
+	thirdParties: [],
 	jurisdictions: ["us"],
 	consentMechanism: {
 		hasBanner: true,
@@ -30,7 +31,10 @@ test("valid config produces no errors", () => {
 });
 
 test("missing effectiveDate is an error", () => {
-	const issues = validateCookiePolicy({ ...validConfig, effectiveDate: "" });
+	const issues = validateCookiePolicy({
+		...validConfig,
+		effectiveDate: "" as unknown as `${number}-${number}-${number}`,
+	});
 	expect(issues.some((i) => i.message.includes("effectiveDate"))).toBe(true);
 });
 
