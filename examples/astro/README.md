@@ -2,7 +2,7 @@
 
 # Astro Example — OpenPolicy
 
-A minimal Astro static site showing how to render privacy, terms, and cookie policies using `@openpolicy/core` directly in page frontmatter. No Astro integration, no generated files.
+A minimal Astro static site showing how to render privacy and cookie policies using `@openpolicy/core` directly in page frontmatter. No Astro integration, no generated files.
 
 ## What it demonstrates
 
@@ -16,7 +16,6 @@ A minimal Astro static site showing how to render privacy, terms, and cookie pol
 ```
 src/lib/openpolicy.ts   ← defineConfig() — all policy definitions
 src/pages/privacy.astro ← privacy policy page
-src/pages/terms.astro   ← terms of service page
 src/pages/cookie.astro  ← cookie policy page
 astro.config.mjs        ← empty — no integrations needed
 ```

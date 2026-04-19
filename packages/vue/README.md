@@ -58,7 +58,6 @@ export default {
 
 - `OpenPolicy`
 - `PrivacyPolicy`
-- `TermsOfService`
 - `CookiePolicy`
 - `renderDocument`
 - `defaultStyles`

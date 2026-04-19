@@ -62,14 +62,14 @@ PolicyInput → compilePolicy() → section builders → PolicySection[] → ren
 ```
 
 - **Section builders** are functions `(config) => PolicySection | null`. Returning `null` omits the section.
-- **`PolicyInput`** is a discriminated union: `{ type: "privacy" } & PrivacyPolicyConfig | { type: "terms" } & TermsOfServiceConfig`.
+- **`PolicyInput`** is a discriminated union: `{ type: "privacy" } & PrivacyPolicyConfig | { type: "cookie" } & CookiePolicyConfig`.
 - **Renderers** in `packages/core/src/renderers/` produce Markdown or HTML output.
 
 ### Adding a new section
 
-1. Add a builder function in `packages/core/src/templates/privacy/` or `templates/terms/`.
-2. Register it in `compilePrivacyPolicy()` or `compileTermsOfService()`.
-3. Add fields to `PrivacyPolicyConfig` or `TermsOfServiceConfig` in `types.ts`.
+1. Add a builder function in `packages/core/src/documents/privacy.ts` or `documents/cookie.ts`.
+2. Register it in the relevant `compile*Document()` function.
+3. Add fields to `PrivacyPolicyConfig` or `CookiePolicyConfig` in `types.ts`.
 4. Write tests in `packages/core/src/*.test.ts`.
 
 ## Testing

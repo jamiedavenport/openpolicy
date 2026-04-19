@@ -15,7 +15,6 @@ export {
 	renderNode,
 } from "./components/defaults";
 export { PrivacyPolicy } from "./components/PrivacyPolicy";
-export { TermsOfService } from "./components/TermsOfService";
 // Context / Provider
 export type { CookieCategory, CookieRoute, HasExpression } from "./context";
 // Hooks

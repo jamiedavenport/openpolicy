@@ -25,12 +25,8 @@ test("template includes company fields", () => {
 });
 
 test("template includes selected policy sections", () => {
-	const output = getOpenPolicyTemplate("Acme", "hi@acme.com", [
-		"privacy",
-		"terms",
-	]);
+	const output = getOpenPolicyTemplate("Acme", "hi@acme.com", ["privacy"]);
 	expect(output).toContain("privacy:");
-	expect(output).toContain("terms:");
 	expect(output).not.toContain("cookie:");
 });
 
@@ -40,16 +36,13 @@ test("template includes cookie section when selected", () => {
 	]);
 	expect(output).toContain("cookie:");
 	expect(output).not.toContain("privacy:");
-	expect(output).not.toContain("terms:");
 });
 
 test("template includes all sections when all selected", () => {
 	const output = getOpenPolicyTemplate("Acme", "hi@acme.com", [
 		"privacy",
-		"terms",
 		"cookie",
 	]);
 	expect(output).toContain("privacy:");
-	expect(output).toContain("terms:");
 	expect(output).toContain("cookie:");
 });

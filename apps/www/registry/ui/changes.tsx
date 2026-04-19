@@ -23,11 +23,10 @@ type Props = {
 	onApprove: () => void;
 };
 
-const policyOrder = ["privacy", "terms", "cookie"] as const;
+const policyOrder = ["privacy", "cookie"] as const;
 
 const policyLabel: Record<Change["policy"], string> = {
 	privacy: "Privacy Policy",
-	terms: "Terms of Service",
 	cookie: "Cookie Policy",
 };
 

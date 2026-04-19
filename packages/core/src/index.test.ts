@@ -39,10 +39,10 @@ const unifiedConfig: OpenPolicyConfig = {
 		userRights: ["access"],
 		jurisdictions: ["us"],
 	},
-	terms: {
+	cookie: {
 		effectiveDate: "2026-01-01",
-		acceptance: { methods: ["using the service"] },
-		governingLaw: { jurisdiction: "Delaware, USA" },
+		cookies: { essential: true },
+		jurisdictions: ["us"],
 	},
 };
 
@@ -60,15 +60,15 @@ test("isOpenPolicyConfig returns false for null/non-object", () => {
 	expect(isOpenPolicyConfig(42)).toBe(false);
 });
 
-test("isOpenPolicyConfig returns false for object without privacy/terms keys", () => {
+test("isOpenPolicyConfig returns false for object without privacy/cookie keys", () => {
 	expect(isOpenPolicyConfig({ company })).toBe(false);
 });
 
-test("expandOpenPolicyConfig returns both inputs when privacy and terms present", () => {
+test("expandOpenPolicyConfig returns both inputs when privacy and cookie present", () => {
 	const inputs = expandOpenPolicyConfig(unifiedConfig);
 	expect(inputs).toHaveLength(2);
 	expect(inputs[0]?.type).toBe("privacy");
-	expect(inputs[1]?.type).toBe("terms");
+	expect(inputs[1]?.type).toBe("cookie");
 });
 
 test("expandOpenPolicyConfig merges company into each input", () => {
@@ -77,7 +77,7 @@ test("expandOpenPolicyConfig merges company into each input", () => {
 	expect(inputs[1]?.company).toEqual(company);
 });
 
-test("expandOpenPolicyConfig returns only privacy when terms omitted", () => {
+test("expandOpenPolicyConfig returns only privacy when cookie omitted", () => {
 	const inputs = expandOpenPolicyConfig({
 		company,
 		privacy: unifiedConfig.privacy,
@@ -86,16 +86,16 @@ test("expandOpenPolicyConfig returns only privacy when terms omitted", () => {
 	expect(inputs[0]?.type).toBe("privacy");
 });
 
-test("expandOpenPolicyConfig returns only terms when privacy omitted", () => {
+test("expandOpenPolicyConfig returns only cookie when privacy omitted", () => {
 	const inputs = expandOpenPolicyConfig({
 		company,
-		terms: unifiedConfig.terms,
+		cookie: unifiedConfig.cookie,
 	});
 	expect(inputs).toHaveLength(1);
-	expect(inputs[0]?.type).toBe("terms");
+	expect(inputs[0]?.type).toBe("cookie");
 });
 
-test("expandOpenPolicyConfig returns empty array when neither privacy nor terms", () => {
+test("expandOpenPolicyConfig returns empty array when neither privacy nor cookie", () => {
 	const inputs = expandOpenPolicyConfig({ company } as OpenPolicyConfig);
 	expect(inputs).toHaveLength(0);
 });

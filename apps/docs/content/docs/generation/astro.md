@@ -33,7 +33,7 @@ const policy = renderHTML(compile(privacyPolicy));
 
 `expandOpenPolicyConfig` splits your unified config into individual policies. `compile` runs each through its section builders. `renderHTML` converts the result to an HTML string.
 
-Terms and cookie pages work the same way — just find `type === "terms"` or `type === "cookie"` instead.
+Cookie pages work the same way — just find `type === "cookie"` instead.
 
 See the [full working example](https://github.com/openpolicyhq/openpolicy/tree/main/examples/astro) and the [blog post](/blog/no-build-astro) for a complete walkthrough.
 

@@ -1,7 +1,7 @@
 ---
 name: define-config
 description: >
-  Writing the defineConfig() object for OpenPolicyConfig — privacy, terms, cookie — including all field types, jurisdiction requirements, and preset constants from @openpolicy/sdk.
+  Writing the defineConfig() object for OpenPolicyConfig — privacy and cookie — including all field types, jurisdiction requirements, and preset constants from @openpolicy/sdk.
 type: core
 library: openpolicy
 library_version: "0.0.19"
@@ -42,7 +42,7 @@ export default defineConfig({
 });
 ```
 
-`company` is declared once at the top level — do not repeat it inside `privacy`, `terms`, or `cookie`.
+`company` is declared once at the top level — do not repeat it inside `privacy` or `cookie`.
 
 ## Core Patterns
 
@@ -89,45 +89,7 @@ export default defineConfig({
 
 `Compliance.GDPR` expands to `{ jurisdictions: ["eu"], legalBasis: ["legitimate_interests"], userRights: ["access", "rectification", "erasure", "portability", "restriction", "objection"] }`.
 
-### 2. Terms of service config
-
-`governingLaw` is required — validation throws if absent.
-
-```ts
-export default defineConfig({
-  company: { ... },
-  terms: {
-    effectiveDate: "2026-01-01",
-    acceptance: { methods: ["using the service", "creating an account"] },
-    governingLaw: { jurisdiction: "Delaware, USA" },
-    eligibility: { minimumAge: 18 },
-    accounts: {
-      registrationRequired: true,
-      userResponsibleForCredentials: true,
-      companyCanTerminate: true,
-    },
-    disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
-    limitationOfLiability: {
-      excludesIndirectDamages: true,
-      liabilityCap: "fees paid in the last 12 months",
-    },
-    termination: {
-      companyCanTerminate: true,
-      userCanTerminate: true,
-      effectOfTermination: "All licenses granted to the user terminate immediately.",
-    },
-    disputeResolution: {
-      method: "arbitration",
-      venue: "San Francisco, CA",
-      classActionWaiver: true,
-    },
-  },
-});
-```
-
-All fields other than `effectiveDate`, `acceptance`, and `governingLaw` are optional. Include sections only when the corresponding policy content applies. See [references/terms-config.md](./references/terms-config.md) for the full field table.
-
-### 3. Using Compliance presets
+### 2. Using Compliance presets
 
 `Compliance.GDPR` and `Compliance.CCPA` are objects safe to spread into `privacy`:
 
@@ -159,7 +121,7 @@ Available preset groups from `@openpolicy/sdk`:
 | `Compliance` | Preset bundles: `GDPR`, `CCPA` |
 | `Providers` | Named third-party descriptors: Stripe, PostHog, Vercel, Sentry, Clerk, Resend, … |
 
-### 4. Cookie config
+### 3. Cookie config
 
 ```ts
 export default defineConfig({
@@ -229,32 +191,6 @@ Source: `packages/core/src/types.ts`
 
 ---
 
-### HIGH — Omitting governingLaw from terms of service
-
-Wrong:
-```ts
-// WRONG: governingLaw missing — validation throws at compile time
-terms: {
-  effectiveDate: "2026-01-01",
-  acceptance: { methods: ["using the service"] },
-}
-```
-
-Correct:
-```ts
-terms: {
-  effectiveDate: "2026-01-01",
-  acceptance: { methods: ["using the service"] },
-  governingLaw: { jurisdiction: "Delaware, USA" },
-}
-```
-
-`governingLaw` is a required field on `TermsOfServiceConfig`. `validateTermsOfService()` emits a fatal error if `governingLaw.jurisdiction` is absent or empty. TypeScript will catch this at authoring time only if the object is typed as `Omit<TermsOfServiceConfig, "company">`.
-
-Source: `packages/core/src/validate-terms.ts`
-
----
-
 ### MEDIUM — Not specifying jurisdictions — GDPR/CCPA sections silently absent
 
 Wrong:
@@ -283,4 +219,3 @@ Source: `packages/core/src/templates/privacy/`
 ## Reference
 
 - [PrivacyPolicyConfig and CookiePolicyConfig field table](./references/privacy-config.md)
-- [TermsOfServiceConfig field table](./references/terms-config.md)

@@ -34,21 +34,18 @@ export type {
 	CompanyConfig,
 	CompileOptions,
 	CookiePolicyConfig,
-	DisputeResolutionMethod,
 	Jurisdiction,
 	LegalBasis,
 	OpenPolicyConfig,
 	OutputFormat,
 	PolicyInput,
 	PrivacyPolicyConfig,
-	TermsOfServiceConfig,
 	UserRight,
 	ValidationIssue,
 } from "./types";
 export { isOpenPolicyConfig } from "./types";
 export { validatePrivacyPolicy } from "./validate";
 export { validateCookiePolicy } from "./validate-cookie";
-export { validateTermsOfService } from "./validate-terms";
 
 import type { OpenPolicyConfig, PolicyInput } from "./types";
 
@@ -62,9 +59,6 @@ export function expandOpenPolicyConfig(
 			company: config.company,
 			...config.privacy,
 		});
-	}
-	if (config.terms) {
-		inputs.push({ type: "terms", company: config.company, ...config.terms });
 	}
 	if (config.cookie) {
 		inputs.push({ type: "cookie", company: config.company, ...config.cookie });

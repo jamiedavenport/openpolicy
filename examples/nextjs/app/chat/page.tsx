@@ -25,8 +25,8 @@ import {
 const STARTERS = [
 	"What data do you collect about me?",
 	"How can I delete my data?",
-	"What are the terms for account termination?",
-	"What is the governing law for disputes?",
+	"Which cookies do you use and why?",
+	"How do I opt out of analytics?",
 ];
 
 export default function ChatPage() {
@@ -46,7 +46,7 @@ export default function ChatPage() {
 			<header className="px-6 py-4 border-b">
 				<h1 className="text-xl font-semibold">Legal Assistant</h1>
 				<p className="text-sm text-muted-foreground mt-0.5">
-					Ask questions about our privacy policy and terms of service
+					Ask questions about our privacy and cookie policies
 				</p>
 			</header>
 

@@ -1,7 +1,7 @@
 ---
 name: migrate
 description: >
-  Converting existing hand-written privacy policies or terms of service documents into OpenPolicy defineConfig() configs — mapping prose sections to structured TypeScript fields without passing raw text as values.
+  Converting existing hand-written privacy policies into OpenPolicy defineConfig() configs — mapping prose sections to structured TypeScript fields without passing raw text as values.
 type: lifecycle
 library: openpolicy
 library_version: "0.0.19"
@@ -173,83 +173,7 @@ userRights: [...Compliance.GDPR.userRights, ...Compliance.CCPA.userRights],
 
 `Compliance.CCPA` does not include `legalBasis` — only add it when the existing policy states an EU legal basis.
 
-### 3. Mapping TermsOfService optional sections
-
-`TermsOfServiceConfig` has three required fields (`effectiveDate`, `acceptance`, `governingLaw`) and many optional ones. The rule for migration: if the existing document has a section covering a concept, include the corresponding config field.
-
-Read each section heading and match it:
-
-| Existing section | Config field |
-|---|---|
-| Age / eligibility requirements | `eligibility` |
-| Account creation, credentials | `accounts` |
-| Prohibited conduct / acceptable use | `prohibitedUses` |
-| User-generated content, uploads | `userContent` |
-| Intellectual property, trademarks | `intellectualProperty` |
-| Pricing, subscriptions, refunds | `payments` |
-| Uptime, maintenance | `availability` |
-| Account suspension / cancellation | `termination` |
-| Disclaimer of warranties | `disclaimers` |
-| Limitation of liability | `limitationOfLiability` |
-| Indemnification | `indemnification` |
-| Third-party services / links | `thirdPartyServices` |
-| Dispute resolution, arbitration | `disputeResolution` |
-| How changes are communicated | `changesPolicy` |
-| Link to privacy policy | `privacyPolicyUrl` |
-
-A full migration for a SaaS product with payments, user content, and arbitration:
-
-```ts
-terms: {
-  effectiveDate: "2026-01-01",
-  acceptance: { methods: ["creating an account", "using the service"] },
-  governingLaw: { jurisdiction: "Delaware, USA" },
-  eligibility: { minimumAge: 18 },
-  accounts: {
-    registrationRequired: true,
-    userResponsibleForCredentials: true,
-    companyCanTerminate: true,
-  },
-  prohibitedUses: [
-    "Reverse engineering the service",
-    "Automated scraping without prior written consent",
-    "Using the service to violate applicable law",
-  ],
-  userContent: {
-    usersOwnContent: true,
-    licenseGrantedToCompany: true,
-    licenseDescription: "A worldwide, royalty-free license to host and display your content.",
-    companyCanRemoveContent: true,
-  },
-  payments: {
-    hasPaidFeatures: true,
-    refundPolicy: "30-day money-back guarantee on annual plans.",
-    priceChangesNotice: "30 days advance notice via email.",
-  },
-  termination: {
-    companyCanTerminate: true,
-    userCanTerminate: true,
-    effectOfTermination: "All licenses granted to the user terminate immediately.",
-  },
-  disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
-  limitationOfLiability: {
-    excludesIndirectDamages: true,
-    liabilityCap: "Fees paid in the prior 12 months.",
-  },
-  disputeResolution: {
-    method: "arbitration",
-    venue: "San Francisco, CA",
-    classActionWaiver: true,
-  },
-  changesPolicy: {
-    noticeMethod: "Email notification",
-    noticePeriodDays: 30,
-  },
-  privacyPolicyUrl: "https://acme.com/privacy",
-},
-```
-
-### 4. Using presets to standardize values
+### 3. Using presets to standardize values
 
 Prefer preset constants over raw strings wherever the meaning matches exactly. This reduces typo risk and keeps the config readable.
 
@@ -310,51 +234,5 @@ privacy: {
   },
 }
 ```
-
-The same principle applies to `prohibitedUses` (keep each entry to a short clause, not a full paragraph), `acceptance.methods` (short action phrases, not sentences), and `payments.refundPolicy` (one concise sentence is acceptable; not a multi-paragraph refund terms block).
-
-Source: `packages/core/src/types.ts`
-
----
-
-### MEDIUM — Omitting optional TermsOfService sections that cover existing policy content
-
-Skipping optional sections when the existing document has matching content produces a terms document that is legally less complete than what the team approved.
-
-Wrong:
-```ts
-// Existing policy has payment terms, user content policy, and account termination section —
-// but all three are omitted from the config.
-terms: {
-  effectiveDate: "2026-01-01",
-  acceptance: { methods: ["using the service"] },
-  governingLaw: { jurisdiction: "Delaware, USA" },
-}
-```
-
-Correct:
-```ts
-terms: {
-  effectiveDate: "2026-01-01",
-  acceptance: { methods: ["using the service"] },
-  governingLaw: { jurisdiction: "Delaware, USA" },
-  payments: {
-    hasPaidFeatures: true,
-    refundPolicy: "30-day money-back guarantee.",
-    priceChangesNotice: "30 days advance notice.",
-  },
-  userContent: {
-    usersOwnContent: true,
-    licenseGrantedToCompany: true,
-    companyCanRemoveContent: true,
-  },
-  termination: {
-    companyCanTerminate: true,
-    userCanTerminate: true,
-  },
-}
-```
-
-Before finalizing the config, re-read each section of the original document and confirm a corresponding field is present in the output config. Optional sections that are absent from the config are entirely omitted from the compiled document — there is no fallback prose.
 
 Source: `packages/core/src/types.ts`

@@ -28,34 +28,6 @@ export function getOpenPolicyTemplate(
 	},`
 		: "";
 
-	const termsSection = policies.includes("terms")
-		? `
-	terms: {
-		effectiveDate: "${today}",
-		acceptance: { methods: ["using the service", "creating an account"] },
-		eligibility: { minimumAge: 13 },
-		accounts: {
-			registrationRequired: false,
-			userResponsibleForCredentials: true,
-			companyCanTerminate: true,
-		},
-		prohibitedUses: [
-			"Violating any applicable laws or regulations",
-			"Infringing on intellectual property rights",
-			"Transmitting harmful or malicious content",
-		],
-		intellectualProperty: { companyOwnsService: true, usersMayNotCopy: true },
-		termination: { companyCanTerminate: true, userCanTerminate: true },
-		disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
-		limitationOfLiability: { excludesIndirectDamages: true },
-		governingLaw: { jurisdiction: "Delaware, USA" },
-		changesPolicy: {
-			noticeMethod: "email or prominent notice on our website",
-			noticePeriodDays: 30,
-		},
-	},`
-		: "";
-
 	const cookieSection = policies.includes("cookie")
 		? `
 	cookie: {
@@ -73,7 +45,7 @@ export default defineConfig({
 		legalName: "${companyName}",
 		address: "",
 		contact: "${contactEmail}",
-	},${privacySection}${termsSection}${cookieSection}
+	},${privacySection}${cookieSection}
 });
 `;
 }
@@ -92,7 +64,7 @@ export const initCommand = defineCommand({
 	},
 	async run({ args }) {
 		consola.box(
-			"Welcome to OpenPolicy\nGenerate privacy policies, terms of service, and cookie policies from a single config file.",
+			"Welcome to OpenPolicy\nGenerate privacy policies and cookie policies from a single config file.",
 		);
 		consola.start("Let's get you set up.");
 
@@ -110,7 +82,7 @@ export const initCommand = defineCommand({
 		const policies = (await consola.prompt("Which policies do you need?", {
 			type: "multiselect",
 			cancel: "reject",
-			options: ["privacy", "terms", "cookie"],
+			options: ["privacy", "cookie"],
 		})) as string[];
 
 		const source = getOpenPolicyTemplate(companyName, contactEmail, policies);

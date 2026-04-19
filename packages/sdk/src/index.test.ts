@@ -19,10 +19,10 @@ const unifiedFixture: OpenPolicyConfig = {
 		userRights: ["access"],
 		jurisdictions: ["us"],
 	},
-	terms: {
+	cookie: {
 		effectiveDate: "2026-01-01",
-		acceptance: { methods: ["using the service"] },
-		governingLaw: { jurisdiction: "Delaware, USA" },
+		cookies: { essential: true },
+		jurisdictions: ["us"],
 	},
 };
 

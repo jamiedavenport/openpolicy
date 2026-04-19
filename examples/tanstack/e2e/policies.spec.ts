@@ -75,20 +75,14 @@ for (const route of ROUTES) {
 			await page.goto(route);
 		});
 
-		test("renders all three policy documents", async ({ page }) => {
-			await expect(page.locator("[data-op-policy]")).toHaveCount(3);
+		test("renders both policy documents", async ({ page }) => {
+			await expect(page.locator("[data-op-policy]")).toHaveCount(2);
 		});
 
 		test("privacy policy renders key sections", async ({ page }) => {
 			await expect(page.getByText("Introduction")).toBeVisible();
 			await expect(page.getByText("Information We Collect")).toBeVisible();
 			await expect(page.getByText("Your Rights")).toBeVisible();
-		});
-
-		test("terms of service renders key sections", async ({ page }) => {
-			await expect(page.getByText("Acceptance of Terms")).toBeVisible();
-			await expect(page.getByText("Eligibility")).toBeVisible();
-			await expect(page.getByText("Limitation of Liability")).toBeVisible();
 		});
 
 		test("cookie policy renders key sections", async ({ page }) => {

@@ -2,7 +2,7 @@
 
 **The first policy-as-code framework for developers.**
 
-Stop copying privacy policies from random generators. Stop paying lawyers to update boilerplate every time you add a new third-party integration. OpenPolicy lets you define your privacy policy, terms of service, and other legal agreements in TypeScript—then generate compliant, always-up-to-date documents at build time.
+Stop copying privacy policies from random generators. Stop paying lawyers to update boilerplate every time you add a new third-party integration. OpenPolicy lets you define your privacy and cookie policies in TypeScript—then generate compliant, always-up-to-date documents at build time.
 
 ---
 

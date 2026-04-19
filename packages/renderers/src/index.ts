@@ -13,8 +13,6 @@ function filenameFor(type: PolicyInput["type"], ext: string): string {
 	switch (type) {
 		case "privacy":
 			return `privacy-policy.${ext}`;
-		case "terms":
-			return `terms-of-service.${ext}`;
 		case "cookie":
 			return `cookie-policy.${ext}`;
 	}

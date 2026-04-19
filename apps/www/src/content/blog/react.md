@@ -1,6 +1,6 @@
 ---
 title: "Build Privacy Policies Your Customers Actually Want to Read"
-description: "Render your privacy policy and terms of service directly into your React, Next.js, or TanStack app as components you fully control — swap every heading, paragraph, and section for your own."
+description: "Render your privacy policy directly into your React, Next.js, or TanStack app as components you fully control — swap every heading, paragraph, and section for your own."
 pubDate: 2026-03-18
 author: "OpenPolicy Team"
 ---
@@ -55,44 +55,6 @@ export default defineConfig({
     userRights: ["access", "erasure", "portability", "objection"],
     jurisdictions: ["us", "eu"],
   },
-  terms: {
-    effectiveDate: "2026-03-18",
-    acceptance: {
-      methods: ["using the service", "creating an account"],
-    },
-    eligibility: {
-      minimumAge: 13,
-    },
-    accounts: {
-      registrationRequired: true,
-      userResponsibleForCredentials: true,
-      companyCanTerminate: true,
-    },
-    prohibitedUses: [
-      "Violating any applicable laws or regulations",
-      "Attempting to gain unauthorized access to any part of the service",
-      "Transmitting malware or malicious code",
-    ],
-    intellectualProperty: {
-      companyOwnsService: true,
-      usersMayNotCopy: true,
-    },
-    disclaimers: {
-      serviceProvidedAsIs: true,
-      noWarranties: true,
-    },
-    limitationOfLiability: {
-      excludesIndirectDamages: true,
-      liabilityCap: "the amount paid by the user in the past 12 months",
-    },
-    governingLaw: {
-      jurisdiction: "Delaware, USA",
-    },
-    changesPolicy: {
-      noticeMethod: "email or prominent notice on the website",
-      noticePeriodDays: 30,
-    },
-  },
 });
 ```
 
@@ -114,7 +76,7 @@ export function PrivacyPolicyPage() {
 }
 ```
 
-That's a working privacy policy page. No build script, no generated files. The same flow works for terms and cookies — swap in `<TermsOfService />` or `<CookiePolicy />` and you're done.
+That's a working privacy policy page. No build script, no generated files. The same flow works for cookies — swap in `<CookiePolicy />` and you're done.
 
 ## Make it yours
 

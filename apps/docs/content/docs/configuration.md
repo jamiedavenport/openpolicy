@@ -37,15 +37,15 @@ export default defineConfig({
     userRights: ["access", "erasure"],
     jurisdictions: ["us", "eu"],
   },
-  terms: {
+  cookie: {
     effectiveDate: "2026-01-01",
-    acceptance: { methods: ["using the service", "creating an account"] },
-    governingLaw: { jurisdiction: "Delaware, USA" },
+    cookies: { essential: true, analytics: false, marketing: false },
+    jurisdictions: ["us", "eu"],
   },
 });
 ```
 
-The `company` block is required and shared across all policy types. Each policy section (`privacy`, `terms`, `cookie`) is optional — only the sections you define will produce output.
+The `company` block is required and shared across all policy types. Each policy section (`privacy`, `cookie`) is optional — only the sections you define will produce output.
 
 ## Using AI
 

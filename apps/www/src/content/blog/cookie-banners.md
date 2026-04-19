@@ -130,7 +130,7 @@ const {
 - **Consent gates, not manual checks.** `<ConsentGate requires="analytics">` is clearer and less error-prone than checking a consent object in every script component.
 - **Inspectable.** Consent is stored in localStorage under `op_consent`. Open DevTools and you can see exactly what was recorded — no black box.
 
-The same `openpolicy.ts` config powers the `<PrivacyPolicy>`, `<TermsOfService>`, and `<CookiePolicy>` React components too. One file, all your legal docs.
+The same `openpolicy.ts` config powers the `<PrivacyPolicy>` and `<CookiePolicy>` React components too. One file, all your legal docs.
 
 ---
 

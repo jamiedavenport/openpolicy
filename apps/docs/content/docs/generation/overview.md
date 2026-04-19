@@ -14,7 +14,6 @@ At build time (or on demand via the CLI), OpenPolicy reads your `openpolicy.ts` 
 | Section | Output filename |
 |---|---|
 | `privacy` | `privacy-policy.{ext}` |
-| `terms` | `terms-of-service.{ext}` |
 | `cookie` | `cookie-policy.{ext}` |
 
 ## Output formats

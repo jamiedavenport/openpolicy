@@ -1,4 +1,4 @@
-import { CookiePolicy, PrivacyPolicy, TermsOfService } from "@openpolicy/react";
+import { CookiePolicy, PrivacyPolicy } from "@openpolicy/react";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/css-vars")({
@@ -23,12 +23,9 @@ function RouteComponent() {
         .policy-css-vars [data-op-paragraph] { font-size: var(--policy-text-size); color: var(--policy-text-color); line-height: 1.625; margin-bottom: 0.75rem; }
         .policy-css-vars [data-op-list] { list-style-type: disc; list-style-position: inside; font-size: var(--policy-text-size); color: var(--policy-text-color); margin-bottom: 0.75rem; }
       `}</style>
-			<div className="grid grid-cols-3 gap-8 py-12 px-8">
+			<div className="grid grid-cols-2 gap-8 py-12 px-8">
 				<div className="policy-css-vars">
 					<PrivacyPolicy />
-				</div>
-				<div className="policy-css-vars">
-					<TermsOfService />
 				</div>
 				<div className="policy-css-vars">
 					<CookiePolicy />

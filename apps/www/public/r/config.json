@@ -2,7 +2,7 @@
 	"$schema": "https://ui.shadcn.com/schema/registry-item.json",
 	"name": "config",
 	"title": "OpenPolicy Config",
-	"description": "Starter openpolicy.ts config file for defining your privacy policy, terms of service, and cookie policy.",
+	"description": "Starter openpolicy.ts config file for defining your privacy and cookie policies.",
 	"dependencies": ["@openpolicy/sdk"],
 	"files": [
 		{

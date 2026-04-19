@@ -1,6 +1,6 @@
 ---
 title: "Building a Legal Chatbot with OpenPolicy and AI SDK"
-description: "Compile your privacy policy and terms of service into a Claude system prompt and stream plain-English answers — no RAG, no vector DB, just a route handler and 100 lines of React."
+description: "Compile your privacy policy into a Claude system prompt and stream plain-English answers — no RAG, no vector DB, just a route handler and 100 lines of React."
 pubDate: 2026-03-23
 author: "OpenPolicy Team"
 ---
@@ -34,11 +34,6 @@ export default defineConfig({
     userRights: ["access", "erasure"],
     jurisdictions: ["us"],
   },
-  terms: {
-    eligibility: { minimumAge: 13 },
-    termination: { companyCanTerminate: true, userCanTerminate: true },
-    governingLaw: { jurisdiction: "Delaware, USA" },
-  },
 });
 ```
 
@@ -62,8 +57,8 @@ const policiesMarkdown = inputs
   .join("\n\n---\n\n");
 
 const SYSTEM_PROMPT = `You are a legal assistant for ${openpolicy.company.name}. \
-Answer questions about the following policies clearly and concisely. \
-Cite specific sections when relevant. Do not speculate beyond what the policies state.
+Answer questions about the following policy clearly and concisely. \
+Cite specific sections when relevant. Do not speculate beyond what the policy states.
 
 ${policiesMarkdown}`;
 
@@ -80,7 +75,7 @@ export async function POST(req: Request) {
 
 **Why Markdown instead of HTML?** The renderers support both, but Markdown is the right choice for LLM context. HTML tags burn tokens without adding meaning — Markdown gives Claude the same structural information (headings, lists, emphasis) without the noise.
 
-**Why a system prompt instead of RAG?** Privacy policies and terms of service are short — typically 2,000–5,000 words combined — and meant to be understood as a whole. A user asking about account termination might also need to know about the notice period, what happens to their data, and whether they can appeal, all from different sections. Putting the full documents in context lets Claude surface that complete picture naturally.
+**Why a system prompt instead of RAG?** Privacy policies are short — typically 1,500–3,000 words — and meant to be understood as a whole. A user asking about data deletion might also need to know about retention periods, third-party sharing, and their rights under GDPR, all from different sections. Putting the full document in context lets Claude surface that complete picture naturally.
 
 **Prompt caching:** The policy content doesn't change between requests. If you're running this at volume, [Anthropic's prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) means you pay for those tokens once per cache TTL rather than on every call.
 
@@ -104,8 +99,8 @@ Starter questions help users get started without staring at a blank input:
 const STARTERS = [
   "What data do you collect about me?",
   "How can I delete my data?",
-  "What are the terms for account termination?",
-  "What is the governing law for disputes?",
+  "Do you share my data with third parties?",
+  "What rights do I have over my data?",
 ];
 ```
 
@@ -122,6 +117,6 @@ const { success } = await ratelimit.limit(ip);
 if (!success) return new Response("Too many requests", { status: 429 });
 ```
 
-**You still get traditional policy pages too.** The chatbot doesn't replace your `/privacy` and `/terms` routes — it sits alongside them. `<PrivacyPolicy />` and `<TermsOfService />` render the full documents directly into your Next.js app from the same config object. Users who want to read the full text still can; users who just want a quick answer can ask. Both outputs, one source of truth.
+**You still get a traditional policy page too.** The chatbot doesn't replace your `/privacy` route — it sits alongside it. `<PrivacyPolicy />` renders the full document directly into your Next.js app from the same config object. Users who want to read the full text still can; users who just want a quick answer can ask. Both outputs, one source of truth.
 
 Check out the [full example](https://github.com/jamiedavenport/openpolicy/tree/main/examples/nextjs).

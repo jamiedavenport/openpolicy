@@ -5,7 +5,6 @@ export type {
 	LegalBasis,
 	OpenPolicyConfig,
 	PrivacyPolicyConfig,
-	TermsOfServiceConfig,
 	UserRight,
 } from "@openpolicy/core";
 

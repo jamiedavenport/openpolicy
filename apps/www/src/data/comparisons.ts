@@ -89,7 +89,7 @@ export const comparisons: Comparison[] = [
 		narrative: [
 			{
 				heading: "The cost problem",
-				body: "A lawyer-drafted privacy policy or terms of service typically costs $500–$5,000 upfront, and that's before revisions. When your product changes — new data types, new features, new markets — you pay again. For early-stage teams, this compounds fast.",
+				body: "A lawyer-drafted privacy policy typically costs $500–$5,000 upfront, and that's before revisions. When your product changes — new data types, new features, new markets — you pay again. For early-stage teams, this compounds fast.",
 			},
 			{
 				heading: "The maintenance problem",

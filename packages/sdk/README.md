@@ -1,6 +1,6 @@
 # `@openpolicy/sdk`
 
-> TypeScript SDK for defining privacy policies and terms of service as code.
+> TypeScript SDK for defining privacy and cookie policies as code.
 
 Part of [OpenPolicy](https://openpolicy.sh) — a policy-as-code framework that compiles legal agreements from TypeScript at build time.
 
@@ -48,10 +48,10 @@ export default defineConfig({
 });
 ```
 
-### Terms of service
+### Cookie policy
 
 ```ts
-// terms.config.ts
+// cookies.config.ts
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
@@ -59,19 +59,12 @@ export default defineConfig({
     name: "Acme",
     legalName: "Acme, Inc.",
     address: "123 Main St, San Francisco, CA 94105",
-    contact: "legal@acme.com",
+    contact: "privacy@acme.com",
   },
-  terms: {
+  cookie: {
     effectiveDate: "2026-01-01",
-    acceptance: { methods: ["using the service", "creating an account"] },
-    eligibility: { minimumAge: 13 },
-    disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
-    limitationOfLiability: { excludesIndirectDamages: true },
-    governingLaw: { jurisdiction: "Delaware, USA" },
-    changesPolicy: {
-      noticeMethod: "email or prominent notice on the website",
-      noticePeriodDays: 30,
-    },
+    cookies: { essential: true, analytics: true, marketing: false },
+    jurisdictions: ["us", "eu"],
   },
 });
 ```

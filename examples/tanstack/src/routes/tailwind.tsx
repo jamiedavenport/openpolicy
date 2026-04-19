@@ -1,4 +1,4 @@
-import { CookiePolicy, PrivacyPolicy, TermsOfService } from "@openpolicy/react";
+import { CookiePolicy, PrivacyPolicy } from "@openpolicy/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 
@@ -15,12 +15,9 @@ const policyStyles = cn(
 
 function RouteComponent() {
 	return (
-		<div className="grid grid-cols-3 gap-8 py-12 px-8">
+		<div className="grid grid-cols-2 gap-8 py-12 px-8">
 			<div className={policyStyles}>
 				<PrivacyPolicy />
-			</div>
-			<div className={policyStyles}>
-				<TermsOfService />
 			</div>
 			<div className={policyStyles}>
 				<CookiePolicy />

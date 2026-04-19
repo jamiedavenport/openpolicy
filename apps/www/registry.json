@@ -7,7 +7,7 @@
 			"name": "config",
 			"type": "registry:lib",
 			"title": "OpenPolicy Config",
-			"description": "Starter openpolicy.ts config file for defining your privacy policy, terms of service, and cookie policy.",
+			"description": "Starter openpolicy.ts config file for defining your privacy and cookie policies.",
 			"dependencies": ["@openpolicy/sdk"],
 			"files": [
 				{
@@ -46,25 +46,6 @@
 					"path": "registry/privacy-policy.tsx",
 					"type": "registry:component",
 					"target": "components/ui/openpolicy/privacy-policy.tsx"
-				}
-			]
-		},
-		{
-			"name": "terms-of-service",
-			"type": "registry:component",
-			"title": "Terms of Service",
-			"description": "A Tailwind-styled terms of service component powered by OpenPolicy.",
-			"docs": "Remeber to wrap your compoents in the `<OpenPolicy>` provider. https://docs.openpolicy.sh/react",
-			"registryDependencies": [
-				"https://openpolicy.sh/r/config.json",
-				"https://openpolicy.sh/r/policy-components.json"
-			],
-			"dependencies": ["@openpolicy/react", "@openpolicy/sdk"],
-			"files": [
-				{
-					"path": "registry/terms-of-service.tsx",
-					"type": "registry:component",
-					"target": "components/ui/openpolicy/terms-of-service.tsx"
 				}
 			]
 		},

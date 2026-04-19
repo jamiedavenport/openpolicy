@@ -4,7 +4,7 @@ A minimal Vite + Vue app showing how to render OpenPolicy documents at runtime w
 
 ## What it demonstrates
 
-- Using `@openpolicy/vue` runtime components (`OpenPolicy`, `PrivacyPolicy`, `TermsOfService`, `CookiePolicy`)
+- Using `@openpolicy/vue` runtime components (`OpenPolicy`, `PrivacyPolicy`, `CookiePolicy`)
 - Defining a unified policy config with `@openpolicy/sdk`
 - Routing policy pages with `vue-router`
 - Styling policies via the default injected styles and page-level app styles
@@ -12,7 +12,7 @@ A minimal Vite + Vue app showing how to render OpenPolicy documents at runtime w
 ## Project structure
 
 ```
-openpolicy.ts        ← defineConfig() — unified policy definition (privacy, terms, cookie)
+openpolicy.ts        ← defineConfig() — unified policy definition (privacy, cookie)
 src/
   main.ts            ← Vue app + router + policy routes
   styles.css         ← app-level styles

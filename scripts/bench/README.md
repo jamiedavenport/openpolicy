@@ -1,6 +1,6 @@
 # OpenPolicy bench
 
-Bundle, network, and runtime benchmark for OpenPolicy. Measures the delta that OpenPolicy adds to a TanStack Start app: the privacy-policy route, the shadcn cookie banner, the compiled policy HTML, and the Vite auto-collect plugin.
+Bundle, network, and runtime benchmark for OpenPolicy. Measures the delta that OpenPolicy adds to a TanStack Start app: the privacy-policy and cookie-policy routes, the shadcn cookie banner, the compiled policy HTML, and the Vite auto-collect plugin.
 
 ## Running
 
@@ -19,7 +19,7 @@ Two scenarios are built from `examples/tanstack`:
 
 | Scenario | Description |
 | --- | --- |
-| **full** | The example as-shipped: `<OpenPolicy>` provider, privacy/terms/cookie routes, shadcn cookie banner, `autoCollect()` Vite plugin, compiled policy HTML. |
+| **full** | The example as-shipped: `<OpenPolicy>` provider, privacy/cookie routes, shadcn cookie banner, `autoCollect()` Vite plugin, compiled policy HTML. |
 | **baseline** | Same TanStack Start shell with OpenPolicy removed: `__root.tsx` is stripped of the provider, policy routes and `src/policies/` are deleted, `autoCollect()` is removed from `vite.config.ts`. |
 
 The **Δ between the two is OpenPolicy's impact**. We measure both so the number is explainable.

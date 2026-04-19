@@ -2,7 +2,7 @@
 
 > CLI for generating and validating [OpenPolicy](https://openpolicy.sh) policy documents.
 
-Compile privacy policies and terms of service to Markdown, HTML, or PDF from the command line — no Vite or Astro required.
+Compile privacy and cookie policies to Markdown, HTML, or PDF from the command line — no Vite or Astro required.
 
 ## Install
 
@@ -25,25 +25,24 @@ bunx @openpolicy/cli --help
 Creates a starter config file with placeholder content:
 
 ```sh
-openpolicy init                  # privacy policy (default)
-openpolicy init --type terms     # terms of service
+openpolicy init
 ```
 
 ### `generate` — compile a policy
 
 ```sh
 openpolicy generate ./privacy.config.ts --format markdown,html --out ./public/policies
-openpolicy generate ./terms.config.ts   --format markdown      --out ./public/policies
+openpolicy generate ./cookie.config.ts  --format markdown      --out ./public/policies
 ```
 
 | Flag | Default | Description |
 |---|---|---|
 | `--format` | `markdown` | Comma-separated output formats: `markdown`, `html`, `pdf` |
 | `--out` | `./public/policies` | Output directory |
-| `--type` | auto-detected | Override policy type: `privacy` or `terms` |
+| `--type` | auto-detected | Override policy type: `privacy` or `cookie` |
 | `--watch` | `false` | Watch config files and regenerate on changes |
 
-Policy type is auto-detected from the filename — files containing `"terms"` compile as terms of service.
+Policy type is auto-detected from the filename — files containing `"cookie"` compile as cookie policies.
 
 ### `validate` — check a policy config
 
@@ -55,7 +54,7 @@ openpolicy validate ./privacy.config.ts --jurisdiction gdpr
 | Flag | Default | Description |
 |---|---|---|
 | `--jurisdiction` | `all` | Validate against: `gdpr`, `ccpa`, or `all` |
-| `--type` | auto-detected | Override policy type: `privacy` or `terms` |
+| `--type` | auto-detected | Override policy type: `privacy` or `cookie` |
 
 ## Documentation
 

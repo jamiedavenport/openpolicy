@@ -1,6 +1,6 @@
 ---
 title: OpenPolicy with TanStack
-description: Generate and render privacy policies and terms of service in TanStack Router apps using OpenPolicy.
+description: Generate and render privacy and cookie policies in TanStack Router apps using OpenPolicy.
 framework: TanStack
 icon: simple-icons:tanstack
 pubDate: 2026-03-23

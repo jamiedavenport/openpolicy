@@ -198,7 +198,7 @@ export default function PrivacyPage() {
 }
 ```
 
-`PrivacyPolicy`, `TermsOfService`, and `CookiePolicy` read config from React context; without the provider they silently render `null` with no visible error.
+`PrivacyPolicy` and `CookiePolicy` read config from React context; without the provider they silently render `null` with no visible error.
 
 Source: packages/react/src/context.tsx
 

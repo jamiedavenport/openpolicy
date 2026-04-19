@@ -91,7 +91,7 @@ export default {
 		}
 	});
 
-	test("generates both privacy-policy.md and terms-of-service.md from unified config", async () => {
+	test("generates both privacy-policy.md and cookie-policy.md from unified config", async () => {
 		const tmpDir = await mkdtemp(join(tmpdir(), "openpolicy-vite-unified-"));
 		try {
 			const unifiedConfig = `
@@ -112,10 +112,10 @@ export default {
     userRights: ["access"],
     jurisdictions: ["us"],
   },
-  terms: {
+  cookie: {
     effectiveDate: "2026-01-01",
-    acceptance: { methods: ["using the service"] },
-    governingLaw: { jurisdiction: "Delaware, USA" },
+    cookies: { essential: true },
+    jurisdictions: ["us"],
   },
 };
 `;
@@ -126,7 +126,7 @@ export default {
 			await generatePolicies(configPath, outDir, ["markdown"]);
 
 			expect(existsSync(join(outDir, "privacy-policy.md"))).toBe(true);
-			expect(existsSync(join(outDir, "terms-of-service.md"))).toBe(true);
+			expect(existsSync(join(outDir, "cookie-policy.md"))).toBe(true);
 		} finally {
 			await rm(tmpDir, { recursive: true });
 		}

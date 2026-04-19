@@ -20,18 +20,14 @@ async function generateFromConfig(
 		const inputs = expandOpenPolicyConfig(config as OpenPolicyConfig);
 		if (inputs.length === 0) {
 			consola.warn(
-				`Unified config has no privacy or terms sections: ${configPath}`,
+				`Unified config has no privacy or cookie sections: ${configPath}`,
 			);
 			return;
 		}
 		await mkdir(outDir, { recursive: true });
 		for (const input of inputs) {
 			const outputFilename =
-				input.type === "terms"
-					? "terms-of-service"
-					: input.type === "cookie"
-						? "cookie-policy"
-						: "privacy-policy";
+				input.type === "cookie" ? "cookie-policy" : "privacy-policy";
 			consola.start(
 				`Generating ${input.type} policy from ${configPath} → formats: ${formats.join(", ")}`,
 			);

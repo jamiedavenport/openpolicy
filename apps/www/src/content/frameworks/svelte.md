@@ -1,6 +1,6 @@
 ---
 title: OpenPolicy with Svelte
-description: Generate and render privacy policies and terms of service in Svelte and SvelteKit apps using OpenPolicy.
+description: Generate and render privacy and cookie policies in Svelte and SvelteKit apps using OpenPolicy.
 framework: Svelte
 icon: simple-icons:svelte
 pubDate: 2026-03-23

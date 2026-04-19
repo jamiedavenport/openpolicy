@@ -1,13 +1,13 @@
 ---
 title: "Legal pages as components, not scripts"
-description: "OpenPolicy is on the shadcn registry. Install privacy policy, terms of service, and cookie policy components with a single command — code you own, styled with Tailwind."
+description: "OpenPolicy is on the shadcn registry. Install privacy policy and cookie policy components with a single command — code you own, styled with Tailwind."
 pubDate: 2026-03-27
 author: "OpenPolicy Team"
 ---
 
 The old way: find a template, copy-paste the HTML, swap in your company name, commit it to a static route, and forget about it. Or paste an embed script from a compliance tool and depend on a third party's uptime forever. Either way, you own nothing.
 
-The shadcn model flips that. You run a command, code lands in your repo, and it's yours. OpenPolicy takes it further — your privacy policy and terms of service render from your config, so when your product changes, you update one file and rebuild.
+The shadcn model flips that. You run a command, code lands in your repo, and it's yours. OpenPolicy takes it further — your privacy policy renders from your config, so when your product changes, you update one file and rebuild.
 
 ## Install
 
@@ -17,18 +17,16 @@ bunx shadcn@latest add @openpolicy/privacy-policy
 
 That one command installs three registry items: `@openpolicy/config` (your starter `openpolicy.ts`), `@openpolicy/policy-components` (the primitive renderers), and `@openpolicy/privacy-policy` (the composed component). Registry dependencies resolve automatically — you don't need to install them separately.
 
-All five available items:
+All four available items:
 
 - `@openpolicy/config` — starter `openpolicy.ts` config file
 - `@openpolicy/policy-components` — 5 primitive render components (`PolicySection`, `PolicyHeading`, etc.)
 - `@openpolicy/privacy-policy` — full privacy policy component
-- `@openpolicy/terms-of-service` — full terms of service component
 - `@openpolicy/cookie-policy` — full cookie policy component
 
-Install terms of service or cookie policy the same way:
+Install the cookie policy the same way:
 
 ```sh
-bunx shadcn@latest add @openpolicy/terms-of-service
 bunx shadcn@latest add @openpolicy/cookie-policy
 ```
 
@@ -133,7 +131,7 @@ The components are regular React. Override any renderer by passing a `components
 />
 ```
 
-Add shadcn `Tooltip` to annotate headings with plain-English explanations — the `context.reason` field is attached to every heading the compiler generates. See [how to build that](/blog/shadcn-terms).
+Add shadcn `Tooltip` to annotate headings with plain-English explanations — the `context.reason` field is attached to every heading the compiler generates.
 
 For static generation, use the [Vite plugin](https://docs.openpolicy.sh/generative/vite) or CLI to output your policy as HTML, Markdown, or PDF — no React required.
 
@@ -144,7 +142,6 @@ For static generation, use the [Vite plugin](https://docs.openpolicy.sh/generati
 | `@openpolicy/config` | Starter `openpolicy.ts` config |
 | `@openpolicy/policy-components` | 5 primitive render components |
 | `@openpolicy/privacy-policy` | Full privacy policy component |
-| `@openpolicy/terms-of-service` | Full terms of service component |
 | `@openpolicy/cookie-policy` | Full cookie policy component |
 
 Start with whichever policy you need. The config and primitive components install automatically as dependencies of each policy component, so you only need one command.

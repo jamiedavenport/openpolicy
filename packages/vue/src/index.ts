@@ -12,7 +12,6 @@ export {
 	renderNode,
 } from "./components/defaults";
 export { PrivacyPolicy } from "./components/PrivacyPolicy";
-export { TermsOfService } from "./components/TermsOfService";
 // Context / Provider
 export { OpenPolicyProvider as OpenPolicy } from "./context";
 // Render
