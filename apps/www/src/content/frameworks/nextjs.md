@@ -1,6 +1,6 @@
 ---
 title: OpenPolicy with Next.js
-description: Generate and render privacy policies and terms of service in Next.js apps using OpenPolicy.
+description: Generate and render privacy and cookie policies in Next.js apps using OpenPolicy.
 framework: Next.js
 icon: simple-icons:nextdotjs
 pubDate: 2026-03-23

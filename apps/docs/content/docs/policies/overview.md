@@ -1,14 +1,13 @@
 ---
 title: Overview
-description: The three policy types supported by OpenPolicy
+description: The policy types supported by OpenPolicy
 ---
 
-OpenPolicy supports three policy types, each defined as a section in your config and compiled independently.
+OpenPolicy supports two policy types, compiled independently from a single flat config.
 
-| Policy | Config key | Output filename |
+| Policy | Detected from | Output filename |
 |---|---|---|
-| Privacy Policy | `privacy` | `privacy-policy.{ext}` |
-| Terms of Service | `terms` | `terms-of-service.{ext}` |
-| Cookie Policy | `cookie` | `cookie-policy.{ext}` |
+| Privacy Policy | `dataCollected`, `legalBasis`, `retention`, `children` | `privacy-policy.{ext}` |
+| Cookie Policy | `cookies`, `consentMechanism`, `trackingTechnologies` | `cookie-policy.{ext}` |
 
-Each section is optional. Only the sections you define will produce output. All three share the `company` block for common details like name, address, and contact email.
+Each policy is optional — OpenPolicy auto-detects which to produce based on the fields you provide. The `company` block and shared fields (`effectiveDate`, `jurisdictions`) live at the top level and apply to every policy generated.

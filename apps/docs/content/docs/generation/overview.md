@@ -9,13 +9,12 @@ See the [Quick Start](/policies/quick-start) to render policies as React compone
 
 ## How it works
 
-At build time (or on demand via the CLI), OpenPolicy reads your `openpolicy.ts` config and compiles each section into a document. Each present section produces its own output file:
+At build time (or on demand via the CLI), OpenPolicy reads your `openpolicy.ts` config and compiles each detected policy into a document. Which policies get generated is auto-detected from the fields you define:
 
-| Section | Output filename |
-|---|---|
-| `privacy` | `privacy-policy.{ext}` |
-| `terms` | `terms-of-service.{ext}` |
-| `cookie` | `cookie-policy.{ext}` |
+| Policy | Detected from | Output filename |
+|---|---|---|
+| Privacy | `dataCollected`, `legalBasis`, `retention`, `children` | `privacy-policy.{ext}` |
+| Cookie | `cookies`, `consentMechanism`, `trackingTechnologies` | `cookie-policy.{ext}` |
 
 ## Output formats
 

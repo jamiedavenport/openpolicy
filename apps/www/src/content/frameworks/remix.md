@@ -1,6 +1,6 @@
 ---
 title: OpenPolicy with Remix
-description: Generate and render privacy policies and terms of service in Remix apps using OpenPolicy.
+description: Generate and render privacy and cookie policies in Remix apps using OpenPolicy.
 framework: Remix
 icon: simple-icons:remix
 pubDate: 2026-03-23

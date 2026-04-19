@@ -1,9 +1,4 @@
-import {
-	CookiePolicy,
-	OpenPolicy,
-	PrivacyPolicy,
-	TermsOfService,
-} from "@openpolicy/vue";
+import { CookiePolicy, OpenPolicy, PrivacyPolicy } from "@openpolicy/vue";
 import { createApp, defineComponent, h } from "vue";
 import {
 	createRouter,
@@ -18,7 +13,6 @@ const nav = () =>
 	h("nav", { class: "nav" }, [
 		h(RouterLink, { to: "/" }, () => "Home"),
 		h(RouterLink, { to: "/privacy" }, () => "Privacy"),
-		h(RouterLink, { to: "/terms" }, () => "Terms"),
 		h(RouterLink, { to: "/cookie" }, () => "Cookie"),
 	]);
 
@@ -55,16 +49,6 @@ const PrivacyPage = defineComponent({
 	},
 });
 
-const TermsPage = defineComponent({
-	name: "TermsPage",
-	render() {
-		return h("main", { class: "page" }, [
-			nav(),
-			h(OpenPolicy, { config: openpolicy }, () => h(TermsOfService)),
-		]);
-	},
-});
-
 const CookiePage = defineComponent({
 	name: "CookiePage",
 	render() {
@@ -80,7 +64,6 @@ const router = createRouter({
 	routes: [
 		{ path: "/", component: HomePage },
 		{ path: "/privacy", component: PrivacyPage },
-		{ path: "/terms", component: TermsPage },
 		{ path: "/cookie", component: CookiePage },
 	],
 });

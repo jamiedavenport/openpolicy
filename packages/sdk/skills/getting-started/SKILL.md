@@ -33,14 +33,12 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: {
-      ...dataCollected,
-      "Account Information": ["Email address", "Display name"],
-    },
-    thirdParties: [...thirdParties],
+  effectiveDate: "2026-01-01",
+  dataCollected: {
+    ...dataCollected,
+    "Account Information": ["Email address", "Display name"],
   },
+  thirdParties: [...thirdParties],
 });
 ```
 
@@ -125,14 +123,12 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: {
-      ...dataCollected,                          // populated by autoCollect() at build time
-      "Manual Category": ["Manually added field"], // additional hand-declared entries
-    },
-    thirdParties: [...thirdParties],             // populated by autoCollect() at build time
+  effectiveDate: "2026-01-01",
+  dataCollected: {
+    ...dataCollected,                          // populated by autoCollect() at build time
+    "Manual Category": ["Manually added field"], // additional hand-declared entries
   },
+  thirdParties: [...thirdParties],             // populated by autoCollect() at build time
 });
 ```
 
@@ -198,7 +194,7 @@ export default function PrivacyPage() {
 }
 ```
 
-`PrivacyPolicy`, `TermsOfService`, and `CookiePolicy` read config from React context; without the provider they silently render `null` with no visible error.
+`PrivacyPolicy` and `CookiePolicy` read config from React context; without the provider they silently render `null` with no visible error.
 
 Source: packages/react/src/context.tsx
 
@@ -218,11 +214,9 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: { "Account Information": ["Email address"] },
-    thirdParties: [],
-  },
+  effectiveDate: "2026-01-01",
+  dataCollected: { "Account Information": ["Email address"] },
+  thirdParties: [],
 });
 ```
 
@@ -238,11 +232,9 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: { ...dataCollected, "Account Information": ["Email address"] },
-    thirdParties: [...thirdParties],
-  },
+  effectiveDate: "2026-01-01",
+  dataCollected: { ...dataCollected, "Account Information": ["Email address"] },
+  thirdParties: [...thirdParties],
 });
 ```
 

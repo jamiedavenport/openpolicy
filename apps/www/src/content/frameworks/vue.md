@@ -1,6 +1,6 @@
 ---
 title: OpenPolicy with Vue
-description: Generate and render privacy policies and terms of service in Vue apps using OpenPolicy.
+description: Generate and render privacy and cookie policies in Vue apps using OpenPolicy.
 framework: Vue
 icon: simple-icons:vuedotjs
 pubDate: 2026-03-23

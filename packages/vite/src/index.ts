@@ -6,7 +6,6 @@ import {
 	isOpenPolicyConfig,
 	validateCookiePolicy,
 	validatePrivacyPolicy,
-	validateTermsOfService,
 } from "@openpolicy/core";
 import { compilePolicy } from "@openpolicy/renderers";
 import type { Plugin } from "vite";
@@ -39,11 +38,9 @@ export async function generatePolicies(
 		await mkdir(outDir, { recursive: true });
 		for (const input of inputs) {
 			const issues =
-				input.type === "terms"
-					? validateTermsOfService(input)
-					: input.type === "cookie"
-						? validateCookiePolicy(input)
-						: validatePrivacyPolicy(input);
+				input.type === "cookie"
+					? validateCookiePolicy(input)
+					: validatePrivacyPolicy(input);
 			for (const issue of issues) {
 				if (issue.level === "error")
 					throw new Error(`[openpolicy] ${issue.message}`);
@@ -51,11 +48,7 @@ export async function generatePolicies(
 			}
 			const results = await compilePolicy(input, { formats });
 			const outputFilename =
-				input.type === "terms"
-					? "terms-of-service"
-					: input.type === "cookie"
-						? "cookie-policy"
-						: "privacy-policy";
+				input.type === "cookie" ? "cookie-policy" : "privacy-policy";
 			for (const result of results) {
 				const ext = result.format === "markdown" ? "md" : result.format;
 				await writeFile(

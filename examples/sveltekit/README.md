@@ -7,23 +7,21 @@ A minimal SvelteKit app showing how to use the `@openpolicy/vite` plugin to gene
 ## What it demonstrates
 
 - Adding `openPolicy()` to the Vite config inside a SvelteKit project
-- Defining a Privacy Policy, Terms of Service, and Cookie Policy using `@openpolicy/sdk`
+- Defining a Privacy Policy and Cookie Policy using `@openpolicy/sdk`
 - Generating HTML output to `src/lib/policies/` at build time and with hot-reload in dev
 - Importing generated HTML files as raw strings and rendering them with `{@html}`
 
 ## Project structure
 
 ```
-openpolicy.ts         ← defineConfig() — unified policy definition (privacy, terms, cookie)
+openpolicy.ts         ← defineConfig() — unified policy definition (privacy, cookie)
 vite.config.ts        ← openPolicy() plugin configured here
 src/
-  lib/policies/       ← generated output (privacy-policy.html, terms-of-service.html, cookie-policy.html)
+  lib/policies/       ← generated output (privacy-policy.html, cookie-policy.html)
   routes/
     +page.svelte      ← home page with links to policy pages
     privacy/
       +page.svelte    ← renders privacy-policy.html
-    terms/
-      +page.svelte    ← renders terms-of-service.html
     cookie/
       +page.svelte    ← renders cookie-policy.html
 ```

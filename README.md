@@ -2,7 +2,7 @@
 
 # Overview
 
-OpenPolicy turns TypeScript config files into privacy policies, terms of service, and cookie policies. Define your policy once and render it directly as React components. Includes a consent-aware cookie banner powered by a shadcn registry component.
+OpenPolicy turns TypeScript config files into privacy and cookie policies. Define your policy once and render it directly as React components. Includes a consent-aware cookie banner powered by a shadcn registry component.
 
 - [Homepage](https://openpolicy.sh)
 - [Blog](https://openpolicy.sh/blog)

@@ -1,4 +1,4 @@
-import { CookiePolicy, PrivacyPolicy, TermsOfService } from "@openpolicy/react";
+import { CookiePolicy, PrivacyPolicy } from "@openpolicy/react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
 	Tooltip,
@@ -32,9 +32,8 @@ const components = {
 
 function RouteComponent() {
 	return (
-		<div className="grid grid-cols-3 gap-8 py-12 px-8">
+		<div className="grid grid-cols-2 gap-8 py-12 px-8">
 			<PrivacyPolicy components={components} />
-			<TermsOfService components={components} />
 			<CookiePolicy components={components} />
 		</div>
 	);

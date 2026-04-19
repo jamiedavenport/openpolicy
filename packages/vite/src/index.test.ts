@@ -30,16 +30,13 @@ export default {
     address: "1 Test Ave, Testville, TX 12345",
     contact: "privacy@test.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: { "Usage Data": ["Page views", "Session duration"] },
-    legalBasis: "legitimate_interests",
-    retention: { "Usage Data": "90 days" },
-    cookies: { essential: true, analytics: true, marketing: false },
-    thirdParties: [],
-    userRights: ["access", "erasure"],
-    jurisdictions: ["us"],
-  },
+  effectiveDate: "2026-01-01",
+  jurisdictions: ["us"],
+  dataCollected: { "Usage Data": ["Page views", "Session duration"] },
+  legalBasis: "legitimate_interests",
+  retention: { "Usage Data": "90 days" },
+  cookies: { essential: true, analytics: true, marketing: false },
+  thirdParties: [],
 };
 `;
 
@@ -63,11 +60,12 @@ describe("generatePolicies", () => {
 		}
 	});
 
-	test("throws on non-unified config", async () => {
+	test("throws on non-OpenPolicyConfig shape", async () => {
 		const tmpDir = await mkdtemp(join(tmpdir(), "openpolicy-vite-invalid-"));
 		try {
 			const invalidConfig = `
 export default {
+  type: "privacy",
   effectiveDate: "",
   company: { name: "", legalName: "", address: "", contact: "" },
   dataCollected: {},
@@ -75,7 +73,6 @@ export default {
   retention: {},
   cookies: { essential: true, analytics: false, marketing: false },
   thirdParties: [],
-  userRights: [],
   jurisdictions: ["us"],
 };
 `;
@@ -91,10 +88,10 @@ export default {
 		}
 	});
 
-	test("generates both privacy-policy.md and terms-of-service.md from unified config", async () => {
+	test("generates both privacy-policy.md and cookie-policy.md from flat config", async () => {
 		const tmpDir = await mkdtemp(join(tmpdir(), "openpolicy-vite-unified-"));
 		try {
-			const unifiedConfig = `
+			const flatConfig = `
 export default {
   company: {
     name: "Acme Inc.",
@@ -102,31 +99,23 @@ export default {
     address: "123 Main St, Springfield, USA",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: { "Account Information": ["Name", "Email"] },
-    legalBasis: "legitimate_interests",
-    retention: { "Account data": "Until deletion" },
-    cookies: { essential: true, analytics: false, marketing: false },
-    thirdParties: [],
-    userRights: ["access"],
-    jurisdictions: ["us"],
-  },
-  terms: {
-    effectiveDate: "2026-01-01",
-    acceptance: { methods: ["using the service"] },
-    governingLaw: { jurisdiction: "Delaware, USA" },
-  },
+  effectiveDate: "2026-01-01",
+  jurisdictions: ["us"],
+  dataCollected: { "Account Information": ["Name", "Email"] },
+  legalBasis: "legitimate_interests",
+  retention: { "Account data": "Until deletion" },
+  cookies: { essential: true, analytics: false, marketing: false },
+  thirdParties: [],
 };
 `;
 			const configPath = join(tmpDir, "openpolicy.ts");
-			await Bun.write(configPath, unifiedConfig);
+			await Bun.write(configPath, flatConfig);
 
 			const outDir = join(tmpDir, "out");
 			await generatePolicies(configPath, outDir, ["markdown"]);
 
 			expect(existsSync(join(outDir, "privacy-policy.md"))).toBe(true);
-			expect(existsSync(join(outDir, "terms-of-service.md"))).toBe(true);
+			expect(existsSync(join(outDir, "cookie-policy.md"))).toBe(true);
 		} finally {
 			await rm(tmpDir, { recursive: true });
 		}

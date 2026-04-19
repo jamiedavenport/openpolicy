@@ -1,11 +1,11 @@
 ---
-title: "Ship a Privacy Policy and Terms of Service with Your TanStack App"
-description: "Use the OpenPolicy Vite plugin to generate legally-structured policy documents at build time — no Google Docs, no copy-paste."
+title: "Ship a Privacy Policy with Your TanStack App"
+description: "Use the OpenPolicy Vite plugin to generate a legally-structured privacy policy at build time — no Google Docs, no copy-paste."
 pubDate: 2026-03-06
 author: "OpenPolicy Team"
 ---
 
-Most TanStack Start apps need a privacy policy and terms of service before they launch. The usual approach: grab a template from the internet, paste it into a static page, and forget about it until a lawyer asks why it still says "Company Name Here."
+Most TanStack Start apps need a privacy policy before they launch. The usual approach: grab a template from the internet, paste it into a static page, and forget about it until a lawyer asks why it still says "Company Name Here."
 
 OpenPolicy treats your policies like code. You define them as TypeScript objects, and the Vite plugin compiles them to HTML at build time — in sync with every deploy.
 
@@ -52,66 +52,25 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-03-06",
-    dataCollected: {
-      "Account information": ["Email address", "Display name"],
-      "Usage data": ["Pages visited", "Session duration"],
-    },
-    legalBasis: "Legitimate interests and user consent",
-    retention: {
-      "Account data": "Until account deletion",
-      "Analytics data": "13 months",
-    },
-    cookies: {
-      essential: true,
-      analytics: true,
-      marketing: false,
-    },
-    thirdParties: [
-      { name: "Vercel", purpose: "Hosting and edge delivery" },
-      { name: "Plausible", purpose: "Privacy-friendly analytics" },
-    ],
-    userRights: ["access", "erasure", "portability", "objection"],
-    jurisdictions: ["us", "eu"],
+  effectiveDate: "2026-03-06",
+  jurisdictions: ["us", "eu"],
+  dataCollected: {
+    "Account information": ["Email address", "Display name"],
+    "Usage data": ["Pages visited", "Session duration"],
   },
-  terms: {
-    effectiveDate: "2026-03-06",
-    acceptance: {
-      methods: ["using the service", "creating an account"],
-    },
-    eligibility: {
-      minimumAge: 13,
-    },
-    accounts: {
-      registrationRequired: true,
-      userResponsibleForCredentials: true,
-      companyCanTerminate: true,
-    },
-    prohibitedUses: [
-      "Violating any applicable laws or regulations",
-      "Attempting to gain unauthorized access to any part of the service",
-      "Transmitting malware or malicious code",
-    ],
-    intellectualProperty: {
-      companyOwnsService: true,
-      usersMayNotCopy: true,
-    },
-    disclaimers: {
-      serviceProvidedAsIs: true,
-      noWarranties: true,
-    },
-    limitationOfLiability: {
-      excludesIndirectDamages: true,
-      liabilityCap: "the amount paid by the user in the past 12 months",
-    },
-    governingLaw: {
-      jurisdiction: "Delaware, USA",
-    },
-    changesPolicy: {
-      noticeMethod: "email or prominent notice on the website",
-      noticePeriodDays: 30,
-    },
+  legalBasis: ["legitimate_interests", "consent"],
+  retention: {
+    "Account data": "Until account deletion",
+    "Analytics data": "13 months",
+  },
+  thirdParties: [
+    { name: "Vercel", purpose: "Hosting and edge delivery" },
+    { name: "Plausible", purpose: "Privacy-friendly analytics" },
+  ],
+  cookies: {
+    essential: true,
+    analytics: true,
+    marketing: false,
   },
 });
 ```
@@ -123,14 +82,13 @@ After the next build (or on save in dev), the plugin writes:
 ```
 src/policies/
   privacy-policy.html
-  terms-of-service.html
 ```
 
 Because the files land inside `src/`, Vite can resolve them as `?raw` imports directly from your route components.
 
-## Render on dedicated routes
+## Render on a dedicated route
 
-Create a route file for each policy. TanStack Router picks them up automatically via file-based routing:
+Create a route file for the policy. TanStack Router picks it up automatically via file-based routing:
 
 ```tsx
 // src/routes/privacy.tsx
@@ -146,21 +104,7 @@ function RouteComponent() {
 }
 ```
 
-```tsx
-// src/routes/terms.tsx
-import { createFileRoute } from "@tanstack/react-router";
-import html from "../policies/terms-of-service.html?raw";
-
-export const Route = createFileRoute("/terms")({
-  component: RouteComponent,
-});
-
-function RouteComponent() {
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
-}
-```
-
-TanStack Router auto-generates `routeTree.gen.ts` when it detects the new files — no manual registration needed.
+TanStack Router auto-generates `routeTree.gen.ts` when it detects the new file — no manual registration needed.
 
 Add a `.gitignore` entry so the generated files aren't checked in:
 

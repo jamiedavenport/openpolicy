@@ -5,7 +5,7 @@ pubDate: 2026-03-09
 author: "OpenPolicy Team"
 ---
 
-Most Next.js apps need a privacy policy and terms of service before they launch. The usual approach: grab a template from the internet, paste it into a static page, and forget about it until a lawyer asks why it still says "Company Name Here."
+Most Next.js apps need a privacy policy before they launch. The usual approach: grab a template from the internet, paste it into a static page, and forget about it until a lawyer asks why it still says "Company Name Here."
 
 OpenPolicy treats your policies like code. You define them as TypeScript objects, and the CLI compiles them to HTML as part of your build — in sync with every deploy.
 
@@ -31,66 +31,25 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-03-09",
-    dataCollected: {
-      "Account information": ["Email address", "Display name"],
-      "Usage data": ["Pages visited", "Session duration"],
-    },
-    legalBasis: "Legitimate interests and user consent",
-    retention: {
-      "Account data": "Until account deletion",
-      "Analytics data": "13 months",
-    },
-    cookies: {
-      essential: true,
-      analytics: true,
-      marketing: false,
-    },
-    thirdParties: [
-      { name: "Vercel", purpose: "Hosting and edge delivery" },
-      { name: "Plausible", purpose: "Privacy-friendly analytics" },
-    ],
-    userRights: ["access", "erasure", "portability", "objection"],
-    jurisdictions: ["us", "eu"],
+  effectiveDate: "2026-03-09",
+  jurisdictions: ["us", "eu"],
+  dataCollected: {
+    "Account information": ["Email address", "Display name"],
+    "Usage data": ["Pages visited", "Session duration"],
   },
-  terms: {
-    effectiveDate: "2026-03-09",
-    acceptance: {
-      methods: ["using the service", "creating an account"],
-    },
-    eligibility: {
-      minimumAge: 13,
-    },
-    accounts: {
-      registrationRequired: true,
-      userResponsibleForCredentials: true,
-      companyCanTerminate: true,
-    },
-    prohibitedUses: [
-      "Violating any applicable laws or regulations",
-      "Attempting to gain unauthorized access to any part of the service",
-      "Transmitting malware or malicious code",
-    ],
-    intellectualProperty: {
-      companyOwnsService: true,
-      usersMayNotCopy: true,
-    },
-    disclaimers: {
-      serviceProvidedAsIs: true,
-      noWarranties: true,
-    },
-    limitationOfLiability: {
-      excludesIndirectDamages: true,
-      liabilityCap: "the amount paid by the user in the past 12 months",
-    },
-    governingLaw: {
-      jurisdiction: "Delaware, USA",
-    },
-    changesPolicy: {
-      noticeMethod: "email or prominent notice on the website",
-      noticePeriodDays: 30,
-    },
+  legalBasis: ["legitimate_interests", "consent"],
+  retention: {
+    "Account data": "Until account deletion",
+    "Analytics data": "13 months",
+  },
+  thirdParties: [
+    { name: "Vercel", purpose: "Hosting and edge delivery" },
+    { name: "Plausible", purpose: "Privacy-friendly analytics" },
+  ],
+  cookies: {
+    essential: true,
+    analytics: true,
+    marketing: false,
   },
 });
 ```
@@ -106,7 +65,7 @@ export default defineConfig({
 }
 ```
 
-The `prebuild` script runs automatically before `next build`. With a unified `openpolicy.ts`, a single `openpolicy generate` invocation compiles all sections in one pass.
+The `prebuild` script runs automatically before `next build`, so the policy file is regenerated alongside every deploy.
 
 Run it manually to generate the files for the first time:
 
@@ -119,7 +78,6 @@ bun run generate:policies
 ```
 public/policies/
   privacy-policy.html
-  terms-of-service.html
 ```
 
 Files land in `public/policies/` so Next.js serves them as static assets, but they're also readable at runtime via `fs.readFile` in Server Components.
@@ -136,24 +94,6 @@ import { join } from "node:path";
 export default async function PrivacyPage() {
   const html = await readFile(
     join(process.cwd(), "public/policies/privacy-policy.html"),
-    "utf-8",
-  );
-  return (
-    <main style={{ maxWidth: 800, margin: "0 auto", padding: "40px 24px" }}>
-      <div dangerouslySetInnerHTML={{ __html: html }} />
-    </main>
-  );
-}
-```
-
-```tsx
-// app/terms/page.tsx
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
-
-export default async function TermsPage() {
-  const html = await readFile(
-    join(process.cwd(), "public/policies/terms-of-service.html"),
     "utf-8",
   );
   return (

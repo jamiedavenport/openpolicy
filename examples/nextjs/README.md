@@ -7,17 +7,16 @@ A minimal Next.js App Router app showing how to render policy documents directly
 ## What it demonstrates
 
 - Wrapping the app in `<OpenPolicy>` via a `"use client"` provider in `app/providers.tsx`
-- Rendering `<PrivacyPolicy />` and `<TermsOfService />` as client components in App Router
+- Rendering `<PrivacyPolicy />` as a client component in App Router
 - Defining policies using `defineConfig()` from `@openpolicy/sdk`
 
 ## Project structure
 
 ```
-openpolicy.ts            ← defineConfig() — privacy + terms config
+openpolicy.ts            ← defineConfig() — privacy config
 app/providers.tsx        ← "use client" wrapper around <OpenPolicy>
 app/layout.tsx           ← root layout that renders <Providers>
 app/privacy/page.tsx     ← renders <PrivacyPolicy />
-app/terms/page.tsx       ← renders <TermsOfService />
 ```
 
 ## Running locally

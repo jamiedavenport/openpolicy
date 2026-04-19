@@ -1,6 +1,6 @@
 # PrivacyPolicyConfig Field Reference
 
-When used inside `defineConfig()`, `company` is omitted — it lives at the top level of `OpenPolicyConfig`. All other fields below are on `privacy: Omit<PrivacyPolicyConfig, "company">`.
+All fields below live at the top level of `OpenPolicyConfig` (the object passed to `defineConfig()`) alongside `company`. OpenPolicy auto-detects the privacy policy from the presence of privacy-specific fields.
 
 ## PrivacyPolicyConfig
 
@@ -12,8 +12,7 @@ When used inside `defineConfig()`, `company` is omitted — it lives at the top 
 | `retention` | `Record<string, string>` | Yes | Keys should match `dataCollected` categories. Use `Retention.*` preset strings. |
 | `cookies` | `{ essential: boolean; analytics: boolean; marketing: boolean }` | Yes | All three booleans required. Drives cookie policy sections. |
 | `thirdParties` | `{ name: string; purpose: string; policyUrl?: string }[]` | Yes | Can be empty array. Use `Providers.*` presets or spread `thirdParties` sentinel. |
-| `userRights` | `UserRight[]` | Yes | Empty array triggers a warning. GDPR recommends 6 rights; CCPA recommends 4. |
-| `jurisdictions` | `Jurisdiction[]` | Yes | Controls which jurisdiction-specific sections appear. See values below. |
+| `jurisdictions` | `Jurisdiction[]` | Yes | Controls which jurisdiction-specific sections appear and drives the auto-derived user rights list. See values below. |
 | `children` | `{ underAge: number; noticeUrl?: string }` | No | Include when service is directed at children. `underAge` must be a positive integer. |
 
 ### LegalBasis values
@@ -38,18 +37,17 @@ When used inside `defineConfig()`, `company` is omitted — it lives at the top 
 | `"nz"` | New Zealand |
 | `"other"` | Other / unspecified |
 
-### UserRight values
+### User rights (auto-derived)
 
-| Constant | String value | Required by |
-|---|---|---|
-| `Rights.Access` | `"access"` | GDPR, CCPA |
-| `Rights.Rectification` | `"rectification"` | GDPR |
-| `Rights.Erasure` | `"erasure"` | GDPR, CCPA |
-| `Rights.Portability` | `"portability"` | GDPR |
-| `Rights.Restriction` | `"restriction"` | GDPR |
-| `Rights.Objection` | `"objection"` | GDPR |
-| `Rights.OptOutSale` | `"opt_out_sale"` | CCPA |
-| `Rights.NonDiscrimination` | `"non_discrimination"` | CCPA |
+User rights are **not** a config field — they are derived from `jurisdictions` at compile time.
+
+| Jurisdiction | Rights granted |
+|---|---|
+| `"eu"` (GDPR) | access, rectification, erasure, portability, restriction, objection |
+| `"ca"` (CCPA) | access, erasure, opt_out_sale, non_discrimination |
+| `"us"`, `"au"`, `"nz"`, `"other"` | ∅ (no baseline) |
+
+When multiple jurisdictions are declared, the rights are unioned and rendered in a fixed canonical order.
 
 ### DataCategories presets
 
@@ -97,18 +95,15 @@ Each entry is a `{ name: string; purpose: string; policyUrl: string }` safe to u
 
 | Preset | Expands to |
 |---|---|
-| `Compliance.GDPR` | `{ jurisdictions: ["eu"], legalBasis: ["legitimate_interests"], userRights: ["access", "rectification", "erasure", "portability", "restriction", "objection"] }` |
-| `Compliance.CCPA` | `{ jurisdictions: ["ca"], userRights: ["access", "erasure", "opt_out_sale", "non_discrimination"] }` |
+| `Compliance.GDPR` | `{ jurisdictions: ["eu"], legalBasis: ["legitimate_interests"] }` |
+| `Compliance.CCPA` | `{ jurisdictions: ["ca"] }` |
 
 ### Validation behavior
 
 - `effectiveDate` empty → fatal error
 - `company.*` fields empty → fatal error per field
 - `dataCollected` has zero keys → fatal error
-- `userRights` empty → warning only
 - `"eu"` in jurisdictions + no `legalBasis` → fatal error
-- `"eu"` in jurisdictions + missing GDPR right → warning per right
-- `"ca"` in jurisdictions + missing CCPA right → warning per right
 - `children.underAge` ≤ 0 → fatal error
 
 Source: `packages/core/src/validate.ts`
@@ -117,14 +112,14 @@ Source: `packages/core/src/validate.ts`
 
 ## CookiePolicyConfig
 
-When used inside `defineConfig()`, supply as `cookie: Omit<CookiePolicyConfig, "company">`.
+All fields below live at the top level of `OpenPolicyConfig` (the object passed to `defineConfig()`) alongside `company`. OpenPolicy auto-detects the cookie policy from the presence of `cookies`, `consentMechanism`, or `trackingTechnologies`.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `effectiveDate` | `string` | Yes | ISO date string. |
+| `effectiveDate` | `string` | Yes | ISO date string. Shared with privacy policy. |
 | `cookies` | `CookiePolicyCookies` | Yes | `essential: boolean` is required; all other keys are `boolean` and treated as additional cookie categories. |
-| `jurisdictions` | `Jurisdiction[]` | Yes | Same values as `PrivacyPolicyConfig.jurisdictions`. |
-| `thirdParties` | `{ name: string; purpose: string; policyUrl?: string }[]` | No | Use `Providers.*` presets. |
+| `jurisdictions` | `Jurisdiction[]` | Yes | Same values as the privacy policy. Shared at the top level. |
+| `thirdParties` | `{ name: string; purpose: string; policyUrl?: string }[]` | No | Use `Providers.*` presets. Shared with privacy policy. |
 | `trackingTechnologies` | `string[]` | No | e.g. `["cookies", "localStorage", "sessionStorage", "pixel"]` |
 | `consentMechanism` | `{ hasBanner: boolean; hasPreferencePanel: boolean; canWithdraw: boolean }` | No | Required when `"eu"` in jurisdictions for GDPR compliance. |
 
@@ -140,14 +135,15 @@ type CookiePolicyCookies = {
 Example with custom categories:
 
 ```ts
-cookie: {
+defineConfig({
+  company: { /* ... */ },
   effectiveDate: "2026-01-01",
+  jurisdictions: ["eu", "us"],
   cookies: {
     essential: true,
     analytics: true,
     marketing: false,
     preferences: true,
   },
-  jurisdictions: ["eu", "us"],
-}
+})
 ```

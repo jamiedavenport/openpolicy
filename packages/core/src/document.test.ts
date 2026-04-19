@@ -26,23 +26,6 @@ test("compile returns a Document with correct type", () => {
 	expect(Array.isArray(doc.sections)).toBe(true);
 });
 
-test("compile returns correct type for terms", () => {
-	const doc = compile({
-		type: "terms",
-		effectiveDate: "2026-01-01",
-		company: {
-			name: "Acme Inc.",
-			legalName: "Acme Corporation",
-			address: "123 Main St, Springfield, USA",
-			contact: "legal@acme.com",
-		},
-		acceptance: { methods: ["using the service"] },
-		governingLaw: { jurisdiction: "California, USA" },
-	});
-	expect(doc.policyType).toBe("terms");
-	expect(Array.isArray(doc.sections)).toBe(true);
-});
-
 test("privacy compile returns non-empty sections", () => {
 	const doc = compile({ type: "privacy", ...minimalPrivacyConfig });
 	expect(doc.sections.length).toBeGreaterThan(0);

@@ -33,13 +33,10 @@ export default defineConfig({
     legalName: "Acme, Inc.",
     contact: "legal@acme.com",
   },
-  privacy: {
-    dataCollected: {
-      "Account Information": ["Full name", "Email address"],
-      "Usage Data": ["Pages visited", "Feature usage"],
-    },
-    userRights: ["access", "erasure", "portability"],
-    jurisdictions: ["us", "eu"],
+  jurisdictions: ["us", "eu"],
+  dataCollected: {
+    "Account Information": ["Full name", "Email address"],
+    "Usage Data": ["Pages visited", "Feature usage"],
   },
 });
 ```
@@ -94,7 +91,7 @@ A user who hasn't consented to analytics shouldn't have analytics running. With 
 
 The policy component API is fully composable. You can override any renderer — headings, paragraphs, sections, lists — and plug in your own design system or behaviour. The policy stops being a page you link to in a footer and starts being a part of your product.
 
-- Add `Tooltip` annotations to every legal clause so users understand what they're agreeing to — [here's how to do it with shadcn](/blog/shadcn-terms)
+- Add `Tooltip` annotations to every legal clause so users understand what they're agreeing to
 - Render cookie banners and consent modals driven by the same config
 - Build a legal chatbot that answers plain-English questions about your policy using the compiled Markdown as context — [see the full walkthrough](/blog/legal-chatbot-ai-sdk)
 

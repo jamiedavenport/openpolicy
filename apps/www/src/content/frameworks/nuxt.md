@@ -1,6 +1,6 @@
 ---
 title: OpenPolicy with Nuxt
-description: Generate and render privacy policies and terms of service in Nuxt apps using OpenPolicy.
+description: Generate and render privacy and cookie policies in Nuxt apps using OpenPolicy.
 framework: Nuxt
 icon: simple-icons:nuxtdotjs
 pubDate: 2026-03-23

@@ -4,7 +4,6 @@ import {
 	isOpenPolicyConfig,
 	validateCookiePolicy,
 	validatePrivacyPolicy,
-	validateTermsOfService,
 } from "@openpolicy/core";
 import { defineCommand } from "citty";
 import consola from "consola";
@@ -45,11 +44,9 @@ export const validateCommand = defineCommand({
 			consola.start(`Validating ${input.type} policy: ${configPath}`);
 
 			const issues =
-				input.type === "terms"
-					? validateTermsOfService(input)
-					: input.type === "cookie"
-						? validateCookiePolicy(input as CookiePolicyConfig)
-						: validatePrivacyPolicy(input);
+				input.type === "cookie"
+					? validateCookiePolicy(input as CookiePolicyConfig)
+					: validatePrivacyPolicy(input);
 
 			if (issues.length === 0) {
 				consola.success(`${input.type}: no issues found.`);

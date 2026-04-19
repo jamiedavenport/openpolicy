@@ -5,31 +5,29 @@ description: Generate and render a cookie policy from your openpolicy.ts config
 
 See the [Quick Start](/policies/quick-start) to add a cookie policy page to your app.
 
-Add a `cookie` section to your config:
+Add cookie fields to your config — the cookie policy is auto-detected from the presence of fields like `cookies`, `consentMechanism`, and `trackingTechnologies`:
 
 ```ts
 // openpolicy.ts
-cookie: {
-  effectiveDate: "2026-01-01",
-  cookies: {
-    essential: true,
-    analytics: true,
-    functional: false,
-    marketing: false,
+effectiveDate: "2026-01-01",
+jurisdictions: ["us", "eu"],
+cookies: {
+  essential: true,
+  analytics: true,
+  functional: false,
+  marketing: false,
+},
+thirdParties: [
+  {
+    name: "Google Analytics",
+    purpose: "Website analytics and performance monitoring",
+    policyUrl: "https://policies.google.com/privacy",
   },
-  thirdParties: [
-    {
-      name: "Google Analytics",
-      purpose: "Website analytics and performance monitoring",
-      policyUrl: "https://policies.google.com/privacy",
-    },
-  ],
-  consentMechanism: {
-    hasBanner: true,
-    hasPreferencePanel: true,
-    canWithdraw: true,
-  },
-  jurisdictions: ["us", "eu"],
+],
+consentMechanism: {
+  hasBanner: true,
+  hasPreferencePanel: true,
+  canWithdraw: true,
 },
 ```
 

@@ -1,6 +1,6 @@
 ---
 title: "Zero-build privacy policies with Astro"
-description: "Skip the Vite plugin — compile privacy, terms, and cookie policies directly in Astro page frontmatter using @openpolicy/core."
+description: "Skip the Vite plugin — compile privacy and cookie policies directly in Astro page frontmatter using @openpolicy/core."
 pubDate: 2026-04-10
 author: "OpenPolicy Team"
 ---
@@ -46,22 +46,14 @@ export default defineConfig({
     legalName: "Acme, Inc.",
     // ...
   },
-  privacy: {
-    effectiveDate: "2026-04-01",
-    dataCollected: { /* ... */ },
-    jurisdictions: ["us", "eu"],
-    // ...
-  },
-  cookie: {
-    effectiveDate: "2026-04-01",
-    cookies: [ /* ... */ ],
-    // ...
-  },
-  terms: {
-    effectiveDate: "2026-04-01",
-    governingLaw: { jurisdiction: "Delaware, USA" },
-    // ...
-  },
+  effectiveDate: "2026-04-01",
+  jurisdictions: ["us", "eu"],
+  // Privacy policy fields — auto-detected from field presence
+  dataCollected: { /* ... */ },
+  // ...
+  // Cookie policy fields — auto-detected from field presence
+  cookies: { /* ... */ },
+  // ...
 });
 ```
 
@@ -106,7 +98,7 @@ const policy = renderHTML(compile(privacyPolicy));
 
 Everything runs at build time. Zero JavaScript ships to the browser.
 
-Terms and cookie pages work the same way — just find `type === "terms"` or `type === "cookie"` instead.
+Cookie pages work the same way — just find `type === "cookie"` instead.
 
 ## `astro.config.mjs`
 
@@ -125,7 +117,7 @@ The plugin approach generated intermediate files that lived in your `src/` direc
 - **No generated files.** No `src/generated/` directory to create, manage, or exclude from git.
 - **No plugin configuration.** `astro.config.mjs` stays empty. No `outDir`, no `formats`, no watched paths.
 - **No extra package.** Drop `@openpolicy/astro` — only `core` and `renderers` are needed at runtime.
-- **All three policy types.** Privacy, terms, and cookie policies compile from one config. Same `defineConfig()` call, same pipeline.
+- **Both policy types.** Privacy and cookie policies compile from one config. Same `defineConfig()` call, same pipeline.
 
 The output is the same as before: statically rendered HTML with no client-side JavaScript. The difference is that the compilation happens inline, in the page that uses it, rather than as a side-effect of a plugin watching your filesystem.
 

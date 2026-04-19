@@ -12,7 +12,7 @@ bunx shadcn@latest add @openpolicy/cookie-banner
 bun add @openpolicy/react @openpolicy/sdk
 ```
 
-Fill out the `cookie` section in your `openpolicy.ts`, then wrap your app with the `<OpenPolicy>` provider and place the components in your root layout:
+Fill out the cookie-related fields in your `openpolicy.ts`, then wrap your app with the `<OpenPolicy>` provider and place the components in your root layout:
 
 ```tsx
 import { OpenPolicy } from "@openpolicy/react";
@@ -38,23 +38,21 @@ Install the packages:
 bun add @openpolicy/react @openpolicy/sdk
 ```
 
-Add a `cookie` section to your `openpolicy.ts`:
+Add cookie fields to your `openpolicy.ts` — the cookie policy is auto-detected from the presence of `cookies` and related fields:
 
 ```ts
-cookie: {
-  effectiveDate: "2026-01-01",
-  cookies: {
-    essential: true,
-    analytics: true,
-    functional: false,
-    marketing: false,
-  },
-  consentMechanism: {
-    hasBanner: true,
-    hasPreferencePanel: true,
-    canWithdraw: true,
-  },
-  jurisdictions: ["us", "eu"],
+effectiveDate: "2026-01-01",
+jurisdictions: ["us", "eu"],
+cookies: {
+  essential: true,
+  analytics: true,
+  functional: false,
+  marketing: false,
+},
+consentMechanism: {
+  hasBanner: true,
+  hasPreferencePanel: true,
+  canWithdraw: true,
 },
 ```
 

@@ -3,6 +3,7 @@ import {
 	type CookieConsent,
 	type CookieConsentStatus,
 	type CookiePolicyConfig,
+	expandOpenPolicyConfig,
 	isOpenPolicyConfig,
 	type OpenPolicyConfig,
 	rejectAll,
@@ -66,10 +67,13 @@ export function resolveCookieConfig(
 	raw: OpenPolicyConfig | CookiePolicyConfig | null | undefined,
 ): CookiePolicyConfig | undefined {
 	if (!raw) return undefined;
-	if (isOpenPolicyConfig(raw) && raw.cookie)
-		return { ...raw.cookie, company: raw.company } as CookiePolicyConfig;
-	if (!isOpenPolicyConfig(raw)) return raw as CookiePolicyConfig;
-	return undefined;
+	if (isOpenPolicyConfig(raw)) {
+		const cookie = expandOpenPolicyConfig(raw).find((p) => p.type === "cookie");
+		if (!cookie) return undefined;
+		const { type: _type, ...rest } = cookie;
+		return rest;
+	}
+	return raw as CookiePolicyConfig;
 }
 
 const CATEGORY_LABELS: Record<string, string> = {

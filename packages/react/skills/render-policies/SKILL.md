@@ -1,9 +1,9 @@
 ---
 name: render-policies
 description: >
-  Render OpenPolicy privacy, terms of service, and cookie policy documents as
+  Render OpenPolicy privacy and cookie policy documents as
   React components using @openpolicy/react. Components — PrivacyPolicy,
-  TermsOfService, CookiePolicy — read config from the OpenPolicyProvider
+  CookiePolicy — read config from the OpenPolicyProvider
   (alias OpenPolicy) context and accept optional config and components props
   for per-page overrides and full rendering customization via PolicyComponents.
 type: framework
@@ -71,21 +71,16 @@ import config from './openpolicy';
 
 `config` must be an `OpenPolicyConfig` (the nested shape produced by `defineConfig()`). The provider also injects default styles via a React `<style>` tag, so the CSS import is optional when using the provider — but import it explicitly for non-provider rendering paths.
 
-### 2. Rendering all three policy types
+### 2. Rendering both policy types
 
 Each component reads its slice of the config from context automatically:
 
 ```tsx
-import { PrivacyPolicy, TermsOfService, CookiePolicy } from '@openpolicy/react';
+import { PrivacyPolicy, CookiePolicy } from '@openpolicy/react';
 
 // Privacy policy page
 export default function PrivacyPage() {
   return <PrivacyPolicy />;
-}
-
-// Terms of service page
-export default function TermsPage() {
-  return <TermsOfService />;
 }
 
 // Cookie policy page
@@ -94,7 +89,7 @@ export default function CookiePolicyPage() {
 }
 ```
 
-All three components accept the same optional props:
+Both components accept the same optional props:
 
 | Prop | Type | Description |
 |------|------|-------------|
@@ -161,7 +156,6 @@ Pre-styled variants are available via the shadcn registry. Install individual co
 
 ```sh
 shadcn add @openpolicy/privacy-policy
-shadcn add @openpolicy/terms-of-service
 shadcn add @openpolicy/cookie-policy
 ```
 
@@ -191,7 +185,7 @@ export default function PrivacyPage() {
 
 ### HIGH — Rendering policy components outside `<OpenPolicy>` provider
 
-`PrivacyPolicy`, `TermsOfService`, and `CookiePolicy` call `useContext(OpenPolicyContext)` and return `null` when no config is found. Without the provider, nothing renders and no error is thrown — the bug is invisible in development.
+`PrivacyPolicy` and `CookiePolicy` call `useContext(OpenPolicyContext)` and return `null` when no config is found. Without the provider, nothing renders and no error is thrown — the bug is invisible in development.
 
 ```tsx
 // privacy-page.tsx — WRONG: no provider anywhere in the tree

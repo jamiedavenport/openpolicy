@@ -1,7 +1,7 @@
 ---
 name: define-config
 description: >
-  Writing the defineConfig() object for OpenPolicyConfig — privacy, terms, cookie — including all field types, jurisdiction requirements, and preset constants from @openpolicy/sdk.
+  Writing the defineConfig() object for OpenPolicyConfig — privacy and cookie — including all field types, jurisdiction requirements, and preset constants from @openpolicy/sdk.
 type: core
 library: openpolicy
 library_version: "0.0.19"
@@ -29,26 +29,25 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: { ...dataCollected },
-    legalBasis: "legitimate_interests",
-    retention: { "Account Information": "Until account deletion" },
-    cookies: { essential: true, analytics: false, marketing: false },
-    thirdParties: [...thirdParties],
-    userRights: ["access", "erasure"],
-    jurisdictions: ["us"],
-  },
+  effectiveDate: "2026-01-01",
+  jurisdictions: ["us"],
+  dataCollected: { ...dataCollected },
+  legalBasis: "legitimate_interests",
+  retention: { "Account Information": "Until account deletion" },
+  thirdParties: [...thirdParties],
+  cookies: { essential: true, analytics: false, marketing: false },
 });
 ```
 
-`company` is declared once at the top level — do not repeat it inside `privacy`, `terms`, or `cookie`.
+All policy fields live at the top level of `OpenPolicyConfig`. OpenPolicy auto-detects which policies to generate from the fields you provide: privacy-specific fields (like `dataCollected`, `legalBasis`, `retention`) produce a privacy policy, and cookie-specific fields (like `cookies`, `consentMechanism`) produce a cookie policy. `effectiveDate` and `jurisdictions` are shared across both.
+
+User rights (access, erasure, portability, etc.) are **derived automatically** from `jurisdictions` — declare `eu` for the six GDPR rights, `ca` for the four CCPA rights, or both for the union. There is no `userRights` field on the public config.
 
 ## Core Patterns
 
 ### 1. Privacy config with GDPR
 
-Use `Compliance.GDPR` to spread the required `jurisdictions`, `legalBasis`, and `userRights` values in one step:
+Use `Compliance.GDPR` to spread the required `jurisdictions` and `legalBasis` values in one step (rights are derived automatically from `jurisdictions`):
 
 ```ts
 import {
@@ -68,85 +67,44 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    ...Compliance.GDPR,
-    dataCollected: {
-      ...dataCollected,
-      ...DataCategories.AccountInfo,
-      ...DataCategories.UsageData,
-    },
-    retention: {
-      "Account Information": Retention.UntilAccountDeletion,
-      "Usage Data": Retention.NinetyDays,
-    },
-    cookies: { essential: true, analytics: true, marketing: false },
-    thirdParties: [...thirdParties, Providers.Stripe, Providers.PostHog],
-    children: { underAge: 13 },
+  effectiveDate: "2026-01-01",
+  ...Compliance.GDPR,
+  dataCollected: {
+    ...dataCollected,
+    ...DataCategories.AccountInfo,
+    ...DataCategories.UsageData,
   },
+  retention: {
+    "Account Information": Retention.UntilAccountDeletion,
+    "Usage Data": Retention.NinetyDays,
+  },
+  thirdParties: [...thirdParties, Providers.Stripe, Providers.PostHog],
+  children: { underAge: 13 },
+  cookies: { essential: true, analytics: true, marketing: false },
 });
 ```
 
-`Compliance.GDPR` expands to `{ jurisdictions: ["eu"], legalBasis: ["legitimate_interests"], userRights: ["access", "rectification", "erasure", "portability", "restriction", "objection"] }`.
+`Compliance.GDPR` expands to `{ jurisdictions: ["eu"], legalBasis: ["legitimate_interests"] }`. The six GDPR user rights are derived automatically from `jurisdictions: ["eu"]`.
 
-### 2. Terms of service config
+### 2. Using Compliance presets
 
-`governingLaw` is required — validation throws if absent.
-
-```ts
-export default defineConfig({
-  company: { ... },
-  terms: {
-    effectiveDate: "2026-01-01",
-    acceptance: { methods: ["using the service", "creating an account"] },
-    governingLaw: { jurisdiction: "Delaware, USA" },
-    eligibility: { minimumAge: 18 },
-    accounts: {
-      registrationRequired: true,
-      userResponsibleForCredentials: true,
-      companyCanTerminate: true,
-    },
-    disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
-    limitationOfLiability: {
-      excludesIndirectDamages: true,
-      liabilityCap: "fees paid in the last 12 months",
-    },
-    termination: {
-      companyCanTerminate: true,
-      userCanTerminate: true,
-      effectOfTermination: "All licenses granted to the user terminate immediately.",
-    },
-    disputeResolution: {
-      method: "arbitration",
-      venue: "San Francisco, CA",
-      classActionWaiver: true,
-    },
-  },
-});
-```
-
-All fields other than `effectiveDate`, `acceptance`, and `governingLaw` are optional. Include sections only when the corresponding policy content applies. See [references/terms-config.md](./references/terms-config.md) for the full field table.
-
-### 3. Using Compliance presets
-
-`Compliance.GDPR` and `Compliance.CCPA` are objects safe to spread into `privacy`:
+`Compliance.GDPR` and `Compliance.CCPA` are objects safe to spread directly into `defineConfig()`:
 
 ```ts
-import { Compliance } from "@openpolicy/sdk";
+import { Compliance, defineConfig } from "@openpolicy/sdk";
 
 // GDPR only
-privacy: { ...Compliance.GDPR, ... }
+defineConfig({ ...Compliance.GDPR, /* ... */ })
 
-// Both (array values merge correctly via spread — userRights and jurisdictions union)
-privacy: {
+// Both — union the jurisdictions; user rights are derived automatically
+defineConfig({
   ...Compliance.GDPR,
   jurisdictions: [...Compliance.GDPR.jurisdictions, ...Compliance.CCPA.jurisdictions],
-  userRights: [...Compliance.GDPR.userRights, ...Compliance.CCPA.userRights],
-  ...
-}
+  // ...
+})
 ```
 
-`Compliance.CCPA` does not include `legalBasis` — it provides only `jurisdictions: ["ca"]` and `userRights: ["access", "erasure", "opt_out_sale", "non_discrimination"]`.
+`Compliance.CCPA` does not include `legalBasis` — it provides only `jurisdictions: ["ca"]`. The four CCPA user rights are derived automatically.
 
 Available preset groups from `@openpolicy/sdk`:
 
@@ -154,40 +112,37 @@ Available preset groups from `@openpolicy/sdk`:
 |---|---|
 | `DataCategories` | Named `dataCollected` entries (AccountInfo, SessionData, PaymentInfo, UsageData, DeviceInfo, LocationData, Communications) |
 | `Retention` | Retention period strings (UntilAccountDeletion, ThirtyDays, NinetyDays, OneYear, ThreeYears, AsRequiredByLaw, …) |
-| `Rights` | `UserRight` string constants (Access, Rectification, Erasure, …) |
 | `LegalBases` | `LegalBasis` string constants (Consent, Contract, LegitimateInterests, …) |
 | `Compliance` | Preset bundles: `GDPR`, `CCPA` |
 | `Providers` | Named third-party descriptors: Stripe, PostHog, Vercel, Sentry, Clerk, Resend, … |
 
-### 4. Cookie config
+### 3. Cookie config
 
 ```ts
 export default defineConfig({
   company: { ... },
-  cookie: {
-    effectiveDate: "2026-01-01",
-    cookies: { essential: true, analytics: true, marketing: false },
-    jurisdictions: ["eu", "us"],
-    consentMechanism: {
-      hasBanner: true,
-      hasPreferencePanel: true,
-      canWithdraw: true,
-    },
-    trackingTechnologies: ["localStorage", "sessionStorage", "cookies"],
-    thirdParties: [Providers.GoogleAnalytics, Providers.Cloudflare],
+  effectiveDate: "2026-01-01",
+  jurisdictions: ["eu", "us"],
+  cookies: { essential: true, analytics: true, marketing: false },
+  consentMechanism: {
+    hasBanner: true,
+    hasPreferencePanel: true,
+    canWithdraw: true,
   },
+  trackingTechnologies: ["localStorage", "sessionStorage", "cookies"],
+  thirdParties: [Providers.GoogleAnalytics, Providers.Cloudflare],
 });
 ```
 
-`CookiePolicyCookies` requires `essential: boolean` — all other keys are `boolean` and are treated as additional cookie categories.
+The `cookies` field requires `essential: boolean` — all other keys are `boolean` and are treated as additional cookie categories. Presence of `cookies`, `consentMechanism`, or `trackingTechnologies` auto-detects a cookie policy.
 
 ## Common Mistakes
 
-### HIGH — Using standalone PrivacyPolicyConfig instead of nested OpenPolicyConfig
+### HIGH — Using standalone PrivacyPolicyConfig instead of flat OpenPolicyConfig
 
 Wrong:
 ```ts
-// WRONG: standalone shape, company repeated inside the policy object
+// WRONG: standalone shape
 import type { PrivacyPolicyConfig } from "@openpolicy/sdk";
 
 const config: PrivacyPolicyConfig = {
@@ -201,25 +156,24 @@ const config: PrivacyPolicyConfig = {
   userRights: [],
   jurisdictions: [],
 };
+// userRights is a REQUIRED field on the internal PrivacyPolicyConfig,
+// but this shape isn't what defineConfig() accepts.
 ```
 
 Correct:
 ```ts
-// correct: nested OpenPolicyConfig via defineConfig()
+// correct: flat OpenPolicyConfig via defineConfig()
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
   company: { name: "Acme", legalName: "Acme, Inc.", address: "...", contact: "privacy@acme.com" },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: {},
-    legalBasis: "consent",
-    retention: {},
-    cookies: { essential: true, analytics: false, marketing: false },
-    thirdParties: [],
-    userRights: [],
-    jurisdictions: [],
-  },
+  effectiveDate: "2026-01-01",
+  jurisdictions: [],
+  dataCollected: {},
+  legalBasis: "consent",
+  retention: {},
+  thirdParties: [],
+  cookies: { essential: true, analytics: false, marketing: false },
 });
 ```
 
@@ -229,58 +183,32 @@ Source: `packages/core/src/types.ts`
 
 ---
 
-### HIGH — Omitting governingLaw from terms of service
-
-Wrong:
-```ts
-// WRONG: governingLaw missing — validation throws at compile time
-terms: {
-  effectiveDate: "2026-01-01",
-  acceptance: { methods: ["using the service"] },
-}
-```
-
-Correct:
-```ts
-terms: {
-  effectiveDate: "2026-01-01",
-  acceptance: { methods: ["using the service"] },
-  governingLaw: { jurisdiction: "Delaware, USA" },
-}
-```
-
-`governingLaw` is a required field on `TermsOfServiceConfig`. `validateTermsOfService()` emits a fatal error if `governingLaw.jurisdiction` is absent or empty. TypeScript will catch this at authoring time only if the object is typed as `Omit<TermsOfServiceConfig, "company">`.
-
-Source: `packages/core/src/validate-terms.ts`
-
----
-
 ### MEDIUM — Not specifying jurisdictions — GDPR/CCPA sections silently absent
 
 Wrong:
 ```ts
-// WRONG: jurisdictions missing — legalBasis section and GDPR/CCPA content will not appear
-privacy: {
+// WRONG: jurisdictions missing — legalBasis section and GDPR/CCPA content will not appear,
+// and no user rights will be derived
+defineConfig({
+  company: { /* ... */ },
   legalBasis: "legitimate_interests",
-  userRights: ["access", "erasure"],
   // jurisdictions omitted
-}
+})
 ```
 
 Correct:
 ```ts
-privacy: {
+defineConfig({
+  company: { /* ... */ },
   legalBasis: "legitimate_interests",
-  userRights: ["access", "erasure"],
   jurisdictions: ["eu", "us"],
-}
+})
 ```
 
-Section builders for GDPR (`eu`) and CCPA (`ca`) content check `config.jurisdictions` before generating output. Omitting `jurisdictions` (or passing an empty array) causes those sections to be silently skipped with no warning. `Compliance.GDPR` and `Compliance.CCPA` include the correct `jurisdictions` values when spread.
+Section builders for GDPR (`eu`) and CCPA (`ca`) content check the top-level `jurisdictions` field before generating output, and the user rights list is derived from the same field. Omitting `jurisdictions` (or passing an empty array) causes those sections to be silently skipped and no rights to be listed. `Compliance.GDPR` and `Compliance.CCPA` include the correct `jurisdictions` values when spread.
 
 Source: `packages/core/src/templates/privacy/`
 
 ## Reference
 
 - [PrivacyPolicyConfig and CookiePolicyConfig field table](./references/privacy-config.md)
-- [TermsOfServiceConfig field table](./references/terms-config.md)

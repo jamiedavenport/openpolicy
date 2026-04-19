@@ -1,6 +1,6 @@
 ---
 title: "Build Privacy Policies Your Customers Actually Want to Read"
-description: "Render your privacy policy and terms of service directly into your React, Next.js, or TanStack app as components you fully control — swap every heading, paragraph, and section for your own."
+description: "Render your privacy policy directly into your React, Next.js, or TanStack app as components you fully control — swap every heading, paragraph, and section for your own."
 pubDate: 2026-03-18
 author: "OpenPolicy Team"
 ---
@@ -32,66 +32,25 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-03-18",
-    dataCollected: {
-      "Account information": ["Email address", "Display name"],
-      "Usage data": ["Pages visited", "Session duration"],
-    },
-    legalBasis: "Legitimate interests and user consent",
-    retention: {
-      "Account data": "Until account deletion",
-      "Analytics data": "13 months",
-    },
-    cookies: {
-      essential: true,
-      analytics: true,
-      marketing: false,
-    },
-    thirdParties: [
-      { name: "Vercel", purpose: "Hosting and edge delivery" },
-      { name: "Plausible", purpose: "Privacy-friendly analytics" },
-    ],
-    userRights: ["access", "erasure", "portability", "objection"],
-    jurisdictions: ["us", "eu"],
+  effectiveDate: "2026-03-18",
+  jurisdictions: ["us", "eu"],
+  dataCollected: {
+    "Account information": ["Email address", "Display name"],
+    "Usage data": ["Pages visited", "Session duration"],
   },
-  terms: {
-    effectiveDate: "2026-03-18",
-    acceptance: {
-      methods: ["using the service", "creating an account"],
-    },
-    eligibility: {
-      minimumAge: 13,
-    },
-    accounts: {
-      registrationRequired: true,
-      userResponsibleForCredentials: true,
-      companyCanTerminate: true,
-    },
-    prohibitedUses: [
-      "Violating any applicable laws or regulations",
-      "Attempting to gain unauthorized access to any part of the service",
-      "Transmitting malware or malicious code",
-    ],
-    intellectualProperty: {
-      companyOwnsService: true,
-      usersMayNotCopy: true,
-    },
-    disclaimers: {
-      serviceProvidedAsIs: true,
-      noWarranties: true,
-    },
-    limitationOfLiability: {
-      excludesIndirectDamages: true,
-      liabilityCap: "the amount paid by the user in the past 12 months",
-    },
-    governingLaw: {
-      jurisdiction: "Delaware, USA",
-    },
-    changesPolicy: {
-      noticeMethod: "email or prominent notice on the website",
-      noticePeriodDays: 30,
-    },
+  legalBasis: ["legitimate_interests", "consent"],
+  retention: {
+    "Account data": "Until account deletion",
+    "Analytics data": "13 months",
+  },
+  thirdParties: [
+    { name: "Vercel", purpose: "Hosting and edge delivery" },
+    { name: "Plausible", purpose: "Privacy-friendly analytics" },
+  ],
+  cookies: {
+    essential: true,
+    analytics: true,
+    marketing: false,
   },
 });
 ```
@@ -114,7 +73,7 @@ export function PrivacyPolicyPage() {
 }
 ```
 
-That's a working privacy policy page. No build script, no generated files. The same flow works for terms and cookies — swap in `<TermsOfService />` or `<CookiePolicy />` and you're done.
+That's a working privacy policy page. No build script, no generated files. The same flow works for cookies — swap in `<CookiePolicy />` and you're done.
 
 ## Make it yours
 

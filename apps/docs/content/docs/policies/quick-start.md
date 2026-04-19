@@ -11,9 +11,6 @@ Install a ready-to-use policy component from the OpenPolicy shadcn registry. Thi
 # Privacy Policy
 bunx shadcn@latest add @openpolicy/privacy-policy
 
-# Terms of Service
-bunx shadcn@latest add @openpolicy/terms-of-service
-
 # Cookie Policy
 bunx shadcn@latest add @openpolicy/cookie-policy
 ```
@@ -54,7 +51,7 @@ bun add @openpolicy/react @openpolicy/sdk
 Wrap your app with the provider, then render whichever components you need:
 
 ```tsx
-import { OpenPolicy, PrivacyPolicy, TermsOfService, CookiePolicy } from "@openpolicy/react";
+import { OpenPolicy, PrivacyPolicy, CookiePolicy } from "@openpolicy/react";
 import openpolicy from "@/openpolicy";
 
 export function PrivacyPolicyPage() {

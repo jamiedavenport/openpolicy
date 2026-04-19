@@ -2,6 +2,8 @@ export type OutputFormat = "markdown" | "html" | "pdf";
 
 export type CompileOptions = { formats: OutputFormat[] };
 
+export type PolicyCategory = "privacy" | "cookie";
+
 export type Jurisdiction = "us" | "eu" | "ca" | "au" | "nz" | "other";
 
 export type UserRight =
@@ -29,75 +31,17 @@ export type CompanyConfig = {
 	contact: string;
 };
 
-export type PrivacyPolicyConfig = {
-	effectiveDate: string;
-	company: CompanyConfig;
-	dataCollected: Record<string, string[]>;
-	legalBasis: LegalBasis | LegalBasis[];
-	retention: Record<string, string>;
-	cookies: { essential: boolean; analytics: boolean; marketing: boolean };
-	thirdParties: { name: string; purpose: string; policyUrl?: string }[];
-	userRights: UserRight[];
-	jurisdictions: Jurisdiction[];
-	// optional children-specific policy
-	children?: {
-		underAge: number;
-		noticeUrl?: string;
-	};
-};
+export type EffectiveDate = `${number}-${number}-${number}`;
 
-export type DisputeResolutionMethod =
-	| "arbitration"
-	| "litigation"
-	| "mediation";
+export type DataCollection = Record<string, string[]>;
 
-export type TermsOfServiceConfig = {
-	effectiveDate: string;
-	company: CompanyConfig;
-	acceptance: { methods: string[] };
-	eligibility?: { minimumAge: number; jurisdictionRestrictions?: string[] };
-	accounts?: {
-		registrationRequired: boolean;
-		userResponsibleForCredentials: boolean;
-		companyCanTerminate: boolean;
-	};
-	prohibitedUses?: string[];
-	userContent?: {
-		usersOwnContent: boolean;
-		licenseGrantedToCompany: boolean;
-		licenseDescription?: string;
-		companyCanRemoveContent: boolean;
-	};
-	intellectualProperty?: {
-		companyOwnsService: boolean;
-		usersMayNotCopy: boolean;
-	};
-	payments?: {
-		hasPaidFeatures: boolean;
-		refundPolicy?: string;
-		priceChangesNotice?: string;
-	};
-	availability?: { noUptimeGuarantee: boolean; maintenanceWindows?: string };
-	termination?: {
-		companyCanTerminate: boolean;
-		userCanTerminate: boolean;
-		effectOfTermination?: string;
-	};
-	disclaimers?: { serviceProvidedAsIs: boolean; noWarranties: boolean };
-	limitationOfLiability?: {
-		excludesIndirectDamages: boolean;
-		liabilityCap?: string;
-	};
-	indemnification?: { userIndemnifiesCompany: boolean; scope?: string };
-	thirdPartyServices?: { name: string; purpose: string }[];
-	disputeResolution?: {
-		method: DisputeResolutionMethod;
-		venue?: string;
-		classActionWaiver?: boolean;
-	};
-	governingLaw: { jurisdiction: string };
-	changesPolicy?: { noticeMethod: string; noticePeriodDays?: number };
-	privacyPolicyUrl?: string;
+export type Retention = Record<string, string>;
+
+export type ThirdParty = { name: string; purpose: string; policyUrl?: string };
+
+export type ChildrenConfig = {
+	underAge: number;
+	noticeUrl?: string;
 };
 
 export type CookiePolicyCookies = {
@@ -105,40 +49,71 @@ export type CookiePolicyCookies = {
 	[key: string]: boolean;
 };
 
+export type TrackingTechnology = string;
+
+export type ConsentMechanism = {
+	hasBanner: boolean;
+	hasPreferencePanel: boolean;
+	canWithdraw: boolean;
+};
+
+// Internal type consumed by section builders via PolicyInput.
+// Produced by expandOpenPolicyConfig() — not part of the public API.
+export type PrivacyPolicyConfig = {
+	effectiveDate: EffectiveDate;
+	company: CompanyConfig;
+	dataCollected: DataCollection;
+	legalBasis: LegalBasis | LegalBasis[];
+	retention: Retention;
+	cookies: CookiePolicyCookies;
+	thirdParties: ThirdParty[];
+	userRights: UserRight[];
+	jurisdictions: Jurisdiction[];
+	children?: ChildrenConfig;
+};
+
+// Internal type consumed by section builders via PolicyInput.
+// Produced by expandOpenPolicyConfig() — not part of the public API.
 export type CookiePolicyConfig = {
-	effectiveDate: string;
+	effectiveDate: EffectiveDate;
 	company: CompanyConfig;
 	cookies: CookiePolicyCookies;
-	thirdParties?: { name: string; purpose: string; policyUrl?: string }[];
-	trackingTechnologies?: string[];
-	consentMechanism?: {
-		hasBanner: boolean;
-		hasPreferencePanel: boolean;
-		canWithdraw: boolean;
-	};
+	thirdParties: ThirdParty[];
+	trackingTechnologies?: TrackingTechnology[];
+	consentMechanism?: ConsentMechanism;
 	jurisdictions: Jurisdiction[];
 };
 
 export type PolicyInput =
 	| ({ type: "privacy" } & PrivacyPolicyConfig)
-	| ({ type: "terms" } & TermsOfServiceConfig)
 	| ({ type: "cookie" } & CookiePolicyConfig);
 
+// Public config passed to defineConfig(). All fields live at the top level.
 export type OpenPolicyConfig = {
 	company: CompanyConfig;
-	privacy?: Omit<PrivacyPolicyConfig, "company">;
-	terms?: Omit<TermsOfServiceConfig, "company">;
-	cookie?: Omit<CookiePolicyConfig, "company">;
+	effectiveDate: EffectiveDate;
+	jurisdictions: Jurisdiction[];
+
+	// Data handling — feeds the privacy policy.
+	dataCollected?: DataCollection;
+	legalBasis?: LegalBasis | LegalBasis[];
+	retention?: Retention;
+	children?: ChildrenConfig;
+	thirdParties?: ThirdParty[];
+
+	// Cookie posture — feeds the cookie policy and the privacy cookie-overview section.
+	cookies?: CookiePolicyCookies;
+	trackingTechnologies?: TrackingTechnology[];
+	consentMechanism?: ConsentMechanism;
+
+	// Explicit opt-out. Omit to auto-detect based on which fields are present.
+	policies?: PolicyCategory[];
 };
 
 export function isOpenPolicyConfig(value: unknown): value is OpenPolicyConfig {
 	if (value === null || typeof value !== "object") return false;
 	const obj = value as Record<string, unknown>;
-	return (
-		"company" in obj &&
-		!("effectiveDate" in obj) &&
-		("privacy" in obj || "terms" in obj || "cookie" in obj)
-	);
+	return "company" in obj && "effectiveDate" in obj && !("type" in obj);
 }
 
 export type ValidationIssue = {

@@ -9,60 +9,24 @@ export function getOpenPolicyTemplate(
 	policies: string[],
 ): string {
 	const today = new Date().toISOString().slice(0, 10);
+	const wantPrivacy = policies.includes("privacy");
+	const wantCookie = policies.includes("cookie");
 
-	const privacySection = policies.includes("privacy")
+	const privacyFields = wantPrivacy
 		? `
-	privacy: {
-		effectiveDate: "${today}",
-		dataCollected: {
-			"Personal Information": ["Email address"],
-		},
-		legalBasis: "legitimate_interests",
-		retention: {
-			"All personal data": "As long as necessary for the purposes described in this policy",
-		},
-		cookies: { essential: true, analytics: false, marketing: false },
-		thirdParties: [],
-		userRights: ["access", "erasure"],
-		jurisdictions: ["us"],
-	},`
+	dataCollected: {
+		"Personal Information": ["Email address"],
+	},
+	legalBasis: "legitimate_interests",
+	retention: {
+		"All personal data": "As long as necessary for the purposes described in this policy",
+	},
+	thirdParties: [],`
 		: "";
 
-	const termsSection = policies.includes("terms")
+	const cookieFields = wantCookie
 		? `
-	terms: {
-		effectiveDate: "${today}",
-		acceptance: { methods: ["using the service", "creating an account"] },
-		eligibility: { minimumAge: 13 },
-		accounts: {
-			registrationRequired: false,
-			userResponsibleForCredentials: true,
-			companyCanTerminate: true,
-		},
-		prohibitedUses: [
-			"Violating any applicable laws or regulations",
-			"Infringing on intellectual property rights",
-			"Transmitting harmful or malicious content",
-		],
-		intellectualProperty: { companyOwnsService: true, usersMayNotCopy: true },
-		termination: { companyCanTerminate: true, userCanTerminate: true },
-		disclaimers: { serviceProvidedAsIs: true, noWarranties: true },
-		limitationOfLiability: { excludesIndirectDamages: true },
-		governingLaw: { jurisdiction: "Delaware, USA" },
-		changesPolicy: {
-			noticeMethod: "email or prominent notice on our website",
-			noticePeriodDays: 30,
-		},
-	},`
-		: "";
-
-	const cookieSection = policies.includes("cookie")
-		? `
-	cookie: {
-		effectiveDate: "${today}",
-		cookies: { essential: true, analytics: false, functional: false, marketing: false },
-		jurisdictions: ["us"],
-	},`
+	cookies: { essential: true, analytics: false, functional: false, marketing: false },`
 		: "";
 
 	return `import { defineConfig } from "@openpolicy/sdk";
@@ -73,7 +37,9 @@ export default defineConfig({
 		legalName: "${companyName}",
 		address: "",
 		contact: "${contactEmail}",
-	},${privacySection}${termsSection}${cookieSection}
+	},
+	effectiveDate: "${today}",
+	jurisdictions: ["us"],${privacyFields}${cookieFields}
 });
 `;
 }
@@ -92,7 +58,7 @@ export const initCommand = defineCommand({
 	},
 	async run({ args }) {
 		consola.box(
-			"Welcome to OpenPolicy\nGenerate privacy policies, terms of service, and cookie policies from a single config file.",
+			"Welcome to OpenPolicy\nGenerate privacy policies and cookie policies from a single config file.",
 		);
 		consola.start("Let's get you set up.");
 
@@ -110,7 +76,7 @@ export const initCommand = defineCommand({
 		const policies = (await consola.prompt("Which policies do you need?", {
 			type: "multiselect",
 			cancel: "reject",
-			options: ["privacy", "terms", "cookie"],
+			options: ["privacy", "cookie"],
 		})) as string[];
 
 		const source = getOpenPolicyTemplate(companyName, contactEmail, policies);

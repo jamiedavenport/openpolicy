@@ -51,7 +51,7 @@ export type DocumentSection = {
 	context?: NodeContext;
 };
 
-export type PolicyType = "privacy" | "terms" | "cookie";
+export type PolicyType = "privacy" | "cookie";
 
 // The top-level document
 export type Document = {

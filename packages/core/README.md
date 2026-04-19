@@ -6,7 +6,7 @@ This is an internal package used by `@openpolicy/sdk`, `@openpolicy/vite`, and `
 
 ## What it does
 
-- Compiles `PrivacyPolicyConfig` and `TermsOfServiceConfig` definitions to Markdown, HTML, and PDF
+- Compiles `PrivacyPolicyConfig` and `CookiePolicyConfig` definitions to Markdown, HTML, and PDF
 - Validates policy configs and returns structured warnings and errors
 - Exports section builders, renderers, and all core types
 

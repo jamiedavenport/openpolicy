@@ -1,6 +1,6 @@
 ---
 title: "Policy Pages in SvelteKit That Actually Stay Up to Date"
-description: "Use the OpenPolicy Vite plugin to generate legally-structured privacy, terms, and cookie policy pages at build time — hot-reloaded in dev, committed with your code."
+description: "Use the OpenPolicy Vite plugin to generate legally-structured privacy and cookie policy pages at build time — hot-reloaded in dev, committed with your code."
 pubDate: 2026-03-13
 author: "OpenPolicy Team"
 ---
@@ -31,88 +31,35 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-03-13",
-    dataCollected: {
-      "Account information": ["Email address", "Display name"],
-      "Usage data": ["Pages visited", "Session duration"],
-    },
-    legalBasis: "Legitimate interests and user consent",
-    retention: {
-      "Account data": "Until account deletion",
-      "Analytics data": "13 months",
-    },
-    cookies: {
-      essential: true,
-      analytics: true,
-      marketing: false,
-    },
-    thirdParties: [
-      { name: "Vercel", purpose: "Hosting and edge delivery" },
-      { name: "Plausible", purpose: "Privacy-friendly analytics" },
-    ],
-    userRights: ["access", "erasure", "portability", "objection"],
-    jurisdictions: ["us", "eu"],
+  effectiveDate: "2026-03-13",
+  jurisdictions: ["us", "eu"],
+  dataCollected: {
+    "Account information": ["Email address", "Display name"],
+    "Usage data": ["Pages visited", "Session duration"],
   },
-  terms: {
-    effectiveDate: "2026-03-13",
-    acceptance: {
-      methods: ["using the service", "creating an account"],
-    },
-    eligibility: {
-      minimumAge: 13,
-    },
-    accounts: {
-      registrationRequired: true,
-      userResponsibleForCredentials: true,
-      companyCanTerminate: true,
-    },
-    prohibitedUses: [
-      "Violating any applicable laws or regulations",
-      "Attempting to gain unauthorized access to any part of the service",
-      "Transmitting malware or malicious code",
-    ],
-    intellectualProperty: {
-      companyOwnsService: true,
-      usersMayNotCopy: true,
-    },
-    disclaimers: {
-      serviceProvidedAsIs: true,
-      noWarranties: true,
-    },
-    limitationOfLiability: {
-      excludesIndirectDamages: true,
-      liabilityCap: "the amount paid by the user in the past 12 months",
-    },
-    governingLaw: {
-      jurisdiction: "Delaware, USA",
-    },
-    changesPolicy: {
-      noticeMethod: "email or prominent notice on the website",
-      noticePeriodDays: 30,
-    },
+  legalBasis: ["legitimate_interests", "consent"],
+  retention: {
+    "Account data": "Until account deletion",
+    "Analytics data": "13 months",
   },
-  cookie: {
-    effectiveDate: "2026-03-13",
-    cookies: {
-      essential: true,
-      analytics: true,
-      functional: false,
-      marketing: false,
+  thirdParties: [
+    {
+      name: "Plausible",
+      purpose: "Privacy-friendly analytics",
+      policyUrl: "https://plausible.io/privacy",
     },
-    thirdParties: [
-      {
-        name: "Plausible",
-        purpose: "Privacy-friendly analytics",
-        policyUrl: "https://plausible.io/privacy",
-      },
-    ],
-    consentMechanism: {
-      hasBanner: true,
-      hasPreferencePanel: false,
-      canWithdraw: true,
-    },
-    jurisdictions: ["us", "eu"],
+    { name: "Vercel", purpose: "Hosting and edge delivery" },
+  ],
+  cookies: {
+    essential: true,
+    analytics: true,
+    functional: false,
+    marketing: false,
+  },
+  consentMechanism: {
+    hasBanner: true,
+    hasPreferencePanel: false,
+    canWithdraw: true,
   },
 });
 ```
@@ -145,11 +92,10 @@ Outputting to `src/lib/policies` puts the files inside SvelteKit's `$lib` alias 
 ```
 src/lib/policies/
   privacy-policy.html
-  terms-of-service.html
   cookie-policy.html
 ```
 
-A single `defineConfig()` with `privacy`, `terms`, and `cookie` sections compiles all three in one pass.
+A single `defineConfig()` compiles both policies in one pass — OpenPolicy auto-detects which to generate from the fields you provide.
 
 ## Render on dedicated routes
 
@@ -163,21 +109,6 @@ Import each HTML file as a raw string using Vite's `?raw` suffix, then render it
 
 <script lang="ts">
   import policy from "$lib/policies/privacy-policy.html?raw";
-</script>
-
-<main>
-  {@html policy}
-</main>
-```
-
-```svelte
-<!-- src/routes/terms/+page.svelte -->
-<svelte:head>
-  <title>Terms of Service</title>
-</svelte:head>
-
-<script lang="ts">
-  import policy from "$lib/policies/terms-of-service.html?raw";
 </script>
 
 <main>

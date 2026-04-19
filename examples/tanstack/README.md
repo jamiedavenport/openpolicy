@@ -6,19 +6,19 @@ A TanStack Start (React + Vite) app showcasing three different ways to style `@o
 
 ## What it demonstrates
 
-- Unified `defineConfig()` covering all three policy types (privacy, terms, cookie) in a single file
+- Unified `defineConfig()` covering both policy types (privacy, cookie) in a single file
 - Three styling approaches across three routes:
   - **`/tailwind`** — policies styled with Tailwind utility classes
   - **`/css-vars`** — policies styled with CSS custom properties
   - **`/shadcn`** — policies with a custom `Heading` component using shadcn `Tooltip` to surface `node.context.reason` on hover
-- `@openpolicy/react` components (`PrivacyPolicy`, `TermsOfService`, `CookiePolicy`) rendered directly as React components
+- `@openpolicy/react` components (`PrivacyPolicy`, `CookiePolicy`) rendered directly as React components
 - Configuring the `openPolicy()` plugin in `vite.config.ts` alongside TanStack Start
 
 ## Project structure
 
 ```
 vite.config.ts                ← openPolicy() plugin + TanStack Start + Tailwind
-src/openpolicy.ts             ← defineConfig() — all three policies in one file
+src/openpolicy.ts             ← defineConfig() — both policies in one file
 src/routes/__root.tsx         ← root layout: OpenPolicy provider + TooltipProvider + nav
 src/routes/index.tsx          ← "/" — placeholder
 src/routes/tailwind.tsx       ← "/tailwind" — policies styled with Tailwind classes

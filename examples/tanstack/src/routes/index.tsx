@@ -67,9 +67,9 @@ function RouteComponent() {
 					<span className="text-muted-foreground">for TanStack</span>
 				</h1>
 				<p className="mb-8 text-lg text-muted-foreground leading-relaxed">
-					Generate legally-structured privacy policies, terms of service, and
-					cookie policies from a single TypeScript config — then render them
-					directly into your React app with full styling control.
+					Generate legally-structured privacy policies and cookie policies from
+					a single TypeScript config — then render them directly into your React
+					app with full styling control.
 				</p>
 				<div className="flex flex-wrap items-center gap-3">
 					<a
@@ -163,12 +163,8 @@ function RouteComponent() {
 						</div>
 						<p className="text-sm text-muted-foreground">
 							Drop{" "}
-							<code className="font-mono text-xs">&lt;PrivacyPolicy /&gt;</code>
-							,{" "}
-							<code className="font-mono text-xs">
-								&lt;TermsOfService /&gt;
-							</code>
-							, or{" "}
+							<code className="font-mono text-xs">&lt;PrivacyPolicy /&gt;</code>{" "}
+							or{" "}
 							<code className="font-mono text-xs">&lt;CookiePolicy /&gt;</code>{" "}
 							anywhere in your app.
 						</p>

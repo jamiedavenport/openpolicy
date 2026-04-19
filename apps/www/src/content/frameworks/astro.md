@@ -1,6 +1,6 @@
 ---
 title: OpenPolicy with Astro
-description: Generate and render privacy policies and terms of service in Astro sites using the OpenPolicy Astro integration.
+description: Generate and render privacy and cookie policies in Astro sites using the OpenPolicy Astro integration.
 framework: Astro
 icon: simple-icons:astro
 pubDate: 2026-03-23

@@ -22,14 +22,13 @@ This is a monorepo under `packages/`. Key packages:
 
 ## Domain Concepts
 
-- **Policy types**: `"privacy"` (PrivacyPolicyConfig) and `"terms"` (TermsOfServiceConfig) — `PolicyInput` is a discriminated union
+- **Policy types**: `"privacy"` (PrivacyPolicyConfig) and `"cookie"` (CookiePolicyConfig) — `PolicyInput` is a discriminated union
 - **Policy definition**: TypeScript object passed to `defineConfig()` describing the policy content
 - **Compilation**: Policy definitions are compiled to HTML, Markdown, or PDF — triggered either by the Vite plugin at build time or by `openpolicy generate` via the CLI
 - **Section builders**: Each section is a `(config) => PolicySection | null` function; `null` means the section is not applicable and is omitted
-- **Output filenames**: `privacy-policy.{ext}` for privacy, `terms-of-service.{ext}` for terms
-- **Type auto-detection**: config filenames containing `"terms"` are treated as `TermsOfServiceConfig`; all others default to `PrivacyPolicyConfig`. Used by both the CLI (`--type` overrides) and the Vite plugin (`configs` array; per-entry `type` overrides)
+- **Output filenames**: `privacy-policy.{ext}` for privacy, `cookie-policy.{ext}` for cookie
 - **Formats**: `markdown` | `html` | `pdf` (implemented); `jsx` throws "not yet implemented"
-- **Compliance targets**: GDPR, CCPA, and multi-jurisdiction templates (privacy only)
+- **Compliance targets**: GDPR, CCPA, and multi-jurisdiction templates
 - **`llms.txt`**: AI-readable reference for auto-generating policy configs from existing codebases
 
 ## Git Hooks
@@ -47,6 +46,10 @@ Two hooks are active:
 ## Versioning & Release
 
 This repo uses [Changesets](https://github.com/changesets/changesets) for versioning and publishing. Publishable packages are `@openpolicy/sdk`, `@openpolicy/cli`, `@openpolicy/vite`, and `@openpolicy/core`.
+
+### Pre-1.0 bump policy
+
+While we are at `0.0.x`, **use `patch` in changesets for every change — including breaking ones**. We explicitly accept breaking changes during this phase and don't differentiate them with `minor`/`major` bumps yet. Describe the breaking nature in the changeset body so consumers can see it in the CHANGELOG; only switch to semver-correct `major`/`minor` bumps after the first `1.0.0` release.
 
 ### Automated release flow
 

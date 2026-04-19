@@ -1,5 +1,9 @@
 import { expect, test } from "bun:test";
-import { expandOpenPolicyConfig, isOpenPolicyConfig } from "./index";
+import {
+	expandOpenPolicyConfig,
+	isOpenPolicyConfig,
+	shouldEmit,
+} from "./index";
 import type { OpenPolicyConfig, PolicyInput } from "./types";
 
 const input: PolicyInput = {
@@ -27,30 +31,22 @@ const company = {
 	contact: "privacy@acme.com",
 };
 
-const unifiedConfig: OpenPolicyConfig = {
+const fullConfig: OpenPolicyConfig = {
 	company,
-	privacy: {
-		effectiveDate: "2026-01-01",
-		dataCollected: { "Account Information": ["Name", "Email"] },
-		legalBasis: "legitimate_interests",
-		retention: { "Account data": "Until deletion" },
-		cookies: { essential: true, analytics: false, marketing: false },
-		thirdParties: [],
-		userRights: ["access"],
-		jurisdictions: ["us"],
-	},
-	terms: {
-		effectiveDate: "2026-01-01",
-		acceptance: { methods: ["using the service"] },
-		governingLaw: { jurisdiction: "Delaware, USA" },
-	},
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["us"],
+	dataCollected: { "Account Information": ["Name", "Email"] },
+	legalBasis: "legitimate_interests",
+	retention: { "Account data": "Until deletion" },
+	cookies: { essential: true, analytics: false, marketing: false },
+	thirdParties: [],
 };
 
-test("isOpenPolicyConfig returns true for unified config", () => {
-	expect(isOpenPolicyConfig(unifiedConfig)).toBe(true);
+test("isOpenPolicyConfig returns true for flat config", () => {
+	expect(isOpenPolicyConfig(fullConfig)).toBe(true);
 });
 
-test("isOpenPolicyConfig returns false for privacy config (has effectiveDate)", () => {
+test("isOpenPolicyConfig returns false for PolicyInput (has type discriminator)", () => {
 	expect(isOpenPolicyConfig(input)).toBe(false);
 });
 
@@ -60,42 +56,62 @@ test("isOpenPolicyConfig returns false for null/non-object", () => {
 	expect(isOpenPolicyConfig(42)).toBe(false);
 });
 
-test("isOpenPolicyConfig returns false for object without privacy/terms keys", () => {
+test("isOpenPolicyConfig returns false for object without effectiveDate", () => {
 	expect(isOpenPolicyConfig({ company })).toBe(false);
 });
 
-test("expandOpenPolicyConfig returns both inputs when privacy and terms present", () => {
-	const inputs = expandOpenPolicyConfig(unifiedConfig);
+test("expandOpenPolicyConfig emits both inputs when all fields present", () => {
+	const inputs = expandOpenPolicyConfig(fullConfig);
 	expect(inputs).toHaveLength(2);
 	expect(inputs[0]?.type).toBe("privacy");
-	expect(inputs[1]?.type).toBe("terms");
+	expect(inputs[1]?.type).toBe("cookie");
 });
 
-test("expandOpenPolicyConfig merges company into each input", () => {
-	const inputs = expandOpenPolicyConfig(unifiedConfig);
+test("expandOpenPolicyConfig merges company and shared fields into each input", () => {
+	const inputs = expandOpenPolicyConfig(fullConfig);
 	expect(inputs[0]?.company).toEqual(company);
 	expect(inputs[1]?.company).toEqual(company);
+	expect(inputs[0]?.effectiveDate).toBe("2026-01-01");
+	expect(inputs[1]?.effectiveDate).toBe("2026-01-01");
+	expect(inputs[0]?.jurisdictions).toEqual(["us"]);
+	expect(inputs[1]?.jurisdictions).toEqual(["us"]);
 });
 
-test("expandOpenPolicyConfig returns only privacy when terms omitted", () => {
-	const inputs = expandOpenPolicyConfig({
-		company,
-		privacy: unifiedConfig.privacy,
-	});
+test("expandOpenPolicyConfig auto-detects privacy-only when cookies omitted", () => {
+	const { cookies: _, ...privacyOnly } = fullConfig;
+	const inputs = expandOpenPolicyConfig(privacyOnly);
 	expect(inputs).toHaveLength(1);
 	expect(inputs[0]?.type).toBe("privacy");
 });
 
-test("expandOpenPolicyConfig returns only terms when privacy omitted", () => {
+test("expandOpenPolicyConfig auto-detects cookie-only when no privacy fields", () => {
 	const inputs = expandOpenPolicyConfig({
 		company,
-		terms: unifiedConfig.terms,
+		effectiveDate: "2026-01-01",
+		jurisdictions: ["us"],
+		cookies: { essential: true },
 	});
 	expect(inputs).toHaveLength(1);
-	expect(inputs[0]?.type).toBe("terms");
+	expect(inputs[0]?.type).toBe("cookie");
 });
 
-test("expandOpenPolicyConfig returns empty array when neither privacy nor terms", () => {
-	const inputs = expandOpenPolicyConfig({ company } as OpenPolicyConfig);
+test("expandOpenPolicyConfig returns empty array when nothing to emit", () => {
+	const inputs = expandOpenPolicyConfig({
+		company,
+		effectiveDate: "2026-01-01",
+		jurisdictions: ["us"],
+	});
 	expect(inputs).toHaveLength(0);
+});
+
+test("shouldEmit honours explicit policies override", () => {
+	const config: OpenPolicyConfig = {
+		...fullConfig,
+		policies: ["privacy"],
+	};
+	expect(shouldEmit("privacy", config)).toBe(true);
+	expect(shouldEmit("cookie", config)).toBe(false);
+	const inputs = expandOpenPolicyConfig(config);
+	expect(inputs).toHaveLength(1);
+	expect(inputs[0]?.type).toBe("privacy");
 });

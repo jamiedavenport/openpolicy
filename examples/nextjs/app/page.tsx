@@ -11,9 +11,6 @@ export default function Home() {
 				<Link href="/privacy" className="text-blue-500">
 					Privacy Policy
 				</Link>
-				<Link href="/terms" className="text-blue-500">
-					Terms of Service
-				</Link>
 				<Link href="/chat" className="text-blue-500">
 					AI Legal Assistant
 				</Link>

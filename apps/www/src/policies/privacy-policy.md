@@ -53,8 +53,11 @@ We do not share your personal information with third parties except as required 
 You have the following rights regarding your personal data:
 
 - Right to access your personal data
+- Right to correct inaccurate data
 - Right to request deletion of your data
 - Right to receive your data in a portable format
+- Right to restrict how we process your data
+- Right to object to processing
 
 ---
 

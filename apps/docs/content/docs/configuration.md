@@ -24,28 +24,22 @@ export default defineConfig({
     address: "123 Main St, Springfield, USA",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: {
-      "Account Information": ["Name", "Email address"],
-      "Usage Data": ["Pages visited", "IP address"],
-    },
-    legalBasis: "Legitimate interests and consent",
-    retention: { "Account data": "Until account deletion" },
-    cookies: { essential: true, analytics: false, marketing: false },
-    thirdParties: [],
-    userRights: ["access", "erasure"],
-    jurisdictions: ["us", "eu"],
+  effectiveDate: "2026-01-01",
+  jurisdictions: ["us", "eu"],
+  dataCollected: {
+    "Account Information": ["Name", "Email address"],
+    "Usage Data": ["Pages visited", "IP address"],
   },
-  terms: {
-    effectiveDate: "2026-01-01",
-    acceptance: { methods: ["using the service", "creating an account"] },
-    governingLaw: { jurisdiction: "Delaware, USA" },
-  },
+  legalBasis: ["legitimate_interests", "consent"],
+  retention: { "Account data": "Until account deletion" },
+  thirdParties: [],
+  cookies: { essential: true, analytics: false, marketing: false },
 });
 ```
 
-The `company` block is required and shared across all policy types. Each policy section (`privacy`, `terms`, `cookie`) is optional — only the sections you define will produce output.
+The `company` block is required and shared across all policy types. All other fields live at the top level: `effectiveDate` and `jurisdictions` are shared, and OpenPolicy auto-detects which policies to generate from the fields you provide — include privacy-specific fields (like `dataCollected`, `legalBasis`, `retention`) for a privacy policy, and cookie-specific fields (like `cookies`, `consentMechanism`) for a cookie policy.
+
+The user rights you're legally required to disclose (access, erasure, portability, etc.) are derived automatically from `jurisdictions` — declare `eu` and you get the six GDPR rights, declare `ca` and you get the four CCPA rights, declare both and you get the union. There's no `userRights` field to set.
 
 ## Using AI
 

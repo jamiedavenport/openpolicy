@@ -21,21 +21,19 @@ This drops `CookieBanner` and `CookiePreferences` into `components/ui/openpolicy
 
 ## Add cookies to your config
 
-Open `lib/openpolicy.ts` and add a `cookie` section:
+Open `lib/openpolicy.ts` and add cookie fields — OpenPolicy auto-detects the cookie policy from the presence of `cookies`:
 
 ```ts
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
   company: { ... },
-  cookie: {
-    effectiveDate: "2026-03-31",
-    cookies: {
-      essential: true,
-      analytics: true,
-      functional: false,
-      marketing: false,
-    },
+  effectiveDate: "2026-03-31",
+  cookies: {
+    essential: true,
+    analytics: true,
+    functional: false,
+    marketing: false,
   },
 });
 ```
@@ -130,7 +128,7 @@ const {
 - **Consent gates, not manual checks.** `<ConsentGate requires="analytics">` is clearer and less error-prone than checking a consent object in every script component.
 - **Inspectable.** Consent is stored in localStorage under `op_consent`. Open DevTools and you can see exactly what was recorded — no black box.
 
-The same `openpolicy.ts` config powers the `<PrivacyPolicy>`, `<TermsOfService>`, and `<CookiePolicy>` React components too. One file, all your legal docs.
+The same `openpolicy.ts` config powers the `<PrivacyPolicy>` and `<CookiePolicy>` React components too. One file, all your legal docs.
 
 ---
 

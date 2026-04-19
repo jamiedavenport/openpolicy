@@ -1,6 +1,6 @@
 ---
 title: OpenPolicy with React
-description: Generate and render privacy policies and terms of service in React apps using OpenPolicy.
+description: Generate and render privacy and cookie policies in React apps using OpenPolicy.
 framework: React
 icon: simple-icons:react
 pubDate: 2026-03-23

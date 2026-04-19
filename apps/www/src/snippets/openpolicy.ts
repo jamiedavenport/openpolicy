@@ -7,10 +7,8 @@ export default defineConfig({
 		address: "123 Market St, San Francisco, CA 94105",
 		contact: "privacy@acme.com",
 	},
-	privacy: {
-		/* [...] */
-	},
-	cookie: {
-		/* [...] */
-	},
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["us"],
+	/* data-handling fields (dataCollected, legalBasis, retention, children) */
+	/* cookie fields (cookies, trackingTechnologies, consentMechanism) */
 });

@@ -22,7 +22,7 @@ This skill builds on openpolicy/vite-setup. Read it first.
 
 `thirdParty()` is a **runtime no-op**. It is a build-time marker — `autoCollect()` scans source files statically via `oxc-parser` and extracts the three string literal arguments. The plugin then populates the `thirdParties` sentinel exported from `@openpolicy/sdk`. Without the plugin, `thirdParty()` calls have no effect whatsoever.
 
-The populated sentinel must be spread into `privacy.thirdParties` in the config file. Without the spread, the plugin output is discarded and the policy renders with no third parties listed.
+The populated sentinel must be spread into the top-level `thirdParties` field in the config file. Without the spread, the plugin output is discarded and the policy renders with no third parties listed.
 
 ## Setup
 
@@ -66,10 +66,8 @@ export default defineConfig({
     address: "123 Main St, San Francisco, CA 94105",
     contact: "privacy@acme.com",
   },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    thirdParties: [...thirdParties],
-  },
+  effectiveDate: "2026-01-01",
+  thirdParties: [...thirdParties],
 });
 ```
 
@@ -127,9 +125,7 @@ thirdParty("Fathom Analytics", "Privacy-friendly web analytics", "https://usefat
 import { defineConfig, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
-  privacy: {
-    thirdParties: [...thirdParties],
-  },
+  thirdParties: [...thirdParties],
 });
 ```
 
@@ -141,14 +137,12 @@ export default defineConfig({
 import { defineConfig, Providers } from "@openpolicy/sdk";
 
 export default defineConfig({
-  privacy: {
-    thirdParties: [
-      Providers.Stripe,
-      Providers.Sentry,
-      Providers.Vercel,
-      { name: "Custom Service", purpose: "Internal logging", policyUrl: "https://example.com/privacy" },
-    ],
-  },
+  thirdParties: [
+    Providers.Stripe,
+    Providers.Sentry,
+    Providers.Vercel,
+    { name: "Custom Service", purpose: "Internal logging", policyUrl: "https://example.com/privacy" },
+  ],
 });
 ```
 
@@ -157,9 +151,7 @@ Available presets: `Stripe`, `Paddle`, `LemonSqueezy`, `PayPal`, `GoogleAnalytic
 Note: when using `Providers` statically, you can still spread `thirdParties` alongside it to capture any additional auto-collected services:
 
 ```ts
-privacy: {
-  thirdParties: [...thirdParties, Providers.Cloudflare],
-}
+thirdParties: [...thirdParties, Providers.Cloudflare],
 ```
 
 ## Common Mistakes
@@ -186,16 +178,14 @@ import { thirdParty } from "@openpolicy/sdk";
 thirdParty("Stripe", "Payment processing", "https://stripe.com/privacy");
 ```
 
-### HIGH — Not spreading thirdParties sentinel into privacy.thirdParties
+### HIGH — Not spreading thirdParties sentinel into thirdParties
 
-Even when `autoCollect()` scans the source and populates the sentinel, the populated value is discarded unless it is imported and spread into `privacy.thirdParties` in the config. The privacy policy then renders with an empty third-party section, which may be legally invalid.
+Even when `autoCollect()` scans the source and populates the sentinel, the populated value is discarded unless it is imported and spread into the top-level `thirdParties` field in the config. The privacy policy then renders with an empty third-party section, which may be legally invalid.
 
 ```ts
 // WRONG: thirdParties not imported or spread
 export default defineConfig({
-  privacy: {
-    thirdParties: [], // static empty array, discards plugin output
-  },
+  thirdParties: [], // static empty array, discards plugin output
 });
 ```
 
@@ -204,11 +194,9 @@ export default defineConfig({
 import { defineConfig, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
-  privacy: {
-    thirdParties: [...thirdParties],
-    // or combine with static entries:
-    // thirdParties: [...thirdParties, Providers.Cloudflare],
-  },
+  thirdParties: [...thirdParties],
+  // or combine with static entries:
+  // thirdParties: [...thirdParties, Providers.Cloudflare],
 });
 ```
 
