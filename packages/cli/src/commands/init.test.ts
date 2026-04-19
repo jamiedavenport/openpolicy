@@ -29,6 +29,7 @@ test("template includes privacy fields when privacy selected", () => {
 	expect(output).toContain("dataCollected:");
 	expect(output).toContain("legalBasis:");
 	expect(output).not.toContain("cookies:");
+	expect(output).not.toContain("userRights:");
 });
 
 test("template includes cookies field when cookie selected", () => {

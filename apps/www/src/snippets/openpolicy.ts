@@ -9,6 +9,6 @@ export default defineConfig({
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["us"],
-	/* data-handling fields (dataCollected, legalBasis, retention, userRights, children) */
+	/* data-handling fields (dataCollected, legalBasis, retention, children) */
 	/* cookie fields (cookies, trackingTechnologies, consentMechanism) */
 });

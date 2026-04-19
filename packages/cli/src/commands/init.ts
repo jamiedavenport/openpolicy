@@ -21,7 +21,6 @@ export function getOpenPolicyTemplate(
 	retention: {
 		"All personal data": "As long as necessary for the purposes described in this policy",
 	},
-	userRights: ["access", "erasure"],
 	thirdParties: [],`
 		: "";
 

@@ -40,7 +40,6 @@ const fullConfig: OpenPolicyConfig = {
 	retention: { "Account data": "Until deletion" },
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
-	userRights: ["access"],
 };
 
 test("isOpenPolicyConfig returns true for flat config", () => {

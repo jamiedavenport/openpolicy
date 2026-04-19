@@ -24,5 +24,4 @@ export default defineConfig({
 		marketing: false,
 	},
 	thirdParties: [],
-	userRights: ["access", "erasure", "portability"],
 });

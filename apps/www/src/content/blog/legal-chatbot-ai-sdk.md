@@ -31,7 +31,6 @@ export default defineConfig({
   },
   jurisdictions: ["us"],
   dataCollected: { "Personal Information": ["Full name", "Email address"] },
-  userRights: ["access", "erasure"],
 });
 ```
 

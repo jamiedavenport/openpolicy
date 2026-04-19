@@ -47,7 +47,6 @@ export default defineConfig({
       { name: 'Stripe', purpose: 'Payment processing' },
       { name: 'PostHog', purpose: 'Product analytics' },
     ],
-    userRights: ['access', 'rectification', 'erasure', 'portability'],
     jurisdictions: ['us'],
   },
 })

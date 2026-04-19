@@ -141,7 +141,8 @@ function buildThirdParties(config: PrivacyPolicyConfig): DocumentSection {
 	]);
 }
 
-function buildUserRights(config: PrivacyPolicyConfig): DocumentSection {
+function buildUserRights(config: PrivacyPolicyConfig): DocumentSection | null {
+	if (config.userRights.length === 0) return null;
 	const items = config.userRights.map((right) => {
 		const label = RIGHTS_LABELS[right] ?? right;
 		return li([label]);

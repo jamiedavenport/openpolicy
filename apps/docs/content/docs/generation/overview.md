@@ -13,7 +13,7 @@ At build time (or on demand via the CLI), OpenPolicy reads your `openpolicy.ts` 
 
 | Policy | Detected from | Output filename |
 |---|---|---|
-| Privacy | `dataCollected`, `legalBasis`, `retention`, `userRights` | `privacy-policy.{ext}` |
+| Privacy | `dataCollected`, `legalBasis`, `retention`, `children` | `privacy-policy.{ext}` |
 | Cookie | `cookies`, `consentMechanism`, `trackingTechnologies` | `cookie-policy.{ext}` |
 
 ## Output formats

@@ -42,7 +42,6 @@ export default defineConfig({
     "Account data": "Until account deletion",
     "Analytics data": "13 months",
   },
-  userRights: ["access", "erasure", "portability", "objection"],
   thirdParties: [
     {
       name: "Plausible",

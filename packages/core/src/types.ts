@@ -98,7 +98,6 @@ export type OpenPolicyConfig = {
 	dataCollected?: DataCollection;
 	legalBasis?: LegalBasis | LegalBasis[];
 	retention?: Retention;
-	userRights?: UserRight[];
 	children?: ChildrenConfig;
 	thirdParties?: ThirdParty[];
 

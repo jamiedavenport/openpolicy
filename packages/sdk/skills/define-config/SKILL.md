@@ -34,19 +34,20 @@ export default defineConfig({
   dataCollected: { ...dataCollected },
   legalBasis: "legitimate_interests",
   retention: { "Account Information": "Until account deletion" },
-  userRights: ["access", "erasure"],
   thirdParties: [...thirdParties],
   cookies: { essential: true, analytics: false, marketing: false },
 });
 ```
 
-All policy fields live at the top level of `OpenPolicyConfig`. OpenPolicy auto-detects which policies to generate from the fields you provide: privacy-specific fields (like `dataCollected`, `legalBasis`, `userRights`) produce a privacy policy, and cookie-specific fields (like `cookies`, `consentMechanism`) produce a cookie policy. `effectiveDate` and `jurisdictions` are shared across both.
+All policy fields live at the top level of `OpenPolicyConfig`. OpenPolicy auto-detects which policies to generate from the fields you provide: privacy-specific fields (like `dataCollected`, `legalBasis`, `retention`) produce a privacy policy, and cookie-specific fields (like `cookies`, `consentMechanism`) produce a cookie policy. `effectiveDate` and `jurisdictions` are shared across both.
+
+User rights (access, erasure, portability, etc.) are **derived automatically** from `jurisdictions` — declare `eu` for the six GDPR rights, `ca` for the four CCPA rights, or both for the union. There is no `userRights` field on the public config.
 
 ## Core Patterns
 
 ### 1. Privacy config with GDPR
 
-Use `Compliance.GDPR` to spread the required `jurisdictions`, `legalBasis`, and `userRights` values in one step:
+Use `Compliance.GDPR` to spread the required `jurisdictions` and `legalBasis` values in one step (rights are derived automatically from `jurisdictions`):
 
 ```ts
 import {
@@ -83,7 +84,7 @@ export default defineConfig({
 });
 ```
 
-`Compliance.GDPR` expands to `{ jurisdictions: ["eu"], legalBasis: ["legitimate_interests"], userRights: ["access", "rectification", "erasure", "portability", "restriction", "objection"] }`.
+`Compliance.GDPR` expands to `{ jurisdictions: ["eu"], legalBasis: ["legitimate_interests"] }`. The six GDPR user rights are derived automatically from `jurisdictions: ["eu"]`.
 
 ### 2. Using Compliance presets
 
@@ -95,16 +96,15 @@ import { Compliance, defineConfig } from "@openpolicy/sdk";
 // GDPR only
 defineConfig({ ...Compliance.GDPR, /* ... */ })
 
-// Both (array values merge correctly via spread — userRights and jurisdictions union)
+// Both — union the jurisdictions; user rights are derived automatically
 defineConfig({
   ...Compliance.GDPR,
   jurisdictions: [...Compliance.GDPR.jurisdictions, ...Compliance.CCPA.jurisdictions],
-  userRights: [...Compliance.GDPR.userRights, ...Compliance.CCPA.userRights],
   // ...
 })
 ```
 
-`Compliance.CCPA` does not include `legalBasis` — it provides only `jurisdictions: ["ca"]` and `userRights: ["access", "erasure", "opt_out_sale", "non_discrimination"]`.
+`Compliance.CCPA` does not include `legalBasis` — it provides only `jurisdictions: ["ca"]`. The four CCPA user rights are derived automatically.
 
 Available preset groups from `@openpolicy/sdk`:
 
@@ -112,7 +112,6 @@ Available preset groups from `@openpolicy/sdk`:
 |---|---|
 | `DataCategories` | Named `dataCollected` entries (AccountInfo, SessionData, PaymentInfo, UsageData, DeviceInfo, LocationData, Communications) |
 | `Retention` | Retention period strings (UntilAccountDeletion, ThirtyDays, NinetyDays, OneYear, ThreeYears, AsRequiredByLaw, …) |
-| `Rights` | `UserRight` string constants (Access, Rectification, Erasure, …) |
 | `LegalBases` | `LegalBasis` string constants (Consent, Contract, LegitimateInterests, …) |
 | `Compliance` | Preset bundles: `GDPR`, `CCPA` |
 | `Providers` | Named third-party descriptors: Stripe, PostHog, Vercel, Sentry, Clerk, Resend, … |
@@ -157,6 +156,8 @@ const config: PrivacyPolicyConfig = {
   userRights: [],
   jurisdictions: [],
 };
+// userRights is a REQUIRED field on the internal PrivacyPolicyConfig,
+// but this shape isn't what defineConfig() accepts.
 ```
 
 Correct:
@@ -171,7 +172,6 @@ export default defineConfig({
   dataCollected: {},
   legalBasis: "consent",
   retention: {},
-  userRights: [],
   thirdParties: [],
   cookies: { essential: true, analytics: false, marketing: false },
 });
@@ -187,11 +187,11 @@ Source: `packages/core/src/types.ts`
 
 Wrong:
 ```ts
-// WRONG: jurisdictions missing — legalBasis section and GDPR/CCPA content will not appear
+// WRONG: jurisdictions missing — legalBasis section and GDPR/CCPA content will not appear,
+// and no user rights will be derived
 defineConfig({
   company: { /* ... */ },
   legalBasis: "legitimate_interests",
-  userRights: ["access", "erasure"],
   // jurisdictions omitted
 })
 ```
@@ -201,12 +201,11 @@ Correct:
 defineConfig({
   company: { /* ... */ },
   legalBasis: "legitimate_interests",
-  userRights: ["access", "erasure"],
   jurisdictions: ["eu", "us"],
 })
 ```
 
-Section builders for GDPR (`eu`) and CCPA (`ca`) content check the top-level `jurisdictions` field before generating output. Omitting `jurisdictions` (or passing an empty array) causes those sections to be silently skipped with no warning. `Compliance.GDPR` and `Compliance.CCPA` include the correct `jurisdictions` values when spread.
+Section builders for GDPR (`eu`) and CCPA (`ca`) content check the top-level `jurisdictions` field before generating output, and the user rights list is derived from the same field. Omitting `jurisdictions` (or passing an empty array) causes those sections to be silently skipped and no rights to be listed. `Compliance.GDPR` and `Compliance.CCPA` include the correct `jurisdictions` values when spread.
 
 Source: `packages/core/src/templates/privacy/`
 

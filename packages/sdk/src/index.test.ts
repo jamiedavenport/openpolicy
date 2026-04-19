@@ -16,7 +16,6 @@ const fixture: OpenPolicyConfig = {
 	retention: { "Account data": "Until deletion" },
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
-	userRights: ["access"],
 };
 
 test("defineConfig returns config unchanged", () => {

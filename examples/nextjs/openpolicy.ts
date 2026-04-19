@@ -36,5 +36,4 @@ export default defineConfig({
 		hasPreferencePanel: true,
 		canWithdraw: true,
 	},
-	userRights: ["access", "erasure"],
 });

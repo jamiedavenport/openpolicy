@@ -42,7 +42,6 @@ export default defineConfig({
       { name: "Vercel", purpose: "Hosting" },
       { name: "Plausible", purpose: "Privacy-friendly analytics" },
     ],
-    userRights: ["access", "erasure", "portability"],
     jurisdictions: ["us", "eu"],
   },
 });

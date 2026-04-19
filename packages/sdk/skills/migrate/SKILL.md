@@ -80,10 +80,6 @@ export default defineConfig({
     ...Compliance.GDPR.jurisdictions,
     ...Compliance.CCPA.jurisdictions,
   ],
-  userRights: [
-    ...Compliance.GDPR.userRights,
-    ...Compliance.CCPA.userRights,
-  ],
   dataCollected: {
     ...dataCollected,
     ...DataCategories.AccountInfo,
@@ -166,8 +162,9 @@ Use `Compliance.GDPR` or `Compliance.CCPA` as a starting point when the existing
 ```ts
 ...Compliance.GDPR,
 jurisdictions: [...Compliance.GDPR.jurisdictions, ...Compliance.CCPA.jurisdictions],
-userRights: [...Compliance.GDPR.userRights, ...Compliance.CCPA.userRights],
 ```
+
+The user-rights list is derived from the resulting `jurisdictions` array — no need to merge a separate array.
 
 `Compliance.CCPA` does not include `legalBasis` — only add it when the existing policy states an EU legal basis.
 

@@ -37,6 +37,5 @@ export default defineConfig({
 		hasPreferencePanel: true,
 		canWithdraw: true,
 	},
-	userRights: ["access", "erasure"],
 	children: { underAge: 16, noticeUrl: "https://acme.com/parental-notice" },
 });

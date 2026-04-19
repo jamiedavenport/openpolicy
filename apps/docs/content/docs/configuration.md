@@ -32,13 +32,14 @@ export default defineConfig({
   },
   legalBasis: ["legitimate_interests", "consent"],
   retention: { "Account data": "Until account deletion" },
-  userRights: ["access", "erasure"],
   thirdParties: [],
   cookies: { essential: true, analytics: false, marketing: false },
 });
 ```
 
-The `company` block is required and shared across all policy types. All other fields live at the top level: `effectiveDate` and `jurisdictions` are shared, and OpenPolicy auto-detects which policies to generate from the fields you provide — include privacy-specific fields (like `dataCollected`, `legalBasis`, `userRights`) for a privacy policy, and cookie-specific fields (like `cookies`, `consentMechanism`) for a cookie policy.
+The `company` block is required and shared across all policy types. All other fields live at the top level: `effectiveDate` and `jurisdictions` are shared, and OpenPolicy auto-detects which policies to generate from the fields you provide — include privacy-specific fields (like `dataCollected`, `legalBasis`, `retention`) for a privacy policy, and cookie-specific fields (like `cookies`, `consentMechanism`) for a cookie policy.
+
+The user rights you're legally required to disclose (access, erasure, portability, etc.) are derived automatically from `jurisdictions` — declare `eu` and you get the six GDPR rights, declare `ca` and you get the four CCPA rights, declare both and you get the union. There's no `userRights` field to set.
 
 ## Using AI
 

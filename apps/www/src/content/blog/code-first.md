@@ -38,7 +38,6 @@ export default defineConfig({
     "Account Information": ["Full name", "Email address"],
     "Usage Data": ["Pages visited", "Feature usage"],
   },
-  userRights: ["access", "erasure", "portability"],
 });
 ```
 

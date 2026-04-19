@@ -1,4 +1,4 @@
-import type { LegalBasis, UserRight } from "@openpolicy/core";
+import type { LegalBasis } from "@openpolicy/core";
 
 export const DataCategories = {
 	AccountInfo: { "Account Information": ["Name", "Email address"] },
@@ -37,17 +37,6 @@ export const Retention = {
 	ThreeYears: "3 years",
 	AsRequiredByLaw: "As required by applicable law",
 } as const;
-
-export const Rights = {
-	Access: "access",
-	Rectification: "rectification",
-	Erasure: "erasure",
-	Portability: "portability",
-	Restriction: "restriction",
-	Objection: "objection",
-	OptOutSale: "opt_out_sale",
-	NonDiscrimination: "non_discrimination",
-} as const satisfies Record<string, UserRight>;
 
 export const LegalBases = {
 	Consent: "consent",

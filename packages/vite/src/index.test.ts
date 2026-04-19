@@ -37,7 +37,6 @@ export default {
   retention: { "Usage Data": "90 days" },
   cookies: { essential: true, analytics: true, marketing: false },
   thirdParties: [],
-  userRights: ["access", "erasure"],
 };
 `;
 
@@ -74,7 +73,6 @@ export default {
   retention: {},
   cookies: { essential: true, analytics: false, marketing: false },
   thirdParties: [],
-  userRights: [],
   jurisdictions: ["us"],
 };
 `;
@@ -108,7 +106,6 @@ export default {
   retention: { "Account data": "Until deletion" },
   cookies: { essential: true, analytics: false, marketing: false },
   thirdParties: [],
-  userRights: ["access"],
 };
 `;
 			const configPath = join(tmpDir, "openpolicy.ts");

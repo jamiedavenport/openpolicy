@@ -35,7 +35,7 @@ export function validateOpenPolicyConfig(
 		issues.push({
 			level: "error",
 			message:
-				"Config must produce at least one policy — provide data-handling fields (dataCollected, legalBasis, retention, userRights, children) or cookies",
+				"Config must produce at least one policy — provide data-handling fields (dataCollected, legalBasis, retention, children) or cookies",
 		});
 	}
 
@@ -45,7 +45,7 @@ export function validateOpenPolicyConfig(
 				issues.push({
 					level: "error",
 					message:
-						'policies includes "privacy" but no data-handling fields are set — add dataCollected, legalBasis, retention, userRights, or children',
+						'policies includes "privacy" but no data-handling fields are set — add dataCollected, legalBasis, retention, or children',
 				});
 			}
 			if (category === "cookie" && !config.cookies) {
@@ -72,7 +72,6 @@ function hasAnyPrivacyField(config: OpenPolicyConfig): boolean {
 		config.dataCollected !== undefined ||
 		config.legalBasis !== undefined ||
 		config.retention !== undefined ||
-		config.userRights !== undefined ||
 		config.children !== undefined
 	);
 }

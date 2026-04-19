@@ -5,7 +5,7 @@ description: Generate and render a privacy policy from your openpolicy.ts config
 
 See the [Quick Start](/policies/quick-start) to add a privacy policy page to your app.
 
-Add privacy fields to your config — the privacy policy is auto-detected from the presence of fields like `dataCollected`, `legalBasis`, `retention`, and `userRights`:
+Add privacy fields to your config — the privacy policy is auto-detected from the presence of fields like `dataCollected`, `legalBasis`, and `retention`. User rights (access, erasure, portability, etc.) are derived automatically from your `jurisdictions`:
 
 ```ts
 // openpolicy.ts
@@ -20,7 +20,6 @@ retention: {
   "Account data": "Until account deletion",
   "Usage logs": "90 days",
 },
-userRights: ["access", "erasure"],
 thirdParties: [],
 ```
 

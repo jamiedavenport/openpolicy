@@ -53,6 +53,7 @@ export type {
 	ValidationIssue,
 } from "./types";
 export { isOpenPolicyConfig } from "./types";
+export { deriveUserRights } from "./user-rights";
 export { validatePrivacyPolicy } from "./validate";
 export { validateOpenPolicyConfig } from "./validate-config";
 export { validateCookiePolicy } from "./validate-cookie";
@@ -63,12 +64,12 @@ import type {
 	PolicyCategory,
 	PolicyInput,
 } from "./types";
+import { deriveUserRights } from "./user-rights";
 
 const PRIVACY_FIELDS = [
 	"dataCollected",
 	"legalBasis",
 	"retention",
-	"userRights",
 	"children",
 ] as const;
 
@@ -107,7 +108,7 @@ export function expandOpenPolicyConfig(
 			retention: config.retention ?? {},
 			cookies: config.cookies ?? EMPTY_COOKIES,
 			thirdParties: config.thirdParties ?? [],
-			userRights: config.userRights ?? [],
+			userRights: deriveUserRights(config.jurisdictions),
 			children: config.children,
 		});
 	}

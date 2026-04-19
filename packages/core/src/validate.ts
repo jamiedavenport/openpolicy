@@ -21,11 +21,6 @@ export function validatePrivacyPolicy(
 			level: "error",
 			message: "dataCollected must have at least one entry",
 		});
-	if (config.userRights.length === 0)
-		issues.push({
-			level: "warning",
-			message: "userRights is empty — consider listing applicable rights",
-		});
 
 	// GDPR checks
 	if (config.jurisdictions.includes("eu")) {
@@ -34,36 +29,6 @@ export function validatePrivacyPolicy(
 			: [config.legalBasis];
 		if (basisArray.length === 0 || (basisArray.length === 1 && !basisArray[0]))
 			issues.push({ level: "error", message: "GDPR requires a legalBasis" });
-		for (const right of [
-			"access",
-			"rectification",
-			"erasure",
-			"portability",
-			"restriction",
-			"objection",
-		] as const) {
-			if (!config.userRights.includes(right))
-				issues.push({
-					level: "warning",
-					message: `GDPR recommends including the "${right}" right`,
-				});
-		}
-	}
-
-	// CCPA checks
-	if (config.jurisdictions.includes("ca")) {
-		for (const right of [
-			"access",
-			"erasure",
-			"opt_out_sale",
-			"non_discrimination",
-		] as const) {
-			if (!config.userRights.includes(right))
-				issues.push({
-					level: "warning",
-					message: `CCPA recommends including the "${right}" right`,
-				});
-		}
 	}
 
 	// children config sanity
