@@ -32,7 +32,10 @@
 		"changeset": "changeset",
 		"version-packages": "changeset version",
 		"publish-packages": "turbo run build && changeset publish",
-		"knip": "knip"
+		"knip": "knip",
+		"bench": "bun scripts/bench/bench.ts",
+		"bench:bundle": "bun scripts/bench/bench.ts --only=bundle",
+		"bench:runtime": "bun scripts/bench/bench.ts --only=runtime"
 	},
 	"workspaces": [
 		"apps/*",

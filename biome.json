@@ -40,7 +40,13 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!**/dist", "!**/*.generated.js", "!**/*.gen.ts"]
+		"includes": [
+			"**",
+			"!**/dist",
+			"!**/*.generated.js",
+			"!**/*.gen.ts",
+			"!scripts/bench/results"
+		]
 	},
 	"formatter": {
 		"enabled": true,
