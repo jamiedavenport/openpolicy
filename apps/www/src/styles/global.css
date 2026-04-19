@@ -2,9 +2,19 @@
 @plugin "@tailwindcss/typography";
 
 @theme inline {
+	--font-sans: var(--font-geist);
+	--font-serif: var(--font-instrument-serif);
 	--font-mono: var(--font-geist-mono);
 }
 
-code {
-	font-size: inherit;
+body {
+	font-family: var(--font-sans);
+}
+
+:not(pre) > code {
+	font-family: var(--font-mono);
+	font-size: 0.875em;
+	padding: 0.125em 0.375em;
+	background-color: var(--color-gray-100);
+	color: var(--color-gray-900);
 }

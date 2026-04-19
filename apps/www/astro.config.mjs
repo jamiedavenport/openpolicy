@@ -25,8 +25,18 @@ export default defineConfig({
 		fonts: [
 			{
 				provider: fontProviders.fontsource(),
+				name: "Geist",
+				cssVariable: "--font-geist",
+			},
+			{
+				provider: fontProviders.fontsource(),
 				name: "Geist Mono",
 				cssVariable: "--font-geist-mono",
+			},
+			{
+				provider: fontProviders.fontsource(),
+				name: "Instrument Serif",
+				cssVariable: "--font-instrument-serif",
 			},
 		],
 	},

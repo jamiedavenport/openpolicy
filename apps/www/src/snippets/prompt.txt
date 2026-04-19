@@ -8,6 +8,6 @@ Your output should capture:
 - The applicable jurisdiction (US, EU, UK, etc.)
 - Legal basis for processing
 - User rights supported
-- Terms of service details (acceptance, governing law, prohibited uses, etc.)
+- Cookie usage (essential, analytics, marketing) and consent categories
 
 Output only a single openpolicy.ts using defineConfig(). No explanations.

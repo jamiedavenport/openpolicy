@@ -1,193 +1,221 @@
 ---
-import { Code } from "astro:components";
 import { Icon } from "astro-icon/components";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import CodeBlock from "../components/code-block.astro";
+import CompareCell from "../components/compare-cell.astro";
 import { homepageRows } from "../data/comparisons";
-
-import Lucid from "../assets/lucid.svg";
-import virentis from "../assets/virentis.png";
 
 import installCmd from "../snippets/install.sh?raw";
 import policyTs from "../snippets/openpolicy.ts?raw";
+import instrumentTs from "../snippets/instrument.ts?raw";
+import viteCfg from "../snippets/vite.config.ts?raw";
 import privacyRoute from "../snippets/privacy-policy.tsx?raw";
 import llmPrompt from "../snippets/prompt.txt?raw";
-import cookies from "../assets/cookies.png";
-import document from "../assets/document.png";
-import cloud from "../assets/cloud.png";
+
+const shadcnCmd = "bunx shadcn@latest add @openpolicy/privacy-policy";
+
+const features = [
+  {
+    name: "Policy-as-code",
+    description: "A TypeScript config is your source of truth.",
+  },
+  {
+    name: "Build-time analysis",
+    description: "A Vite plugin scans collecting() calls and wires your data inventory automatically.",
+  },
+  {
+    name: "Consent primitives",
+    description: "useCookies(), <ConsentGate>, and a headless <CookieBanner>.",
+  },
+  {
+    name: "React & Vue renderers",
+    description: "Drop <PrivacyPolicy /> into any framework.",
+  },
+  {
+    name: "Multi-format output",
+    description: "Markdown, HTML, and PDF from the same config.",
+  },
+  {
+    name: "GPL-3.0 licensed",
+    description: "No subscription, no lock-in.",
+  },
+];
+
+const frameworks = [
+  { name: "React", icon: "simple-icons:react", slug: "react" },
+  { name: "Next.js", icon: "simple-icons:nextdotjs", slug: "nextjs" },
+  { name: "Vue", icon: "simple-icons:vuedotjs", slug: "vue" },
+  { name: "Nuxt", icon: "simple-icons:nuxtdotjs", slug: "nuxt" },
+  { name: "Svelte", icon: "simple-icons:svelte", slug: "svelte" },
+  { name: "Astro", icon: "simple-icons:astro", slug: "astro" },
+  { name: "TanStack", icon: "simple-icons:tanstack", slug: "tanstack" },
+  { name: "Remix", icon: "simple-icons:remix", slug: "remix" },
+];
 ---
 
 <BaseLayout
   title="OpenPolicy"
-  description="The first policy-as-code framework for developers. Generate privacy policies, terms of service, and legal agreements directly from TypeScript."
+  description="The first policy-as-code framework for developers. Generate privacy policies and cookie notices directly from TypeScript."
   ogUrl="https://openpolicy.sh"
 >
   <section>
-    <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
       README.md
     </h2>
     <p class="mb-4">
-      Create legal policies the way developers build software. Our
-      platform lets you generate privacy policies, terms of service, and
-      other legal agreements directly from code—making them fast,
-      accurate, and easy to maintain.
+      OpenPolicy turns a TypeScript config into your privacy policy and cookie notice — rendered as React components, Markdown, HTML, or PDF. Primitives like <code>collecting()</code>, <code>thirdParty()</code>, and <code>&lt;CookieBanner /&gt;</code> wire data and consent controls into the app itself.
     </p>
-    <div class="border border-gray-200 mb-4 bg-gray-100">
-      <div class="flex border-b border-gray-200">
-        <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
-          openpolicy.ts
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-px bg-gray-200 border border-gray-200 mb-6">
+      {features.map((f, i) => (
+        <div class="bg-white p-5 relative">
+          <span class="absolute top-4 right-4 font-mono text-xs text-gray-300 tabular-nums">0{i + 1}</span>
+          <p class="font-medium text-sm mb-1.5 pr-8">{f.name}</p>
+          <p class="text-sm text-gray-500">{f.description}</p>
         </div>
-      </div>
-      <Code code={policyTs} lang="ts" theme="github-light" class="p-4 text-sm" />
+      ))}
     </div>
+    <p class="text-sm text-gray-500 mb-2">
+      Define everything in one <code>openpolicy.ts</code> config.
+    </p>
+    <CodeBlock code={policyTs} lang="ts" filename="openpolicy.ts" />
+  </section>
 
-    <div class="border border-gray-200 mb-4 bg-gray-100">
-      <div class="flex border-b border-gray-200">
-        <div class="text-xs text-gray-500 px-4 py-2 bg-white border-r border-gray-200">
-          pages/privacy-policy.tsx
-        </div>
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
+      01-INSTALL.md
+    </h2>
+    <p class="mb-4">
+      Two install paths — scaffold a config with the CLI, or pull ready-made components from the shadcn registry.
+    </p>
+    <div class="flex flex-col gap-8">
+      <div>
+        <p class="font-mono font-medium text-xs text-gray-500 mb-2">
+          WITH THE CLI
+        </p>
+        <CodeBlock code={installCmd} lang="bash" />
       </div>
-      <Code code={privacyRoute} lang="tsx" theme="github-light" class="p-4 text-sm" />
+      <div>
+        <p class="font-mono font-medium text-xs text-gray-500 mb-2">
+          WITH SHADCN/UI
+        </p>
+        <p class="text-sm text-gray-500 mb-2">
+          Ships Tailwind-styled <code>&lt;PrivacyPolicy&gt;</code>, <code>&lt;CookiePolicy&gt;</code>, and <code>&lt;CookieBanner&gt;</code> — full source, yours to edit.
+        </p>
+        <CodeBlock code={shadcnCmd} lang="bash" />
+      </div>
     </div>
   </section>
 
   <section>
     <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
-      FEATURES.md
+      02-INSTRUMENT.md
     </h2>
-    <div class="grid grid-cols-3 gap-px bg-gray-200 border border-gray-200">
-      <div class="bg-white p-4">
-        <p class="font-mono font-medium text-xs mb-1">TypeScript-first</p>
-        <p class="text-xs text-gray-500">Define policies in the language you already know.</p>
-      </div>
-      <div class="bg-white p-4">
-        <p class="font-mono font-medium text-xs mb-1">Multi-format output</p>
-        <p class="text-xs text-gray-500">Generate HTML, PDF, and Markdown at build time.</p>
-      </div>
-      <div class="bg-white p-4">
-        <p class="font-mono font-medium text-xs mb-1">Vite integration</p>
-        <p class="text-xs text-gray-500">Drop into your existing build pipeline in minutes.</p>
-      </div>
-      <div class="bg-white p-4">
-        <p class="font-mono font-medium text-xs mb-1">GDPR & CCPA ready</p>
-        <p class="text-xs text-gray-500">Built-in templates for the regulations that matter.</p>
-      </div>
-      <div class="bg-white p-4">
-        <p class="font-mono font-medium text-xs mb-1">Version controlled</p>
-        <p class="text-xs text-gray-500">Policies live in your repo and ship with your code.</p>
-      </div>
-      <div class="bg-white p-4">
-        <p class="font-mono font-medium text-xs mb-1">Always in sync</p>
-        <p class="text-xs text-gray-500">Regenerated on every build — never out of date.</p>
-      </div>
-      <div class="bg-white p-4">
-        <p class="font-mono font-medium text-xs mb-1">Multi-jurisdiction</p>
-        <p class="text-xs text-gray-500">US, EU, UK and more supported out of the box.</p>
-      </div>
-      <div class="bg-white p-4">
-        <p class="font-mono font-medium text-xs mb-1">Audit trail</p>
-        <p class="text-xs text-gray-500">Every policy change is tracked in git, reviewable in PRs.</p>
-      </div>
-      <div class="bg-white p-4">
-        <p class="font-mono font-medium text-xs mb-1">Framework agnostic</p>
-        <p class="text-xs text-gray-500">Works with React, Vue, Svelte, or plain HTML.</p>
-      </div>
-    </div>
+    <p class="mb-4">
+      Wrap data at the point you store it. <code>collecting()</code> is a pass-through at runtime, but the Vite plugin scans for these calls at build time and populates your policy's data inventory automatically. <code>thirdParty()</code> does the same for integrations.
+    </p>
+    <CodeBlock code={instrumentTs} lang="ts" filename="src/actions/create-user.ts" />
+    <p class="text-sm text-gray-500 mt-6 mb-2">
+      Wire <code>autoCollect()</code> into your Vite config so the scan runs on every build.
+    </p>
+    <CodeBlock code={viteCfg} lang="ts" filename="vite.config.ts" />
   </section>
 
-  {(() => {
-    const frameworks = [
-      { name: "React", icon: "simple-icons:react", slug: "react" },
-      { name: "Next.js", icon: "simple-icons:nextdotjs", slug: "nextjs" },
-      { name: "Vue", icon: "simple-icons:vuedotjs", slug: "vue" },
-      { name: "Nuxt", icon: "simple-icons:nuxtdotjs", slug: "nuxt" },
-      { name: "Svelte", icon: "simple-icons:svelte", slug: "svelte" },
-      { name: "Astro", icon: "simple-icons:astro", slug: "astro" },
-      { name: "TanStack", icon: "simple-icons:tanstack", slug: "tanstack" },
-      { name: "Remix", icon: "simple-icons:remix", slug: "remix" },
-    ];
-    return (
-      <section>
-        <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
-          FRAMEWORKS.md
-        </h2>
-        <p class="mb-4">
-          OpenPolicy is framework agnostic. Render directly into your React, Next.js, Vue, Nuxt, Astro, or any other app.
-        </p>
-        <div class="grid grid-cols-4 gap-px bg-gray-200 border border-gray-200">
-          {frameworks.map(({ name, icon, slug }) => (
-            <a href={`/framework/${slug}`} class="bg-white p-4 flex flex-col items-center gap-2 hover:bg-gray-50 transition-colors">
-              <Icon name={icon} class="size-6 text-gray-700" />
-              <span class="font-mono text-xs text-gray-500">{name}</span>
-            </a>
-          ))}
-        </div>
-      </section>
-    );
-  })()}
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
+      03-NOTIFY.md
+    </h2>
+    <p class="mb-4">
+      Render the compiled policy anywhere with <code>&lt;PrivacyPolicy&gt;</code> or <code>&lt;CookiePolicy&gt;</code>. Control consent-gated code paths with <code>useCookies()</code> and <code>&lt;ConsentGate&gt;</code>. <code>&lt;CookieBanner&gt;</code> handles display, persistence, and <code>data-consent-*</code> attributes on <code>&lt;body&gt;</code>.
+    </p>
+    <CodeBlock code={privacyRoute} lang="tsx" filename="src/routes/privacy.tsx" />
+  </section>
 
   <section>
-    <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
       COMPARE.md
     </h2>
-    <p class="mb-4">How OpenPolicy compares to the alternatives.</p>
-    <div class="overflow-x-auto">
-      <table class="w-full border border-gray-200 text-xs border-collapse">
-        <thead>
-          <tr class="border-b border-gray-200 bg-gray-50">
-            <th class="text-left p-3 font-mono font-medium border-r border-gray-200"></th>
-            <th class="text-left p-3 font-mono font-medium border-r border-gray-200">OpenPolicy</th>
-            <th class="text-left p-3 font-mono font-medium border-r border-gray-200">
-              <a href="/compare/lawyers" class="hover:underline">Lawyers</a>
-            </th>
-            <th class="text-left p-3 font-mono font-medium border-r border-gray-200">
-              <a href="/compare/templates" class="hover:underline">Templates</a>
-            </th>
-            <th class="text-left p-3 font-mono font-medium border-r border-gray-200">
-              <a href="/compare/termly" class="hover:underline">Termly</a>
-            </th>
-            <th class="text-left p-3 font-mono font-medium">
-              <a href="/compare/iubenda" class="hover:underline">iubenda</a>
-            </th>
+    <p class="mb-4">
+      How OpenPolicy stacks up against the usual alternatives.
+    </p>
+    <div class="border border-gray-200 overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="border-b border-gray-200">
+          <tr>
+            <th class="text-left font-mono font-medium text-xs text-gray-500 p-4">Feature</th>
+            <th class="text-center font-mono font-medium text-xs text-gray-900 p-4 bg-gray-50">OpenPolicy</th>
+            <th class="text-center font-mono font-medium text-xs text-gray-500 p-4">Lawyers</th>
+            <th class="text-center font-mono font-medium text-xs text-gray-500 p-4">Templates</th>
+            <th class="text-center font-mono font-medium text-xs text-gray-500 p-4">Termly</th>
+            <th class="text-center font-mono font-medium text-xs text-gray-500 p-4">iubenda</th>
           </tr>
         </thead>
-        <tbody>
-          {homepageRows.map((row, i) => (
-            <tr class:list={["border-b border-gray-200", i % 2 === 1 ? "bg-gray-50" : "bg-white"]}>
-              <td class="p-3 text-gray-600 border-r border-gray-200">{row.feature}</td>
-              <td class="p-3 font-medium border-r border-gray-200">{row.openpolicy}</td>
-              <td class="p-3 text-gray-500 border-r border-gray-200">{row.lawyers}</td>
-              <td class="p-3 text-gray-500 border-r border-gray-200">{row.templates}</td>
-              <td class="p-3 text-gray-500 border-r border-gray-200">{row.termly}</td>
-              <td class="p-3 text-gray-500">{row.iubenda}</td>
+        <tbody class="divide-y divide-gray-200">
+          {homepageRows.map((row) => (
+            <tr>
+              <td class="p-4">{row.feature}</td>
+              <td class="text-center p-4 bg-gray-50"><CompareCell value={row.openpolicy} emphasize /></td>
+              <td class="text-center p-4"><CompareCell value={row.lawyers} /></td>
+              <td class="text-center p-4"><CompareCell value={row.templates} /></td>
+              <td class="text-center p-4"><CompareCell value={row.termly} /></td>
+              <td class="text-center p-4"><CompareCell value={row.iubenda} /></td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
-  </section>
-
-  <section>
-    <h2 class="font-mono font-medium text-xs text-gray-500 mb-2">
-      SHOWCASE.md
-    </h2>
-    <p class="mb-4">These teams are using OpenPolicy to generate their legal documentation and streamline their development process</p>
-    <div class="grid grid-cols-3 gap-px bg-gray-200 border border-gray-200">
-      <a href="https://lucid.jxd.dev" class="bg-white p-4 hover:bg-gray-50 transition-colors flex items-center justify-center" target="_blank">
-        <Lucid class="h-5" />
-      </a>
-      <a href="https://www.virentis.uk/" class="bg-white p-4 hover:bg-gray-50 transition-colors flex items-center justify-center" target="_blank">
-        <img src={virentis.src} alt="Virentis" class="h-8" />
-      </a>
-      <a href="https://www.auvia.io/" class="bg-white p-4 hover:bg-gray-50 transition-colors flex items-center justify-center font-bold" target="_blank">
-        Auvia
+    <div class="mt-4">
+      <a href="/compare/lawyers" class="font-mono text-xs text-gray-500 hover:text-gray-900 transition-colors">
+        See full comparisons →
       </a>
     </div>
   </section>
 
   <section>
     <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
-      BADGES.md
+      PLUS.md
     </h2>
-    <a href="https://openalternative.co/openpolicy?utm_source=openalternative&utm_medium=badge&utm_campaign=embed&utm_content=tool-openpolicy" target="_blank"><img src="https://openalternative.co/openpolicy/badge.svg?theme=light&width=200&height=50" width="200" height="50" alt="OpenPolicy badge" loading="lazy" /></a>
+    <div class="border border-gray-200 bg-gray-50 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+      <div class="flex-1">
+        <p class="font-mono font-medium text-xs text-gray-500 mb-2">OPTIONAL CLOUD TIER</p>
+        <p class="font-medium text-sm mb-1">OpenPolicy Plus — privacy infrastructure at scale</p>
+        <p class="text-sm text-gray-500">
+          Server-side consent capture, compliance checks on every pull request, and hands-on onboarding. The core framework stays GPL-3.0 and free forever.
+        </p>
+      </div>
+      <a
+        href="https://plus.openpolicy.sh"
+        target="_blank"
+        class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors duration-200 shrink-0"
+      >
+        Learn more →
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
+      PROMPT.md
+    </h2>
+    <p class="mb-4">
+      Already have an app? Drop this prompt into Claude, Cursor, or Copilot — it reads your codebase and emits an <code>openpolicy.ts</code>.
+    </p>
+    <CodeBlock code={llmPrompt} lang="markdown" filename="prompt.md" wrap />
+  </section>
+
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
+      FRAMEWORKS.md
+    </h2>
+    <p class="mb-4">
+      OpenPolicy is framework agnostic. Render directly into your React, Next.js, Vue, Nuxt, Astro, or any other app.
+    </p>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-gray-200 border border-gray-200">
+      {frameworks.map(({ name, icon, slug }) => (
+        <a href={`/framework/${slug}`} class="bg-white p-5 flex flex-col items-center gap-2.5 hover:bg-gray-50 transition-colors">
+          <Icon name={icon} class="size-6 text-gray-700" />
+          <span class="font-mono text-xs text-gray-500">{name}</span>
+        </a>
+      ))}
+    </div>
   </section>
 </BaseLayout>

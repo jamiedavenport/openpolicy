@@ -10,9 +10,6 @@ export default defineConfig({
 	privacy: {
 		/* [...] */
 	},
-	terms: {
-		/* [...] */
-	},
 	cookie: {
 		/* [...] */
 	},
