@@ -21,6 +21,12 @@ const shareUrl = encodeURIComponent(postUrl);
 const xShareUrl = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
 const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
 const blueskyShareUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(post.data.title + " " + postUrl)}`;
+
+const formattedDate = post.data.pubDate.toLocaleDateString("en-US", {
+	year: "numeric",
+	month: "long",
+	day: "numeric",
+});
 ---
 
 <BaseLayout
@@ -30,33 +36,41 @@ const blueskyShareUrl = `https://bsky.app/intent/compose?text=${encodeURICompone
   ogImage={`https://openpolicy.sh/og/${post.slug}.png`}
 >
   <section>
-    <div class="border-b border-gray-200 pb-6 mb-8">
-      <div class="flex items-center justify-between mb-3">
-        <p class="font-mono font-medium text-xs text-gray-500">
-          {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-        </p>
-        <div class="flex items-center gap-3">
-          <a href={xShareUrl} target="_blank" rel="noopener noreferrer"
-             aria-label="Share on X"
-             class="text-gray-400 hover:text-gray-700 transition-colors">
-            <Icon name="simple-icons:x" class="w-3.5 h-3.5" />
-          </a>
-          <a href={linkedinShareUrl} target="_blank" rel="noopener noreferrer"
-             aria-label="Share on LinkedIn"
-             class="text-gray-400 hover:text-gray-700 transition-colors">
-            <Icon name="simple-icons:linkedin" class="w-3.5 h-3.5" />
-          </a>
-          <a href={blueskyShareUrl} target="_blank" rel="noopener noreferrer"
-             aria-label="Share on Bluesky"
-             class="text-gray-400 hover:text-gray-700 transition-colors">
-            <Icon name="simple-icons:bluesky" class="w-3.5 h-3.5" />
-          </a>
-        </div>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-6">
+      BLOG.md <span class="text-gray-300">/</span> {post.slug}
+    </h2>
+
+    <h1 class="text-3xl lg:text-4xl font-semibold tracking-tight text-pretty mb-3 max-w-[24ch]">
+      {post.data.title}
+    </h1>
+    <p class="text-base/7 text-gray-500 text-pretty max-w-[65ch] mb-8">
+      {post.data.description}
+    </p>
+
+    <div class="flex items-center justify-between border-y border-gray-200 py-3 mb-10">
+      <p class="font-mono text-xs text-gray-500 tabular-nums">
+        {formattedDate}
+      </p>
+      <div class="flex items-center gap-3">
+        <a href={xShareUrl} target="_blank" rel="noopener noreferrer"
+           aria-label="Share on X"
+           class="text-gray-400 hover:text-gray-700 transition-colors">
+          <Icon name="simple-icons:x" class="size-3.5" />
+        </a>
+        <a href={linkedinShareUrl} target="_blank" rel="noopener noreferrer"
+           aria-label="Share on LinkedIn"
+           class="text-gray-400 hover:text-gray-700 transition-colors">
+          <Icon name="simple-icons:linkedin" class="size-3.5" />
+        </a>
+        <a href={blueskyShareUrl} target="_blank" rel="noopener noreferrer"
+           aria-label="Share on Bluesky"
+           class="text-gray-400 hover:text-gray-700 transition-colors">
+          <Icon name="simple-icons:bluesky" class="size-3.5" />
+        </a>
       </div>
-      <h1 class="font-mono font-bold text-2xl leading-snug">{post.data.title}</h1>
     </div>
 
-    <article class="prose prose-gray max-w-none">
+    <article class="prose max-w-[72ch]">
       <Content />
     </article>
 

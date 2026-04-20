@@ -12,6 +12,9 @@ import icon from "astro-icon";
 export default defineConfig({
 	site: "https://openpolicy.sh",
 	adapter: vercel(),
+	markdown: {
+		shikiConfig: { theme: "github-light" },
+	},
 	integrations: [
 		openPolicy({
 			formats: ["markdown"],
