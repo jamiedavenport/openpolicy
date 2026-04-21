@@ -177,7 +177,7 @@ export default defineConfig({
 });
 ```
 
-React components and the autoCollect pipeline read from `OpenPolicyConfig`; the standalone policy types are internal shapes not consumed by the rendering layer.
+React components and the `openPolicy()` Vite plugin's auto-collect pipeline read from `OpenPolicyConfig`; the standalone policy types are internal shapes not consumed by the rendering layer.
 
 Source: `packages/core/src/types.ts`
 

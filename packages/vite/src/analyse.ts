@@ -38,7 +38,7 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 	try {
 		result = parseSync(filename, code);
 	} catch {
-		console.warn(`[openpolicy-auto-collect] parse error in ${filename}`);
+		console.warn(`[openpolicy] parse error in ${filename}`);
 		return empty;
 	}
 
@@ -47,7 +47,7 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 		// produces a usable AST, so we keep going and let the walker decide.
 		const fatal = result.errors.some((e) => e.severity === ("Error" as never));
 		if (fatal) {
-			console.warn(`[openpolicy-auto-collect] parse error in ${filename}`);
+			console.warn(`[openpolicy] parse error in ${filename}`);
 			return empty;
 		}
 	}

@@ -72,9 +72,9 @@ export default defineConfig({
 
 The SDK exports types and helper functions for _defining_ policies. To compile them to Markdown or HTML, pair it with one of:
 
-- **[`@openpolicy/vite`](https://openpolicy.sh/docs/getting-started/vite)** — Vite plugin (build-time, with hot-reload in dev)
-- **[`@openpolicy/astro`](https://openpolicy.sh/docs/getting-started/astro)** — Astro integration
-- **[`@openpolicy/cli`](https://openpolicy.sh/docs/getting-started/cli)** — `openpolicy generate` CLI command
+- **[`@openpolicy/core`](https://openpolicy.sh/docs/getting-started/overview)** — compile directly in your app at runtime or in Astro frontmatter
+- **[`@openpolicy/vite`](https://openpolicy.sh/docs/getting-started/vite)** — Vite plugin that scans source for `collecting()` / `thirdParty()` annotations
+- **[`@openpolicy/cli`](https://openpolicy.sh/docs/getting-started/cli)** — `openpolicy generate` CLI command for static file output
 
 ## Documentation
 

@@ -2,7 +2,7 @@
 name: getting-started
 description: >
   End-to-end setup for OpenPolicy: install @openpolicy/sdk, @openpolicy/react, and
-  @openpolicy/vite-auto-collect; create openpolicy.ts with defineConfig(); wire autoCollect()
+  @openpolicy/vite; create openpolicy.ts with defineConfig(); wire openPolicy()
   into vite.config.ts; wrap the React app with <OpenPolicy>; render <PrivacyPolicy>.
 type: lifecycle
 library: openpolicy
@@ -10,7 +10,7 @@ library_version: "0.0.19"
 sources:
   - jamiedavenport/openpolicy:packages/sdk/README.md
   - jamiedavenport/openpolicy:packages/react/src/context.tsx
-  - jamiedavenport/openpolicy:packages/vite-auto-collect/src/index.ts
+  - jamiedavenport/openpolicy:packages/vite/src/index.ts
 ---
 
 ## Setup
@@ -18,7 +18,7 @@ sources:
 Install packages:
 
 ```sh
-bun add @openpolicy/sdk @openpolicy/react @openpolicy/vite-auto-collect
+bun add @openpolicy/sdk @openpolicy/react @openpolicy/vite
 ```
 
 Create `openpolicy.ts` at the project root:
@@ -42,16 +42,16 @@ export default defineConfig({
 });
 ```
 
-Add `autoCollect()` to `vite.config.ts` — it must appear before any React plugin:
+Add `openPolicy()` to `vite.config.ts` — it must appear before any React plugin:
 
 ```ts
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { autoCollect } from "@openpolicy/vite-auto-collect";
+import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
   plugins: [
-    autoCollect({ thirdParties: { usePackageJson: true } }),
+    openPolicy({ thirdParties: { usePackageJson: true } }),
     react(),
   ],
 });
@@ -87,7 +87,7 @@ export default function PrivacyPage() {
 ```ts
 import { collecting } from "@openpolicy/sdk";
 
-// Call next to the point of collection; autoCollect() scans for these at build time
+// Call next to the point of collection; openPolicy() scans for these at build time
 export async function createUser(name: string, email: string) {
   const user = collecting(
     "Account Information",
@@ -109,7 +109,7 @@ import { thirdParty } from "@openpolicy/sdk";
 thirdParty("Stripe", "Payment processing", "https://stripe.com/privacy");
 ```
 
-The `autoCollect({ thirdParties: { usePackageJson: true } })` option also auto-detects ~30 known packages (Stripe, Sentry, PostHog, etc.) from `package.json`.
+The `openPolicy({ thirdParties: { usePackageJson: true } })` option also auto-detects ~30 known packages (Stripe, Sentry, PostHog, etc.) from `package.json`.
 
 ### Spread both sentinels in `openpolicy.ts`
 
@@ -125,44 +125,16 @@ export default defineConfig({
   },
   effectiveDate: "2026-01-01",
   dataCollected: {
-    ...dataCollected,                          // populated by autoCollect() at build time
+    ...dataCollected,                          // populated by openPolicy() at build time
     "Manual Category": ["Manually added field"], // additional hand-declared entries
   },
-  thirdParties: [...thirdParties],             // populated by autoCollect() at build time
+  thirdParties: [...thirdParties],             // populated by openPolicy() at build time
 });
 ```
 
-Both `dataCollected` and `thirdParties` are placeholder objects in `@openpolicy/sdk`; `autoCollect()` replaces them via virtual module injection during the Vite build.
+Both `dataCollected` and `thirdParties` are placeholder objects in `@openpolicy/sdk`; `openPolicy()` replaces them via virtual module injection during the Vite build.
 
 ## Common Mistakes
-
-### CRITICAL: Using `openPolicy()` from `@openpolicy/vite` instead of `autoCollect()`
-
-Wrong:
-```ts
-// vite.config.ts
-import { openPolicy } from "@openpolicy/vite";
-
-export default defineConfig({
-  plugins: [openPolicy({ formats: ["markdown"], outDir: "public/policies" })],
-});
-```
-
-Correct:
-```ts
-// vite.config.ts
-import { autoCollect } from "@openpolicy/vite-auto-collect";
-
-export default defineConfig({
-  plugins: [autoCollect()],
-});
-```
-
-`openPolicy()` generates static files at build time that React components never read; `autoCollect()` populates the `dataCollected` and `thirdParties` sentinels that feed the React runtime rendering path.
-
-Source: maintainer interview
-
----
 
 ### HIGH: Rendering policy components without `<OpenPolicy>` provider
 
@@ -238,6 +210,6 @@ export default defineConfig({
 });
 ```
 
-Without spreading the sentinels, `autoCollect()` plugin output is discarded and the policy compiles with only the hand-declared entries — all `collecting()` and `thirdParty()` call annotations are silently ignored.
+Without spreading the sentinels, `openPolicy()` plugin output is discarded and the policy compiles with only the hand-declared entries — all `collecting()` and `thirdParty()` call annotations are silently ignored.
 
 Source: packages/sdk/src/auto-collected.ts

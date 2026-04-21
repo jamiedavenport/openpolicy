@@ -1,21 +1,19 @@
 [![OpenPolicy](https://openpolicy.sh/og.png)](https://openpolicy.sh)
 
-# SvelteKit Example — OpenPolicy Vite Plugin
+# SvelteKit Example — OpenPolicy CLI
 
-A minimal SvelteKit app showing how to use the `@openpolicy/vite` plugin to generate policy documents at build time. Policies are compiled from a typed TypeScript config and rendered as SvelteKit routes.
+A minimal SvelteKit app showing how to use the `@openpolicy/cli` `generate` command to produce policy documents from a typed TypeScript config. Policies are rendered as SvelteKit routes from pre-generated HTML files.
 
 ## What it demonstrates
 
-- Adding `openPolicy()` to the Vite config inside a SvelteKit project
 - Defining a Privacy Policy and Cookie Policy using `@openpolicy/sdk`
-- Generating HTML output to `src/lib/policies/` at build time and with hot-reload in dev
+- Generating HTML output to `src/lib/policies/` via `bunx openpolicy generate`
 - Importing generated HTML files as raw strings and rendering them with `{@html}`
 
 ## Project structure
 
 ```
 openpolicy.ts         ← defineConfig() — unified policy definition (privacy, cookie)
-vite.config.ts        ← openPolicy() plugin configured here
 src/
   lib/policies/       ← generated output (privacy-policy.html, cookie-policy.html)
   routes/
@@ -30,12 +28,13 @@ src/
 
 ```sh
 bun install
-bun run dev      # start dev server — policies are generated on startup and hot-reloaded on save
+bunx openpolicy generate --format html --out src/lib/policies
+bun run dev      # start dev server
 bun run build    # production build
 ```
 
 ## Learn more
 
 - [OpenPolicy docs](https://openpolicy.dev/docs)
-- [`@openpolicy/vite` plugin](https://openpolicy.dev/docs/getting-started/vite)
+- [`@openpolicy/cli`](https://openpolicy.dev/docs/generation/cli)
 - [`@openpolicy/sdk` reference](https://openpolicy.dev/docs/reference/openpolicy-config)

@@ -1,15 +1,15 @@
 # `@openpolicy/vite`
 
-> Vite plugin for compiling [OpenPolicy](https://openpolicy.sh) policy documents at build time.
+> Vite plugin that scans source files for [OpenPolicy](https://openpolicy.sh) `collecting()` and `thirdParty()` calls and populates the SDK's auto-collected registry at build time.
 
-Compiles `defineConfig()` configs to Markdown or HTML automatically — on every build and on save in dev mode.
+At `buildStart` the plugin walks your `srcDir`, extracts every `collecting()` / `thirdParty()` call from `@openpolicy/sdk`, and exposes the merged result as `dataCollected` / `thirdParties` on `@openpolicy/sdk`. Your policy config spreads those values into the runtime-rendered policy — no files are written to disk.
 
 ## Install
 
 ```sh
 bun add -D @openpolicy/vite
 bun add @openpolicy/sdk
-# or: npm install --save-dev @openpolicy/vite @openpolicy/sdk
+# or: npm install --save-dev @openpolicy/vite && npm install @openpolicy/sdk
 ```
 
 ## Setup
@@ -20,34 +20,24 @@ import { defineConfig } from "vite";
 import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [
-    openPolicy({
-      formats: ["markdown"],
-      outDir: "public/policies",
-    }),
-  ],
+  plugins: [openPolicy()],
 });
 ```
+
+Astro users: add it the same way under `vite.plugins` in `astro.config.mjs`.
 
 ## Options
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `configPath` | `string` | `"openpolicy.ts"` | Path to the unified policy config file, relative to the Vite root. |
-| `formats` | `OutputFormat[]` | `["markdown"]` | `"markdown"` or `"html"` |
-| `outDir` | `string` | `"public/policies"` | Output directory, relative to the Vite root |
-
-## Scaffold
-
-If a config file doesn't exist when Vite starts, the plugin creates a starter file with placeholder content — edit and save to generate your first policy.
-
-## Astro
-
-For Astro projects, use [`@openpolicy/astro`](https://openpolicy.sh/docs/getting-started/astro) instead — it wraps this plugin and plugs into Astro's integration API.
+| `srcDir` | `string` | `"src"` | Directory walked for `collecting()` / `thirdParty()` calls, relative to the Vite root. |
+| `extensions` | `string[]` | `[".ts", ".tsx"]` | File extensions to scan. |
+| `ignore` | `string[]` | `[]` | Extra directory basenames to skip (appended to the built-in list: `node_modules`, `dist`, `.git`, `.next`, `.output`, `.svelte-kit`, `.cache`). |
+| `thirdParties.usePackageJson` | `boolean` | `false` | Auto-detect third-party services from `package.json` dependencies against the built-in registry (Stripe, Sentry, PostHog, etc.). |
 
 ## Documentation
 
-[openpolicy.sh/docs/getting-started/vite](https://openpolicy.sh/docs/getting-started/vite)
+[openpolicy.sh/docs](https://docs.openpolicy.sh)
 
 ## Links
 

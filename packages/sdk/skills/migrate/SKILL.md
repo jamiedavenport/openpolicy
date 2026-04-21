@@ -129,7 +129,7 @@ dataCollected: {
 },
 ```
 
-Always spread `dataCollected` first so the autoCollect plugin's output is included alongside the explicit entries.
+Always spread `dataCollected` first so the `openPolicy()` Vite plugin's output is included alongside the explicit entries.
 
 ### 2. Mapping jurisdiction and legal basis from GDPR/CCPA language
 

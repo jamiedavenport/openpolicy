@@ -1,7 +1,7 @@
 import { collecting } from "@openpolicy/sdk";
 
 /**
- * Placeholder ORM call sites that exist purely so `@openpolicy/vite-auto-collect`
+ * Placeholder ORM call sites that exist purely so `@openpolicy/vite`
  * has something to discover during this example's build. Replace with real
  * `db.insert(...)` code in a production app — `collecting()` returns its
  * `value` argument unchanged, so it's safe to drop in at any write site.

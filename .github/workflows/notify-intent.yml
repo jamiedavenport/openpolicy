@@ -22,8 +22,8 @@ on:
       - 'packages/react/src/**'
       - 'packages/sdk/docs/**'
       - 'packages/sdk/src/**'
-      - 'packages/vite-auto-collect/docs/**'
-      - 'packages/vite-auto-collect/src/**'
+      - 'packages/vite/docs/**'
+      - 'packages/vite/src/**'
 
 jobs:
   notify:

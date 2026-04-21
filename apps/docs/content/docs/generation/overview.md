@@ -9,7 +9,7 @@ See the [Quick Start](/policies/quick-start) to render policies as React compone
 
 ## How it works
 
-At build time (or on demand via the CLI), OpenPolicy reads your `openpolicy.ts` config and compiles each detected policy into a document. Which policies get generated is auto-detected from the fields you define:
+On demand via the CLI, OpenPolicy reads your `openpolicy.ts` config and compiles each detected policy into a document. Which policies get generated is auto-detected from the fields you define:
 
 | Policy | Detected from | Output filename |
 |---|---|---|
@@ -26,6 +26,6 @@ At build time (or on demand via the CLI), OpenPolicy reads your `openpolicy.ts` 
 
 ## Options
 
-- **[Vite plugin](/generation/vite)** — generates files automatically at build time; watches for changes in dev
-- **[Astro integration](/generation/astro)** — wraps the Vite plugin for Astro projects
-- **[CLI](/generation/cli)** — generate on demand, useful outside of a Vite build
+- **[CLI](/generation/cli)** — generate policy files on demand
+- **[Vite plugin](/generation/vite)** — scans source for `collecting()` / `thirdParty()` annotations at build time (does not write files)
+- **[Astro](/generation/astro)** — compile directly in page frontmatter with `@openpolicy/core`

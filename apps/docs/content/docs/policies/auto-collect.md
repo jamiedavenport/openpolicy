@@ -10,27 +10,25 @@ It works through two complementary mechanisms:
 - **`collecting()`** — a zero-cost wrapper you place around data storage calls to declare what you're storing
 - **`thirdParty()`** — a side-effect-free call you place next to third-party SDK initialisation to declare an external service
 
-The `@openpolicy/vite-auto-collect` Vite plugin scans your source files at build time, extracts these declarations, and merges them into your policy config before compilation runs.
+The `@openpolicy/vite` plugin scans your source files at build time, extracts these declarations, and exposes them to `@openpolicy/sdk` at runtime so they render inside your policy.
 
 ## Install
 
 ```sh
-bun add -D @openpolicy/vite-auto-collect
+bun add -D @openpolicy/vite
 ```
 
 ## Setup
 
-Add `autoCollect()` **before** `openPolicy()` in your Vite plugin array. The scan must complete before the policy config is imported.
+Add `openPolicy()` to your Vite plugin array. The scan runs during `buildStart` and refreshes on change in dev.
 
 ```ts
 // vite.config.ts
 import { defineConfig } from "vite";
-import { autoCollect } from "@openpolicy/vite-auto-collect";
 import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
   plugins: [
-    autoCollect(),
     openPolicy(),
   ],
 });
@@ -130,7 +128,7 @@ Instead of writing `thirdParty()` calls manually, you can enable `usePackageJson
 
 ```ts
 // vite.config.ts
-autoCollect({
+openPolicy({
   thirdParties: {
     usePackageJson: true,
   },
@@ -162,7 +160,7 @@ The plugin reads both `dependencies` and `devDependencies` from your project roo
 ## Plugin options
 
 ```ts
-autoCollect({
+openPolicy({
   srcDir: "src",                    // directory to scan
   extensions: [".ts", ".tsx"],      // file extensions to include
   ignore: ["generated"],            // extra directory names to skip

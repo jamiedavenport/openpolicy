@@ -3,7 +3,6 @@
 import sitemap from "@astrojs/sitemap";
 
 import vercel from "@astrojs/vercel";
-import { openPolicy } from "@openpolicy/astro";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
 import icon from "astro-icon";
@@ -15,14 +14,7 @@ export default defineConfig({
 	markdown: {
 		shikiConfig: { theme: "github-light" },
 	},
-	integrations: [
-		openPolicy({
-			formats: ["markdown"],
-			outDir: "./src/policies",
-		}),
-		icon(),
-		sitemap(),
-	],
+	integrations: [icon(), sitemap()],
 
 	experimental: {
 		fonts: [

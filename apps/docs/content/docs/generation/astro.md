@@ -39,43 +39,23 @@ See the [full working example](https://github.com/openpolicyhq/openpolicy/tree/m
 
 ---
 
-## Alternative: `@openpolicy/astro` integration
+## Auto-collect annotations
 
-The Astro integration still works if you prefer file-based output. It wraps the Vite plugin as a native Astro integration and writes policy files to a directory at build time.
-
-```sh
-bun add -D @openpolicy/astro
-```
+If you annotate data collection with `collecting()` / `thirdParty()` inside your source, add the Vite plugin directly to `astro.config.mjs` so those calls are scanned at build time:
 
 ```ts
 // astro.config.ts
 import { defineConfig } from "astro/config";
-import { openPolicy } from "@openpolicy/astro";
+import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  integrations: [
-    openPolicy(),
-  ],
+  vite: {
+    plugins: [openPolicy()],
+  },
 });
 ```
 
-By default this reads `openpolicy.ts` from the project root and writes output to `public/policies/` as Markdown.
-
-### Options
-
-```ts
-openPolicy({
-  configPath: "openpolicy.ts",   // path to your config file
-  formats: ["markdown"],         // "markdown" | "html" | "pdf"
-  outDir: "public/policies",     // output directory
-})
-```
-
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `configPath` | `string` | `"openpolicy.ts"` | Path to your config file |
-| `formats` | `OutputFormat[]` | `["markdown"]` | One or more output formats |
-| `outDir` | `string` | `"public/policies"` | Directory to write files into |
+See [Auto-collect](/policies/auto-collect) for full details.
 
 ## Alternative: CLI
 
