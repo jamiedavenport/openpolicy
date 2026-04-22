@@ -16,10 +16,11 @@ export type {
 	TrackingTechnology,
 } from "@openpolicy/core";
 
-export { dataCollected, thirdParties } from "./auto-collected";
+export { cookies, dataCollected, thirdParties } from "./auto-collected";
 export { collecting, Ignore } from "./collecting";
 export { Compliance } from "./compliance";
 export { DataCategories, LegalBases, Retention } from "./data";
+export { defineCookie } from "./define-cookie";
 export { Providers } from "./providers";
 export { thirdParty } from "./third-parties";
 

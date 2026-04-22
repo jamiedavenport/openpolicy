@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
 import { extractFromFile, type ThirdPartyEntry } from "./analyse";
-import { KNOWN_PACKAGES } from "./known-packages";
+import { KNOWN_COOKIE_PACKAGES, KNOWN_PACKAGES } from "./known-packages";
 import { walkSources } from "./scan";
 
 export type OpenPolicyOptions = {
@@ -25,6 +25,18 @@ export type OpenPolicyOptions = {
 	thirdParties?: {
 		usePackageJson?: boolean;
 	};
+
+	cookies?: {
+		usePackageJson?: boolean;
+	};
+};
+
+type CookieMap = { essential: boolean; [key: string]: boolean };
+
+type Scanned = {
+	dataCollected: Record<string, string[]>;
+	thirdParties: ThirdPartyEntry[];
+	cookies: CookieMap;
 };
 
 /**
@@ -53,37 +65,41 @@ const SDK_PATH_PATTERN = /[\\/](?:@openpolicy[\\/]sdk|packages[\\/]sdk)[\\/]/;
 const AUTO_COLLECTED_SPECIFIER = /^\.\/auto-collected(?:\.js)?$/;
 
 /**
- * Vite plugin that scans source files for `@openpolicy/sdk` `collecting()`
- * calls at the start of each build and inlines the discovered categories into
- * the SDK's `dataCollected` sentinel.
+ * Vite plugin that scans source files for `@openpolicy/sdk` `collecting()`,
+ * `thirdParty()`, and `defineCookie()` calls (plus `<ConsentGate>` and
+ * `useCookies().has()` usage from `@openpolicy/react`) at the start of each
+ * build and inlines the discovered data into the SDK's `dataCollected` /
+ * `thirdParties` / `cookies` sentinels.
  *
  * Internally the plugin intercepts `@openpolicy/sdk`'s own relative import of
  * `./auto-collected` and redirects it to a virtual module whose body is a
- * literal `export const dataCollected = { ... }`. Because the replacement
- * becomes part of the consumer's own module graph, the scanned data survives
- * any downstream bundler boundary (e.g. nitro's SSR output), which a shared
- * module-level registry would not.
+ * literal `export const … = …`. Because the replacement becomes part of the
+ * consumer's own module graph, the scanned data survives any downstream
+ * bundler boundary (e.g. nitro's SSR output), which a shared module-level
+ * registry would not.
  */
 export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 	const srcDirOpt = options.srcDir ?? "src";
 	const extensions = options.extensions ?? [".ts", ".tsx"];
 	const ignore = options.ignore ?? [];
 	const usePackageJsonOpt = options.thirdParties?.usePackageJson ?? false;
+	const useCookiesPackageJsonOpt = options.cookies?.usePackageJson ?? false;
 	let resolvedRoot: string;
 	let resolvedSrcDir: string;
-	let scanned: {
-		dataCollected: Record<string, string[]>;
-		thirdParties: ThirdPartyEntry[];
-	} = { dataCollected: {}, thirdParties: [] };
+	let scanned: Scanned = {
+		dataCollected: {},
+		thirdParties: [],
+		cookies: { essential: true },
+	};
 
-	async function detectFromPackageJson(
+	async function readPackageJsonDeps(
 		root: string,
-	): Promise<ThirdPartyEntry[]> {
+	): Promise<Record<string, string>> {
 		let raw: string;
 		try {
 			raw = await readFile(resolve(root, "package.json"), "utf8");
 		} catch {
-			return [];
+			return {};
 		}
 		let pkg: {
 			dependencies?: Record<string, string>;
@@ -92,12 +108,15 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 		try {
 			pkg = JSON.parse(raw) as typeof pkg;
 		} catch {
-			return [];
+			return {};
 		}
-		const allDeps = {
-			...pkg.dependencies,
-			...pkg.devDependencies,
-		};
+		return { ...pkg.dependencies, ...pkg.devDependencies };
+	}
+
+	async function detectThirdPartiesFromPackageJson(
+		root: string,
+	): Promise<ThirdPartyEntry[]> {
+		const allDeps = await readPackageJsonDeps(root);
 		const entries: ThirdPartyEntry[] = [];
 		const seenNames = new Set<string>();
 		for (const pkgName of Object.keys(allDeps)) {
@@ -110,11 +129,23 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 		return entries;
 	}
 
-	async function scanAndMerge(): Promise<typeof scanned> {
+	async function detectCookiesFromPackageJson(root: string): Promise<string[]> {
+		const allDeps = await readPackageJsonDeps(root);
+		const categories = new Set<string>();
+		for (const pkgName of Object.keys(allDeps)) {
+			const cats = KNOWN_COOKIE_PACKAGES.get(pkgName);
+			if (!cats) continue;
+			for (const cat of cats) categories.add(cat);
+		}
+		return [...categories];
+	}
+
+	async function scanAndMerge(): Promise<Scanned> {
 		const files = await walkSources(resolvedSrcDir, extensions, ignore);
 		const mergedData: Record<string, string[]> = {};
 		const mergedParties: ThirdPartyEntry[] = [];
 		const seenParties = new Set<string>();
+		const cookieSet = new Set<string>();
 		for (const file of files) {
 			let code: string;
 			try {
@@ -142,9 +173,10 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 					mergedParties.push(entry);
 				}
 			}
+			for (const cat of extracted.cookies) cookieSet.add(cat);
 		}
 		if (usePackageJsonOpt) {
-			const pkgEntries = await detectFromPackageJson(resolvedRoot);
+			const pkgEntries = await detectThirdPartiesFromPackageJson(resolvedRoot);
 			for (const entry of pkgEntries) {
 				if (!seenParties.has(entry.name)) {
 					seenParties.add(entry.name);
@@ -152,7 +184,20 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 				}
 			}
 		}
-		return { dataCollected: mergedData, thirdParties: mergedParties };
+		if (useCookiesPackageJsonOpt) {
+			const pkgCookies = await detectCookiesFromPackageJson(resolvedRoot);
+			for (const cat of pkgCookies) cookieSet.add(cat);
+		}
+		const cookies: CookieMap = { essential: true };
+		for (const cat of cookieSet) {
+			if (cat === "essential") continue;
+			cookies[cat] = true;
+		}
+		return {
+			dataCollected: mergedData,
+			thirdParties: mergedParties,
+			cookies,
+		};
 	}
 
 	/**
@@ -169,9 +214,9 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 	/**
 	 * Re-runs the scan and, if anything changed, invalidates the virtual
 	 * module and triggers a full page reload. A full reload is used because
-	 * `dataCollected` is spread into the policy config at module-evaluation
-	 * time and the result is captured by the React tree as a prop — there's
-	 * no clean way to hot-swap it in place.
+	 * the sentinel values are spread into the policy config at module-
+	 * evaluation time and the result is captured by the React tree as a
+	 * prop — there's no clean way to hot-swap in place.
 	 */
 	async function rescanAndRefresh(server: ViteDevServer): Promise<void> {
 		const next = await scanAndMerge();
@@ -266,7 +311,8 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 				`export const dataCollected = ${JSON.stringify(
 					scanned.dataCollected,
 				)};\n` +
-				`export const thirdParties = ${JSON.stringify(scanned.thirdParties)};\n`
+				`export const thirdParties = ${JSON.stringify(scanned.thirdParties)};\n` +
+				`export const cookies = ${JSON.stringify(scanned.cookies)};\n`
 			);
 		},
 	};

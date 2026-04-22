@@ -50,11 +50,12 @@ async function runPluginBuildStart(
 type ScannedResult = {
 	dataCollected: Record<string, string[]>;
 	thirdParties: ThirdPartyEntry[];
+	cookies: { essential: boolean; [key: string]: boolean };
 };
 
 /**
- * Calls the plugin's `load` hook with the virtual ID and parses both exports
- * out of the emitted JS source.
+ * Calls the plugin's `load` hook with the virtual ID and parses all three
+ * exports out of the emitted JS source.
  */
 function loadScanned(plugin: PluginInstance): ScannedResult {
 	const load = plugin.load as
@@ -82,7 +83,16 @@ function loadScanned(plugin: PluginInstance): ScannedResult {
 		source.slice(tpStart, tpEnd),
 	) as ThirdPartyEntry[];
 
-	return { dataCollected, thirdParties };
+	const ckStart = source.indexOf("cookies = ") + "cookies = ".length;
+	const ckEnd = source.indexOf(";\n", ckStart);
+	if (ckStart < "cookies = ".length || ckEnd === -1)
+		throw new Error(`could not parse cookies from: ${source}`);
+	const cookies = JSON.parse(source.slice(ckStart, ckEnd)) as {
+		essential: boolean;
+		[key: string]: boolean;
+	};
+
+	return { dataCollected, thirdParties, cookies };
 }
 
 type WatcherEvent = "change" | "add" | "unlink";
@@ -686,6 +696,164 @@ test("usePackageJson: graceful when package.json is missing", async () => {
 			policyUrl: "https://stripe.com/privacy",
 		},
 	]);
+});
+
+// ---------------------------------------------------------------------------
+// cookie detection tests
+// ---------------------------------------------------------------------------
+
+test("cookies: empty scan emits essential-only map", async () => {
+	await touch("src/noop.ts", `export const x = 1;\n`);
+
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).cookies).toEqual({ essential: true });
+});
+
+test("cookies: defineCookie() adds the category", async () => {
+	await touch(
+		"src/cookies.ts",
+		`
+		import { defineCookie } from "@openpolicy/sdk";
+		defineCookie("analytics");
+		defineCookie("marketing");
+		`,
+	);
+
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).cookies).toEqual({
+		essential: true,
+		analytics: true,
+		marketing: true,
+	});
+});
+
+test("cookies: ConsentGate usage adds the category", async () => {
+	await touch(
+		"src/Widget.tsx",
+		`
+		import { ConsentGate } from "@openpolicy/react";
+		export function Widget() {
+			return <ConsentGate requires="analytics">hi</ConsentGate>;
+		}
+		`,
+	);
+
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).cookies).toEqual({
+		essential: true,
+		analytics: true,
+	});
+});
+
+test("cookies: useCookies().has() adds the category (including nested expr)", async () => {
+	await touch(
+		"src/hook.ts",
+		`
+		import { useCookies } from "@openpolicy/react";
+		export function X() {
+			return useCookies().has({ or: ["analytics", "marketing"] });
+		}
+		`,
+	);
+
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).cookies).toEqual({
+		essential: true,
+		analytics: true,
+		marketing: true,
+	});
+});
+
+test("cookies: usePackageJson disabled by default — posthog-js alone does not add analytics", async () => {
+	await touch(
+		"package.json",
+		JSON.stringify({ dependencies: { "posthog-js": "^1.0.0" } }),
+	);
+
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).cookies).toEqual({ essential: true });
+});
+
+test("cookies: usePackageJson — posthog-js detected as analytics", async () => {
+	await touch(
+		"package.json",
+		JSON.stringify({ dependencies: { "posthog-js": "^1.0.0" } }),
+	);
+
+	const plugin = openPolicy({ cookies: { usePackageJson: true } });
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).cookies).toEqual({
+		essential: true,
+		analytics: true,
+	});
+});
+
+test("cookies: usePackageJson + defineCookie unions categories", async () => {
+	await touch(
+		"package.json",
+		JSON.stringify({ dependencies: { "posthog-js": "^1.0.0" } }),
+	);
+	await touch(
+		"src/cookies.ts",
+		`
+		import { defineCookie } from "@openpolicy/sdk";
+		defineCookie("marketing");
+		`,
+	);
+
+	const plugin = openPolicy({ cookies: { usePackageJson: true } });
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).cookies).toEqual({
+		essential: true,
+		analytics: true,
+		marketing: true,
+	});
+});
+
+test("cookies: usePackageJson graceful when package.json missing", async () => {
+	const plugin = openPolicy({ cookies: { usePackageJson: true } });
+	await runPluginBuildStart(plugin, tmp);
+
+	expect(loadScanned(plugin).cookies).toEqual({ essential: true });
+});
+
+test("cookies: dev watcher reloads when a cookie-relevant call is added", async () => {
+	await touch("src/x.ts", `export const x = 1;\n`);
+
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp);
+	expect(loadScanned(plugin).cookies).toEqual({ essential: true });
+
+	const stub = createStubServer();
+	await runConfigureServer(plugin, stub.server);
+
+	await touch(
+		"src/x.ts",
+		`
+		import { defineCookie } from "@openpolicy/sdk";
+		defineCookie("analytics");
+		`,
+	);
+	await stub.runHandler("change", join(tmp, "src/x.ts"));
+
+	expect(loadScanned(plugin).cookies).toEqual({
+		essential: true,
+		analytics: true,
+	});
+	expect(stub.invalidatedIds).toContain(RESOLVED_VIRTUAL_ID);
+	expect(stub.sentMessages).toContainEqual({ type: "full-reload" });
 });
 
 /**
