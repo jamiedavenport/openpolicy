@@ -65,6 +65,7 @@
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/react": "workspace:*",
+        "@openpolicy/renderers": "workspace:*",
         "@openpolicy/sdk": "workspace:*",
         "@tailwindcss/typography": "^0.5.19",
         "@types/react": "^19.0.0",
@@ -181,7 +182,7 @@
     },
     "packages/cli": {
       "name": "@openpolicy/cli",
-      "version": "0.0.23",
+      "version": "0.0.24",
       "bin": {
         "openpolicy": "./src/cli.ts",
       },
@@ -195,14 +196,14 @@
     },
     "packages/core": {
       "name": "@openpolicy/core",
-      "version": "0.0.23",
+      "version": "0.0.24",
       "devDependencies": {
         "@openpolicy/tooling": "workspace:*",
       },
     },
     "packages/react": {
       "name": "@openpolicy/react",
-      "version": "0.0.23",
+      "version": "0.0.24",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
@@ -217,7 +218,7 @@
     },
     "packages/renderers": {
       "name": "@openpolicy/renderers",
-      "version": "0.0.23",
+      "version": "0.0.24",
       "dependencies": {
         "pdfkit": "^0.18.0",
       },
@@ -229,7 +230,7 @@
     },
     "packages/sdk": {
       "name": "@openpolicy/sdk",
-      "version": "0.0.23",
+      "version": "0.0.24",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
@@ -238,7 +239,7 @@
     },
     "packages/vite": {
       "name": "@openpolicy/vite",
-      "version": "0.0.23",
+      "version": "0.0.24",
       "dependencies": {
         "oxc-parser": "^0.124.0",
       },
@@ -253,7 +254,7 @@
     },
     "packages/vue": {
       "name": "@openpolicy/vue",
-      "version": "0.0.23",
+      "version": "0.0.24",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",

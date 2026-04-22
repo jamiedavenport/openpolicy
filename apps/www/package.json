@@ -26,6 +26,7 @@
 		"@types/react": "^19.0.0",
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/react": "workspace:*",
+		"@openpolicy/renderers": "workspace:*",
 		"@openpolicy/sdk": "workspace:*",
 		"@tailwindcss/typography": "^0.5.19",
 		"shadcn": "latest"
