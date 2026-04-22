@@ -1,5 +1,12 @@
 # @openpolicy/cli
 
+## 0.0.25
+
+### Patch Changes
+
+- a38360e: Bundle `citty` and `consola` into the CLI's `dist/cli.js` and drop them from runtime `dependencies`. The published tarball now ships a single self-contained binary, so installing `@openpolicy/cli` no longer pulls in a dep tree (~470K → one ~126K file) and consumers can't end up on a mismatched dependency version.
+- a38360e: Fix broken `openpolicy` bin in the published package. The CLI's `bin` entry was relying on `publishConfig.bin` to override a dev-only `./src/cli.ts` path to `./dist/cli.js` at publish time, but the override wasn't applied — so the published tarball shipped a bin pointing at a TypeScript source file with no shebang, and invoking `openpolicy` fell through to bash and exited 1. `bin` now points directly at `./dist/cli.js`.
+
 ## 0.0.24
 
 ### Patch Changes
