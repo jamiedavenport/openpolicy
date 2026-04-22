@@ -8,7 +8,7 @@ export default defineConfig({
 		contact: "privacy@yourcompany.com",
 	},
 	effectiveDate: "2026-01-01",
-	jurisdictions: ["us", "eu"],
+	jurisdictions: ["eu", "us-ca"],
 	dataCollected: {
 		"Personal Information": ["Full name", "Email address"],
 		"Usage Data": ["Pages visited", "Time spent on site"],

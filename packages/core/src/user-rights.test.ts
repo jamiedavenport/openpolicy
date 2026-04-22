@@ -4,19 +4,25 @@ import type { OpenPolicyConfig, PolicyInput, UserRight } from "./types";
 import { deriveUserRights } from "./user-rights";
 import { validateOpenPolicyConfig } from "./validate-config";
 
+const GDPR_RIGHTS: UserRight[] = [
+	"access",
+	"rectification",
+	"erasure",
+	"portability",
+	"restriction",
+	"objection",
+];
+
 test("deriveUserRights: EU-only returns the six GDPR rights in canonical order", () => {
-	expect(deriveUserRights(["eu"])).toEqual([
-		"access",
-		"rectification",
-		"erasure",
-		"portability",
-		"restriction",
-		"objection",
-	]);
+	expect(deriveUserRights(["eu"])).toEqual(GDPR_RIGHTS);
 });
 
-test("deriveUserRights: CA-only returns the four CCPA rights in canonical order", () => {
-	expect(deriveUserRights(["ca"])).toEqual([
+test("deriveUserRights: UK-only returns the six GDPR rights (UK-GDPR parity)", () => {
+	expect(deriveUserRights(["uk"])).toEqual(GDPR_RIGHTS);
+});
+
+test("deriveUserRights: US-CA-only returns the four CCPA rights in canonical order", () => {
+	expect(deriveUserRights(["us-ca"])).toEqual([
 		"access",
 		"erasure",
 		"opt_out_sale",
@@ -24,7 +30,7 @@ test("deriveUserRights: CA-only returns the four CCPA rights in canonical order"
 	]);
 });
 
-test("deriveUserRights: EU+CA returns the union in canonical order regardless of input order", () => {
+test("deriveUserRights: EU+US-CA returns the union in canonical order regardless of input order", () => {
 	const expected: UserRight[] = [
 		"access",
 		"rectification",
@@ -35,12 +41,17 @@ test("deriveUserRights: EU+CA returns the union in canonical order regardless of
 		"opt_out_sale",
 		"non_discrimination",
 	];
-	expect(deriveUserRights(["eu", "ca"])).toEqual(expected);
-	expect(deriveUserRights(["ca", "eu"])).toEqual(expected);
+	expect(deriveUserRights(["eu", "us-ca"])).toEqual(expected);
+	expect(deriveUserRights(["us-ca", "eu"])).toEqual(expected);
 });
 
-test("deriveUserRights: US-only returns an empty array", () => {
-	expect(deriveUserRights(["us"])).toEqual([]);
+test("deriveUserRights: EU dedupes with UK (both grant the same GDPR rights)", () => {
+	expect(deriveUserRights(["eu", "uk"])).toEqual(GDPR_RIGHTS);
+});
+
+test("deriveUserRights: a reserved jurisdiction with no shipped content returns an empty array", () => {
+	expect(deriveUserRights(["ca"])).toEqual([]);
+	expect(deriveUserRights(["us-va"])).toEqual([]);
 });
 
 test("buildUserRights: privacy policy omits 'Your Rights' section when derivation is empty", () => {
@@ -59,7 +70,7 @@ test("buildUserRights: privacy policy omits 'Your Rights' section when derivatio
 		cookies: { essential: true, analytics: false, marketing: false },
 		thirdParties: [],
 		userRights: [],
-		jurisdictions: ["us"],
+		jurisdictions: ["ca"],
 	};
 	const document = compile(input);
 	const hasRightsSection = document.sections.some(
@@ -77,7 +88,7 @@ test("validateOpenPolicyConfig: emits no userRights-related issues", () => {
 			contact: "privacy@acme.com",
 		},
 		effectiveDate: "2026-01-01",
-		jurisdictions: ["us"],
+		jurisdictions: ["us-ca"],
 		dataCollected: { "Account Information": ["Name", "Email"] },
 		legalBasis: "legitimate_interests",
 		retention: { "Account data": "Until deletion" },

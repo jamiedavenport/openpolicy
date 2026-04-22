@@ -30,7 +30,7 @@ export default defineConfig({
 		retention: { "Account data": "Until account deletion" },
 		cookies: { essential: true, analytics: false, marketing: false },
 		thirdParties: [],
-		jurisdictions: ["us", "eu"],
+		jurisdictions: ["eu", "us-ca"],
 	},
 });
 ```

@@ -42,7 +42,7 @@ export default defineConfig({
       { name: "Vercel", purpose: "Hosting" },
       { name: "Plausible", purpose: "Privacy-friendly analytics" },
     ],
-    jurisdictions: ["us", "eu"],
+    jurisdictions: ["eu", "us-ca"],
   },
 });
 ```
@@ -63,7 +63,7 @@ export default defineConfig({
   cookie: {
     effectiveDate: "2026-01-01",
     cookies: { essential: true, analytics: true, marketing: false },
-    jurisdictions: ["us", "eu"],
+    jurisdictions: ["eu", "us-ca"],
   },
 });
 ```

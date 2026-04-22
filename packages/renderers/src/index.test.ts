@@ -17,7 +17,7 @@ const input: PolicyInput = {
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
 	userRights: ["access"],
-	jurisdictions: ["us"],
+	jurisdictions: ["ca"],
 };
 
 test("compilePolicy routes privacy input to markdown", async () => {

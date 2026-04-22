@@ -10,7 +10,7 @@ Add cookie fields to your config — the cookie policy is auto-detected from the
 ```ts
 // openpolicy.ts
 effectiveDate: "2026-01-01",
-jurisdictions: ["us", "eu"],
+jurisdictions: ["eu", "us-ca"],
 cookies: {
   essential: true,
   analytics: true,

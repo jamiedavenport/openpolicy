@@ -138,16 +138,31 @@ function buildManaging(): DocumentSection {
 	]);
 }
 
-function buildJurisdictionEu(
+function buildJurisdictionEuUk(
 	config: CookiePolicyConfig,
 ): DocumentSection | null {
-	if (!config.jurisdictions.includes("eu")) return null;
-	return section("cookie-jurisdiction-eu", [
-		heading("European Users (GDPR)", {
-			reason: "Required under ePrivacy Directive and GDPR",
-		}),
+	const hasEu = config.jurisdictions.includes("eu");
+	const hasUk = config.jurisdictions.includes("uk");
+	if (!hasEu && !hasUk) return null;
+	const regions =
+		hasEu && hasUk
+			? "European Economic Area or the United Kingdom"
+			: hasEu
+				? "European Economic Area"
+				: "United Kingdom";
+	const heading_text =
+		hasEu && hasUk
+			? "European and UK Users (GDPR / UK-GDPR)"
+			: hasEu
+				? "European Users (GDPR)"
+				: "UK Users (UK-GDPR)";
+	const reason = hasUk
+		? "Required under the UK-GDPR and PECR"
+		: "Required under ePrivacy Directive and GDPR";
+	return section("cookie-jurisdiction-eu-uk", [
+		heading(heading_text, { reason }),
 		p([
-			"If you are located in the European Economic Area, we rely on your consent as our legal basis for setting non-essential cookies. You have the right to withdraw consent at any time.",
+			`If you are located in the ${regions}, we rely on your consent as our legal basis for setting non-essential cookies. You have the right to withdraw consent at any time.`,
 		]),
 		p([
 			"Essential cookies are set on the basis of our legitimate interests to provide you with a functioning service.",
@@ -177,7 +192,7 @@ const SECTION_BUILDERS: ((
 	buildThirdParties,
 	buildConsent,
 	() => buildManaging(),
-	buildJurisdictionEu,
+	buildJurisdictionEuUk,
 	buildContact,
 ];
 

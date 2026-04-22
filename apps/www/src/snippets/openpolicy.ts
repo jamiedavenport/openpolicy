@@ -8,7 +8,7 @@ export default defineConfig({
 		contact: "privacy@acme.com",
 	},
 	effectiveDate: "2026-01-01",
-	jurisdictions: ["us"],
+	jurisdictions: ["us-ca"],
 	/* data-handling fields (dataCollected, legalBasis, retention, children) */
 	/* cookie fields (cookies, trackingTechnologies, consentMechanism) */
 });

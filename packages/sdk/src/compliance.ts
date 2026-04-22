@@ -5,7 +5,11 @@ export const Compliance = {
 		jurisdictions: ["eu"] as Jurisdiction[],
 		legalBasis: ["legitimate_interests"] as LegalBasis[],
 	},
+	UK_GDPR: {
+		jurisdictions: ["uk"] as Jurisdiction[],
+		legalBasis: ["legitimate_interests"] as LegalBasis[],
+	},
 	CCPA: {
-		jurisdictions: ["ca"] as Jurisdiction[],
+		jurisdictions: ["us-ca"] as Jurisdiction[],
 	},
 } as const;

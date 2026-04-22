@@ -28,14 +28,20 @@ All fields below live at the top level of `OpenPolicyConfig` (the object passed 
 
 ### Jurisdiction values
 
-| Value | Region |
-|---|---|
-| `"us"` | United States |
-| `"eu"` | European Union (triggers GDPR sections) |
-| `"ca"` | California, USA (triggers CCPA sections) |
-| `"au"` | Australia |
-| `"nz"` | New Zealand |
-| `"other"` | Other / unspecified |
+| Value | Region | Gated content in 0.1.0 |
+|---|---|---|
+| `"eu"` | European Union | GDPR sections |
+| `"uk"` | United Kingdom | UK-GDPR sections (ICO, DPA 2018) |
+| `"us-ca"` | California, USA | CCPA / CPRA sections |
+| `"us-va"` | Virginia, USA | Reserved (no content yet) |
+| `"us-co"` | Colorado, USA | Reserved (no content yet) |
+| `"br"` | Brazil | Reserved (no content yet) |
+| `"ca"` | Canada | Reserved (no content yet) |
+| `"au"` | Australia | Reserved (no content yet) |
+| `"jp"` | Japan | Reserved (no content yet) |
+| `"sg"` | Singapore | Reserved (no content yet) |
+
+There is no federal `"us"` code — use specific state codes like `"us-ca"`. See [Supported jurisdictions](https://docs.openpolicy.sh/references/jurisdictions) for the canonical list.
 
 ### User rights (auto-derived)
 
@@ -44,8 +50,9 @@ User rights are **not** a config field — they are derived from `jurisdictions`
 | Jurisdiction | Rights granted |
 |---|---|
 | `"eu"` (GDPR) | access, rectification, erasure, portability, restriction, objection |
-| `"ca"` (CCPA) | access, erasure, opt_out_sale, non_discrimination |
-| `"us"`, `"au"`, `"nz"`, `"other"` | ∅ (no baseline) |
+| `"uk"` (UK-GDPR) | access, rectification, erasure, portability, restriction, objection |
+| `"us-ca"` (CCPA) | access, erasure, opt_out_sale, non_discrimination |
+| Reserved codes (`"us-va"`, `"us-co"`, `"br"`, `"ca"`, `"au"`, `"jp"`, `"sg"`) | ∅ (no baseline yet) |
 
 When multiple jurisdictions are declared, the rights are unioned and rendered in a fixed canonical order.
 
@@ -96,14 +103,16 @@ Each entry is a `{ name: string; purpose: string; policyUrl: string }` safe to u
 | Preset | Expands to |
 |---|---|
 | `Compliance.GDPR` | `{ jurisdictions: ["eu"], legalBasis: ["legitimate_interests"] }` |
-| `Compliance.CCPA` | `{ jurisdictions: ["ca"] }` |
+| `Compliance.UK_GDPR` | `{ jurisdictions: ["uk"], legalBasis: ["legitimate_interests"] }` |
+| `Compliance.CCPA` | `{ jurisdictions: ["us-ca"] }` |
 
 ### Validation behavior
 
 - `effectiveDate` empty → fatal error
 - `company.*` fields empty → fatal error per field
 - `dataCollected` has zero keys → fatal error
-- `"eu"` in jurisdictions + no `legalBasis` → fatal error
+- `"eu"` or `"uk"` in jurisdictions + no `legalBasis` → fatal error
+- Any unknown jurisdiction code → fatal error (lists valid codes in message)
 - `children.underAge` ≤ 0 → fatal error
 
 Source: `packages/core/src/validate.ts`
@@ -121,7 +130,7 @@ All fields below live at the top level of `OpenPolicyConfig` (the object passed 
 | `jurisdictions` | `Jurisdiction[]` | Yes | Same values as the privacy policy. Shared at the top level. |
 | `thirdParties` | `{ name: string; purpose: string; policyUrl?: string }[]` | No | Use `Providers.*` presets. Shared with privacy policy. |
 | `trackingTechnologies` | `string[]` | No | e.g. `["cookies", "localStorage", "sessionStorage", "pixel"]` |
-| `consentMechanism` | `{ hasBanner: boolean; hasPreferencePanel: boolean; canWithdraw: boolean }` | No | Required when `"eu"` in jurisdictions for GDPR compliance. |
+| `consentMechanism` | `{ hasBanner: boolean; hasPreferencePanel: boolean; canWithdraw: boolean }` | No | Required when `"eu"` or `"uk"` is in jurisdictions (GDPR / UK-GDPR + PECR compliance). |
 
 ### CookiePolicyCookies shape
 
@@ -138,7 +147,7 @@ Example with custom categories:
 defineConfig({
   company: { /* ... */ },
   effectiveDate: "2026-01-01",
-  jurisdictions: ["eu", "us"],
+  jurisdictions: ["eu", "us-ca"],
   cookies: {
     essential: true,
     analytics: true,

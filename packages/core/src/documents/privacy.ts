@@ -69,14 +69,18 @@ function buildDataCollected(config: PrivacyPolicyConfig): DocumentSection {
 }
 
 function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
-	if (!config.jurisdictions.includes("eu")) return null;
+	if (
+		!config.jurisdictions.includes("eu") &&
+		!config.jurisdictions.includes("uk")
+	)
+		return null;
 	const bases = Array.isArray(config.legalBasis)
 		? config.legalBasis
 		: [config.legalBasis];
 	const labelled = bases.map((b) => LEGAL_BASIS_LABELS[b] ?? b);
 	return section("legal-basis", [
 		heading("Legal Basis for Processing", {
-			reason: "Required by GDPR Article 13",
+			reason: "Required by GDPR and UK-GDPR Article 13",
 		}),
 		p([labelled.join(" and ")]),
 	]);
@@ -179,10 +183,42 @@ function buildGdprSupplement(
 	]);
 }
 
+function buildUkGdprSupplement(
+	config: PrivacyPolicyConfig,
+): DocumentSection | null {
+	if (!config.jurisdictions.includes("uk")) return null;
+	return section("uk-gdpr-supplement", [
+		heading("UK Privacy Rights (UK-GDPR)", {
+			reason: "Required by the UK-GDPR and Data Protection Act 2018",
+		}),
+		p([
+			"This section applies to individuals in the United Kingdom under the UK General Data Protection Regulation (UK-GDPR), as tailored by the Data Protection Act 2018.",
+		]),
+		p([
+			"Data Controller: ",
+			bold(config.company.legalName),
+			`, ${config.company.address}`,
+		]),
+		p([
+			"The supervisory authority for data protection in the UK is the ",
+			bold("Information Commissioner's Office (ICO)"),
+			". If you believe we have not handled your data in accordance with UK data protection law, you have the right to lodge a complaint with the ICO at ",
+			link(
+				"https://ico.org.uk/make-a-complaint/",
+				"ico.org.uk/make-a-complaint",
+			),
+			".",
+		]),
+		p([
+			"If we transfer your personal data outside the United Kingdom, we ensure appropriate safeguards are in place in accordance with the UK-GDPR, including the UK International Data Transfer Agreement or the UK Addendum to the EU Standard Contractual Clauses where applicable.",
+		]),
+	]);
+}
+
 function buildCcpaSupplement(
 	config: PrivacyPolicyConfig,
 ): DocumentSection | null {
-	if (!config.jurisdictions.includes("ca")) return null;
+	if (!config.jurisdictions.includes("us-ca")) return null;
 	return section("ccpa-supplement", [
 		heading("California Privacy Rights (CCPA)", { reason: "Required by CCPA" }),
 		p([
@@ -229,6 +265,7 @@ const SECTION_BUILDERS: ((
 	buildThirdParties,
 	buildUserRights,
 	buildGdprSupplement,
+	buildUkGdprSupplement,
 	buildCcpaSupplement,
 	buildContact,
 ];

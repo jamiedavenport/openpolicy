@@ -33,7 +33,7 @@ export default defineConfig({
     contact: "privacy@acme.com",
   },
   effectiveDate: "2026-01-01",
-  jurisdictions: ["us", "eu"],
+  jurisdictions: ["eu", "us-ca"],
   dataCollected: {
     "Account Information": ["Name", "Email address"],
     "Usage Data": ["Pages visited", "IP address"],
@@ -47,7 +47,7 @@ export default defineConfig({
 
 The `company` block is required and shared across all policy types. All other fields live at the top level: `effectiveDate` and `jurisdictions` are shared, and OpenPolicy auto-detects which policies to generate from the fields you provide — include privacy-specific fields (like `dataCollected`, `legalBasis`, `retention`) for a privacy policy, and cookie-specific fields (like `cookies`, `consentMechanism`) for a cookie policy.
 
-The user rights you're legally required to disclose (access, erasure, portability, etc.) are derived automatically from `jurisdictions` — declare `eu` and you get the six GDPR rights, declare `ca` and you get the four CCPA rights, declare both and you get the union. There's no `userRights` field to set.
+The user rights you're legally required to disclose (access, erasure, portability, etc.) are derived automatically from `jurisdictions` — declare `eu` or `uk` and you get the six GDPR rights, declare `us-ca` and you get the four CCPA rights, declare any combination and you get the union. There's no `userRights` field to set. See [Supported jurisdictions](/references/jurisdictions) for the full list of codes.
 
 ## Using AI
 

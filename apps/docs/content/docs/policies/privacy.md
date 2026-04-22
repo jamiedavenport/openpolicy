@@ -10,7 +10,7 @@ Add privacy fields to your config — the privacy policy is auto-detected from t
 ```ts
 // openpolicy.ts
 effectiveDate: "2026-01-01",
-jurisdictions: ["us", "eu"],
+jurisdictions: ["eu", "us-ca"],
 dataCollected: {
   "Account Information": ["Name", "Email address"],
   "Usage Data": ["Pages visited", "IP address"],

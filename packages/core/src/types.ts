@@ -4,7 +4,17 @@ export type CompileOptions = { formats: OutputFormat[] };
 
 export type PolicyCategory = "privacy" | "cookie";
 
-export type Jurisdiction = "us" | "eu" | "ca" | "au" | "nz" | "other";
+export type Jurisdiction =
+	| "eu" //    European Union — GDPR
+	| "uk" //    United Kingdom — UK-GDPR + Data Protection Act 2018
+	| "us-ca" // California, USA — CCPA / CPRA
+	| "us-va" // Virginia, USA — VCDPA (reserved; no gated content in 0.1.0)
+	| "us-co" // Colorado, USA — CPA (reserved; no gated content in 0.1.0)
+	| "br" //    Brazil — LGPD (reserved; no gated content in 0.1.0)
+	| "ca" //    Canada — PIPEDA (reserved; no gated content in 0.1.0)
+	| "au" //    Australia — Privacy Act 1988 (reserved; no gated content in 0.1.0)
+	| "jp" //    Japan — APPI (reserved; no gated content in 0.1.0)
+	| "sg"; //   Singapore — PDPA (reserved; no gated content in 0.1.0)
 
 export type UserRight =
 	| "access"

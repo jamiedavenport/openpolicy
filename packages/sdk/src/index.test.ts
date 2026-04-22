@@ -10,7 +10,7 @@ const fixture: OpenPolicyConfig = {
 		contact: "privacy@acme.com",
 	},
 	effectiveDate: "2026-01-01",
-	jurisdictions: ["us"],
+	jurisdictions: ["ca"],
 	dataCollected: { "Account Information": ["Name", "Email"] },
 	legalBasis: "legitimate_interests",
 	retention: { "Account data": "Until deletion" },

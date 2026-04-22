@@ -145,7 +145,7 @@ import { defineConfig, dataCollected } from "@openpolicy/sdk";
 export default defineConfig({
   company: { /* ... */ },
   effectiveDate: "2026-01-01",
-  jurisdictions: ["eu", "us"],
+  jurisdictions: ["eu", "us-ca"],
   legalBasis: "legitimate_interests",
   dataCollected: {
     ...dataCollected,                              // auto-collected at build time

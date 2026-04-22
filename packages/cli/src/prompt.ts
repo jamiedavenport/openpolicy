@@ -6,7 +6,7 @@ SDK reference: https://docs.openpolicy.sh/llms.txt
 Your output should capture:
 - Every category of data collected and why
 - All third-party services integrated and their purpose
-- The applicable jurisdiction (US, EU, UK, etc.)
+- The applicable jurisdictions as region codes (e.g. "eu", "uk", "us-ca" — see https://docs.openpolicy.sh/references/jurisdictions)
 - Legal basis for processing
 - User rights supported
 - Cookie usage (essential, analytics, marketing) and consent categories

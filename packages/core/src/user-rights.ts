@@ -1,17 +1,20 @@
 import type { Jurisdiction, UserRight } from "./types";
 
+const GDPR_RIGHTS: readonly UserRight[] = [
+	"access",
+	"rectification",
+	"erasure",
+	"portability",
+	"restriction",
+	"objection",
+];
+
 const RIGHTS_BY_JURISDICTION: Partial<
 	Record<Jurisdiction, readonly UserRight[]>
 > = {
-	eu: [
-		"access",
-		"rectification",
-		"erasure",
-		"portability",
-		"restriction",
-		"objection",
-	],
-	ca: ["access", "erasure", "opt_out_sale", "non_discrimination"],
+	eu: GDPR_RIGHTS,
+	uk: GDPR_RIGHTS,
+	"us-ca": ["access", "erasure", "opt_out_sale", "non_discrimination"],
 };
 
 const CANONICAL_ORDER: readonly UserRight[] = [

@@ -63,7 +63,7 @@ export const thirdParties: {
  * export default defineConfig({
  *   company: { ... },
  *   effectiveDate: "2026-01-01",
- *   jurisdictions: ["us", "eu"],
+ *   jurisdictions: ["eu", "us-ca"],
  *   cookies,
  * });
  * ```
