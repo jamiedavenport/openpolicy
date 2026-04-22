@@ -3,7 +3,7 @@ import { defineConfig } from "@openpolicy/sdk";
 export default defineConfig({
 	company: {
 		name: "OpenPolicy",
-		legalName: "JXD Ltd",
+		legalName: "PolicyStack Ltd",
 		address: "86-90 Paul Street, London, EC2A 4NE, United Kingdom",
 		contact: "jamie@openpolicy.sh",
 	},
