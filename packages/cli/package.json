@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/cli",
-	"version": "0.0.23",
+	"version": "0.0.24",
 	"type": "module",
 	"description": "CLI to install OpenPolicy and print a setup prompt for coding agents",
 	"license": "GPL-3.0-only",

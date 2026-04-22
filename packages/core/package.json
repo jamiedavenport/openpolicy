@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/core",
-	"version": "0.0.23",
+	"version": "0.0.24",
 	"type": "module",
 	"description": "Core package for OpenPolicy",
 	"license": "GPL-3.0-only",
