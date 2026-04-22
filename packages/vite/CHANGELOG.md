@@ -1,5 +1,7 @@
 # @openpolicy/vite
 
+## 0.0.25
+
 ## 0.0.24
 
 ### Patch Changes
