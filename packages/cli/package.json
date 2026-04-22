@@ -14,12 +14,7 @@
 		"README.md"
 	],
 	"bin": {
-		"openpolicy": "./src/cli.ts"
-	},
-	"publishConfig": {
-		"bin": {
-			"openpolicy": "./dist/cli.js"
-		}
+		"openpolicy": "./dist/cli.js"
 	},
 	"scripts": {
 		"dev": "rolldown -c --watch",
@@ -27,11 +22,9 @@
 		"check-types": "tsc --noEmit",
 		"test": "bun test"
 	},
-	"dependencies": {
+	"devDependencies": {
+		"@openpolicy/tooling": "workspace:*",
 		"citty": "^0.1.6",
 		"consola": "^3.4.2"
-	},
-	"devDependencies": {
-		"@openpolicy/tooling": "workspace:*"
 	}
 }

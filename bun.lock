@@ -184,14 +184,12 @@
       "name": "@openpolicy/cli",
       "version": "0.0.24",
       "bin": {
-        "openpolicy": "./src/cli.ts",
-      },
-      "dependencies": {
-        "citty": "^0.1.6",
-        "consola": "^3.4.2",
+        "openpolicy": "./dist/cli.js",
       },
       "devDependencies": {
         "@openpolicy/tooling": "workspace:*",
+        "citty": "^0.1.6",
+        "consola": "^3.4.2",
       },
     },
     "packages/core": {
