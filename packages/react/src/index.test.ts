@@ -20,7 +20,7 @@ const privacyConfig: PrivacyPolicyConfig = {
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
 	userRights: ["access", "erasure"],
-	jurisdictions: ["us"],
+	jurisdictions: ["ca"],
 };
 
 test("renderDocument returns a React element", () => {

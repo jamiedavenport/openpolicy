@@ -42,7 +42,7 @@ Add cookie fields to your `openpolicy.ts` — the cookie policy is auto-detected
 
 ```ts
 effectiveDate: "2026-01-01",
-jurisdictions: ["us", "eu"],
+jurisdictions: ["eu", "us-ca"],
 cookies: {
   essential: true,
   analytics: true,

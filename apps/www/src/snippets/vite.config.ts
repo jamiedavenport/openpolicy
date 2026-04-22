@@ -1,6 +1,6 @@
-import { autoCollect } from "@openpolicy/vite-auto-collect";
+import { openPolicy } from "@openpolicy/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-	plugins: [autoCollect()],
+	plugins: [openPolicy()],
 });

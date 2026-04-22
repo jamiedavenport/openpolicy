@@ -1,4 +1,9 @@
-import { dataCollected, defineConfig, thirdParties } from "@openpolicy/sdk";
+import {
+	cookies,
+	dataCollected,
+	defineConfig,
+	thirdParties,
+} from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -8,7 +13,7 @@ export default defineConfig({
 		contact: "privacy@acme.com",
 	},
 	effectiveDate: "2026-03-03",
-	jurisdictions: ["us", "eu"],
+	jurisdictions: ["eu", "us-ca"],
 	dataCollected: {
 		...dataCollected,
 		"Usage Data": ["Pages visited", "Browser type", "IP address"],
@@ -18,12 +23,7 @@ export default defineConfig({
 		"Account data": "Until account deletion",
 		"Usage logs": "90 days",
 	},
-	cookies: {
-		essential: true,
-		analytics: true,
-		functional: false,
-		marketing: false,
-	},
+	cookies,
 	thirdParties,
 	trackingTechnologies: ["web beacons", "local storage"],
 	consentMechanism: {

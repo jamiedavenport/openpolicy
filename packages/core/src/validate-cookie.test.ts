@@ -17,7 +17,7 @@ const validConfig: CookiePolicyConfig = {
 		marketing: false,
 	},
 	thirdParties: [],
-	jurisdictions: ["us"],
+	jurisdictions: ["ca"],
 	consentMechanism: {
 		hasBanner: true,
 		hasPreferencePanel: true,
@@ -127,4 +127,19 @@ test("eu jurisdiction with canWithdraw true has no gdpr warning", () => {
 	expect(
 		issues.some((i) => i.level === "warning" && i.message.includes("withdraw")),
 	).toBe(false);
+});
+
+test("uk jurisdiction with canWithdraw false is a warning (UK-GDPR parity)", () => {
+	const issues = validateCookiePolicy({
+		...validConfig,
+		jurisdictions: ["uk"],
+		consentMechanism: {
+			hasBanner: true,
+			hasPreferencePanel: true,
+			canWithdraw: false,
+		},
+	});
+	expect(
+		issues.some((i) => i.level === "warning" && i.message.includes("withdraw")),
+	).toBe(true);
 });

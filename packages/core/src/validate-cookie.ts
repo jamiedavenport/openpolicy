@@ -35,16 +35,17 @@ export function validateCookiePolicy(
 		});
 	}
 
-	// GDPR consent withdrawal check
+	// GDPR / UK-GDPR consent withdrawal check
 	if (
-		config.jurisdictions.includes("eu") &&
+		(config.jurisdictions.includes("eu") ||
+			config.jurisdictions.includes("uk")) &&
 		config.consentMechanism &&
 		!config.consentMechanism.canWithdraw
 	) {
 		issues.push({
 			level: "warning",
 			message:
-				"GDPR requires that users can withdraw cookie consent — consider setting consentMechanism.canWithdraw to true",
+				"GDPR and UK-GDPR require that users can withdraw cookie consent — consider setting consentMechanism.canWithdraw to true",
 		});
 	}
 

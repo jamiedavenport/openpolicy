@@ -344,3 +344,200 @@ test("collecting and thirdParty can coexist in the same file", () => {
 		},
 	]);
 });
+
+// ---------------------------------------------------------------------------
+// cookie detection tests
+// ---------------------------------------------------------------------------
+
+test("defineCookie: string literal category is collected", () => {
+	const code = `
+		import { defineCookie } from "@openpolicy/sdk";
+		defineCookie("analytics");
+	`;
+	expect(extractFromFile("a.ts", code).cookies).toEqual(["analytics"]);
+});
+
+test("defineCookie: multiple distinct categories collected in insertion order", () => {
+	const code = `
+		import { defineCookie } from "@openpolicy/sdk";
+		defineCookie("analytics");
+		defineCookie("marketing");
+	`;
+	expect(extractFromFile("a.ts", code).cookies).toEqual([
+		"analytics",
+		"marketing",
+	]);
+});
+
+test("defineCookie: duplicate categories deduped", () => {
+	const code = `
+		import { defineCookie } from "@openpolicy/sdk";
+		defineCookie("analytics");
+		defineCookie("analytics");
+	`;
+	expect(extractFromFile("a.ts", code).cookies).toEqual(["analytics"]);
+});
+
+test("defineCookie: renamed import recognised", () => {
+	const code = `
+		import { defineCookie as dc } from "@openpolicy/sdk";
+		dc("functional");
+	`;
+	expect(extractFromFile("a.ts", code).cookies).toEqual(["functional"]);
+});
+
+test("defineCookie: ignored if imported from non-SDK module", () => {
+	const code = `
+		import { defineCookie } from "./local-define-cookie";
+		defineCookie("analytics");
+	`;
+	expect(extractFromFile("a.ts", code).cookies).toEqual([]);
+});
+
+test("defineCookie: ignored for type-only imports", () => {
+	const code = `
+		import type { defineCookie } from "@openpolicy/sdk";
+		defineCookie("analytics");
+	`;
+	expect(extractFromFile("a.ts", code).cookies).toEqual([]);
+});
+
+test("defineCookie: non-literal argument skipped silently", () => {
+	const code = `
+		import { defineCookie } from "@openpolicy/sdk";
+		const cat = "analytics";
+		defineCookie(cat);
+	`;
+	expect(extractFromFile("a.ts", code).cookies).toEqual([]);
+});
+
+test("ConsentGate: requires='analytics' JSX prop collected", () => {
+	const code = `
+		import { ConsentGate } from "@openpolicy/react";
+		export function X() {
+			return <ConsentGate requires="analytics">hi</ConsentGate>;
+		}
+	`;
+	expect(extractFromFile("a.tsx", code).cookies).toEqual(["analytics"]);
+});
+
+test("ConsentGate: requires={{ or: [...] }} expression flattened", () => {
+	const code = `
+		import { ConsentGate } from "@openpolicy/react";
+		export function X() {
+			return <ConsentGate requires={{ or: ["analytics", "marketing"] }}>hi</ConsentGate>;
+		}
+	`;
+	expect(extractFromFile("a.tsx", code).cookies.sort()).toEqual([
+		"analytics",
+		"marketing",
+	]);
+});
+
+test("ConsentGate: requires={{ and: [...] }} expression flattened", () => {
+	const code = `
+		import { ConsentGate } from "@openpolicy/react";
+		export function X() {
+			return <ConsentGate requires={{ and: ["analytics", "functional"] }}>hi</ConsentGate>;
+		}
+	`;
+	expect(extractFromFile("a.tsx", code).cookies.sort()).toEqual([
+		"analytics",
+		"functional",
+	]);
+});
+
+test("ConsentGate: requires={{ not: 'marketing' }} expression flattened", () => {
+	const code = `
+		import { ConsentGate } from "@openpolicy/react";
+		export function X() {
+			return <ConsentGate requires={{ not: "marketing" }}>hi</ConsentGate>;
+		}
+	`;
+	expect(extractFromFile("a.tsx", code).cookies).toEqual(["marketing"]);
+});
+
+test("ConsentGate: ignored if imported from non-React module", () => {
+	const code = `
+		import { ConsentGate } from "./local-gate";
+		export function X() {
+			return <ConsentGate requires="analytics">hi</ConsentGate>;
+		}
+	`;
+	expect(extractFromFile("a.tsx", code).cookies).toEqual([]);
+});
+
+test("useCookies().has: string literal category collected", () => {
+	const code = `
+		import { useCookies } from "@openpolicy/react";
+		export function X() {
+			const ok = useCookies().has("analytics");
+			return ok ? 1 : 0;
+		}
+	`;
+	expect(extractFromFile("a.ts", code).cookies).toEqual(["analytics"]);
+});
+
+test("useCookies().has: nested { or: [...] } expression flattened", () => {
+	const code = `
+		import { useCookies } from "@openpolicy/react";
+		export function X() {
+			return useCookies().has({ or: ["analytics", "marketing"] });
+		}
+	`;
+	expect(extractFromFile("a.ts", code).cookies.sort()).toEqual([
+		"analytics",
+		"marketing",
+	]);
+});
+
+test("useCookies().has: deeply nested expression flattened", () => {
+	const code = `
+		import { useCookies } from "@openpolicy/react";
+		export function X() {
+			return useCookies().has({ and: [{ or: ["analytics", "functional"] }, "marketing"] });
+		}
+	`;
+	expect(extractFromFile("a.ts", code).cookies.sort()).toEqual([
+		"analytics",
+		"functional",
+		"marketing",
+	]);
+});
+
+test("useCookies().has: renamed import recognised", () => {
+	const code = `
+		import { useCookies as uc } from "@openpolicy/react";
+		export function X() {
+			return uc().has("analytics");
+		}
+	`;
+	expect(extractFromFile("a.ts", code).cookies).toEqual(["analytics"]);
+});
+
+test("useCookies().has: ignored if useCookies imported from non-React module", () => {
+	const code = `
+		import { useCookies } from "./local-hook";
+		export function X() {
+			return useCookies().has("analytics");
+		}
+	`;
+	expect(extractFromFile("a.ts", code).cookies).toEqual([]);
+});
+
+test("cookies + collecting + thirdParty coexist in one file", () => {
+	const code = `
+		import { collecting, thirdParty, defineCookie } from "@openpolicy/sdk";
+		import { ConsentGate } from "@openpolicy/react";
+		collecting("Account Information", v, { name: "Name" });
+		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
+		defineCookie("analytics");
+		export function X() {
+			return <ConsentGate requires="marketing">hi</ConsentGate>;
+		}
+	`;
+	const result = extractFromFile("a.tsx", code);
+	expect(result.dataCollected).toEqual({ "Account Information": ["Name"] });
+	expect(result.thirdParties).toHaveLength(1);
+	expect(result.cookies.sort()).toEqual(["analytics", "marketing"]);
+});

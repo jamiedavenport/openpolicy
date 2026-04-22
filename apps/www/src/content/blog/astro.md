@@ -1,44 +1,19 @@
 ---
 title: "Ship a Privacy Policy with Your Astro Site"
-description: "Use the OpenPolicy Astro integration to generate a legally-structured privacy policy at build time — no Google Docs, no copy-paste."
+description: "Define your privacy policy as TypeScript and render it directly in an Astro page — no integration, no generated files."
 pubDate: 2026-03-05
 author: "OpenPolicy Team"
 ---
 
 Most Astro sites need a privacy policy before they launch. The usual approach: grab a template from the internet, paste it into a static page, and forget about it until a lawyer asks why it still says "Company Name Here."
 
-OpenPolicy treats your policies like code. You define them as TypeScript objects, and the Astro integration compiles them to Markdown at build time — in sync with every deploy.
+OpenPolicy treats your policies like code. You define them as TypeScript objects and render them directly in an Astro page's frontmatter — in sync with every deploy.
 
 ## Install
 
 ```sh
-npx astro add @openpolicy/astro
-bun add @openpolicy/sdk
+bun add @openpolicy/sdk @openpolicy/core @openpolicy/renderers
 ```
-
-`astro add` installs the package and automatically updates `astro.config.mjs`. If you prefer to wire it up manually:
-
-```sh
-bun add -D @openpolicy/astro @openpolicy/vite
-```
-
-## Add the integration to `astro.config.mjs`
-
-```js
-import { defineConfig } from "astro/config";
-import { openPolicy } from "@openpolicy/astro";
-
-export default defineConfig({
-  integrations: [
-    openPolicy({
-      formats: ["markdown"],
-      outDir: "src/generated/policies",
-    }),
-  ],
-});
-```
-
-On the first `bun run dev`, if the config file doesn't exist yet, the plugin scaffolds it automatically. Edit the generated file and save — the plugin watches for changes and regenerates.
 
 ## Define your policies
 
@@ -56,7 +31,7 @@ export default defineConfig({
     contact: "privacy@acme.com",
   },
   effectiveDate: "2026-03-05",
-  jurisdictions: ["us", "eu"],
+  jurisdictions: ["eu", "us-ca"],
   dataCollected: {
     "Account information": ["Email address", "Display name"],
     "Usage data": ["Pages visited", "Session duration"],
@@ -78,37 +53,26 @@ export default defineConfig({
 });
 ```
 
-## What gets generated
-
-After the next build (or on save in dev), the plugin writes:
-
-```
-src/generated/policies/
-  privacy-policy.md
-```
-
-Because the files land inside `src/`, Astro can import them directly as Markdown components.
-
 ## Render on a dedicated page
 
 ```astro
 ---
 // src/pages/privacy.astro
-import { Content } from "../../generated/policies/privacy-policy.md";
+import { compile, expandOpenPolicyConfig } from "@openpolicy/core";
+import { renderHTML } from "@openpolicy/renderers";
+import openpolicy from "../../openpolicy";
+
+const policies = expandOpenPolicyConfig(openpolicy);
+const privacyPolicy = policies.find((p) => p.type === "privacy");
+if (!privacyPolicy) throw new Error("Privacy policy not found");
+
+const html = renderHTML(compile(privacyPolicy));
 ---
-<div class="prose prose-gray max-w-none">
-  <Content />
-</div>
+
+<div class="prose prose-gray max-w-none" set:html={html} />
 ```
 
-Astro compiles the Markdown to HTML at build time, so there's no client-side rendering overhead. The `prose` class (from Tailwind Typography) handles all the heading, list, and paragraph styles.
-
-Add `.gitignore` entries so the generated files aren't checked in:
-
-```
-# .gitignore
-src/generated/
-```
+Astro evaluates the frontmatter at build time, so there's no client-side rendering overhead. The `prose` class (from Tailwind Typography) handles all the heading, list, and paragraph styles.
 
 ## Why this is better than a static page
 
@@ -117,4 +81,4 @@ src/generated/
 - **Version-controlled.** The config lives in your repo. `git blame` shows you when and why anything changed.
 - **Jurisdiction-aware.** Set `jurisdictions: ["eu"]` and GDPR-required sections (right to erasure, data transfers, DPA contact) are included automatically.
 
-The generated Markdown includes all required sections for the jurisdictions you specify. You own the config; OpenPolicy handles the legal structure.
+The compiled policy includes all required sections for the jurisdictions you specify. You own the config; OpenPolicy handles the legal structure.

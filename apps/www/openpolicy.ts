@@ -8,7 +8,7 @@ export default defineConfig({
 		contact: "jamie@openpolicy.sh",
 	},
 	effectiveDate: "2026-03-03",
-	jurisdictions: ["us", "eu"],
+	jurisdictions: ["eu", "uk", "us-ca"],
 	dataCollected: {
 		"Account Information": ["Name", "Email address"],
 		"Session Data": ["IP address", "User agent"],

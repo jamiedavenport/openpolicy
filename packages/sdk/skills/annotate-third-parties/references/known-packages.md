@@ -1,6 +1,6 @@
 # Known Packages Registry
 
-These npm package names are auto-detected when `usePackageJson: true` is set in `autoCollect()`. The plugin reads `dependencies` and `devDependencies` from the project root `package.json` and matches entries against this registry. Multiple package names can map to the same service — deduplication is by service name, first match wins.
+These npm package names are auto-detected when `usePackageJson: true` is set in `openPolicy()`. The plugin reads `dependencies` and `devDependencies` from the project root `package.json` and matches entries against this registry. Multiple package names can map to the same service — deduplication is by service name, first match wins.
 
 | npm package | Service name | Purpose |
 |---|---|---|
@@ -34,4 +34,4 @@ These npm package names are auto-detected when `usePackageJson: true` is set in 
 
 For services not listed here, use `thirdParty()` source annotations or the `Providers` preset constants from `@openpolicy/sdk`. See the main skill file for examples.
 
-The registry source is at `packages/vite-auto-collect/src/known-packages.ts`.
+The registry source is at `packages/vite/src/known-packages.ts`.

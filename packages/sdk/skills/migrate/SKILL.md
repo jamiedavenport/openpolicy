@@ -129,7 +129,7 @@ dataCollected: {
 },
 ```
 
-Always spread `dataCollected` first so the autoCollect plugin's output is included alongside the explicit entries.
+Always spread `dataCollected` first so the `openPolicy()` Vite plugin's output is included alongside the explicit entries.
 
 ### 2. Mapping jurisdiction and legal basis from GDPR/CCPA language
 
@@ -138,9 +138,10 @@ Scan the existing policy for jurisdiction signals:
 | Prose signal | Maps to |
 |---|---|
 | "GDPR", "EU", "EEA", "European" | `jurisdictions: ["eu"]` |
-| "CCPA", "California", "California residents" | `jurisdictions: ["ca"]` |
+| "UK-GDPR", "UK", "United Kingdom", "ICO", "British" | `jurisdictions: ["uk"]` |
+| "CCPA", "CPRA", "California", "California residents" | `jurisdictions: ["us-ca"]` |
 | "Australian Privacy Act" | `jurisdictions: ["au"]` |
-| No specific regulation cited | `jurisdictions: ["us"]` |
+| No specific regulation cited | Pick the specific region(s) where the business operates — there is no federal `"us"` code. See [Supported jurisdictions](https://docs.openpolicy.sh/references/jurisdictions). |
 
 For legal basis (GDPR policies only), map the stated basis:
 

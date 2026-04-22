@@ -24,7 +24,6 @@ src/routes/index.tsx          ← "/" — placeholder
 src/routes/tailwind.tsx       ← "/tailwind" — policies styled with Tailwind classes
 src/routes/css-vars.tsx       ← "/css-vars" — policies styled with CSS custom properties
 src/routes/shadcn.tsx         ← "/shadcn" — policies with custom Heading + shadcn Tooltip
-src/policies/                 ← generated HTML output (build artifact)
 src/components/ui/tooltip.tsx ← Radix UI Tooltip wrapper
 ```
 
@@ -32,7 +31,7 @@ src/components/ui/tooltip.tsx ← Radix UI Tooltip wrapper
 
 ```sh
 bun install
-bun run dev      # start dev server on http://localhost:3000 — policies are generated on startup
+bun run dev      # start dev server on http://localhost:3000
 bun run build    # production build
 ```
 

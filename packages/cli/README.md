@@ -1,64 +1,43 @@
 # `@openpolicy/cli`
 
-> CLI for generating and validating [OpenPolicy](https://openpolicy.sh) policy documents.
+> Install [OpenPolicy](https://openpolicy.sh) into your project and print a setup prompt for your coding agent.
 
-Compile privacy and cookie policies to Markdown, HTML, or PDF from the command line — no Vite or Astro required.
+One command installs `@openpolicy/sdk` plus the right framework integration for your stack (Vite / React / Vue), writes an `openpolicy.ts` stub, and prints a prompt you can paste into Claude Code, Cursor, or any other coding agent to finish setup by reading your codebase.
 
-## Install
+## Usage
 
-```sh
-bun add -D @openpolicy/cli
-bun add @openpolicy/sdk
-# or: npm install --save-dev @openpolicy/cli @openpolicy/sdk
-```
-
-Or run without installing:
+From the root of your project:
 
 ```sh
-bunx @openpolicy/cli --help
+bunx @openpolicy/cli init
+# or: npx @openpolicy/cli init
+# or: pnpm dlx @openpolicy/cli init
 ```
 
-## Commands
+That's it — the CLI detects your package manager from lockfiles, installs the right packages, scaffolds `src/openpolicy.ts` (or `openpolicy.ts` if you don't have a `src/` directory), and prints the agent prompt.
 
-### `init` — interactive setup wizard
-
-Creates a starter config file with placeholder content:
-
-```sh
-openpolicy init
-```
-
-### `generate` — compile a policy
-
-```sh
-openpolicy generate ./privacy.config.ts --format markdown,html --out ./public/policies
-openpolicy generate ./cookie.config.ts  --format markdown      --out ./public/policies
-```
+### Flags
 
 | Flag | Default | Description |
 |---|---|---|
-| `--format` | `markdown` | Comma-separated output formats: `markdown`, `html`, `pdf` |
-| `--out` | `./public/policies` | Output directory |
-| `--type` | auto-detected | Override policy type: `privacy` or `cookie` |
-| `--watch` | `false` | Watch config files and regenerate on changes |
+| `--cwd <path>` | `.` | Working directory |
+| `--pm <bun\|pnpm\|yarn\|npm>` | auto-detected | Override package-manager detection |
+| `--skip-install` | `false` | Print the prompt only; don't install packages |
+| `--dry-run` | `false` | Show planned actions without executing |
+| `--yes`, `-y` | `false` | Skip the confirmation prompt |
+| `--out <path>` | `src/openpolicy.ts` or `openpolicy.ts` | Output path for the stub |
+| `--force` | `false` | Overwrite an existing stub |
 
-Policy type is auto-detected from the filename — files containing `"cookie"` compile as cookie policies.
+## What gets installed
 
-### `validate` — check a policy config
-
-```sh
-openpolicy validate ./privacy.config.ts
-openpolicy validate ./privacy.config.ts --jurisdiction gdpr
-```
-
-| Flag | Default | Description |
-|---|---|---|
-| `--jurisdiction` | `all` | Validate against: `gdpr`, `ccpa`, or `all` |
-| `--type` | auto-detected | Override policy type: `privacy` or `cookie` |
+- `@openpolicy/sdk` — always
+- `@openpolicy/vite` (dev) — if `vite` is in your `package.json`
+- `@openpolicy/react` — if `react` is in your `package.json`
+- `@openpolicy/vue` — if `vue` is in your `package.json`
 
 ## Documentation
 
-[openpolicy.sh/docs/getting-started/cli](https://openpolicy.sh/docs/getting-started/cli)
+[docs.openpolicy.sh](https://docs.openpolicy.sh)
 
 ## Links
 

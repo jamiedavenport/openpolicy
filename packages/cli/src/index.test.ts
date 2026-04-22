@@ -16,14 +16,8 @@ test("mainCommand has init subcommand", () => {
 	);
 });
 
-test("mainCommand has generate subcommand", () => {
-	expect(typeof (mainCommand.subCommands as SubCommandsDef)?.generate).toBe(
-		"function",
-	);
-});
-
-test("mainCommand has validate subcommand", () => {
-	expect(typeof (mainCommand.subCommands as SubCommandsDef)?.validate).toBe(
-		"function",
-	);
+test("mainCommand no longer exposes generate/validate", () => {
+	const subs = mainCommand.subCommands as SubCommandsDef;
+	expect(subs?.generate).toBeUndefined();
+	expect(subs?.validate).toBeUndefined();
 });

@@ -47,7 +47,7 @@ export default defineConfig({
     // ...
   },
   effectiveDate: "2026-04-01",
-  jurisdictions: ["us", "eu"],
+  jurisdictions: ["eu", "us-ca"],
   // Privacy policy fields — auto-detected from field presence
   dataCollected: { /* ... */ },
   // ...

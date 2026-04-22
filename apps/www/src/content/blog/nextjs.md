@@ -32,7 +32,7 @@ export default defineConfig({
     contact: "privacy@acme.com",
   },
   effectiveDate: "2026-03-09",
-  jurisdictions: ["us", "eu"],
+  jurisdictions: ["eu", "us-ca"],
   dataCollected: {
     "Account information": ["Email address", "Display name"],
     "Usage data": ["Pages visited", "Session duration"],

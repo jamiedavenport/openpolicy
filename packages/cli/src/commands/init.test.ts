@@ -1,56 +1,74 @@
-import { expect, test } from "bun:test";
+import { afterAll, afterEach, beforeEach, expect, test } from "bun:test";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import type { ArgsDef, CommandMeta } from "citty";
-import { getOpenPolicyTemplate, initCommand } from "./init";
+import { initCommand, runInit } from "./init";
+
+let dir: string;
+let prevExitCode: typeof process.exitCode;
+
+beforeEach(() => {
+	dir = mkdtempSync(join(tmpdir(), "op-init-"));
+	prevExitCode = process.exitCode;
+	process.exitCode = undefined;
+});
+
+afterEach(() => {
+	rmSync(dir, { recursive: true, force: true });
+	process.exitCode = prevExitCode;
+});
+
+afterAll(() => {
+	process.exitCode = 0;
+});
 
 test("initCommand has correct name", () => {
 	expect((initCommand.meta as CommandMeta)?.name).toBe("init");
 });
 
-test("initCommand has out arg", () => {
-	expect((initCommand.args as ArgsDef)?.out?.type).toBe("string");
+test("initCommand exposes expected args", () => {
+	const args = initCommand.args as ArgsDef;
+	expect(args?.cwd?.type).toBe("string");
+	expect(args?.pm?.type).toBe("string");
+	expect(args?.["skip-install"]?.type).toBe("boolean");
+	expect(args?.["dry-run"]?.type).toBe("boolean");
+	expect(args?.yes?.type).toBe("boolean");
+	expect(args?.out?.type).toBe("string");
+	expect(args?.force?.type).toBe("boolean");
 });
 
-test("template includes defineConfig import", () => {
-	const output = getOpenPolicyTemplate("Acme", "hi@acme.com", ["privacy"]);
-	expect(output).toContain('import { defineConfig } from "@openpolicy/sdk"');
-	expect(output).toContain("export default defineConfig(");
+test("runInit sets exit code 1 when no package.json", async () => {
+	await runInit({
+		cwd: dir,
+		skipInstall: true,
+		dryRun: true,
+		yes: true,
+		force: false,
+	});
+	expect(process.exitCode).toBe(1);
 });
 
-test("template includes company fields", () => {
-	const output = getOpenPolicyTemplate("Acme Inc", "legal@acme.com", [
-		"privacy",
-	]);
-	expect(output).toContain('name: "Acme Inc"');
-	expect(output).toContain('contact: "legal@acme.com"');
+test("runInit dry-run with skip-install writes no files", async () => {
+	writeFileSync(join(dir, "package.json"), JSON.stringify({ name: "scratch" }));
+	await runInit({
+		cwd: dir,
+		skipInstall: true,
+		dryRun: true,
+		yes: true,
+		force: false,
+	});
+	expect(existsSync(join(dir, "openpolicy.ts"))).toBe(false);
 });
 
-test("template includes privacy fields when privacy selected", () => {
-	const output = getOpenPolicyTemplate("Acme", "hi@acme.com", ["privacy"]);
-	expect(output).toContain("dataCollected:");
-	expect(output).toContain("legalBasis:");
-	expect(output).not.toContain("cookies:");
-	expect(output).not.toContain("userRights:");
-});
-
-test("template includes cookies field when cookie selected", () => {
-	const output = getOpenPolicyTemplate("Widgets Co", "hi@widgets.co", [
-		"cookie",
-	]);
-	expect(output).toContain("cookies:");
-	expect(output).not.toContain("dataCollected:");
-});
-
-test("template includes all fields when both selected", () => {
-	const output = getOpenPolicyTemplate("Acme", "hi@acme.com", [
-		"privacy",
-		"cookie",
-	]);
-	expect(output).toContain("dataCollected:");
-	expect(output).toContain("cookies:");
-});
-
-test("template always has top-level effectiveDate and jurisdictions", () => {
-	const output = getOpenPolicyTemplate("Acme", "hi@acme.com", ["privacy"]);
-	expect(output).toContain("effectiveDate:");
-	expect(output).toContain("jurisdictions:");
+test("runInit writes stub to openpolicy.ts at repo root when no src/", async () => {
+	writeFileSync(join(dir, "package.json"), JSON.stringify({ name: "scratch" }));
+	await runInit({
+		cwd: dir,
+		skipInstall: true,
+		dryRun: false,
+		yes: true,
+		force: false,
+	});
+	expect(existsSync(join(dir, "openpolicy.ts"))).toBe(true);
 });

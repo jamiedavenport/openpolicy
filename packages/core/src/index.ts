@@ -30,6 +30,7 @@ export {
 	text,
 	ul,
 } from "./documents";
+export { isJurisdiction, JURISDICTIONS } from "./jurisdictions";
 export type {
 	ChildrenConfig,
 	CompanyConfig,

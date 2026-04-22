@@ -29,7 +29,7 @@ export default defineConfig({
     legalName: "Your Company, Inc.",
     contact: "privacy@yourcompany.com",
   },
-  jurisdictions: ["us"],
+  jurisdictions: ["us-ca"],
   dataCollected: { "Personal Information": ["Full name", "Email address"] },
 });
 ```

@@ -4,6 +4,8 @@
 
 Part of [OpenPolicy](https://openpolicy.sh) — a policy-as-code framework that compiles legal agreements from TypeScript at build time.
 
+> **Not legal advice.** OpenPolicy generates policy documents from your config. It does not provide legal advice. Have a lawyer review your policies before publication. See the [legal notice](https://openpolicy.sh/legal-notice).
+
 ## Install
 
 ```sh
@@ -42,7 +44,7 @@ export default defineConfig({
       { name: "Vercel", purpose: "Hosting" },
       { name: "Plausible", purpose: "Privacy-friendly analytics" },
     ],
-    jurisdictions: ["us", "eu"],
+    jurisdictions: ["eu", "us-ca"],
   },
 });
 ```
@@ -63,18 +65,19 @@ export default defineConfig({
   cookie: {
     effectiveDate: "2026-01-01",
     cookies: { essential: true, analytics: true, marketing: false },
-    jurisdictions: ["us", "eu"],
+    jurisdictions: ["eu", "us-ca"],
   },
 });
 ```
 
-## Compiling policies
+## Rendering policies
 
-The SDK exports types and helper functions for _defining_ policies. To compile them to Markdown or HTML, pair it with one of:
+The SDK exports types and helper functions for _defining_ policies. To render them in your app, pair it with one of:
 
-- **[`@openpolicy/vite`](https://openpolicy.sh/docs/getting-started/vite)** — Vite plugin (build-time, with hot-reload in dev)
-- **[`@openpolicy/astro`](https://openpolicy.sh/docs/getting-started/astro)** — Astro integration
-- **[`@openpolicy/cli`](https://openpolicy.sh/docs/getting-started/cli)** — `openpolicy generate` CLI command
+- **[`@openpolicy/react`](https://docs.openpolicy.sh)** — `<PrivacyPolicy />` / `<CookiePolicy />` components for React
+- **[`@openpolicy/vue`](https://docs.openpolicy.sh)** — Vue 3 components
+- **[`@openpolicy/vite`](https://docs.openpolicy.sh)** — Vite plugin that scans source for `collecting()` / `thirdParty()` annotations at build time
+- **[`@openpolicy/cli`](https://docs.openpolicy.sh/cli)** — one-command project setup: installs the right packages, scaffolds a config, and prints a prompt for your coding agent
 
 ## Documentation
 

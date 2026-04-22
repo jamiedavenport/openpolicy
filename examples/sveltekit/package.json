@@ -11,8 +11,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"dependencies": {
-		"@openpolicy/sdk": "workspace:*",
-		"@openpolicy/vite": "workspace:*"
+		"@openpolicy/sdk": "workspace:*"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.0",

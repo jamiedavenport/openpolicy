@@ -21,7 +21,7 @@ const input: PolicyInput = {
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
 	userRights: ["access"],
-	jurisdictions: ["us"],
+	jurisdictions: ["ca"],
 };
 
 const company = {
@@ -34,7 +34,7 @@ const company = {
 const fullConfig: OpenPolicyConfig = {
 	company,
 	effectiveDate: "2026-01-01",
-	jurisdictions: ["us"],
+	jurisdictions: ["ca"],
 	dataCollected: { "Account Information": ["Name", "Email"] },
 	legalBasis: "legitimate_interests",
 	retention: { "Account data": "Until deletion" },
@@ -73,8 +73,8 @@ test("expandOpenPolicyConfig merges company and shared fields into each input", 
 	expect(inputs[1]?.company).toEqual(company);
 	expect(inputs[0]?.effectiveDate).toBe("2026-01-01");
 	expect(inputs[1]?.effectiveDate).toBe("2026-01-01");
-	expect(inputs[0]?.jurisdictions).toEqual(["us"]);
-	expect(inputs[1]?.jurisdictions).toEqual(["us"]);
+	expect(inputs[0]?.jurisdictions).toEqual(["ca"]);
+	expect(inputs[1]?.jurisdictions).toEqual(["ca"]);
 });
 
 test("expandOpenPolicyConfig auto-detects privacy-only when cookies omitted", () => {
@@ -88,7 +88,7 @@ test("expandOpenPolicyConfig auto-detects cookie-only when no privacy fields", (
 	const inputs = expandOpenPolicyConfig({
 		company,
 		effectiveDate: "2026-01-01",
-		jurisdictions: ["us"],
+		jurisdictions: ["ca"],
 		cookies: { essential: true },
 	});
 	expect(inputs).toHaveLength(1);
@@ -99,7 +99,7 @@ test("expandOpenPolicyConfig returns empty array when nothing to emit", () => {
 	const inputs = expandOpenPolicyConfig({
 		company,
 		effectiveDate: "2026-01-01",
-		jurisdictions: ["us"],
+		jurisdictions: ["ca"],
 	});
 	expect(inputs).toHaveLength(0);
 });

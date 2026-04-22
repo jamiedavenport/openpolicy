@@ -8,6 +8,8 @@ OpenPolicy turns TypeScript config files into privacy and cookie policies. Defin
 - [Blog](https://openpolicy.sh/blog)
 - [Documentation](https://docs.openpolicy.sh)
 
+> **Not legal advice.** OpenPolicy generates policy documents from your config. It does not provide legal advice. Have a lawyer review your policies before publication. See the [legal notice](https://openpolicy.sh/legal-notice).
+
 # Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->

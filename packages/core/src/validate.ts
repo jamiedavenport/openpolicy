@@ -22,13 +22,19 @@ export function validatePrivacyPolicy(
 			message: "dataCollected must have at least one entry",
 		});
 
-	// GDPR checks
-	if (config.jurisdictions.includes("eu")) {
+	// GDPR / UK-GDPR checks
+	if (
+		config.jurisdictions.includes("eu") ||
+		config.jurisdictions.includes("uk")
+	) {
 		const basisArray = Array.isArray(config.legalBasis)
 			? config.legalBasis
 			: [config.legalBasis];
 		if (basisArray.length === 0 || (basisArray.length === 1 && !basisArray[0]))
-			issues.push({ level: "error", message: "GDPR requires a legalBasis" });
+			issues.push({
+				level: "error",
+				message: "GDPR and UK-GDPR require a legalBasis",
+			});
 	}
 
 	// children config sanity

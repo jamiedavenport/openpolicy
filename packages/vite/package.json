@@ -2,7 +2,7 @@
 	"name": "@openpolicy/vite",
 	"version": "0.0.23",
 	"type": "module",
-	"description": "Vite plugin for compiling OpenPolicy privacy policy documents at build time",
+	"description": "Vite plugin that scans source files for @openpolicy/sdk collecting()/thirdParty() calls and populates the auto-collected registry at build time",
 	"license": "GPL-3.0-only",
 	"repository": {
 		"type": "git",
@@ -10,7 +10,9 @@
 		"directory": "packages/vite"
 	},
 	"keywords": [
-		"vite-plugin"
+		"vite-plugin",
+		"openpolicy",
+		"privacy-policy"
 	],
 	"files": [
 		"dist",
@@ -31,10 +33,12 @@
 	"peerDependencies": {
 		"vite": ">=4.0.0"
 	},
+	"dependencies": {
+		"oxc-parser": "^0.124.0"
+	},
 	"devDependencies": {
-		"@openpolicy/core": "workspace:*",
-		"@openpolicy/renderers": "workspace:*",
+		"@openpolicy/sdk": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
-		"vite": "^5.0.0"
+		"vite": "catalog:"
 	}
 }

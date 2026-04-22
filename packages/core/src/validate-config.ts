@@ -1,4 +1,5 @@
 import { shouldEmit } from "./index";
+import { isJurisdiction, JURISDICTIONS } from "./jurisdictions";
 import type {
 	OpenPolicyConfig,
 	PolicyCategory,
@@ -22,11 +23,21 @@ export function validateOpenPolicyConfig(
 		issues.push({ level: "error", message: "company.address is required" });
 	if (!config.company?.contact)
 		issues.push({ level: "error", message: "company.contact is required" });
-	if (!config.jurisdictions || config.jurisdictions.length === 0)
+	if (!config.jurisdictions || config.jurisdictions.length === 0) {
 		issues.push({
 			level: "error",
 			message: "jurisdictions must have at least one entry",
 		});
+	} else {
+		for (const code of config.jurisdictions) {
+			if (!isJurisdiction(code)) {
+				issues.push({
+					level: "error",
+					message: `Unknown jurisdiction "${code}" — valid codes: ${JURISDICTIONS.join(", ")}`,
+				});
+			}
+		}
+	}
 
 	const wantPrivacy = shouldEmit("privacy", config);
 	const wantCookie = shouldEmit("cookie", config);

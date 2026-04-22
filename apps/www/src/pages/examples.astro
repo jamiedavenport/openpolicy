@@ -5,9 +5,9 @@ const examples = [
 	{
 		name: "Astro",
 		description:
-			"Static site using the Astro integration. Generates Markdown and HTML policy files at build time.",
+			"Static site compiling policies directly in page frontmatter with @openpolicy/core. No integration, no generated files.",
 		href: "https://github.com/jamiedavenport/openpolicy/tree/main/examples/astro",
-		packages: ["@openpolicy/sdk", "@openpolicy/astro"],
+		packages: ["@openpolicy/sdk", "@openpolicy/core", "@openpolicy/renderers"],
 	},
 	{
 		name: "Next.js",

@@ -114,6 +114,10 @@ function RouteComponent() {
 
 			<div data-testid="consent-status">{status}</div>
 
+			<ConsentGate requires="analytics">
+				<div>Analytics</div>
+			</ConsentGate>
+
 			<Button variant="outline" onClick={reset} data-testid="reset-consent">
 				Reset consent (show banner again)
 			</Button>

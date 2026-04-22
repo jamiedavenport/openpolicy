@@ -8,7 +8,7 @@ Full example projects are available in the [GitHub repository](https://github.co
 | Example | Stack |
 |---|---|
 | [Next.js](https://github.com/jamiedavenport/openpolicy/tree/main/examples/nextjs) | Next.js + `@openpolicy/react` |
-| [Astro](https://github.com/jamiedavenport/openpolicy/tree/main/examples/astro) | Astro + `@openpolicy/astro` |
-| [SvelteKit](https://github.com/jamiedavenport/openpolicy/tree/main/examples/sveltekit) | SvelteKit + `@openpolicy/vite` |
+| [Astro](https://github.com/jamiedavenport/openpolicy/tree/main/examples/astro) | Astro + `@openpolicy/core` (compile in frontmatter) |
+| [SvelteKit](https://github.com/jamiedavenport/openpolicy/tree/main/examples/sveltekit) | SvelteKit + `@openpolicy/sdk` |
 | [TanStack](https://github.com/jamiedavenport/openpolicy/tree/main/examples/tanstack) | TanStack Start + `@openpolicy/react` |
 | [Vue](https://github.com/jamiedavenport/openpolicy/tree/main/examples/vue) | Vue 3 + `@openpolicy/vue` |

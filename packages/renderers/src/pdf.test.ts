@@ -17,7 +17,7 @@ const input: PolicyInput = {
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
 	userRights: ["access" as const],
-	jurisdictions: ["us" as const],
+	jurisdictions: ["ca" as const],
 };
 
 test("renderPDF returns a Buffer", async () => {

@@ -2,7 +2,7 @@
 
 > Compilation engine for [OpenPolicy](https://openpolicy.sh) policy documents.
 
-This is an internal package used by `@openpolicy/sdk`, `@openpolicy/vite`, and `@openpolicy/astro`. You generally do not need to install or import it directly.
+This is an internal package used by `@openpolicy/sdk`, `@openpolicy/vite`, and `@openpolicy/cli`. You generally do not need to install or import it directly.
 
 ## What it does
 

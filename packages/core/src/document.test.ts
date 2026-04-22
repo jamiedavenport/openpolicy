@@ -17,7 +17,7 @@ const minimalPrivacyConfig: PrivacyPolicyConfig = {
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
 	userRights: ["access"],
-	jurisdictions: ["us"],
+	jurisdictions: ["ca"],
 };
 
 test("compile returns a Document with correct type", () => {
@@ -31,7 +31,7 @@ test("privacy compile returns non-empty sections", () => {
 	expect(doc.sections.length).toBeGreaterThan(0);
 });
 
-test("US-only config has expected section IDs (no EU/CA-only sections)", () => {
+test("Reserved-region config has expected section IDs (no EU/UK/CA-only sections)", () => {
 	const doc = compile({ type: "privacy", ...minimalPrivacyConfig });
 	const ids = doc.sections.map((s) => s.id);
 	expect(ids).toContain("introduction");
@@ -43,6 +43,7 @@ test("US-only config has expected section IDs (no EU/CA-only sections)", () => {
 	expect(ids).toContain("contact");
 	expect(ids).not.toContain("legal-basis");
 	expect(ids).not.toContain("gdpr-supplement");
+	expect(ids).not.toContain("uk-gdpr-supplement");
 	expect(ids).not.toContain("ccpa-supplement");
 });
 
@@ -55,16 +56,45 @@ test("EU config includes legal-basis and gdpr-supplement", () => {
 	const ids = doc.sections.map((s) => s.id);
 	expect(ids).toContain("legal-basis");
 	expect(ids).toContain("gdpr-supplement");
+	expect(ids).not.toContain("uk-gdpr-supplement");
 });
 
-test("CA config includes ccpa-supplement", () => {
+test("UK config includes legal-basis and uk-gdpr-supplement (not gdpr-supplement)", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["uk"],
+	});
+	const ids = doc.sections.map((s) => s.id);
+	expect(ids).toContain("legal-basis");
+	expect(ids).toContain("uk-gdpr-supplement");
+	expect(ids).not.toContain("gdpr-supplement");
+	const ukSection = doc.sections.find((s) => s.id === "uk-gdpr-supplement")!;
+	const textBlob = JSON.stringify(ukSection);
+	expect(textBlob).toContain("Information Commissioner");
+	expect(textBlob).toContain("Data Protection Act 2018");
+});
+
+test("US-CA config includes ccpa-supplement", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["us-ca"],
+	});
+	const ids = doc.sections.map((s) => s.id);
+	expect(ids).toContain("ccpa-supplement");
+});
+
+test("CA (Canada) alone does not include ccpa-supplement or gdpr-supplement", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
 		jurisdictions: ["ca"],
 	});
 	const ids = doc.sections.map((s) => s.id);
-	expect(ids).toContain("ccpa-supplement");
+	expect(ids).not.toContain("ccpa-supplement");
+	expect(ids).not.toContain("gdpr-supplement");
+	expect(ids).not.toContain("uk-gdpr-supplement");
 });
 
 test("children-privacy section absent when children not set", () => {

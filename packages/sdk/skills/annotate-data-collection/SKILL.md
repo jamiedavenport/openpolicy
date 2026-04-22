@@ -2,7 +2,7 @@
 name: annotate-data-collection
 description: >
   Mark data collection points in source code with collecting(category, value,
-  labels) so the autoCollect() Vite plugin can populate privacy.dataCollected
+  labels) so the openPolicy() Vite plugin can populate privacy.dataCollected
   automatically at build time via static AST analysis. All arguments must be
   string literals. Spread the dataCollected sentinel from @openpolicy/sdk into
   the config for plugin output to take effect.
@@ -13,14 +13,14 @@ requires:
   - openpolicy/vite-setup
 sources:
   - jamiedavenport/openpolicy:packages/sdk/src/auto-collected.ts
-  - jamiedavenport/openpolicy:packages/vite-auto-collect/src/analyse.ts
+  - jamiedavenport/openpolicy:packages/vite/src/analyse.ts
 ---
 
 This skill builds on openpolicy/vite-setup. Read it first.
 
 ## How it works
 
-`collecting(category, value, labels)` is a **pass-through at runtime** — it returns `value` unchanged. Its purpose is to serve as a static marker. During a Vite build, `autoCollect()` scans your source files using oxc-parser, finds every `collecting()` call, and merges the extracted category/label data into the `dataCollected` virtual module exported from `@openpolicy/sdk`.
+`collecting(category, value, labels)` is a **pass-through at runtime** — it returns `value` unchanged. Its purpose is to serve as a static marker. During a Vite build, `openPolicy()` scans your source files using oxc-parser, finds every `collecting()` call, and merges the extracted category/label data into the `dataCollected` virtual module exported from `@openpolicy/sdk`.
 
 The scanned data only reaches your policy config if you import the `dataCollected` sentinel and spread it into the top-level `dataCollected` field. Without the spread, all collected annotations are silently discarded.
 
@@ -28,7 +28,7 @@ The scanned data only reaches your policy config if you import the `dataCollecte
 
 ## Setup
 
-Install and wire `autoCollect()` first (see openpolicy/vite-setup). Then follow these three steps:
+Install and wire `openPolicy()` first (see openpolicy/vite-setup). Then follow these three steps:
 
 **Step 1 — Annotate a data collection point in your app code:**
 
@@ -62,7 +62,7 @@ export default defineConfig({
   },
   effectiveDate: "2026-01-01",
   dataCollected: {
-    ...dataCollected,              // populated by autoCollect() at build time
+    ...dataCollected,              // populated by openPolicy() at build time
     // add manually-tracked categories here if needed
   },
 });
@@ -73,14 +73,14 @@ export default defineConfig({
 ```ts
 // vite.config.ts
 import { defineConfig } from "vite";
-import { autoCollect } from "@openpolicy/vite-auto-collect";
+import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [autoCollect()],
+  plugins: [openPolicy()],
 });
 ```
 
-At build time, `autoCollect()` scans `src/` for `collecting()` calls and injects the result into the `dataCollected` sentinel before your config module is evaluated.
+At build time, `openPolicy()` scans `src/` for `collecting()` calls and injects the result into the `dataCollected` sentinel before your config module is evaluated.
 
 ## Core Patterns
 
@@ -145,7 +145,7 @@ import { defineConfig, dataCollected } from "@openpolicy/sdk";
 export default defineConfig({
   company: { /* ... */ },
   effectiveDate: "2026-01-01",
-  jurisdictions: ["eu", "us"],
+  jurisdictions: ["eu", "us-ca"],
   legalBasis: "legitimate_interests",
   dataCollected: {
     ...dataCollected,                              // auto-collected at build time
@@ -186,7 +186,7 @@ The `value` argument (second position) is never read by the scanner and can be a
 
 ### MISTAKE 2 (HIGH) — Not spreading `dataCollected` into the config
 
-Even with `collecting()` calls throughout your codebase and `autoCollect()` wired up in Vite, the plugin output has no effect unless you import `dataCollected` from `@openpolicy/sdk` and spread it into the top-level `dataCollected` field. Without the spread the sentinel is an empty object `{}` and the policy compiles with no auto-collected data.
+Even with `collecting()` calls throughout your codebase and `openPolicy()` wired up in Vite, the plugin output has no effect unless you import `dataCollected` from `@openpolicy/sdk` and spread it into the top-level `dataCollected` field. Without the spread the sentinel is an empty object `{}` and the policy compiles with no auto-collected data.
 
 ```ts
 // WRONG: sentinel not imported or spread

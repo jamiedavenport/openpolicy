@@ -15,7 +15,7 @@ Auto-collect moves the signal to where the behaviour actually lives: the call si
 
 ## Two mechanisms, one pipeline
 
-`@openpolicy/vite-auto-collect` gives you two ways to declare what your app collects and which services it uses — both of which the build pipeline reads automatically when it compiles your policy.
+`@openpolicy/vite` gives you two ways to declare what your app collects and which services it uses — both of which the build pipeline reads automatically when it compiles your policy.
 
 **`collecting()`** — wrap your data storage calls to annotate what's being stored.
 
@@ -85,10 +85,10 @@ Enable `usePackageJson: true` in the plugin config and the plugin reads your `de
 
 ```ts
 // vite.config.ts
-import { autoCollect } from "@openpolicy/vite-auto-collect";
+import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [autoCollect({ thirdParties: { usePackageJson: true } })],
+  plugins: [openPolicy({ thirdParties: { usePackageJson: true } })],
 });
 ```
 
@@ -101,15 +101,15 @@ Explicit `thirdParty()` calls always take precedence over auto-detected entries.
 Install the plugin and add it to your Vite config:
 
 ```sh
-bun add -D @openpolicy/vite-auto-collect
+bun add -D @openpolicy/vite
 ```
 
 ```ts
 // vite.config.ts
-import { autoCollect } from "@openpolicy/vite-auto-collect";
+import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [autoCollect({ thirdParties: { usePackageJson: true } })],
+  plugins: [openPolicy({ thirdParties: { usePackageJson: true } })],
 });
 ```
 
