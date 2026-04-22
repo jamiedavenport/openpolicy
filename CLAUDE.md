@@ -18,13 +18,13 @@ This is a monorepo under `packages/`. Key packages:
 - `packages/sdk` — `@openpolicy/sdk`: public API — `defineConfig()` and related types
 - `packages/core` — `@openpolicy/core`: compilation engine; published to npm as a dependency of sdk and vite
 - `packages/vite` — `@openpolicy/vite`: Vite plugin (`openPolicy()`) that compiles policies at build time
-- `packages/cli` — `@openpolicy/cli`: CLI tool for generating policy documents outside of a Vite build
+- `packages/cli` — `@openpolicy/cli`: CLI tool that installs OpenPolicy into a project and prints a setup prompt for coding agents
 
 ## Domain Concepts
 
 - **Policy types**: `"privacy"` (PrivacyPolicyConfig) and `"cookie"` (CookiePolicyConfig) — `PolicyInput` is a discriminated union
 - **Policy definition**: TypeScript object passed to `defineConfig()` describing the policy content
-- **Compilation**: Policy definitions are compiled to HTML, Markdown, or PDF — triggered either by the Vite plugin at build time or by `openpolicy generate` via the CLI
+- **Compilation**: Policy definitions are compiled to HTML, Markdown, or PDF via `@openpolicy/core` + `@openpolicy/renderers` (e.g. from React/Vue components at runtime, or inline in Astro frontmatter). The Vite plugin scans source at build time to auto-populate `dataCollected` / `thirdParties`. The CLI (`@openpolicy/cli`) handles first-run setup — it installs packages and prints a setup prompt for coding agents; it no longer generates policy files.
 - **Section builders**: Each section is a `(config) => PolicySection | null` function; `null` means the section is not applicable and is omitted
 - **Output filenames**: `privacy-policy.{ext}` for privacy, `cookie-policy.{ext}` for cookie
 - **Formats**: `markdown` | `html` | `pdf` (implemented); `jsx` throws "not yet implemented"
@@ -83,7 +83,7 @@ bun run publish-packages
 `exports` in each package.json points to `./src/index.ts` during development (Bun resolves TypeScript directly). `publishConfig.exports` overrides this to `./dist/` on `npm publish`, so consumers get compiled JS + `.d.ts` files without any extra setup for local development.
 
 ### Build output
-`bun run build` produces both `dist/*.js` (via `bun build`) and `dist/*.d.ts` (via `tsc --emitDeclarationOnly`). `@openpolicy/core` is a regular `dependency` of `sdk` and `vite` — it is published to npm and installed alongside them. `cli` bundles `core` at build time (it remains a `devDependency` there since CLI ships a binary, not importable types).
+`bun run build` produces both `dist/*.js` (via `bun build`) and `dist/*.d.ts` (via `tsc --emitDeclarationOnly`). `@openpolicy/core` is a regular `dependency` of `sdk` and `vite` — it is published to npm and installed alongside them. `cli` no longer depends on `core` or `renderers` — it only shells out to the user's package manager and prints a prompt.
 
 ## Testing
 

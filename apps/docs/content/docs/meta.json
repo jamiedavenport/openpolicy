@@ -1,6 +1,7 @@
 {
 	"pages": [
 		"index",
+		"cli",
 		"configuration",
 		"---Policies---",
 		"policies/overview",
@@ -14,11 +15,6 @@
 		"cookies/hooks",
 		"cookies/banner",
 		"cookies/preferences",
-		"---Generation---",
-		"generation/overview",
-		"generation/cli",
-		"generation/vite",
-		"generation/astro",
 		"---References---",
 		"references/examples"
 	]

@@ -2,7 +2,7 @@
 	"name": "@openpolicy/cli",
 	"version": "0.0.23",
 	"type": "module",
-	"description": "CLI for generating and validating OpenPolicy privacy policy documents",
+	"description": "CLI to install OpenPolicy and print a setup prompt for coding agents",
 	"license": "GPL-3.0-only",
 	"repository": {
 		"type": "git",
@@ -32,8 +32,6 @@
 		"consola": "^3.4.2"
 	},
 	"devDependencies": {
-		"@openpolicy/core": "workspace:*",
-		"@openpolicy/renderers": "workspace:*",
 		"@openpolicy/tooling": "workspace:*"
 	}
 }

@@ -7,6 +7,14 @@ All policies are defined in a single config file using `defineConfig()` from `@o
 
 ## Install
 
+The fastest way is to run [`@openpolicy/cli`](/cli), which installs `@openpolicy/sdk` plus the right framework integration for your stack and scaffolds a starter config:
+
+```sh
+bunx @openpolicy/cli init
+```
+
+Or install manually:
+
 ```sh
 bun add @openpolicy/sdk
 ```
@@ -43,4 +51,4 @@ The user rights you're legally required to disclose (access, erasure, portabilit
 
 ## Using AI
 
-The fastest way to fill out your config is to ask your coding agent to do it. Point it at your codebase and ask it to generate an `openpolicy.ts` based on what it finds — your dependencies, environment variables, data models, and any existing privacy or legal documents. Agents are good at this because the config is typed and the fields map directly to things already described in your code.
+The fastest way to fill out your config is to hand it to a coding agent. [`@openpolicy/cli`](/cli) prints a ready-made prompt for this — run `bunx @openpolicy/cli init`, paste the prompt into Claude Code or Cursor, and the agent will fill in `dataCollected`, `thirdParties`, `jurisdictions`, and cookie usage from your codebase. Agents are good at this because the config is typed and the fields map directly to things already described in your dependencies, environment variables, data models, and existing legal copy.

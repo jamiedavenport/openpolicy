@@ -68,13 +68,14 @@ export default defineConfig({
 });
 ```
 
-## Compiling policies
+## Rendering policies
 
-The SDK exports types and helper functions for _defining_ policies. To compile them to Markdown or HTML, pair it with one of:
+The SDK exports types and helper functions for _defining_ policies. To render them in your app, pair it with one of:
 
-- **[`@openpolicy/core`](https://openpolicy.sh/docs/getting-started/overview)** — compile directly in your app at runtime or in Astro frontmatter
-- **[`@openpolicy/vite`](https://openpolicy.sh/docs/getting-started/vite)** — Vite plugin that scans source for `collecting()` / `thirdParty()` annotations
-- **[`@openpolicy/cli`](https://openpolicy.sh/docs/getting-started/cli)** — `openpolicy generate` CLI command for static file output
+- **[`@openpolicy/react`](https://docs.openpolicy.sh)** — `<PrivacyPolicy />` / `<CookiePolicy />` components for React
+- **[`@openpolicy/vue`](https://docs.openpolicy.sh)** — Vue 3 components
+- **[`@openpolicy/vite`](https://docs.openpolicy.sh)** — Vite plugin that scans source for `collecting()` / `thirdParty()` annotations at build time
+- **[`@openpolicy/cli`](https://docs.openpolicy.sh/cli)** — one-command project setup: installs the right packages, scaffolds a config, and prints a prompt for your coding agent
 
 ## Documentation
 

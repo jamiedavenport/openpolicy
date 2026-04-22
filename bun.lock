@@ -190,8 +190,6 @@
         "consola": "^3.4.2",
       },
       "devDependencies": {
-        "@openpolicy/core": "workspace:*",
-        "@openpolicy/renderers": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
       },
     },
