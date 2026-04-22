@@ -138,6 +138,10 @@ export async function runInit(args: InitArgs): Promise<void> {
 	consola.success(
 		"Paste the prompt above into your coding agent (Claude Code, Cursor, etc.) to finish setup.",
 	);
+
+	consola.warn(
+		"OpenPolicy generates policy documents from your config — it does not provide legal advice. Have a lawyer review your policies before publication. https://openpolicy.sh/legal-notice",
+	);
 }
 
 export const initCommand = defineCommand({

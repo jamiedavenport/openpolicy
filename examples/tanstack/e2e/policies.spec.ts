@@ -80,9 +80,15 @@ for (const route of ROUTES) {
 		});
 
 		test("privacy policy renders key sections", async ({ page }) => {
-			await expect(page.getByText("Introduction")).toBeVisible();
-			await expect(page.getByText("Information We Collect")).toBeVisible();
-			await expect(page.getByText("Your Rights")).toBeVisible();
+			await expect(
+				page.getByRole("heading", { name: "Introduction" }),
+			).toBeVisible();
+			await expect(
+				page.getByRole("heading", { name: "Information We Collect" }),
+			).toBeVisible();
+			await expect(
+				page.getByRole("heading", { name: "Your Rights" }),
+			).toBeVisible();
 		});
 
 		test("cookie policy renders key sections", async ({ page }) => {
