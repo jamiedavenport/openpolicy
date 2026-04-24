@@ -3,7 +3,7 @@
 	"version": "0.0.25",
 	"type": "module",
 	"description": "React components and hooks for OpenPolicy",
-	"license": "GPL-3.0-only",
+	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/jamiedavenport/openpolicy",
@@ -11,16 +11,15 @@
 	},
 	"files": [
 		"dist",
-		"styles.css",
 		"README.md",
+		"NOTICE.md",
 		"skills"
 	],
 	"exports": {
 		".": {
 			"import": "./dist/index.js",
 			"types": "./dist/index.d.ts"
-		},
-		"./styles.css": "./styles.css"
+		}
 	},
 	"scripts": {
 		"dev": "rolldown --watch -c",
@@ -29,14 +28,14 @@
 		"test": "bun test"
 	},
 	"peerDependencies": {
-		"react": ">=19",
-		"react-dom": ">=19"
+		"react": ">=18",
+		"react-dom": ">=18"
 	},
 	"dependencies": {},
 	"devDependencies": {
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
-		"@types/react": "^19.0.0",
+		"@types/react": "^18.0.0 || ^19.0.0",
 		"react": "^19.0.0",
 		"@tanstack/intent": "^0.0.29"
 	},
@@ -45,8 +44,7 @@
 			".": {
 				"import": "./dist/index.js",
 				"types": "./dist/index.d.ts"
-			},
-			"./styles.css": "./styles.css"
+			}
 		}
 	},
 	"keywords": [

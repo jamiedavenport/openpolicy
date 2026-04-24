@@ -2,7 +2,7 @@
 	"name": "openpolicy",
 	"type": "module",
 	"private": true,
-	"license": "GPL-3.0-only",
+	"license": "Apache-2.0",
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.5",
 		"@changesets/cli": "^2.30.0",
@@ -30,7 +30,7 @@
 		"format:write": "biome format --write .",
 		"changeset": "changeset",
 		"version-packages": "changeset version",
-		"publish-packages": "turbo run build && changeset publish",
+		"publish-packages": "bun scripts/sync-legal.ts && turbo run build && changeset publish",
 		"knip": "knip",
 		"bench": "bun scripts/bench/bench.ts",
 		"bench:bundle": "bun scripts/bench/bench.ts --only=bundle",

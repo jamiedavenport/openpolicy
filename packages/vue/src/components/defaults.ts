@@ -14,7 +14,7 @@ import type { PolicyComponents } from "../types";
 export function DefaultHeading({ node }: { node: HeadingNode }) {
 	const level = node.level ?? 2;
 	const tag = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-	return h(tag, { "data-op-heading": "", class: "op-heading" }, node.value);
+	return h(tag, { "data-op-heading": "" }, node.value);
 }
 
 export function DefaultText({ node }: { node: TextNode }) {
@@ -22,15 +22,15 @@ export function DefaultText({ node }: { node: TextNode }) {
 }
 
 export function DefaultBold({ node }: { node: BoldNode }) {
-	return h("strong", { class: "op-bold" }, node.value);
+	return h("strong", null, node.value);
 }
 
 function DefaultItalic({ node }: { node: ItalicNode }) {
-	return h("em", { class: "op-italic" }, node.value);
+	return h("em", null, node.value);
 }
 
 export function DefaultLink({ node }: { node: LinkNode }) {
-	return h("a", { href: node.href, class: "op-link" }, node.value);
+	return h("a", { href: node.href }, node.value);
 }
 
 export function DefaultSection({
@@ -44,7 +44,6 @@ export function DefaultSection({
 		"section",
 		{
 			"data-op-section": "",
-			class: "op-section",
 			id: section.id,
 			...(section.context?.reason && {
 				"data-op-reason": section.context.reason,
@@ -60,11 +59,7 @@ export function DefaultParagraph({
 	node: import("@openpolicy/core").ParagraphNode;
 	children?: VNodeChild;
 }) {
-	return h(
-		"p",
-		{ "data-op-paragraph": "", class: "op-paragraph" },
-		children ?? undefined,
-	);
+	return h("p", { "data-op-paragraph": "" }, children ?? undefined);
 }
 
 export function DefaultList({
@@ -75,11 +70,7 @@ export function DefaultList({
 	children?: VNodeChild;
 }) {
 	const tag = node.ordered ? "ol" : "ul";
-	return h(
-		tag,
-		{ "data-op-list": "", class: "op-list" },
-		children ?? undefined,
-	);
+	return h(tag, { "data-op-list": "" }, children ?? undefined);
 }
 
 export function renderNode(
@@ -123,11 +114,7 @@ export function renderNode(
 					},
 				);
 			}
-			return h(
-				"p",
-				{ key, "data-op-paragraph": "", class: "op-paragraph" },
-				children,
-			);
+			return h("p", { key, "data-op-paragraph": "" }, children);
 		}
 
 		case "list": {
@@ -144,17 +131,13 @@ export function renderNode(
 				);
 			}
 			const ListTag = node.ordered ? "ol" : "ul";
-			return h(
-				ListTag,
-				{ key, "data-op-list": "", class: "op-list" },
-				children,
-			);
+			return h(ListTag, { key, "data-op-list": "" }, children);
 		}
 
 		case "listItem":
 			return h(
 				"li",
-				{ key, "data-op-list-item": "", class: "op-list-item" },
+				{ key, "data-op-list-item": "" },
 				node.children.map((n, i) => renderNode(n, components, i)),
 			);
 

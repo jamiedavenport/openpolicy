@@ -28,11 +28,10 @@ Install the package:
 bun add @openpolicy/react
 ```
 
-Wrap your app with the provider, import styles, and render a policy page:
+Wrap your app with the provider and render a policy page. Components are unstyled and emit `data-op-*` attributes — hook your own CSS (or Tailwind descendant combinators) onto those:
 
 ```tsx
 // layout.tsx (or _app.tsx)
-import '@openpolicy/react/styles.css';
 import { OpenPolicy } from '@openpolicy/react';
 import config from './openpolicy';
 
@@ -129,24 +128,31 @@ export default function PrivacyPage() {
 }
 ```
 
-### 4. Theming with CSS custom properties
+### 4. Theming with your own CSS
 
-The `.op-policy` wrapper exposes CSS custom properties. Override them globally or scoped:
+Components emit `data-op-*` attributes instead of shipping styles. Target them directly — define whatever custom properties or rules fit your design system:
 
 ```css
-.op-policy {
-  --op-heading-color: #0f172a;
-  --op-body-color: #475569;
-  --op-link-color: #6366f1;
-  --op-link-color-hover: #4f46e5;
-  --op-font-family: 'Inter', sans-serif;
-  --op-font-size-body: 0.9375rem;
-  --op-font-size-heading: 1.125rem;
-  --op-font-weight-heading: 600;
-  --op-line-height: 1.75;
-  --op-section-gap: 2.5rem;
-  --op-border-color: #e2e8f0;
-  --op-border-radius: 0.5rem;
+[data-op-policy] {
+  color: #475569;
+  line-height: 1.75;
+}
+
+[data-op-policy] [data-op-heading] {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+[data-op-policy] [data-op-section] {
+  margin-block: 2.5rem;
+}
+
+[data-op-policy] a {
+  color: #6366f1;
+}
+
+[data-op-policy] a:hover {
+  color: #4f46e5;
 }
 ```
 
@@ -213,19 +219,20 @@ export default function PrivacyPage() {
 }
 ```
 
-### MEDIUM — Not importing `@openpolicy/react/styles.css`
+### MEDIUM — Assuming policy components ship default styles
 
-Without the CSS import, policy components render as unstyled HTML. The provider injects inline styles via a React `<style>` tag, but this may not work in all SSR or bundler setups.
+`@openpolicy/react` is unstyled by design. Components emit `data-op-*` attributes as styling hooks — target those from Tailwind or your own CSS.
 
-```tsx
-// WRONG: no styles imported
-import { PrivacyPolicy } from '@openpolicy/react';
+```css
+/* in your global stylesheet */
+[data-op-policy] [data-op-heading] { font-weight: 600; }
+[data-op-policy] [data-op-section] { margin-block: 2rem; }
+[data-op-policy] [data-op-paragraph] { line-height: 1.7; }
 ```
 
 ```tsx
-// correct
-import '@openpolicy/react/styles.css';
-import { PrivacyPolicy } from '@openpolicy/react';
+/* with Tailwind, using arbitrary selectors */
+<PrivacyPolicy className="[&_[data-op-heading]]:font-semibold [&_[data-op-section]]:my-8" />
 ```
 
-The default styles scope all rules to `.op-policy` so they do not leak to the rest of the page.
+Available hooks: `data-op-policy`, `data-op-section`, `data-op-heading`, `data-op-paragraph`, `data-op-list`, `data-op-list-item`. Sections also expose `data-op-reason` when the context sets one.

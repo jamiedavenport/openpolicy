@@ -13,11 +13,7 @@ import type { PolicyComponents } from "../types";
 export function DefaultHeading({ node }: { node: HeadingNode }) {
 	const level = node.level ?? 2;
 	const Tag = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-	return (
-		<Tag data-op-heading className="op-heading">
-			{node.value}
-		</Tag>
-	);
+	return <Tag data-op-heading>{node.value}</Tag>;
 }
 
 export function DefaultText({ node }: { node: TextNode }) {
@@ -25,19 +21,15 @@ export function DefaultText({ node }: { node: TextNode }) {
 }
 
 export function DefaultBold({ node }: { node: BoldNode }) {
-	return <strong className="op-bold">{node.value}</strong>;
+	return <strong>{node.value}</strong>;
 }
 
 function DefaultItalic({ node }: { node: ItalicNode }) {
-	return <em className="op-italic">{node.value}</em>;
+	return <em>{node.value}</em>;
 }
 
 export function DefaultLink({ node }: { node: LinkNode }) {
-	return (
-		<a href={node.href} className="op-link">
-			{node.value}
-		</a>
-	);
+	return <a href={node.href}>{node.value}</a>;
 }
 
 export function DefaultSection({
@@ -50,7 +42,6 @@ export function DefaultSection({
 	return (
 		<section
 			data-op-section
-			className="op-section"
 			id={section.id}
 			{...(section.context?.reason && {
 				"data-op-reason": section.context.reason,
@@ -68,11 +59,7 @@ export function DefaultParagraph({
 	node: import("@openpolicy/core").ParagraphNode;
 	children: ReactNode;
 }) {
-	return (
-		<p data-op-paragraph className="op-paragraph">
-			{children}
-		</p>
-	);
+	return <p data-op-paragraph>{children}</p>;
 }
 
 export function DefaultList({
@@ -83,11 +70,7 @@ export function DefaultList({
 	children: ReactNode;
 }) {
 	const Tag = node.ordered ? "ol" : "ul";
-	return (
-		<Tag data-op-list className="op-list">
-			{children}
-		</Tag>
-	);
+	return <Tag data-op-list>{children}</Tag>;
 }
 
 export function renderNode(
@@ -124,7 +107,7 @@ export function renderNode(
 					</components.Paragraph>
 				);
 			return (
-				<p key={key} data-op-paragraph className="op-paragraph">
+				<p key={key} data-op-paragraph>
 					{children}
 				</p>
 			);
@@ -142,7 +125,7 @@ export function renderNode(
 				);
 			const ListTag = node.ordered ? "ol" : "ul";
 			return (
-				<ListTag key={key} data-op-list className="op-list">
+				<ListTag key={key} data-op-list>
 					{children}
 				</ListTag>
 			);
@@ -150,7 +133,7 @@ export function renderNode(
 
 		case "listItem":
 			return (
-				<li key={key} data-op-list-item className="op-list-item">
+				<li key={key} data-op-list-item>
 					{node.children.map((n, i) => renderNode(n, components, i))}
 				</li>
 			);
