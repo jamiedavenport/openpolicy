@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import type { CommandMeta, SubCommandsDef } from "citty";
 import { mainCommand, run } from "./index";
 
@@ -11,9 +11,7 @@ test("mainCommand has correct name", () => {
 });
 
 test("mainCommand has init subcommand", () => {
-	expect(typeof (mainCommand.subCommands as SubCommandsDef)?.init).toBe(
-		"function",
-	);
+	expect(typeof (mainCommand.subCommands as SubCommandsDef)?.init).toBe("function");
 });
 
 test("mainCommand no longer exposes generate/validate", () => {

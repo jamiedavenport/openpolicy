@@ -92,9 +92,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 		cookies: { essential: true },
 	};
 
-	async function readPackageJsonDeps(
-		root: string,
-	): Promise<Record<string, string>> {
+	async function readPackageJsonDeps(root: string): Promise<Record<string, string>> {
 		let raw: string;
 		try {
 			raw = await readFile(resolve(root, "package.json"), "utf8");
@@ -113,9 +111,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 		return { ...pkg.dependencies, ...pkg.devDependencies };
 	}
 
-	async function detectThirdPartiesFromPackageJson(
-		root: string,
-	): Promise<ThirdPartyEntry[]> {
+	async function detectThirdPartiesFromPackageJson(root: string): Promise<ThirdPartyEntry[]> {
 		const allDeps = await readPackageJsonDeps(root);
 		const entries: ThirdPartyEntry[] = [];
 		const seenNames = new Set<string>();
@@ -154,9 +150,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 				continue;
 			}
 			const extracted = extractFromFile(file, code);
-			for (const [category, labels] of Object.entries(
-				extracted.dataCollected,
-			)) {
+			for (const [category, labels] of Object.entries(extracted.dataCollected)) {
 				const existing = mergedData[category] ?? [];
 				const seen = new Set(existing);
 				for (const label of labels) {
@@ -308,9 +302,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 		load(id) {
 			if (id !== RESOLVED_VIRTUAL_ID) return null;
 			return (
-				`export const dataCollected = ${JSON.stringify(
-					scanned.dataCollected,
-				)};\n` +
+				`export const dataCollected = ${JSON.stringify(scanned.dataCollected)};\n` +
 				`export const thirdParties = ${JSON.stringify(scanned.thirdParties)};\n` +
 				`export const cookies = ${JSON.stringify(scanned.cookies)};\n`
 			);

@@ -20,18 +20,7 @@ export function compile(input: PolicyInput): Document {
 	};
 }
 
-export {
-	bold,
-	heading,
-	italic,
-	li,
-	link,
-	ol,
-	p,
-	section,
-	text,
-	ul,
-} from "./helpers";
+export { bold, heading, italic, li, link, ol, p, section, text, ul } from "./helpers";
 export type {
 	BoldNode,
 	ContentNode,

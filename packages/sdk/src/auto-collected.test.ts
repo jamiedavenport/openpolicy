@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import { dataCollected } from "./auto-collected";
 
 test("dataCollected is an empty object when no plugin is active", () => {

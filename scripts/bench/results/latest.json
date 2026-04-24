@@ -1,383 +1,383 @@
 {
-  "meta": {
-    "date": "2026-04-19",
-    "node": "v24.3.0",
-    "platform": "darwin/arm64",
-    "iterations": 5
-  },
-  "scenarios": {
-    "baseline": {
-      "name": "baseline",
-      "bundle": {
-        "totals": {
-          "bytes": 466231,
-          "gzipBytes": 184124,
-          "brotliBytes": 167558,
-          "assetCount": 6
-        },
-        "byType": {
-          "js": {
-            "bytes": 364160,
-            "gzipBytes": 117614,
-            "brotliBytes": 102077,
-            "count": 2
-          },
-          "css": {
-            "bytes": 43671,
-            "gzipBytes": 8036,
-            "brotliBytes": 7088,
-            "count": 1
-          },
-          "html": {
-            "bytes": 0,
-            "gzipBytes": 0,
-            "brotliBytes": 0,
-            "count": 0
-          },
-          "font": {
-            "bytes": 58400,
-            "gzipBytes": 58474,
-            "brotliBytes": 58393,
-            "count": 3
-          },
-          "image": {
-            "bytes": 0,
-            "gzipBytes": 0,
-            "brotliBytes": 0,
-            "count": 0
-          },
-          "other": {
-            "bytes": 0,
-            "gzipBytes": 0,
-            "brotliBytes": 0,
-            "count": 0
-          }
-        },
-        "assets": [
-          {
-            "path": "assets/main-B4AoT0fQ.js",
-            "type": "js",
-            "bytes": 363759,
-            "gzipBytes": 117325,
-            "brotliBytes": 101842
-          },
-          {
-            "path": "assets/styles-CV9Bmon_.css",
-            "type": "css",
-            "bytes": 43671,
-            "gzipBytes": 8036,
-            "brotliBytes": 7088
-          },
-          {
-            "path": "assets/geist-latin-wght-normal-Dm3htQBi.woff2",
-            "type": "font",
-            "bytes": 28400,
-            "gzipBytes": 28428,
-            "brotliBytes": 28395
-          },
-          {
-            "path": "assets/geist-latin-ext-wght-normal-DMtmJ5ZE.woff2",
-            "type": "font",
-            "bytes": 15308,
-            "gzipBytes": 15331,
-            "brotliBytes": 15309
-          },
-          {
-            "path": "assets/geist-cyrillic-wght-normal-CHSlOQsW.woff2",
-            "type": "font",
-            "bytes": 14692,
-            "gzipBytes": 14715,
-            "brotliBytes": 14689
-          },
-          {
-            "path": "assets/index-Basfuuwj.js",
-            "type": "js",
-            "bytes": 401,
-            "gzipBytes": 289,
-            "brotliBytes": 235
-          }
-        ]
-      },
-      "runtime": {
-        "url": "http://127.0.0.1:3002",
-        "iterations": 5,
-        "samples": [
-          {
-            "ttfbMs": 4,
-            "fcpMs": 40,
-            "lcpMs": 40,
-            "cls": 0,
-            "loadMs": 15,
-            "jsExecMs": 7,
-            "transferBytes": 439598,
-            "requests": 5
-          },
-          {
-            "ttfbMs": 3,
-            "fcpMs": 44,
-            "lcpMs": 44,
-            "cls": 0,
-            "loadMs": 19,
-            "jsExecMs": 8,
-            "transferBytes": 439598,
-            "requests": 5
-          },
-          {
-            "ttfbMs": 3,
-            "fcpMs": 44,
-            "lcpMs": 44,
-            "cls": 0,
-            "loadMs": 20,
-            "jsExecMs": 13,
-            "transferBytes": 439598,
-            "requests": 5
-          },
-          {
-            "ttfbMs": 4,
-            "fcpMs": 44,
-            "lcpMs": 44,
-            "cls": 0,
-            "loadMs": 17,
-            "jsExecMs": 10,
-            "transferBytes": 439598,
-            "requests": 5
-          },
-          {
-            "ttfbMs": 2,
-            "fcpMs": 36,
-            "lcpMs": 36,
-            "cls": 0,
-            "loadMs": 20,
-            "jsExecMs": 16,
-            "transferBytes": 439598,
-            "requests": 5
-          }
-        ],
-        "median": {
-          "ttfbMs": 3,
-          "fcpMs": 44,
-          "lcpMs": 44,
-          "cls": 0,
-          "loadMs": 19,
-          "jsExecMs": 10,
-          "transferBytes": 439598,
-          "requests": 5
-        },
-        "p95": {
-          "ttfbMs": 4,
-          "fcpMs": 44,
-          "lcpMs": 44,
-          "cls": 0,
-          "loadMs": 20,
-          "jsExecMs": 16,
-          "transferBytes": 439598,
-          "requests": 5
-        }
-      }
-    },
-    "full": {
-      "name": "full",
-      "bundle": {
-        "totals": {
-          "bytes": 583908,
-          "gzipBytes": 221809,
-          "brotliBytes": 199648,
-          "assetCount": 11
-        },
-        "byType": {
-          "js": {
-            "bytes": 474906,
-            "gzipBytes": 154222,
-            "brotliBytes": 133259,
-            "count": 7
-          },
-          "css": {
-            "bytes": 50602,
-            "gzipBytes": 9113,
-            "brotliBytes": 7996,
-            "count": 1
-          },
-          "html": {
-            "bytes": 0,
-            "gzipBytes": 0,
-            "brotliBytes": 0,
-            "count": 0
-          },
-          "font": {
-            "bytes": 58400,
-            "gzipBytes": 58474,
-            "brotliBytes": 58393,
-            "count": 3
-          },
-          "image": {
-            "bytes": 0,
-            "gzipBytes": 0,
-            "brotliBytes": 0,
-            "count": 0
-          },
-          "other": {
-            "bytes": 0,
-            "gzipBytes": 0,
-            "brotliBytes": 0,
-            "count": 0
-          }
-        },
-        "assets": [
-          {
-            "path": "assets/main-Br53Uecr.js",
-            "type": "js",
-            "bytes": 426761,
-            "gzipBytes": 137539,
-            "brotliBytes": 118595
-          },
-          {
-            "path": "assets/styles-CE01LjqC.css",
-            "type": "css",
-            "bytes": 50602,
-            "gzipBytes": 9113,
-            "brotliBytes": 7996
-          },
-          {
-            "path": "assets/cookie-banner-BJVeFvoE.js",
-            "type": "js",
-            "bytes": 37564,
-            "gzipBytes": 12336,
-            "brotliBytes": 11014
-          },
-          {
-            "path": "assets/geist-latin-wght-normal-Dm3htQBi.woff2",
-            "type": "font",
-            "bytes": 28400,
-            "gzipBytes": 28428,
-            "brotliBytes": 28395
-          },
-          {
-            "path": "assets/geist-latin-ext-wght-normal-DMtmJ5ZE.woff2",
-            "type": "font",
-            "bytes": 15308,
-            "gzipBytes": 15331,
-            "brotliBytes": 15309
-          },
-          {
-            "path": "assets/geist-cyrillic-wght-normal-CHSlOQsW.woff2",
-            "type": "font",
-            "bytes": 14692,
-            "gzipBytes": 14715,
-            "brotliBytes": 14689
-          },
-          {
-            "path": "assets/index-fbpnmNCe.js",
-            "type": "js",
-            "bytes": 6372,
-            "gzipBytes": 2445,
-            "brotliBytes": 2019
-          },
-          {
-            "path": "assets/css-vars-reTguqWP.js",
-            "type": "js",
-            "bytes": 1514,
-            "gzipBytes": 509,
-            "brotliBytes": 428
-          },
-          {
-            "path": "assets/createLucideIcon-NsWtKV9f.js",
-            "type": "js",
-            "bytes": 1201,
-            "gzipBytes": 688,
-            "brotliBytes": 602
-          },
-          {
-            "path": "assets/tailwind-DfpqFK8w.js",
-            "type": "js",
-            "bytes": 874,
-            "gzipBytes": 362,
-            "brotliBytes": 308
-          },
-          {
-            "path": "assets/shadcn-CuRBnHfZ.js",
-            "type": "js",
-            "bytes": 620,
-            "gzipBytes": 343,
-            "brotliBytes": 293
-          }
-        ]
-      },
-      "runtime": {
-        "url": "http://127.0.0.1:3001",
-        "iterations": 5,
-        "samples": [
-          {
-            "ttfbMs": 6,
-            "fcpMs": 56,
-            "lcpMs": 56,
-            "cls": 0.0003588965468936496,
-            "loadMs": 60,
-            "jsExecMs": 45,
-            "transferBytes": 530983,
-            "requests": 6
-          },
-          {
-            "ttfbMs": 3,
-            "fcpMs": 48,
-            "lcpMs": 48,
-            "cls": 0,
-            "loadMs": 16,
-            "jsExecMs": 12,
-            "transferBytes": 530983,
-            "requests": 6
-          },
-          {
-            "ttfbMs": 3,
-            "fcpMs": 44,
-            "lcpMs": 44,
-            "cls": 0,
-            "loadMs": 15,
-            "jsExecMs": 12,
-            "transferBytes": 530983,
-            "requests": 6
-          },
-          {
-            "ttfbMs": 4,
-            "fcpMs": 44,
-            "lcpMs": 44,
-            "cls": 0,
-            "loadMs": 16,
-            "jsExecMs": 12,
-            "transferBytes": 530983,
-            "requests": 6
-          },
-          {
-            "ttfbMs": 3,
-            "fcpMs": 52,
-            "lcpMs": 52,
-            "cls": 0,
-            "loadMs": 16,
-            "jsExecMs": 13,
-            "transferBytes": 530983,
-            "requests": 6
-          }
-        ],
-        "median": {
-          "ttfbMs": 3,
-          "fcpMs": 48,
-          "lcpMs": 48,
-          "cls": 0,
-          "loadMs": 16,
-          "jsExecMs": 12,
-          "transferBytes": 530983,
-          "requests": 6
-        },
-        "p95": {
-          "ttfbMs": 6,
-          "fcpMs": 56,
-          "lcpMs": 56,
-          "cls": 0.0003588965468936496,
-          "loadMs": 60,
-          "jsExecMs": 45,
-          "transferBytes": 530983,
-          "requests": 6
-        }
-      }
-    }
-  }
+	"meta": {
+		"date": "2026-04-19",
+		"node": "v24.3.0",
+		"platform": "darwin/arm64",
+		"iterations": 5
+	},
+	"scenarios": {
+		"baseline": {
+			"name": "baseline",
+			"bundle": {
+				"totals": {
+					"bytes": 466231,
+					"gzipBytes": 184124,
+					"brotliBytes": 167558,
+					"assetCount": 6
+				},
+				"byType": {
+					"js": {
+						"bytes": 364160,
+						"gzipBytes": 117614,
+						"brotliBytes": 102077,
+						"count": 2
+					},
+					"css": {
+						"bytes": 43671,
+						"gzipBytes": 8036,
+						"brotliBytes": 7088,
+						"count": 1
+					},
+					"html": {
+						"bytes": 0,
+						"gzipBytes": 0,
+						"brotliBytes": 0,
+						"count": 0
+					},
+					"font": {
+						"bytes": 58400,
+						"gzipBytes": 58474,
+						"brotliBytes": 58393,
+						"count": 3
+					},
+					"image": {
+						"bytes": 0,
+						"gzipBytes": 0,
+						"brotliBytes": 0,
+						"count": 0
+					},
+					"other": {
+						"bytes": 0,
+						"gzipBytes": 0,
+						"brotliBytes": 0,
+						"count": 0
+					}
+				},
+				"assets": [
+					{
+						"path": "assets/main-B4AoT0fQ.js",
+						"type": "js",
+						"bytes": 363759,
+						"gzipBytes": 117325,
+						"brotliBytes": 101842
+					},
+					{
+						"path": "assets/styles-CV9Bmon_.css",
+						"type": "css",
+						"bytes": 43671,
+						"gzipBytes": 8036,
+						"brotliBytes": 7088
+					},
+					{
+						"path": "assets/geist-latin-wght-normal-Dm3htQBi.woff2",
+						"type": "font",
+						"bytes": 28400,
+						"gzipBytes": 28428,
+						"brotliBytes": 28395
+					},
+					{
+						"path": "assets/geist-latin-ext-wght-normal-DMtmJ5ZE.woff2",
+						"type": "font",
+						"bytes": 15308,
+						"gzipBytes": 15331,
+						"brotliBytes": 15309
+					},
+					{
+						"path": "assets/geist-cyrillic-wght-normal-CHSlOQsW.woff2",
+						"type": "font",
+						"bytes": 14692,
+						"gzipBytes": 14715,
+						"brotliBytes": 14689
+					},
+					{
+						"path": "assets/index-Basfuuwj.js",
+						"type": "js",
+						"bytes": 401,
+						"gzipBytes": 289,
+						"brotliBytes": 235
+					}
+				]
+			},
+			"runtime": {
+				"url": "http://127.0.0.1:3002",
+				"iterations": 5,
+				"samples": [
+					{
+						"ttfbMs": 4,
+						"fcpMs": 40,
+						"lcpMs": 40,
+						"cls": 0,
+						"loadMs": 15,
+						"jsExecMs": 7,
+						"transferBytes": 439598,
+						"requests": 5
+					},
+					{
+						"ttfbMs": 3,
+						"fcpMs": 44,
+						"lcpMs": 44,
+						"cls": 0,
+						"loadMs": 19,
+						"jsExecMs": 8,
+						"transferBytes": 439598,
+						"requests": 5
+					},
+					{
+						"ttfbMs": 3,
+						"fcpMs": 44,
+						"lcpMs": 44,
+						"cls": 0,
+						"loadMs": 20,
+						"jsExecMs": 13,
+						"transferBytes": 439598,
+						"requests": 5
+					},
+					{
+						"ttfbMs": 4,
+						"fcpMs": 44,
+						"lcpMs": 44,
+						"cls": 0,
+						"loadMs": 17,
+						"jsExecMs": 10,
+						"transferBytes": 439598,
+						"requests": 5
+					},
+					{
+						"ttfbMs": 2,
+						"fcpMs": 36,
+						"lcpMs": 36,
+						"cls": 0,
+						"loadMs": 20,
+						"jsExecMs": 16,
+						"transferBytes": 439598,
+						"requests": 5
+					}
+				],
+				"median": {
+					"ttfbMs": 3,
+					"fcpMs": 44,
+					"lcpMs": 44,
+					"cls": 0,
+					"loadMs": 19,
+					"jsExecMs": 10,
+					"transferBytes": 439598,
+					"requests": 5
+				},
+				"p95": {
+					"ttfbMs": 4,
+					"fcpMs": 44,
+					"lcpMs": 44,
+					"cls": 0,
+					"loadMs": 20,
+					"jsExecMs": 16,
+					"transferBytes": 439598,
+					"requests": 5
+				}
+			}
+		},
+		"full": {
+			"name": "full",
+			"bundle": {
+				"totals": {
+					"bytes": 583908,
+					"gzipBytes": 221809,
+					"brotliBytes": 199648,
+					"assetCount": 11
+				},
+				"byType": {
+					"js": {
+						"bytes": 474906,
+						"gzipBytes": 154222,
+						"brotliBytes": 133259,
+						"count": 7
+					},
+					"css": {
+						"bytes": 50602,
+						"gzipBytes": 9113,
+						"brotliBytes": 7996,
+						"count": 1
+					},
+					"html": {
+						"bytes": 0,
+						"gzipBytes": 0,
+						"brotliBytes": 0,
+						"count": 0
+					},
+					"font": {
+						"bytes": 58400,
+						"gzipBytes": 58474,
+						"brotliBytes": 58393,
+						"count": 3
+					},
+					"image": {
+						"bytes": 0,
+						"gzipBytes": 0,
+						"brotliBytes": 0,
+						"count": 0
+					},
+					"other": {
+						"bytes": 0,
+						"gzipBytes": 0,
+						"brotliBytes": 0,
+						"count": 0
+					}
+				},
+				"assets": [
+					{
+						"path": "assets/main-Br53Uecr.js",
+						"type": "js",
+						"bytes": 426761,
+						"gzipBytes": 137539,
+						"brotliBytes": 118595
+					},
+					{
+						"path": "assets/styles-CE01LjqC.css",
+						"type": "css",
+						"bytes": 50602,
+						"gzipBytes": 9113,
+						"brotliBytes": 7996
+					},
+					{
+						"path": "assets/cookie-banner-BJVeFvoE.js",
+						"type": "js",
+						"bytes": 37564,
+						"gzipBytes": 12336,
+						"brotliBytes": 11014
+					},
+					{
+						"path": "assets/geist-latin-wght-normal-Dm3htQBi.woff2",
+						"type": "font",
+						"bytes": 28400,
+						"gzipBytes": 28428,
+						"brotliBytes": 28395
+					},
+					{
+						"path": "assets/geist-latin-ext-wght-normal-DMtmJ5ZE.woff2",
+						"type": "font",
+						"bytes": 15308,
+						"gzipBytes": 15331,
+						"brotliBytes": 15309
+					},
+					{
+						"path": "assets/geist-cyrillic-wght-normal-CHSlOQsW.woff2",
+						"type": "font",
+						"bytes": 14692,
+						"gzipBytes": 14715,
+						"brotliBytes": 14689
+					},
+					{
+						"path": "assets/index-fbpnmNCe.js",
+						"type": "js",
+						"bytes": 6372,
+						"gzipBytes": 2445,
+						"brotliBytes": 2019
+					},
+					{
+						"path": "assets/css-vars-reTguqWP.js",
+						"type": "js",
+						"bytes": 1514,
+						"gzipBytes": 509,
+						"brotliBytes": 428
+					},
+					{
+						"path": "assets/createLucideIcon-NsWtKV9f.js",
+						"type": "js",
+						"bytes": 1201,
+						"gzipBytes": 688,
+						"brotliBytes": 602
+					},
+					{
+						"path": "assets/tailwind-DfpqFK8w.js",
+						"type": "js",
+						"bytes": 874,
+						"gzipBytes": 362,
+						"brotliBytes": 308
+					},
+					{
+						"path": "assets/shadcn-CuRBnHfZ.js",
+						"type": "js",
+						"bytes": 620,
+						"gzipBytes": 343,
+						"brotliBytes": 293
+					}
+				]
+			},
+			"runtime": {
+				"url": "http://127.0.0.1:3001",
+				"iterations": 5,
+				"samples": [
+					{
+						"ttfbMs": 6,
+						"fcpMs": 56,
+						"lcpMs": 56,
+						"cls": 0.0003588965468936496,
+						"loadMs": 60,
+						"jsExecMs": 45,
+						"transferBytes": 530983,
+						"requests": 6
+					},
+					{
+						"ttfbMs": 3,
+						"fcpMs": 48,
+						"lcpMs": 48,
+						"cls": 0,
+						"loadMs": 16,
+						"jsExecMs": 12,
+						"transferBytes": 530983,
+						"requests": 6
+					},
+					{
+						"ttfbMs": 3,
+						"fcpMs": 44,
+						"lcpMs": 44,
+						"cls": 0,
+						"loadMs": 15,
+						"jsExecMs": 12,
+						"transferBytes": 530983,
+						"requests": 6
+					},
+					{
+						"ttfbMs": 4,
+						"fcpMs": 44,
+						"lcpMs": 44,
+						"cls": 0,
+						"loadMs": 16,
+						"jsExecMs": 12,
+						"transferBytes": 530983,
+						"requests": 6
+					},
+					{
+						"ttfbMs": 3,
+						"fcpMs": 52,
+						"lcpMs": 52,
+						"cls": 0,
+						"loadMs": 16,
+						"jsExecMs": 13,
+						"transferBytes": 530983,
+						"requests": 6
+					}
+				],
+				"median": {
+					"ttfbMs": 3,
+					"fcpMs": 48,
+					"lcpMs": 48,
+					"cls": 0,
+					"loadMs": 16,
+					"jsExecMs": 12,
+					"transferBytes": 530983,
+					"requests": 6
+				},
+				"p95": {
+					"ttfbMs": 6,
+					"fcpMs": 56,
+					"lcpMs": 56,
+					"cls": 0.0003588965468936496,
+					"loadMs": 60,
+					"jsExecMs": 45,
+					"transferBytes": 530983,
+					"requests": 6
+				}
+			}
+		}
+	}
 }

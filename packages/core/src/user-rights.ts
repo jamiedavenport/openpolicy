@@ -9,9 +9,7 @@ const GDPR_RIGHTS: readonly UserRight[] = [
 	"objection",
 ];
 
-const RIGHTS_BY_JURISDICTION: Partial<
-	Record<Jurisdiction, readonly UserRight[]>
-> = {
+const RIGHTS_BY_JURISDICTION: Partial<Record<Jurisdiction, readonly UserRight[]>> = {
 	eu: GDPR_RIGHTS,
 	uk: GDPR_RIGHTS,
 	"us-ca": ["access", "erasure", "opt_out_sale", "non_discrimination"],

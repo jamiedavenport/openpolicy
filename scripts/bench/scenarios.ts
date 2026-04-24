@@ -5,19 +5,8 @@ import { promisify } from "node:util";
 
 const execFile = promisify(execFileCb);
 
-export const EXAMPLE_DIR = join(
-	import.meta.dirname,
-	"..",
-	"..",
-	"examples",
-	"tanstack",
-);
-const PATCHES_DIR = join(
-	import.meta.dirname,
-	"scenarios",
-	"baseline",
-	"patches",
-);
+export const EXAMPLE_DIR = join(import.meta.dirname, "..", "..", "examples", "tanstack");
+const PATCHES_DIR = join(import.meta.dirname, "scenarios", "baseline", "patches");
 
 export type ScenarioName = "baseline" | "full";
 
@@ -43,18 +32,9 @@ async function gitRestoreExample() {
 	await execFile("git", ["clean", "-fd", EXAMPLE_DIR]);
 }
 
-const OPENPOLICY_ROUTES = [
-	"cookie-banner.tsx",
-	"css-vars.tsx",
-	"shadcn.tsx",
-	"tailwind.tsx",
-];
+const OPENPOLICY_ROUTES = ["cookie-banner.tsx", "css-vars.tsx", "shadcn.tsx", "tailwind.tsx"];
 
-const OPENPOLICY_FILES = [
-	"src/openpolicy.ts",
-	"src/lib/collection.ts",
-	"src/lib/stripe.ts",
-];
+const OPENPOLICY_FILES = ["src/openpolicy.ts", "src/lib/collection.ts", "src/lib/stripe.ts"];
 
 export const scenarios: Record<ScenarioName, Scenario> = {
 	full: {
@@ -72,18 +52,9 @@ export const scenarios: Record<ScenarioName, Scenario> = {
 			await assertClean();
 
 			// Replace root + index + vite.config with stripped variants
-			await copyFile(
-				join(PATCHES_DIR, "__root.tsx"),
-				join(EXAMPLE_DIR, "src/routes/__root.tsx"),
-			);
-			await copyFile(
-				join(PATCHES_DIR, "index.tsx"),
-				join(EXAMPLE_DIR, "src/routes/index.tsx"),
-			);
-			await copyFile(
-				join(PATCHES_DIR, "vite.config.ts"),
-				join(EXAMPLE_DIR, "vite.config.ts"),
-			);
+			await copyFile(join(PATCHES_DIR, "__root.tsx"), join(EXAMPLE_DIR, "src/routes/__root.tsx"));
+			await copyFile(join(PATCHES_DIR, "index.tsx"), join(EXAMPLE_DIR, "src/routes/index.tsx"));
+			await copyFile(join(PATCHES_DIR, "vite.config.ts"), join(EXAMPLE_DIR, "vite.config.ts"));
 
 			// Delete routes that import from @openpolicy/*
 			for (const file of OPENPOLICY_ROUTES) {

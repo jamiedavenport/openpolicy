@@ -1,15 +1,11 @@
 import type { PrivacyPolicyConfig, ValidationIssue } from "./types";
 
-export function validatePrivacyPolicy(
-	config: PrivacyPolicyConfig,
-): ValidationIssue[] {
+export function validatePrivacyPolicy(config: PrivacyPolicyConfig): ValidationIssue[] {
 	const issues: ValidationIssue[] = [];
 
 	// Required fields
-	if (!config.effectiveDate)
-		issues.push({ level: "error", message: "effectiveDate is required" });
-	if (!config.company.name)
-		issues.push({ level: "error", message: "company.name is required" });
+	if (!config.effectiveDate) issues.push({ level: "error", message: "effectiveDate is required" });
+	if (!config.company.name) issues.push({ level: "error", message: "company.name is required" });
 	if (!config.company.legalName)
 		issues.push({ level: "error", message: "company.legalName is required" });
 	if (!config.company.address)
@@ -23,13 +19,8 @@ export function validatePrivacyPolicy(
 		});
 
 	// GDPR / UK-GDPR checks
-	if (
-		config.jurisdictions.includes("eu") ||
-		config.jurisdictions.includes("uk")
-	) {
-		const basisArray = Array.isArray(config.legalBasis)
-			? config.legalBasis
-			: [config.legalBasis];
+	if (config.jurisdictions.includes("eu") || config.jurisdictions.includes("uk")) {
+		const basisArray = Array.isArray(config.legalBasis) ? config.legalBasis : [config.legalBasis];
 		if (basisArray.length === 0 || (basisArray.length === 1 && !basisArray[0]))
 			issues.push({
 				level: "error",

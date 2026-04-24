@@ -23,9 +23,9 @@ bun add @openpolicy/sdk @openpolicy/vue
 import { definePrivacyPolicy } from "@openpolicy/sdk";
 
 export const privacyPolicy = definePrivacyPolicy({
-  company: { name: "Acme Inc.", website: "https://acme.com" },
-  contact: { email: "privacy@acme.com" },
-  compliance: { gdpr: true, ccpa: true },
+	company: { name: "Acme Inc.", website: "https://acme.com" },
+	contact: { email: "privacy@acme.com" },
+	compliance: { gdpr: true, ccpa: true },
 });
 ```
 
@@ -39,11 +39,11 @@ import { privacyPolicy } from "@/openpolicy";
 </script>
 
 <template>
-  <main>
-    <OpenPolicy :config="privacyPolicy">
-      <PrivacyPolicy />
-    </OpenPolicy>
-  </main>
+	<main>
+		<OpenPolicy :config="privacyPolicy">
+			<PrivacyPolicy />
+		</OpenPolicy>
+	</main>
 </template>
 ```
 

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, expect, test } from "bun:test";
+import { afterEach, beforeEach, expect, test } from "vite-plus/test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -33,17 +33,12 @@ async function touch(rel: string, content: string): Promise<void> {
  * Invokes `configResolved` and `buildStart` in the order Vite would, so the
  * plugin's internal `scanned` state is populated.
  */
-async function runPluginBuildStart(
-	plugin: PluginInstance,
-	root: string,
-): Promise<void> {
+async function runPluginBuildStart(plugin: PluginInstance, root: string): Promise<void> {
 	const configResolved = plugin.configResolved as
 		| ((config: { root: string }) => void | Promise<void>)
 		| undefined;
 	if (configResolved) await configResolved({ root });
-	const buildStart = plugin.buildStart as
-		| (() => void | Promise<void>)
-		| undefined;
+	const buildStart = plugin.buildStart as (() => void | Promise<void>) | undefined;
 	if (buildStart) await buildStart.call({});
 }
 
@@ -58,30 +53,22 @@ type ScannedResult = {
  * exports out of the emitted JS source.
  */
 function loadScanned(plugin: PluginInstance): ScannedResult {
-	const load = plugin.load as
-		| ((id: string) => string | null | undefined)
-		| undefined;
+	const load = plugin.load as ((id: string) => string | null | undefined) | undefined;
 	if (!load) throw new Error("plugin has no load hook");
 	const source = load.call({}, RESOLVED_VIRTUAL_ID);
 	if (!source) throw new Error("load returned falsy");
 
-	const dcStart =
-		source.indexOf("dataCollected = ") + "dataCollected = ".length;
+	const dcStart = source.indexOf("dataCollected = ") + "dataCollected = ".length;
 	const dcEnd = source.indexOf(";\n", dcStart);
 	if (dcStart < "dataCollected = ".length || dcEnd === -1)
 		throw new Error(`could not parse dataCollected from: ${source}`);
-	const dataCollected = JSON.parse(source.slice(dcStart, dcEnd)) as Record<
-		string,
-		string[]
-	>;
+	const dataCollected = JSON.parse(source.slice(dcStart, dcEnd)) as Record<string, string[]>;
 
 	const tpStart = source.indexOf("thirdParties = ") + "thirdParties = ".length;
 	const tpEnd = source.indexOf(";\n", tpStart);
 	if (tpStart < "thirdParties = ".length || tpEnd === -1)
 		throw new Error(`could not parse thirdParties from: ${source}`);
-	const thirdParties = JSON.parse(
-		source.slice(tpStart, tpEnd),
-	) as ThirdPartyEntry[];
+	const thirdParties = JSON.parse(source.slice(tpStart, tpEnd)) as ThirdPartyEntry[];
 
 	const ckStart = source.indexOf("cookies = ") + "cookies = ".length;
 	const ckEnd = source.indexOf(";\n", ckStart);
@@ -322,12 +309,9 @@ test("resolveId leaves unrelated ./auto-collected imports alone", async () => {
 	const plugin = openPolicy();
 	await runPluginBuildStart(plugin, tmp);
 
-	const result = await callResolveId(
-		plugin,
-		"./auto-collected",
-		"/some/other/package/index.js",
-		{ id: "/some/other/package/auto-collected.js" },
-	);
+	const result = await callResolveId(plugin, "./auto-collected", "/some/other/package/index.js", {
+		id: "/some/other/package/auto-collected.js",
+	});
 	expect(result).toBeNull();
 });
 
@@ -601,10 +585,7 @@ test("dev watcher triggers reload when thirdParty() call is added", async () => 
 // ---------------------------------------------------------------------------
 
 test("usePackageJson is disabled by default — package.json with stripe does not add entries", async () => {
-	await touch(
-		"package.json",
-		JSON.stringify({ dependencies: { stripe: "^14.0.0" } }),
-	);
+	await touch("package.json", JSON.stringify({ dependencies: { stripe: "^14.0.0" } }));
 
 	const plugin = openPolicy();
 	await runPluginBuildStart(plugin, tmp);
@@ -613,10 +594,7 @@ test("usePackageJson is disabled by default — package.json with stripe does no
 });
 
 test("usePackageJson: known package is detected and added as ThirdPartyEntry", async () => {
-	await touch(
-		"package.json",
-		JSON.stringify({ dependencies: { stripe: "^14.0.0" } }),
-	);
+	await touch("package.json", JSON.stringify({ dependencies: { stripe: "^14.0.0" } }));
 
 	const plugin = openPolicy({ thirdParties: { usePackageJson: true } });
 	await runPluginBuildStart(plugin, tmp);
@@ -628,10 +606,7 @@ test("usePackageJson: known package is detected and added as ThirdPartyEntry", a
 });
 
 test("usePackageJson: unknown package is silently ignored", async () => {
-	await touch(
-		"package.json",
-		JSON.stringify({ dependencies: { "some-unknown-pkg": "^1.0.0" } }),
-	);
+	await touch("package.json", JSON.stringify({ dependencies: { "some-unknown-pkg": "^1.0.0" } }));
 
 	const plugin = openPolicy({ thirdParties: { usePackageJson: true } });
 	await runPluginBuildStart(plugin, tmp);
@@ -655,10 +630,7 @@ test("usePackageJson: multiple packages mapping to same service yield one entry"
 });
 
 test("usePackageJson: manual thirdParty() call wins over auto-detected entry", async () => {
-	await touch(
-		"package.json",
-		JSON.stringify({ dependencies: { stripe: "^14.0.0" } }),
-	);
+	await touch("package.json", JSON.stringify({ dependencies: { stripe: "^14.0.0" } }));
 	await touch(
 		"src/payments.ts",
 		`
@@ -773,10 +745,7 @@ test("cookies: useCookies().has() adds the category (including nested expr)", as
 });
 
 test("cookies: usePackageJson disabled by default — posthog-js alone does not add analytics", async () => {
-	await touch(
-		"package.json",
-		JSON.stringify({ dependencies: { "posthog-js": "^1.0.0" } }),
-	);
+	await touch("package.json", JSON.stringify({ dependencies: { "posthog-js": "^1.0.0" } }));
 
 	const plugin = openPolicy();
 	await runPluginBuildStart(plugin, tmp);
@@ -785,10 +754,7 @@ test("cookies: usePackageJson disabled by default — posthog-js alone does not 
 });
 
 test("cookies: usePackageJson — posthog-js detected as analytics", async () => {
-	await touch(
-		"package.json",
-		JSON.stringify({ dependencies: { "posthog-js": "^1.0.0" } }),
-	);
+	await touch("package.json", JSON.stringify({ dependencies: { "posthog-js": "^1.0.0" } }));
 
 	const plugin = openPolicy({ cookies: { usePackageJson: true } });
 	await runPluginBuildStart(plugin, tmp);
@@ -800,10 +766,7 @@ test("cookies: usePackageJson — posthog-js detected as analytics", async () =>
 });
 
 test("cookies: usePackageJson + defineCookie unions categories", async () => {
-	await touch(
-		"package.json",
-		JSON.stringify({ dependencies: { "posthog-js": "^1.0.0" } }),
-	);
+	await touch("package.json", JSON.stringify({ dependencies: { "posthog-js": "^1.0.0" } }));
 	await touch(
 		"src/cookies.ts",
 		`
@@ -894,9 +857,7 @@ function runConfigureServer(
 		return (hook as (s: unknown) => void | Promise<void>)(server);
 	}
 	if (hook && typeof (hook as { handler?: unknown }).handler === "function") {
-		return (hook as { handler: (s: unknown) => void | Promise<void> }).handler(
-			server,
-		);
+		return (hook as { handler: (s: unknown) => void | Promise<void> }).handler(server);
 	}
 	throw new Error("plugin has no configureServer hook");
 }

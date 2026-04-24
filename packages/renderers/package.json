@@ -7,7 +7,7 @@
 	},
 	"scripts": {
 		"check-types": "tsc --noEmit",
-		"test": "bun test"
+		"test": "vp test"
 	},
 	"dependencies": {
 		"pdfkit": "^0.18.0"
@@ -15,6 +15,7 @@
 	"devDependencies": {
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
-		"@types/pdfkit": "^0.17.5"
+		"@types/pdfkit": "^0.17.5",
+		"vite-plus": "catalog:"
 	}
 }

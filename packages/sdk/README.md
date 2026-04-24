@@ -22,30 +22,30 @@ bun add @openpolicy/sdk
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  privacy: {
-    effectiveDate: "2026-01-01",
-    dataCollected: {
-      "Account information": ["Email address", "Display name"],
-      "Usage data": ["Pages visited", "Session duration"],
-    },
-    legalBasis: "Legitimate interests and user consent",
-    retention: {
-      "Account data": "Until account deletion",
-      "Analytics data": "13 months",
-    },
-    cookies: { essential: true, analytics: true, marketing: false },
-    thirdParties: [
-      { name: "Vercel", purpose: "Hosting" },
-      { name: "Plausible", purpose: "Privacy-friendly analytics" },
-    ],
-    jurisdictions: ["eu", "us-ca"],
-  },
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	privacy: {
+		effectiveDate: "2026-01-01",
+		dataCollected: {
+			"Account information": ["Email address", "Display name"],
+			"Usage data": ["Pages visited", "Session duration"],
+		},
+		legalBasis: "Legitimate interests and user consent",
+		retention: {
+			"Account data": "Until account deletion",
+			"Analytics data": "13 months",
+		},
+		cookies: { essential: true, analytics: true, marketing: false },
+		thirdParties: [
+			{ name: "Vercel", purpose: "Hosting" },
+			{ name: "Plausible", purpose: "Privacy-friendly analytics" },
+		],
+		jurisdictions: ["eu", "us-ca"],
+	},
 });
 ```
 
@@ -56,17 +56,17 @@ export default defineConfig({
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  cookie: {
-    effectiveDate: "2026-01-01",
-    cookies: { essential: true, analytics: true, marketing: false },
-    jurisdictions: ["eu", "us-ca"],
-  },
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	cookie: {
+		effectiveDate: "2026-01-01",
+		cookies: { essential: true, analytics: true, marketing: false },
+		jurisdictions: ["eu", "us-ca"],
+	},
 });
 ```
 

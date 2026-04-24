@@ -30,15 +30,15 @@ That's the whole flow. The CLI is meant for one-time setup — once it's done, u
 
 ## Flags
 
-| Flag | Default | Description |
-|---|---|---|
-| `--cwd <path>` | `.` | Working directory |
-| `--pm <bun\|pnpm\|yarn\|npm>` | auto-detected | Override package-manager detection |
-| `--skip-install` | `false` | Skip installation; only print the prompt |
-| `--dry-run` | `false` | Show planned actions without executing |
-| `--yes`, `-y` | `false` | Skip the confirmation prompt |
-| `--out <path>` | auto-detected | Output path for the starter `openpolicy.ts` |
-| `--force` | `false` | Overwrite an existing `openpolicy.ts` |
+| Flag                          | Default       | Description                                 |
+| ----------------------------- | ------------- | ------------------------------------------- |
+| `--cwd <path>`                | `.`           | Working directory                           |
+| `--pm <bun\|pnpm\|yarn\|npm>` | auto-detected | Override package-manager detection          |
+| `--skip-install`              | `false`       | Skip installation; only print the prompt    |
+| `--dry-run`                   | `false`       | Show planned actions without executing      |
+| `--yes`, `-y`                 | `false`       | Skip the confirmation prompt                |
+| `--out <path>`                | auto-detected | Output path for the starter `openpolicy.ts` |
+| `--force`                     | `false`       | Overwrite an existing `openpolicy.ts`       |
 
 ## Why a prompt instead of a wizard?
 

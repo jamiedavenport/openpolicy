@@ -1,9 +1,5 @@
-import { expect, test } from "bun:test";
-import {
-	expandOpenPolicyConfig,
-	isOpenPolicyConfig,
-	shouldEmit,
-} from "./index";
+import { expect, test } from "vite-plus/test";
+import { expandOpenPolicyConfig, isOpenPolicyConfig, shouldEmit } from "./index";
 import type { OpenPolicyConfig, PolicyInput } from "./types";
 
 const input: PolicyInput = {

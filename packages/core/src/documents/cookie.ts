@@ -28,8 +28,7 @@ function buildTypes(config: CookiePolicyConfig): DocumentSection {
 	if (config.cookies.essential)
 		types.push({
 			label: "Essential Cookies",
-			description:
-				"Required for the basic functioning of our services. These cannot be disabled.",
+			description: "Required for the basic functioning of our services. These cannot be disabled.",
 		});
 	if (config.cookies.analytics)
 		types.push({
@@ -46,8 +45,7 @@ function buildTypes(config: CookiePolicyConfig): DocumentSection {
 	if (config.cookies.marketing)
 		types.push({
 			label: "Marketing Cookies",
-			description:
-				"Used to deliver advertisements more relevant to you and your interests.",
+			description: "Used to deliver advertisements more relevant to you and your interests.",
 		});
 
 	if (types.length === 0) {
@@ -63,16 +61,11 @@ function buildTypes(config: CookiePolicyConfig): DocumentSection {
 	]);
 }
 
-function buildTrackingTechnologies(
-	config: CookiePolicyConfig,
-): DocumentSection | null {
-	if (!config.trackingTechnologies || config.trackingTechnologies.length === 0)
-		return null;
+function buildTrackingTechnologies(config: CookiePolicyConfig): DocumentSection | null {
+	if (!config.trackingTechnologies || config.trackingTechnologies.length === 0) return null;
 	return section("cookie-tracking-technologies", [
 		heading("Other Tracking Technologies"),
-		p([
-			"In addition to cookies, we may use the following tracking technologies:",
-		]),
+		p(["In addition to cookies, we may use the following tracking technologies:"]),
 		ul(config.trackingTechnologies.map((t) => li([t]))),
 	]);
 }
@@ -88,9 +81,7 @@ function buildThirdParties(config: CookiePolicyConfig): DocumentSection | null {
 					bold(t.name),
 					" \u2014 ",
 					t.purpose,
-					...(t.policyUrl
-						? [" (", link(t.policyUrl, "Privacy Policy"), ")"]
-						: []),
+					...(t.policyUrl ? [" (", link(t.policyUrl, "Privacy Policy"), ")"] : []),
 				]),
 			),
 		),
@@ -99,34 +90,24 @@ function buildThirdParties(config: CookiePolicyConfig): DocumentSection | null {
 
 function buildConsent(config: CookiePolicyConfig): DocumentSection | null {
 	if (!config.consentMechanism) return null;
-	const { hasBanner, hasPreferencePanel, canWithdraw } =
-		config.consentMechanism;
+	const { hasBanner, hasPreferencePanel, canWithdraw } = config.consentMechanism;
 	const items: string[] = [];
 	if (hasBanner)
-		items.push(
-			"We display a cookie consent banner when you first visit our services.",
-		);
+		items.push("We display a cookie consent banner when you first visit our services.");
 	if (hasPreferencePanel)
-		items.push(
-			"You can manage your cookie preferences at any time via our preference panel.",
-		);
+		items.push("You can manage your cookie preferences at any time via our preference panel.");
 	if (canWithdraw)
 		items.push(
 			"You may withdraw your consent at any time; however, this will not affect the lawfulness of processing based on consent before its withdrawal.",
 		);
 	if (items.length === 0) return null;
-	return section("cookie-consent", [
-		heading("Your Consent"),
-		ul(items.map((i) => li([i]))),
-	]);
+	return section("cookie-consent", [heading("Your Consent"), ul(items.map((i) => li([i])))]);
 }
 
 function buildManaging(): DocumentSection {
 	return section("cookie-managing", [
 		heading("Managing Cookies"),
-		p([
-			"Most web browsers allow you to control cookies through their settings. You can:",
-		]),
+		p(["Most web browsers allow you to control cookies through their settings. You can:"]),
 		ul([
 			li(["Delete cookies already stored on your device"]),
 			li(["Block cookies from being set on your device"]),
@@ -138,9 +119,7 @@ function buildManaging(): DocumentSection {
 	]);
 }
 
-function buildJurisdictionEuUk(
-	config: CookiePolicyConfig,
-): DocumentSection | null {
+function buildJurisdictionEuUk(config: CookiePolicyConfig): DocumentSection | null {
 	const hasEu = config.jurisdictions.includes("eu");
 	const hasUk = config.jurisdictions.includes("uk");
 	if (!hasEu && !hasUk) return null;
@@ -182,9 +161,7 @@ function buildContact(config: CookiePolicyConfig): DocumentSection {
 	]);
 }
 
-const SECTION_BUILDERS: ((
-	config: CookiePolicyConfig,
-) => DocumentSection | null)[] = [
+const SECTION_BUILDERS: ((config: CookiePolicyConfig) => DocumentSection | null)[] = [
 	buildIntroduction,
 	() => buildWhatAreCookies(),
 	buildTypes,
@@ -196,9 +173,7 @@ const SECTION_BUILDERS: ((
 	buildContact,
 ];
 
-export function compileCookieDocument(
-	config: CookiePolicyConfig,
-): DocumentSection[] {
+export function compileCookieDocument(config: CookiePolicyConfig): DocumentSection[] {
 	return SECTION_BUILDERS.map((builder) => builder(config)).filter(
 		(s): s is DocumentSection => s !== null,
 	);

@@ -39,19 +39,19 @@ The following is a complete minimal implementation using plain divs and buttons 
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA",
-    contact: "privacy@acme.com",
-  },
-  cookie: {
-    cookies: {
-      essential: true,
-      analytics: true,
-      marketing: false,
-    },
-  },
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA",
+		contact: "privacy@acme.com",
+	},
+	cookie: {
+		cookies: {
+			essential: true,
+			analytics: true,
+			marketing: false,
+		},
+	},
 });
 ```
 
@@ -65,13 +65,13 @@ import { CookieBanner } from "./CookieBanner";
 import { CookiePreferences } from "./CookiePreferences";
 
 export function App() {
-  return (
-    <OpenPolicy config={config}>
-      <CookieBanner />
-      <CookiePreferences />
-      {/* rest of app */}
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={config}>
+			<CookieBanner />
+			<CookiePreferences />
+			{/* rest of app */}
+		</OpenPolicy>
+	);
 }
 ```
 
@@ -82,34 +82,34 @@ export function App() {
 import { useCookies } from "@openpolicy/react";
 
 export function CookieBanner() {
-  const { route, setRoute, acceptAll, acceptNecessary } = useCookies();
+	const { route, setRoute, acceptAll, acceptNecessary } = useCookies();
 
-  if (route !== "cookie") return null;
+	if (route !== "cookie") return null;
 
-  return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: "1rem",
-        right: "1rem",
-        padding: "1.5rem",
-        background: "#fff",
-        border: "1px solid #e5e7eb",
-        borderRadius: "0.5rem",
-        maxWidth: "24rem",
-        zIndex: 50,
-      }}
-    >
-      <p style={{ marginBottom: "1rem" }}>
-        We use cookies to improve your experience and analyse site traffic.
-      </p>
-      <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
-        <button onClick={() => setRoute("preferences")}>Manage Cookies</button>
-        <button onClick={acceptNecessary}>Necessary Only</button>
-        <button onClick={acceptAll}>Accept All</button>
-      </div>
-    </div>
-  );
+	return (
+		<div
+			style={{
+				position: "fixed",
+				bottom: "1rem",
+				right: "1rem",
+				padding: "1.5rem",
+				background: "#fff",
+				border: "1px solid #e5e7eb",
+				borderRadius: "0.5rem",
+				maxWidth: "24rem",
+				zIndex: 50,
+			}}
+		>
+			<p style={{ marginBottom: "1rem" }}>
+				We use cookies to improve your experience and analyse site traffic.
+			</p>
+			<div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+				<button onClick={() => setRoute("preferences")}>Manage Cookies</button>
+				<button onClick={acceptNecessary}>Necessary Only</button>
+				<button onClick={acceptAll}>Accept All</button>
+			</div>
+		</div>
+	);
 }
 ```
 
@@ -120,62 +120,61 @@ export function CookieBanner() {
 import { useCookies } from "@openpolicy/react";
 
 export function CookiePreferences() {
-  const { route, setRoute, categories, toggle, save, acceptNecessary } =
-    useCookies();
+	const { route, setRoute, categories, toggle, save, acceptNecessary } = useCookies();
 
-  if (route !== "preferences") return null;
+	if (route !== "preferences") return null;
 
-  return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.5)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 50,
-      }}
-    >
-      <div
-        style={{
-          background: "#fff",
-          padding: "2rem",
-          borderRadius: "0.5rem",
-          minWidth: "20rem",
-        }}
-      >
-        <h2>Cookie preferences</h2>
-        <p>Choose which cookies you allow.</p>
+	return (
+		<div
+			style={{
+				position: "fixed",
+				inset: 0,
+				background: "rgba(0,0,0,0.5)",
+				display: "flex",
+				alignItems: "center",
+				justifyContent: "center",
+				zIndex: 50,
+			}}
+		>
+			<div
+				style={{
+					background: "#fff",
+					padding: "2rem",
+					borderRadius: "0.5rem",
+					minWidth: "20rem",
+				}}
+			>
+				<h2>Cookie preferences</h2>
+				<p>Choose which cookies you allow.</p>
 
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {categories.map(({ key, label, enabled, locked }) => (
-            <li
-              key={key}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "0.5rem 0",
-              }}
-            >
-              <span>{label}</span>
-              <input
-                type="checkbox"
-                checked={enabled}
-                disabled={locked}
-                onChange={() => toggle(key)}
-              />
-            </li>
-          ))}
-        </ul>
+				<ul style={{ listStyle: "none", padding: 0 }}>
+					{categories.map(({ key, label, enabled, locked }) => (
+						<li
+							key={key}
+							style={{
+								display: "flex",
+								justifyContent: "space-between",
+								padding: "0.5rem 0",
+							}}
+						>
+							<span>{label}</span>
+							<input
+								type="checkbox"
+								checked={enabled}
+								disabled={locked}
+								onChange={() => toggle(key)}
+							/>
+						</li>
+					))}
+				</ul>
 
-        <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
-          <button onClick={acceptNecessary}>Reject All</button>
-          <button onClick={() => save()}>Save Preferences</button>
-        </div>
-      </div>
-    </div>
-  );
+				<div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+					<button onClick={acceptNecessary}>Reject All</button>
+					<button onClick={() => save()}>Save Preferences</button>
+				</div>
+			</div>
+		</div>
+	);
 }
 ```
 
@@ -209,28 +208,25 @@ Navigating between them:
 
 ```ts
 type CookieCategory = {
-  key: string;    // "essential" | "analytics" | "marketing" | ...
-  label: string;  // human-readable, e.g. "Analytics"
-  enabled: boolean;
-  locked: boolean; // true for "essential" — cannot be toggled
+	key: string; // "essential" | "analytics" | "marketing" | ...
+	label: string; // human-readable, e.g. "Analytics"
+	enabled: boolean;
+	locked: boolean; // true for "essential" — cannot be toggled
 };
 ```
 
 `toggle(key)` updates local draft state without persisting. `save()` merges draft into localStorage and closes the banner. Until `save()` is called, the user's changes are not committed.
 
 ```tsx
-{categories.map(({ key, label, enabled, locked }) => (
-  <label key={key}>
-    <input
-      type="checkbox"
-      checked={enabled}
-      disabled={locked}
-      onChange={() => toggle(key)}
-    />
-    {label}
-  </label>
-))}
-<button onClick={() => save()}>Save</button>
+{
+	categories.map(({ key, label, enabled, locked }) => (
+		<label key={key}>
+			<input type="checkbox" checked={enabled} disabled={locked} onChange={() => toggle(key)} />
+			{label}
+		</label>
+	));
+}
+<button onClick={() => save()}>Save</button>;
 ```
 
 ### 3. ConsentGate — conditional rendering by consent
@@ -262,9 +258,9 @@ const { has } = useCookies();
 
 // Load analytics script only when consent is given
 useEffect(() => {
-  if (has("analytics")) {
-    loadAnalytics();
-  }
+	if (has("analytics")) {
+		loadAnalytics();
+	}
 }, [has]);
 ```
 
@@ -289,15 +285,15 @@ Without the route check the banner renders permanently, ignoring whether consent
 ```tsx
 // WRONG: renders always, no route check
 function CookieBanner() {
-  const { acceptAll, acceptNecessary } = useCookies();
-  return <div>...</div>;
+	const { acceptAll, acceptNecessary } = useCookies();
+	return <div>...</div>;
 }
 
 // Correct
 function CookieBanner() {
-  const { route, acceptAll, acceptNecessary } = useCookies();
-  if (route !== "cookie") return null;
-  return <div>...</div>;
+	const { route, acceptAll, acceptNecessary } = useCookies();
+	if (route !== "cookie") return null;
+	return <div>...</div>;
 }
 ```
 
@@ -323,16 +319,16 @@ Without the provider, `useCookies()` reads from the default context: `consent: n
 ```tsx
 // WRONG: no provider
 function App() {
-  return <CookieBanner />;
+	return <CookieBanner />;
 }
 
 // Correct: provider at root, banner and preferences inside it
 function App() {
-  return (
-    <OpenPolicy config={config}>
-      <CookieBanner />
-      <CookiePreferences />
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={config}>
+			<CookieBanner />
+			<CookiePreferences />
+		</OpenPolicy>
+	);
 }
 ```

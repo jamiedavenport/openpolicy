@@ -3,9 +3,9 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview"
+		"dev": "vp dev",
+		"build": "vp build",
+		"preview": "vp preview"
 	},
 	"dependencies": {
 		"@openpolicy/sdk": "workspace:*",
@@ -17,6 +17,7 @@
 		"@openpolicy/tooling": "workspace:*",
 		"@vitejs/plugin-vue": "^6.0.1",
 		"typescript": "^5.9.3",
-		"vite": "catalog:"
+		"vite": "catalog:",
+		"vite-plus": "catalog:"
 	}
 }

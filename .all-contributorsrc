@@ -1,61 +1,43 @@
 {
-  "projectName": "openpolicy",
-  "projectOwner": "jamiedavenport",
-  "repoType": "github",
-  "repoHost": "https://github.com",
-  "files": [
-    "README.md"
-  ],
-  "imageSize": 100,
-  "commit": true,
-  "commitConvention": "none",
-  "contributors": [
-    {
-      "login": "jamiedavenport",
-      "name": "Jamie Davenport",
-      "avatar_url": "https://avatars.githubusercontent.com/u/1329874?v=4",
-      "profile": "https://www.jxd.dev/",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
-      "login": "jimbobware",
-      "name": "James",
-      "avatar_url": "https://avatars.githubusercontent.com/u/121758727?v=4",
-      "profile": "https://github.com/jimbobware",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
-      "login": "vishvish",
-      "name": "Vish",
-      "avatar_url": "https://avatars.githubusercontent.com/u/184423?v=4",
-      "profile": "https://www.vishvish.com/",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
-      "login": "kdoroszewicz",
-      "name": "Kamil Doroszewicz",
-      "avatar_url": "https://avatars.githubusercontent.com/u/7294362?v=4",
-      "profile": "https://github.com/kdoroszewicz",
-      "contributions": [
-        "code"
-      ]
-    }
-  ],
-  "contributionTypes": [
-    "bug",
-    "code",
-    "doc",
-    "ideas",
-    "maintenance",
-    "review",
-    "test"
-  ],
-  "commitType": "docs",
-  "contributorsPerLine": 7
+	"projectName": "openpolicy",
+	"projectOwner": "jamiedavenport",
+	"repoType": "github",
+	"repoHost": "https://github.com",
+	"files": ["README.md"],
+	"imageSize": 100,
+	"commit": true,
+	"commitConvention": "none",
+	"contributors": [
+		{
+			"login": "jamiedavenport",
+			"name": "Jamie Davenport",
+			"avatar_url": "https://avatars.githubusercontent.com/u/1329874?v=4",
+			"profile": "https://www.jxd.dev/",
+			"contributions": ["code"]
+		},
+		{
+			"login": "jimbobware",
+			"name": "James",
+			"avatar_url": "https://avatars.githubusercontent.com/u/121758727?v=4",
+			"profile": "https://github.com/jimbobware",
+			"contributions": ["code"]
+		},
+		{
+			"login": "vishvish",
+			"name": "Vish",
+			"avatar_url": "https://avatars.githubusercontent.com/u/184423?v=4",
+			"profile": "https://www.vishvish.com/",
+			"contributions": ["code"]
+		},
+		{
+			"login": "kdoroszewicz",
+			"name": "Kamil Doroszewicz",
+			"avatar_url": "https://avatars.githubusercontent.com/u/7294362?v=4",
+			"profile": "https://github.com/kdoroszewicz",
+			"contributions": ["code"]
+		}
+	],
+	"contributionTypes": ["bug", "code", "doc", "ideas", "maintenance", "review", "test"],
+	"commitType": "docs",
+	"contributorsPerLine": 7
 }

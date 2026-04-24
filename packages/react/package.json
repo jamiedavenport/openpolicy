@@ -1,8 +1,10 @@
 {
 	"name": "@openpolicy/react",
 	"version": "0.0.26",
-	"type": "module",
 	"description": "React components and hooks for OpenPolicy",
+	"keywords": [
+		"tanstack-intent"
+	],
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
@@ -15,29 +17,12 @@
 		"NOTICE.md",
 		"skills"
 	],
+	"type": "module",
 	"exports": {
 		".": {
 			"import": "./dist/index.js",
 			"types": "./dist/index.d.ts"
 		}
-	},
-	"scripts": {
-		"dev": "rolldown --watch -c",
-		"build": "rolldown -c",
-		"check-types": "tsc --noEmit",
-		"test": "bun test"
-	},
-	"peerDependencies": {
-		"react": ">=18",
-		"react-dom": ">=18"
-	},
-	"dependencies": {},
-	"devDependencies": {
-		"@openpolicy/core": "workspace:*",
-		"@openpolicy/tooling": "workspace:*",
-		"@types/react": "^18.0.0 || ^19.0.0",
-		"react": "^19.0.0",
-		"@tanstack/intent": "^0.0.29"
 	},
 	"publishConfig": {
 		"exports": {
@@ -47,7 +32,23 @@
 			}
 		}
 	},
-	"keywords": [
-		"tanstack-intent"
-	]
+	"scripts": {
+		"dev": "vp pack --watch",
+		"build": "vp pack",
+		"check-types": "tsc --noEmit",
+		"test": "vp test"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@openpolicy/core": "workspace:*",
+		"@openpolicy/tooling": "workspace:*",
+		"@tanstack/intent": "^0.0.29",
+		"@types/react": "^18.0.0 || ^19.0.0",
+		"react": "^19.0.0",
+		"vite-plus": "catalog:"
+	},
+	"peerDependencies": {
+		"react": ">=18",
+		"react-dom": ">=18"
+	}
 }

@@ -1,7 +1,6 @@
 {
 	"name": "@openpolicy/core",
 	"version": "0.0.26",
-	"type": "module",
 	"description": "Core package for OpenPolicy",
 	"license": "Apache-2.0",
 	"repository": {
@@ -9,12 +8,13 @@
 		"url": "https://github.com/jamiedavenport/openpolicy",
 		"directory": "packages/core"
 	},
-	"sideEffects": false,
 	"files": [
 		"dist",
 		"README.md",
 		"NOTICE.md"
 	],
+	"type": "module",
+	"sideEffects": false,
 	"exports": {
 		".": {
 			"import": "./dist/index.js",
@@ -22,12 +22,13 @@
 		}
 	},
 	"scripts": {
-		"dev": "rolldown --watch -c",
-		"build": "rolldown -c",
+		"dev": "vp pack --watch",
+		"build": "vp pack",
 		"check-types": "tsc --noEmit",
-		"test": "bun test"
+		"test": "vp test"
 	},
 	"devDependencies": {
-		"@openpolicy/tooling": "workspace:*"
+		"@openpolicy/tooling": "workspace:*",
+		"vite-plus": "catalog:"
 	}
 }

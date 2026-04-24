@@ -103,10 +103,7 @@ export function updateConsent(partial: Partial<CookieConsent>): CookieConsent {
 	return next;
 }
 
-export function evalHas(
-	consent: CookieConsent | null,
-	expr: HasExpression,
-): boolean {
+export function evalHas(consent: CookieConsent | null, expr: HasExpression): boolean {
 	if (!consent) return false;
 	if (typeof expr === "string") return Boolean(consent[expr]);
 	if ("and" in expr) return expr.and.every((child) => evalHas(consent, child));
@@ -190,21 +187,10 @@ type OpenPolicyProviderProps = {
 	children?: ReactNode;
 };
 
-export function OpenPolicyProvider({
-	config,
-	shouldShow,
-	children,
-}: OpenPolicyProviderProps) {
-	const cookieConfig = useMemo(
-		() => resolveCookieConfig(config) ?? null,
-		[config],
-	);
+export function OpenPolicyProvider({ config, shouldShow, children }: OpenPolicyProviderProps) {
+	const cookieConfig = useMemo(() => resolveCookieConfig(config) ?? null, [config]);
 
-	const consent = useSyncExternalStore(
-		subscribe,
-		getSnapshotCached,
-		getServerSnapshot,
-	);
+	const consent = useSyncExternalStore(subscribe, getSnapshotCached, getServerSnapshot);
 
 	const status: CookieConsentStatus = consent ? "completed" : "undecided";
 
@@ -228,10 +214,7 @@ export function OpenPolicyProvider({
 		};
 	}, [consent, cookieConfig, status]);
 
-	const has = useCallback(
-		(expr: HasExpression) => evalHas(consent, expr),
-		[consent],
-	);
+	const has = useCallback((expr: HasExpression) => evalHas(consent, expr), [consent]);
 
 	const visible = useShouldShowCookieBanner(status, shouldShow);
 
@@ -279,10 +262,7 @@ export function OpenPolicyProvider({
 
 	const categories: CookieCategory[] = cookieConfig
 		? Object.keys(cookieConfig.cookies)
-				.filter(
-					(key) =>
-						cookieConfig.cookies[key as keyof typeof cookieConfig.cookies],
-				)
+				.filter((key) => cookieConfig.cookies[key as keyof typeof cookieConfig.cookies])
 				.map((key) => ({
 					key,
 					label: CATEGORY_LABELS[String(key)] ?? String(key),
@@ -300,17 +280,13 @@ export function OpenPolicyProvider({
 		if (key === "essential") return;
 		setDraft((prev) => ({
 			...prev,
-			[key]: !(
-				prev[key as keyof CookieConsent] ??
-				consent?.[key as keyof CookieConsent] ??
-				false
-			),
+			[key]: !(prev[key as keyof CookieConsent] ?? consent?.[key as keyof CookieConsent] ?? false),
 		}));
 	};
 
 	const save = (onSave?: (consent: CookieConsent) => void) => {
 		const next = {
-			...(consent ?? {}),
+			...consent,
 			...draft,
 			essential: true,
 		} as CookieConsent;

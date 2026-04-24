@@ -17,13 +17,13 @@ name: Trigger Skill Review
 on:
   push:
     branches: [main]
-    paths:      
-      - 'packages/react/docs/**'
-      - 'packages/react/src/**'
-      - 'packages/sdk/docs/**'
-      - 'packages/sdk/src/**'
-      - 'packages/vite/docs/**'
-      - 'packages/vite/src/**'
+    paths:
+      - "packages/react/docs/**"
+      - "packages/react/src/**"
+      - "packages/sdk/docs/**"
+      - "packages/sdk/src/**"
+      - "packages/vite/docs/**"
+      - "packages/vite/src/**"
 
 jobs:
   notify:

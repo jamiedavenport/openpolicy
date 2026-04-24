@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import { compile } from "./documents";
 import type { OpenPolicyConfig, PolicyInput, UserRight } from "./types";
 import { deriveUserRights } from "./user-rights";
@@ -73,9 +73,7 @@ test("buildUserRights: privacy policy omits 'Your Rights' section when derivatio
 		jurisdictions: ["ca"],
 	};
 	const document = compile(input);
-	const hasRightsSection = document.sections.some(
-		(s) => s.id === "user-rights",
-	);
+	const hasRightsSection = document.sections.some((s) => s.id === "user-rights");
 	expect(hasRightsSection).toBe(false);
 });
 
@@ -94,7 +92,5 @@ test("validateOpenPolicyConfig: emits no userRights-related issues", () => {
 		retention: { "Account data": "Until deletion" },
 	};
 	const issues = validateOpenPolicyConfig(config);
-	expect(
-		issues.some((i) => i.message.toLowerCase().includes("userrights")),
-	).toBe(false);
+	expect(issues.some((i) => i.message.toLowerCase().includes("userrights"))).toBe(false);
 });

@@ -32,24 +32,20 @@ Wrap your app with the provider and render a policy page. Components are unstyle
 
 ```tsx
 // layout.tsx (or _app.tsx)
-import { OpenPolicy } from '@openpolicy/react';
-import config from './openpolicy';
+import { OpenPolicy } from "@openpolicy/react";
+import config from "./openpolicy";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <OpenPolicy config={config}>
-      {children}
-    </OpenPolicy>
-  );
+	return <OpenPolicy config={config}>{children}</OpenPolicy>;
 }
 ```
 
 ```tsx
 // app/privacy/page.tsx
-import { PrivacyPolicy } from '@openpolicy/react';
+import { PrivacyPolicy } from "@openpolicy/react";
 
 export default function PrivacyPage() {
-  return <PrivacyPolicy />;
+	return <PrivacyPolicy />;
 }
 ```
 
@@ -60,12 +56,12 @@ export default function PrivacyPage() {
 `OpenPolicyProvider` (exported as `OpenPolicy`) must wrap the entire application. All policy components and hooks read from this context.
 
 ```tsx
-import { OpenPolicy } from '@openpolicy/react';
-import config from './openpolicy';
+import { OpenPolicy } from "@openpolicy/react";
+import config from "./openpolicy";
 
 <OpenPolicy config={config}>
-  <App />
-</OpenPolicy>
+	<App />
+</OpenPolicy>;
 ```
 
 `config` must be an `OpenPolicyConfig` (the nested shape produced by `defineConfig()`). The provider also injects default styles via a React `<style>` tag, so the CSS import is optional when using the provider — but import it explicitly for non-provider rendering paths.
@@ -75,26 +71,26 @@ import config from './openpolicy';
 Each component reads its slice of the config from context automatically:
 
 ```tsx
-import { PrivacyPolicy, CookiePolicy } from '@openpolicy/react';
+import { PrivacyPolicy, CookiePolicy } from "@openpolicy/react";
 
 // Privacy policy page
 export default function PrivacyPage() {
-  return <PrivacyPolicy />;
+	return <PrivacyPolicy />;
 }
 
 // Cookie policy page
 export default function CookiePolicyPage() {
-  return <CookiePolicy />;
+	return <CookiePolicy />;
 }
 ```
 
 Both components accept the same optional props:
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `config` | `OpenPolicyConfig \| PrivacyPolicyConfig` (or equivalent) | Per-page config override; falls back to context |
-| `components` | `PolicyComponents` | Override default renderers for individual node types |
-| `style` | `CSSProperties` | Inline styles applied to the wrapper `<div>` |
+| Prop         | Type                                                      | Description                                          |
+| ------------ | --------------------------------------------------------- | ---------------------------------------------------- |
+| `config`     | `OpenPolicyConfig \| PrivacyPolicyConfig` (or equivalent) | Per-page config override; falls back to context      |
+| `components` | `PolicyComponents`                                        | Override default renderers for individual node types |
+| `style`      | `CSSProperties`                                           | Inline styles applied to the wrapper `<div>`         |
 
 ### 3. Component customization with PolicyComponents
 
@@ -102,29 +98,29 @@ Override any node renderer by passing a `components` prop. The `PolicyComponents
 
 ```ts
 type PolicyComponents = {
-  Section?: ComponentType<{ section: DocumentSection; children: ReactNode }>;
-  Heading?: ComponentType<{ node: HeadingNode }>;
-  Paragraph?: ComponentType<{ node: ParagraphNode; children: ReactNode }>;
-  List?: ComponentType<{ node: ListNode; children: ReactNode }>;
-  Text?: ComponentType<{ node: TextNode }>;
-  Bold?: ComponentType<{ node: BoldNode }>;
-  Italic?: ComponentType<{ node: ItalicNode }>;
-  Link?: ComponentType<{ node: LinkNode }>;
-}
+	Section?: ComponentType<{ section: DocumentSection; children: ReactNode }>;
+	Heading?: ComponentType<{ node: HeadingNode }>;
+	Paragraph?: ComponentType<{ node: ParagraphNode; children: ReactNode }>;
+	List?: ComponentType<{ node: ListNode; children: ReactNode }>;
+	Text?: ComponentType<{ node: TextNode }>;
+	Bold?: ComponentType<{ node: BoldNode }>;
+	Italic?: ComponentType<{ node: ItalicNode }>;
+	Link?: ComponentType<{ node: LinkNode }>;
+};
 ```
 
 All fields are optional — unspecified slots use the default renderers. Example: swap in a custom heading:
 
 ```tsx
-import { PrivacyPolicy } from '@openpolicy/react';
-import type { HeadingNode } from '@openpolicy/core';
+import { PrivacyPolicy } from "@openpolicy/react";
+import type { HeadingNode } from "@openpolicy/core";
 
 function MyHeading({ node }: { node: HeadingNode }) {
-  return <h2 className="text-2xl font-bold text-slate-900">{node.text}</h2>;
+	return <h2 className="text-2xl font-bold text-slate-900">{node.text}</h2>;
 }
 
 export default function PrivacyPage() {
-  return <PrivacyPolicy components={{ Heading: MyHeading }} />;
+	return <PrivacyPolicy components={{ Heading: MyHeading }} />;
 }
 ```
 
@@ -134,25 +130,25 @@ Components emit `data-op-*` attributes instead of shipping styles. Target them d
 
 ```css
 [data-op-policy] {
-  color: #475569;
-  line-height: 1.75;
+	color: #475569;
+	line-height: 1.75;
 }
 
 [data-op-policy] [data-op-heading] {
-  color: #0f172a;
-  font-weight: 600;
+	color: #0f172a;
+	font-weight: 600;
 }
 
 [data-op-policy] [data-op-section] {
-  margin-block: 2.5rem;
+	margin-block: 2.5rem;
 }
 
 [data-op-policy] a {
-  color: #6366f1;
+	color: #6366f1;
 }
 
 [data-op-policy] a:hover {
-  color: #4f46e5;
+	color: #4f46e5;
 }
 ```
 
@@ -175,17 +171,17 @@ The `openPolicy()` Vite plugin emits `.md` / `.html` / `.pdf` files at build tim
 
 ```ts
 // vite.config.ts — WRONG
-import { openPolicy } from '@openpolicy/vite';
-plugins: [openPolicy({ formats: ['html'], outDir: 'public' })]
+import { openPolicy } from "@openpolicy/vite";
+plugins: [openPolicy({ formats: ["html"], outDir: "public" })];
 ```
 
 The correct approach is React runtime rendering — render `<PrivacyPolicy />` as a page component. The static files produced by `openPolicy()` are never read by the React components.
 
 ```tsx
 // correct: render as a React page
-import { PrivacyPolicy } from '@openpolicy/react';
+import { PrivacyPolicy } from "@openpolicy/react";
 export default function PrivacyPage() {
-  return <PrivacyPolicy />;
+	return <PrivacyPolicy />;
 }
 ```
 
@@ -196,7 +192,7 @@ export default function PrivacyPage() {
 ```tsx
 // privacy-page.tsx — WRONG: no provider anywhere in the tree
 export default function PrivacyPage() {
-  return <PrivacyPolicy />;
+	return <PrivacyPolicy />;
 }
 ```
 
@@ -204,18 +200,14 @@ Wrap at the application root, not inside individual pages:
 
 ```tsx
 // layout.tsx — correct
-import config from './openpolicy';
+import config from "./openpolicy";
 export default function RootLayout({ children }) {
-  return (
-    <OpenPolicy config={config}>
-      {children}
-    </OpenPolicy>
-  );
+	return <OpenPolicy config={config}>{children}</OpenPolicy>;
 }
 
 // privacy-page.tsx — correct: provider is already in the tree
 export default function PrivacyPage() {
-  return <PrivacyPolicy />;
+	return <PrivacyPolicy />;
 }
 ```
 
@@ -225,9 +217,15 @@ export default function PrivacyPage() {
 
 ```css
 /* in your global stylesheet */
-[data-op-policy] [data-op-heading] { font-weight: 600; }
-[data-op-policy] [data-op-section] { margin-block: 2rem; }
-[data-op-policy] [data-op-paragraph] { line-height: 1.7; }
+[data-op-policy] [data-op-heading] {
+	font-weight: 600;
+}
+[data-op-policy] [data-op-section] {
+	margin-block: 2rem;
+}
+[data-op-policy] [data-op-paragraph] {
+	line-height: 1.7;
+}
 ```
 
 ```tsx

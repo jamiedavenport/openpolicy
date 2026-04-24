@@ -5,9 +5,7 @@ import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import openpolicy from "../../../openpolicy";
 
 const inputs = expandOpenPolicyConfig(openpolicy);
-const policiesMarkdown = inputs
-	.map((input) => renderMarkdown(compile(input)))
-	.join("\n\n---\n\n");
+const policiesMarkdown = inputs.map((input) => renderMarkdown(compile(input))).join("\n\n---\n\n");
 
 const SYSTEM_PROMPT = `You are a legal assistant for ${openpolicy.company.name}. \
 Answer questions about the following policies clearly and concisely. \

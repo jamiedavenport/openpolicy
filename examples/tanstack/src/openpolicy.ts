@@ -1,9 +1,4 @@
-import {
-	cookies,
-	dataCollected,
-	defineConfig,
-	thirdParties,
-} from "@openpolicy/sdk";
+import { cookies, dataCollected, defineConfig, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {

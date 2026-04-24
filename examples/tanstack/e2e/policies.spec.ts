@@ -40,9 +40,7 @@ test.describe("/cookie-banner", () => {
 		await expect(page.getByTestId("consent-status")).toHaveText("completed");
 	});
 
-	test("closing preferences panel via X keeps the banner visible", async ({
-		page,
-	}) => {
+	test("closing preferences panel via X keeps the banner visible", async ({ page }) => {
 		await page.getByRole("button", { name: "Manage Cookies" }).click();
 		await expect(page.getByText("Cookie preferences")).toBeVisible();
 		await page.getByRole("button", { name: "Close" }).click();
@@ -80,23 +78,15 @@ for (const route of ROUTES) {
 		});
 
 		test("privacy policy renders key sections", async ({ page }) => {
-			await expect(
-				page.getByRole("heading", { name: "Introduction" }),
-			).toBeVisible();
-			await expect(
-				page.getByRole("heading", { name: "Information We Collect" }),
-			).toBeVisible();
-			await expect(
-				page.getByRole("heading", { name: "Your Rights" }),
-			).toBeVisible();
+			await expect(page.getByRole("heading", { name: "Introduction" })).toBeVisible();
+			await expect(page.getByRole("heading", { name: "Information We Collect" })).toBeVisible();
+			await expect(page.getByRole("heading", { name: "Your Rights" })).toBeVisible();
 		});
 
 		test("cookie policy renders key sections", async ({ page }) => {
 			await expect(page.getByText("What Are Cookies?")).toBeVisible();
 			await expect(page.getByText("Types of Cookies We Use")).toBeVisible();
-			await expect(
-				page.getByRole("heading", { name: "Managing Cookies" }),
-			).toBeVisible();
+			await expect(page.getByRole("heading", { name: "Managing Cookies" })).toBeVisible();
 		});
 
 		test("policies contain company name", async ({ page }) => {

@@ -1,7 +1,6 @@
 {
 	"name": "@openpolicy/cli",
 	"version": "0.0.26",
-	"type": "module",
 	"description": "CLI to install OpenPolicy and print a setup prompt for coding agents",
 	"license": "Apache-2.0",
 	"repository": {
@@ -9,23 +8,25 @@
 		"url": "https://github.com/jamiedavenport/openpolicy",
 		"directory": "packages/cli"
 	},
+	"bin": {
+		"openpolicy": "./dist/cli.js"
+	},
 	"files": [
 		"dist",
 		"README.md",
 		"NOTICE.md"
 	],
-	"bin": {
-		"openpolicy": "./dist/cli.js"
-	},
+	"type": "module",
 	"scripts": {
-		"dev": "rolldown -c --watch",
-		"build": "rolldown -c && chmod +x dist/cli.js",
+		"dev": "vp pack --watch",
+		"build": "vp pack",
 		"check-types": "tsc --noEmit",
-		"test": "bun test"
+		"test": "vp test"
 	},
 	"devDependencies": {
 		"@openpolicy/tooling": "workspace:*",
 		"citty": "^0.1.6",
-		"consola": "^3.4.2"
+		"consola": "^3.4.2",
+		"vite-plus": "catalog:"
 	}
 }

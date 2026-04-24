@@ -17,9 +17,9 @@ Results are written to `scripts/bench/results/latest.{json,md}`.
 
 Two scenarios are built from `examples/tanstack`:
 
-| Scenario | Description |
-| --- | --- |
-| **full** | The example as-shipped: `<OpenPolicy>` provider, privacy/cookie routes, shadcn cookie banner, `openPolicy()` Vite plugin, compiled policy HTML. |
+| Scenario     | Description                                                                                                                                                                                  |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **full**     | The example as-shipped: `<OpenPolicy>` provider, privacy/cookie routes, shadcn cookie banner, `openPolicy()` Vite plugin, compiled policy HTML.                                              |
 | **baseline** | Same TanStack Start shell with OpenPolicy removed: `__root.tsx` is stripped of the provider, policy routes and `src/policies/` are deleted, `openPolicy()` is removed from `vite.config.ts`. |
 
 The **Δ between the two is OpenPolicy's impact**. We measure both so the number is explainable.

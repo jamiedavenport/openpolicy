@@ -27,8 +27,7 @@ export const KNOWN_PACKAGES: ReadonlyMap<string, ThirdPartyEntry> = new Map([
 		{
 			name: "Braintree",
 			purpose: "Payment processing",
-			policyUrl:
-				"https://www.braintreepayments.com/legal/braintree-privacy-policy",
+			policyUrl: "https://www.braintreepayments.com/legal/braintree-privacy-policy",
 		},
 	],
 	[
@@ -36,8 +35,7 @@ export const KNOWN_PACKAGES: ReadonlyMap<string, ThirdPartyEntry> = new Map([
 		{
 			name: "Braintree",
 			purpose: "Payment processing",
-			policyUrl:
-				"https://www.braintreepayments.com/legal/braintree-privacy-policy",
+			policyUrl: "https://www.braintreepayments.com/legal/braintree-privacy-policy",
 		},
 	],
 	[
@@ -216,38 +214,37 @@ export const KNOWN_PACKAGES: ReadonlyMap<string, ThirdPartyEntry> = new Map([
  * Multiple package names can point to the same set of categories; the caller
  * unions results with existing cookie detections.
  */
-export const KNOWN_COOKIE_PACKAGES: ReadonlyMap<string, readonly string[]> =
-	new Map([
-		// Payments / essential
-		["stripe", ["essential"]],
-		["@stripe/stripe-js", ["essential"]],
-		["braintree", ["essential"]],
-		["@braintree/browser-drop-in", ["essential"]],
+export const KNOWN_COOKIE_PACKAGES: ReadonlyMap<string, readonly string[]> = new Map([
+	// Payments / essential
+	["stripe", ["essential"]],
+	["@stripe/stripe-js", ["essential"]],
+	["braintree", ["essential"]],
+	["@braintree/browser-drop-in", ["essential"]],
 
-		// Product / web analytics
-		["posthog-js", ["analytics"]],
-		["posthog-node", ["analytics"]],
-		["mixpanel-browser", ["analytics"]],
-		["@segment/analytics-next", ["analytics"]],
-		["@amplitude/analytics-browser", ["analytics"]],
-		["amplitude-js", ["analytics"]],
-		["@vercel/analytics", ["analytics"]],
-		["plausible-tracker", ["analytics"]],
+	// Product / web analytics
+	["posthog-js", ["analytics"]],
+	["posthog-node", ["analytics"]],
+	["mixpanel-browser", ["analytics"]],
+	["@segment/analytics-next", ["analytics"]],
+	["@amplitude/analytics-browser", ["analytics"]],
+	["amplitude-js", ["analytics"]],
+	["@vercel/analytics", ["analytics"]],
+	["plausible-tracker", ["analytics"]],
 
-		// Session recording / error tracking (analytics-adjacent)
-		["logrocket", ["analytics"]],
-		["@hotjar/browser", ["analytics"]],
-		["@sentry/browser", ["analytics"]],
-		["@sentry/nextjs", ["analytics"]],
-		["@sentry/react", ["analytics"]],
-		["@sentry/vue", ["analytics"]],
-		["@datadog/browser-rum", ["analytics"]],
+	// Session recording / error tracking (analytics-adjacent)
+	["logrocket", ["analytics"]],
+	["@hotjar/browser", ["analytics"]],
+	["@sentry/browser", ["analytics"]],
+	["@sentry/nextjs", ["analytics"]],
+	["@sentry/react", ["analytics"]],
+	["@sentry/vue", ["analytics"]],
+	["@datadog/browser-rum", ["analytics"]],
 
-		// Customer messaging — functional
-		["intercom-client", ["functional"]],
-		["@intercom/messenger-js-sdk", ["functional"]],
+	// Customer messaging — functional
+	["intercom-client", ["functional"]],
+	["@intercom/messenger-js-sdk", ["functional"]],
 
-		// Advertising / marketing
-		["react-facebook-pixel", ["marketing"]],
-		["react-gtm-module", ["marketing"]],
-	]);
+	// Advertising / marketing
+	["react-facebook-pixel", ["marketing"]],
+	["react-gtm-module", ["marketing"]],
+]);

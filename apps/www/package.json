@@ -1,7 +1,7 @@
 {
 	"name": "www",
-	"type": "module",
 	"private": true,
+	"type": "module",
 	"scripts": {
 		"dev": "astro dev",
 		"build": "astro build",
@@ -23,12 +23,12 @@
 		"tailwindcss": "^4.2.1"
 	},
 	"devDependencies": {
-		"@types/react": "^19.0.0",
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/react": "workspace:*",
 		"@openpolicy/renderers": "workspace:*",
 		"@openpolicy/sdk": "workspace:*",
 		"@tailwindcss/typography": "^0.5.19",
+		"@types/react": "^19.0.0",
 		"shadcn": "latest"
 	}
 }

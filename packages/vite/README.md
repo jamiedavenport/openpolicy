@@ -20,7 +20,7 @@ import { defineConfig } from "vite";
 import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [openPolicy()],
+	plugins: [openPolicy()],
 });
 ```
 
@@ -28,12 +28,12 @@ Astro users: add it the same way under `vite.plugins` in `astro.config.mjs`.
 
 ## Options
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `srcDir` | `string` | `"src"` | Directory walked for `collecting()` / `thirdParty()` calls, relative to the Vite root. |
-| `extensions` | `string[]` | `[".ts", ".tsx"]` | File extensions to scan. |
-| `ignore` | `string[]` | `[]` | Extra directory basenames to skip (appended to the built-in list: `node_modules`, `dist`, `.git`, `.next`, `.output`, `.svelte-kit`, `.cache`). |
-| `thirdParties.usePackageJson` | `boolean` | `false` | Auto-detect third-party services from `package.json` dependencies against the built-in registry (Stripe, Sentry, PostHog, etc.). |
+| Option                        | Type       | Default           | Description                                                                                                                                     |
+| ----------------------------- | ---------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `srcDir`                      | `string`   | `"src"`           | Directory walked for `collecting()` / `thirdParty()` calls, relative to the Vite root.                                                          |
+| `extensions`                  | `string[]` | `[".ts", ".tsx"]` | File extensions to scan.                                                                                                                        |
+| `ignore`                      | `string[]` | `[]`              | Extra directory basenames to skip (appended to the built-in list: `node_modules`, `dist`, `.git`, `.next`, `.output`, `.svelte-kit`, `.cache`). |
+| `thirdParties.usePackageJson` | `boolean`  | `false`           | Auto-detect third-party services from `package.json` dependencies against the built-in registry (Stripe, Sentry, PostHog, etc.).                |
 
 ## Documentation
 

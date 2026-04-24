@@ -7,8 +7,8 @@
 
 library:
   name: openpolicy
-  version: '0.0.19'
-  repository: 'https://github.com/jamiedavenport/openpolicy'
+  version: "0.0.19"
+  repository: "https://github.com/jamiedavenport/openpolicy"
   description: >
     Policy-as-code library that compiles privacy policies, terms of service,
     and cookie policies from TypeScript configs — rendered at runtime via React
@@ -49,22 +49,22 @@ skills:
       React + vite-auto-collect, create openpolicy.ts, wrap app, render.
     type: lifecycle
     packages:
-      - '@openpolicy/sdk'
-      - '@openpolicy/react'
-      - '@openpolicy/vite-auto-collect'
+      - "@openpolicy/sdk"
+      - "@openpolicy/react"
+      - "@openpolicy/vite-auto-collect"
     covers:
-      - 'bun add / npm install'
-      - 'defineConfig() in openpolicy.ts'
-      - 'autoCollect() in vite.config.ts'
-      - '<OpenPolicy> provider wrapping'
-      - '<PrivacyPolicy> first render'
-      - 'dataCollected and thirdParties spread into config'
+      - "bun add / npm install"
+      - "defineConfig() in openpolicy.ts"
+      - "autoCollect() in vite.config.ts"
+      - "<OpenPolicy> provider wrapping"
+      - "<PrivacyPolicy> first render"
+      - "dataCollected and thirdParties spread into config"
     tasks:
-      - 'Set up OpenPolicy in a new project from scratch'
-      - 'Wire the Vite plugin and SDK together'
-      - 'Render the first privacy policy page'
+      - "Set up OpenPolicy in a new project from scratch"
+      - "Wire the Vite plugin and SDK together"
+      - "Render the first privacy policy page"
     failure_modes:
-      - mistake: 'Using openPolicy() vite plugin instead of autoCollect()'
+      - mistake: "Using openPolicy() vite plugin instead of autoCollect()"
         mechanism: >
           The openPolicy() plugin generates static files at build time; the
           current recommended pattern is React runtime rendering + autoCollect()
@@ -82,12 +82,12 @@ skills:
           export default defineConfig({
             plugins: [autoCollect()],
           });
-        source: 'maintainer interview'
+        source: "maintainer interview"
         priority: CRITICAL
         status: active
-        skills: ['getting-started', 'vite-setup', 'render-policies', 'cookie-banner']
+        skills: ["getting-started", "vite-setup", "render-policies", "cookie-banner"]
 
-      - mistake: 'Forgetting to wrap app with <OpenPolicy> provider'
+      - mistake: "Forgetting to wrap app with <OpenPolicy> provider"
         mechanism: >
           React components (PrivacyPolicy, TermsOfService, CookiePolicy,
           useCookies) read from context; without the provider they render null
@@ -107,11 +107,11 @@ skills:
               </OpenPolicy>
             );
           }
-        source: 'packages/react/src/context.tsx'
+        source: "packages/react/src/context.tsx"
         priority: HIGH
         status: active
 
-      - mistake: 'Not spreading dataCollected and thirdParties into config'
+      - mistake: "Not spreading dataCollected and thirdParties into config"
         mechanism: >
           Without spreading the SDK sentinels, the autoCollect plugin output is
           discarded. The policy compiles with empty data collected and no third
@@ -135,7 +135,7 @@ skills:
               thirdParties: [...thirdParties],
             },
           });
-        source: 'packages/sdk/src/auto-collected.ts'
+        source: "packages/sdk/src/auto-collected.ts"
         priority: HIGH
         status: active
 
@@ -147,24 +147,24 @@ skills:
       and cookie policy — all fields, types, jurisdiction-specific requirements.
     type: core
     packages:
-      - '@openpolicy/sdk'
-      - '@openpolicy/core'
+      - "@openpolicy/sdk"
+      - "@openpolicy/core"
     covers:
-      - 'defineConfig()'
-      - 'OpenPolicyConfig shape (nested company)'
-      - 'PrivacyPolicyConfig fields'
-      - 'TermsOfServiceConfig fields'
-      - 'CookiePolicyConfig fields'
-      - 'Jurisdiction-specific requirements (GDPR, CCPA)'
-      - 'Compliance presets (Compliance.GDPR, Compliance.CCPA)'
-      - 'DataCategories, Retention, Rights, LegalBases, Providers constants'
+      - "defineConfig()"
+      - "OpenPolicyConfig shape (nested company)"
+      - "PrivacyPolicyConfig fields"
+      - "TermsOfServiceConfig fields"
+      - "CookiePolicyConfig fields"
+      - "Jurisdiction-specific requirements (GDPR, CCPA)"
+      - "Compliance presets (Compliance.GDPR, Compliance.CCPA)"
+      - "DataCategories, Retention, Rights, LegalBases, Providers constants"
     tasks:
-      - 'Write a complete privacy policy config'
-      - 'Add terms of service to an existing config'
-      - 'Configure GDPR compliance requirements'
-      - 'Use preset constants instead of raw strings'
+      - "Write a complete privacy policy config"
+      - "Add terms of service to an existing config"
+      - "Configure GDPR compliance requirements"
+      - "Use preset constants instead of raw strings"
     failure_modes:
-      - mistake: 'Using standalone PrivacyPolicyConfig instead of nested OpenPolicyConfig'
+      - mistake: "Using standalone PrivacyPolicyConfig instead of nested OpenPolicyConfig"
         mechanism: >
           React components and the autoCollect pipeline expect the nested
           OpenPolicyConfig shape (company at top level, policies under
@@ -188,11 +188,11 @@ skills:
               ...
             },
           });
-        source: 'packages/core/src/types.ts'
+        source: "packages/core/src/types.ts"
         priority: HIGH
         status: active
 
-      - mistake: 'Omitting governingLaw from terms of service'
+      - mistake: "Omitting governingLaw from terms of service"
         mechanism: >
           governingLaw is required in TermsOfServiceConfig. Validation throws
           a fatal error if absent, but TypeScript may not catch it if the field
@@ -209,11 +209,11 @@ skills:
             acceptance: { methods: ['using the service'] },
             governingLaw: { jurisdiction: 'Delaware, USA' },
           }
-        source: 'packages/core/src/validate-terms.ts'
+        source: "packages/core/src/validate-terms.ts"
         priority: HIGH
         status: active
 
-      - mistake: 'Not specifying jurisdictions for GDPR/CCPA compliance fields'
+      - mistake: "Not specifying jurisdictions for GDPR/CCPA compliance fields"
         mechanism: >
           Jurisdiction-specific sections (legalBasis for EU, opt_out_sale
           right for CA) are only generated when the corresponding jurisdiction
@@ -231,7 +231,7 @@ skills:
             userRights: ['access', 'erasure'],
             jurisdictions: ['eu', 'us'],
           }
-        source: 'packages/core/src/templates/privacy/'
+        source: "packages/core/src/templates/privacy/"
         priority: MEDIUM
         status: active
 
@@ -243,19 +243,19 @@ skills:
       srcDir, extensions, usePackageJson for third-party auto-detection.
     type: framework
     packages:
-      - '@openpolicy/vite-auto-collect'
+      - "@openpolicy/vite-auto-collect"
     covers:
-      - 'autoCollect() plugin'
-      - 'AutoCollectOptions (srcDir, extensions, ignore, thirdParties.usePackageJson)'
+      - "autoCollect() plugin"
+      - "AutoCollectOptions (srcDir, extensions, ignore, thirdParties.usePackageJson)"
       - 'enforce: "pre" plugin ordering'
-      - 'virtual module resolution for @openpolicy/sdk auto-collected'
-      - 'dev server hot reload on source changes'
+      - "virtual module resolution for @openpolicy/sdk auto-collected"
+      - "dev server hot reload on source changes"
     tasks:
-      - 'Add autoCollect() to vite.config.ts'
-      - 'Configure src directory and file extensions to scan'
-      - 'Enable usePackageJson for automatic third-party detection'
+      - "Add autoCollect() to vite.config.ts"
+      - "Configure src directory and file extensions to scan"
+      - "Enable usePackageJson for automatic third-party detection"
     failure_modes:
-      - mistake: 'Using openPolicy() instead of autoCollect() in vite.config.ts'
+      - mistake: "Using openPolicy() instead of autoCollect() in vite.config.ts"
         mechanism: >
           openPolicy() generates static policy files; autoCollect() populates
           the dataCollected/thirdParties sentinels for React runtime rendering.
@@ -267,12 +267,12 @@ skills:
         correct_pattern: |
           import { autoCollect } from '@openpolicy/vite-auto-collect';
           plugins: [autoCollect({ thirdParties: { usePackageJson: true } })]
-        source: 'maintainer interview'
+        source: "maintainer interview"
         priority: CRITICAL
         status: active
-        skills: ['getting-started', 'vite-setup']
+        skills: ["getting-started", "vite-setup"]
 
-      - mistake: 'Expecting autoCollect to scan files outside default srcDir'
+      - mistake: "Expecting autoCollect to scan files outside default srcDir"
         mechanism: >
           autoCollect() only scans the srcDir (default: "src"). collecting()
           and thirdParty() calls in config files, scripts, or other directories
@@ -283,7 +283,7 @@ skills:
         correct_pattern: |
           // Either move annotations into src/, or configure srcDir:
           autoCollect({ srcDir: 'app' })
-        source: 'packages/vite-auto-collect/src/scan.ts'
+        source: "packages/vite-auto-collect/src/scan.ts"
         priority: MEDIUM
         status: active
 
@@ -295,20 +295,20 @@ skills:
       so the autoCollect plugin can populate dataCollected automatically.
     type: core
     packages:
-      - '@openpolicy/sdk'
-      - '@openpolicy/vite-auto-collect'
+      - "@openpolicy/sdk"
+      - "@openpolicy/vite-auto-collect"
     covers:
-      - 'collecting(category, value, labels)'
-      - 'dataCollected sentinel from @openpolicy/sdk'
-      - 'autoCollected() and spread into privacy.dataCollected'
-      - 'DataCategories preset constants'
-      - 'string literal constraint on category and labels'
+      - "collecting(category, value, labels)"
+      - "dataCollected sentinel from @openpolicy/sdk"
+      - "autoCollected() and spread into privacy.dataCollected"
+      - "DataCategories preset constants"
+      - "string literal constraint on category and labels"
     tasks:
-      - 'Mark a form field as collecting personal data'
-      - 'Annotate a database write with data category and field labels'
-      - 'Use DataCategories presets instead of raw strings'
+      - "Mark a form field as collecting personal data"
+      - "Annotate a database write with data category and field labels"
+      - "Use DataCategories presets instead of raw strings"
     failure_modes:
-      - mistake: 'Using dynamic values in collecting() category or labels'
+      - mistake: "Using dynamic values in collecting() category or labels"
         mechanism: >
           The autoCollect plugin uses static AST analysis (oxc-parser) and
           only extracts string literals. Dynamic variables, template literals,
@@ -320,11 +320,11 @@ skills:
         correct_pattern: |
           // correct: string literals only
           collecting('Account Information', { name, email }, { name: 'Name', email: 'Email' });
-        source: 'packages/vite-auto-collect/src/analyse.ts'
+        source: "packages/vite-auto-collect/src/analyse.ts"
         priority: HIGH
         status: active
 
-      - mistake: 'Not importing and spreading dataCollected into config'
+      - mistake: "Not importing and spreading dataCollected into config"
         mechanism: >
           Even with collecting() calls and autoCollect() wired up, the
           plugin output is discarded unless dataCollected from @openpolicy/sdk
@@ -339,11 +339,11 @@ skills:
           export default defineConfig({
             privacy: { dataCollected: { ...dataCollected } },
           });
-        source: 'packages/sdk/src/auto-collected.ts'
+        source: "packages/sdk/src/auto-collected.ts"
         priority: HIGH
         status: active
 
-      - mistake: 'Calling collecting() with fewer than 3 arguments'
+      - mistake: "Calling collecting() with fewer than 3 arguments"
         mechanism: >
           The plugin requires exactly 3 arguments (category, value, labels).
           Calls with fewer arguments are silently skipped. There is no runtime
@@ -353,7 +353,7 @@ skills:
           collecting('Account Information', { name, email });
         correct_pattern: |
           collecting('Account Information', { name, email }, { name: 'Name', email: 'Email address' });
-        source: 'packages/vite-auto-collect/src/analyse.ts'
+        source: "packages/vite-auto-collect/src/analyse.ts"
         priority: MEDIUM
         status: active
 
@@ -365,21 +365,21 @@ skills:
       third-party services list in the privacy policy.
     type: core
     packages:
-      - '@openpolicy/sdk'
-      - '@openpolicy/vite-auto-collect'
+      - "@openpolicy/sdk"
+      - "@openpolicy/vite-auto-collect"
     covers:
-      - 'thirdParty(name, purpose, policyUrl)'
-      - 'thirdParties sentinel from @openpolicy/sdk'
-      - 'usePackageJson option in autoCollect()'
-      - 'KNOWN_PACKAGES registry (~30 npm packages)'
-      - 'Providers preset constants'
-      - 'manual thirdParties array as fallback'
+      - "thirdParty(name, purpose, policyUrl)"
+      - "thirdParties sentinel from @openpolicy/sdk"
+      - "usePackageJson option in autoCollect()"
+      - "KNOWN_PACKAGES registry (~30 npm packages)"
+      - "Providers preset constants"
+      - "manual thirdParties array as fallback"
     tasks:
-      - 'Mark a third-party SDK usage with thirdParty()'
-      - 'Enable usePackageJson to auto-detect known services from package.json'
-      - 'Add a service not in the known packages registry manually'
+      - "Mark a third-party SDK usage with thirdParty()"
+      - "Enable usePackageJson to auto-detect known services from package.json"
+      - "Add a service not in the known packages registry manually"
     failure_modes:
-      - mistake: 'Using thirdParty() without autoCollect() plugin expecting runtime effect'
+      - mistake: "Using thirdParty() without autoCollect() plugin expecting runtime effect"
         mechanism: >
           thirdParty() is a runtime no-op. It is a build-time marker scanned
           by autoCollect(). Without the plugin, thirdParty() calls have no
@@ -398,11 +398,11 @@ skills:
           // 3. Spread thirdParties sentinel in openpolicy.ts
           import { thirdParties } from '@openpolicy/sdk';
           privacy: { thirdParties: [...thirdParties] }
-        source: 'maintainer interview; packages/vite-auto-collect/src/analyse.ts'
+        source: "maintainer interview; packages/vite-auto-collect/src/analyse.ts"
         priority: HIGH
         status: active
 
-      - mistake: 'Not spreading thirdParties sentinel into config'
+      - mistake: "Not spreading thirdParties sentinel into config"
         mechanism: >
           The autoCollect plugin populates the thirdParties sentinel, but
           it is not included in the policy unless explicitly spread into
@@ -412,11 +412,11 @@ skills:
         correct_pattern: |
           import { thirdParties } from '@openpolicy/sdk';
           privacy: { thirdParties: [...thirdParties] }
-        source: 'packages/sdk/src/auto-collected.ts'
+        source: "packages/sdk/src/auto-collected.ts"
         priority: HIGH
         status: active
 
-      - mistake: 'Not enabling usePackageJson when known packages are used'
+      - mistake: "Not enabling usePackageJson when known packages are used"
         mechanism: >
           The KNOWN_PACKAGES registry covers ~30 common npm packages (Stripe,
           Sentry, PostHog, Vercel, etc.). Without usePackageJson: true,
@@ -426,7 +426,7 @@ skills:
           autoCollect() // usePackageJson defaults to false
         correct_pattern: |
           autoCollect({ thirdParties: { usePackageJson: true } })
-        source: 'packages/vite-auto-collect/src/known-packages.ts'
+        source: "packages/vite-auto-collect/src/known-packages.ts"
         priority: MEDIUM
         status: active
 
@@ -438,25 +438,25 @@ skills:
       service, and cookie policy pages — including shadcn/ui registry variants.
     type: framework
     packages:
-      - '@openpolicy/react'
-      - '@openpolicy/sdk'
+      - "@openpolicy/react"
+      - "@openpolicy/sdk"
     covers:
-      - '<PrivacyPolicy>'
-      - '<TermsOfService>'
-      - '<CookiePolicy>'
-      - '<OpenPolicy> / OpenPolicyProvider'
-      - 'PolicyComponents customization interface'
-      - 'PolicyTheme CSS custom properties'
-      - 'defaultStyles and styles.css import'
-      - 'data-op-* attributes for custom styling'
-      - 'shadcn/ui registry (shadcn add @openpolicy/*)'
+      - "<PrivacyPolicy>"
+      - "<TermsOfService>"
+      - "<CookiePolicy>"
+      - "<OpenPolicy> / OpenPolicyProvider"
+      - "PolicyComponents customization interface"
+      - "PolicyTheme CSS custom properties"
+      - "defaultStyles and styles.css import"
+      - "data-op-* attributes for custom styling"
+      - "shadcn/ui registry (shadcn add @openpolicy/*)"
     tasks:
-      - 'Render a privacy policy page in React'
-      - 'Render terms of service and cookie policy pages'
-      - 'Customize policy rendering with shadcn/ui registry components'
-      - 'Override default styles with CSS custom properties'
+      - "Render a privacy policy page in React"
+      - "Render terms of service and cookie policy pages"
+      - "Customize policy rendering with shadcn/ui registry components"
+      - "Override default styles with CSS custom properties"
     failure_modes:
-      - mistake: 'Rendering policy components outside OpenPolicy provider'
+      - mistake: "Rendering policy components outside OpenPolicy provider"
         mechanism: >
           PrivacyPolicy, TermsOfService, and CookiePolicy read config from
           React context. Without the provider they silently render null —
@@ -477,11 +477,11 @@ skills:
           export default function PrivacyPage() {
             return <PrivacyPolicy />;
           }
-        source: 'packages/react/src/context.tsx'
+        source: "packages/react/src/context.tsx"
         priority: HIGH
         status: active
 
-      - mistake: 'Forgetting to import styles'
+      - mistake: "Forgetting to import styles"
         mechanism: >
           Components render unstyled without the CSS import. The styles are
           not auto-injected in all bundler setups.
@@ -491,11 +491,11 @@ skills:
         correct_pattern: |
           import '@openpolicy/react/styles.css';
           import { PrivacyPolicy } from '@openpolicy/react';
-        source: 'packages/react/src/styles.ts'
+        source: "packages/react/src/styles.ts"
         priority: MEDIUM
         status: active
 
-      - mistake: 'Generating static files with openPolicy() vite plugin instead of rendering'
+      - mistake: "Generating static files with openPolicy() vite plugin instead of rendering"
         mechanism: >
           Agents trained on older docs or similar static-site libraries may
           use openPolicy() to emit .md/.html files and serve them statically,
@@ -510,10 +510,10 @@ skills:
           export default function PrivacyPage() {
             return <PrivacyPolicy />;
           }
-        source: 'maintainer interview'
+        source: "maintainer interview"
         priority: CRITICAL
         status: active
-        skills: ['getting-started', 'render-policies']
+        skills: ["getting-started", "render-policies"]
 
   - name: Cookie Banner
     slug: cookie-banner
@@ -523,23 +523,23 @@ skills:
       hook, route state machine, and ConsentGate for conditional rendering.
     type: framework
     packages:
-      - '@openpolicy/react'
+      - "@openpolicy/react"
     covers:
-      - 'useCookies() hook'
-      - 'route state machine (cookie | preferences | closed)'
-      - 'acceptAll(), acceptNecessary(), reject()'
-      - 'categories array and toggle() for preferences'
-      - 'save() to persist preferences'
-      - 'ConsentGate component'
-      - 'has() expression DSL'
-      - 'localStorage persistence (op_consent key)'
-      - 'data-consent-* attributes on document.body'
-      - 'shadcn/ui registry (shadcn add @openpolicy/cookie-banner)'
+      - "useCookies() hook"
+      - "route state machine (cookie | preferences | closed)"
+      - "acceptAll(), acceptNecessary(), reject()"
+      - "categories array and toggle() for preferences"
+      - "save() to persist preferences"
+      - "ConsentGate component"
+      - "has() expression DSL"
+      - "localStorage persistence (op_consent key)"
+      - "data-consent-* attributes on document.body"
+      - "shadcn/ui registry (shadcn add @openpolicy/cookie-banner)"
     tasks:
-      - 'Add a cookie consent banner to a React app'
-      - 'Build a cookie preferences panel'
-      - 'Conditionally render content based on consent (ConsentGate)'
-      - 'Install pre-styled banner via shadcn registry'
+      - "Add a cookie consent banner to a React app"
+      - "Build a cookie preferences panel"
+      - "Conditionally render content based on consent (ConsentGate)"
+      - "Install pre-styled banner via shadcn registry"
     failure_modes:
       - mistake: 'Not gating banner render on route === "cookie"'
         mechanism: >
@@ -557,11 +557,11 @@ skills:
             if (route !== 'cookie') return null;
             return <div>...</div>;
           }
-        source: 'apps/www/registry/cookie-banner.tsx'
+        source: "apps/www/registry/cookie-banner.tsx"
         priority: HIGH
         status: active
 
-      - mistake: 'Building custom cookie consent state instead of using useCookies()'
+      - mistake: "Building custom cookie consent state instead of using useCookies()"
         mechanism: >
           Agents may implement useState-based consent flags manually, missing
           the localStorage persistence, cross-tab sync, and document.body
@@ -571,11 +571,11 @@ skills:
           // Custom localStorage logic, missing cross-tab sync
         correct_pattern: |
           const { status, acceptAll, acceptNecessary, has } = useCookies();
-        source: 'maintainer interview'
+        source: "maintainer interview"
         priority: HIGH
         status: active
 
-      - mistake: 'Not using OpenPolicy provider before using useCookies()'
+      - mistake: "Not using OpenPolicy provider before using useCookies()"
         mechanism: >
           useCookies() reads cookie config (which categories to show) from
           context. Without the provider it returns null consent and empty
@@ -591,10 +591,10 @@ skills:
               </OpenPolicy>
             );
           }
-        source: 'packages/react/src/context.tsx'
+        source: "packages/react/src/context.tsx"
         priority: HIGH
         status: active
-        skills: ['cookie-banner', 'render-policies']
+        skills: ["cookie-banner", "render-policies"]
 
   - name: Migrate from Manual Policies
     slug: migrate
@@ -604,20 +604,20 @@ skills:
       documents into OpenPolicy defineConfig() configs.
     type: lifecycle
     packages:
-      - '@openpolicy/sdk'
-      - '@openpolicy/core'
+      - "@openpolicy/sdk"
+      - "@openpolicy/core"
     covers:
-      - 'Mapping prose sections to PrivacyPolicyConfig/TermsOfServiceConfig fields'
-      - 'DataCategories, Retention, Rights presets as migration aids'
-      - 'Identifying jurisdiction from existing policy'
-      - 'Legal basis mapping for GDPR policies'
-      - 'Terms conditional sections (payments, userContent, etc.)'
+      - "Mapping prose sections to PrivacyPolicyConfig/TermsOfServiceConfig fields"
+      - "DataCategories, Retention, Rights presets as migration aids"
+      - "Identifying jurisdiction from existing policy"
+      - "Legal basis mapping for GDPR policies"
+      - "Terms conditional sections (payments, userContent, etc.)"
     tasks:
-      - 'Convert an existing privacy policy document to defineConfig()'
-      - 'Map a hand-written terms of service into TermsOfServiceConfig'
-      - 'Identify which optional terms sections to include'
+      - "Convert an existing privacy policy document to defineConfig()"
+      - "Map a hand-written terms of service into TermsOfServiceConfig"
+      - "Identify which optional terms sections to include"
     failure_modes:
-      - mistake: 'Rewriting policy content as free text instead of mapping to fields'
+      - mistake: "Rewriting policy content as free text instead of mapping to fields"
         mechanism: >
           OpenPolicy generates all prose from structured fields. Agents may
           try to pass raw paragraph text as field values, which either fails
@@ -636,11 +636,11 @@ skills:
               'Usage Data': ['Pages visited', 'Session duration'],
             }
           }
-        source: 'packages/core/src/types.ts'
+        source: "packages/core/src/types.ts"
         priority: HIGH
         status: active
 
-      - mistake: 'Omitting optional terms sections that cover existing policy content'
+      - mistake: "Omitting optional terms sections that cover existing policy content"
         mechanism: >
           Many TermsOfServiceConfig sections are optional but if the existing
           policy has that content (e.g. payments, userContent, termination) it
@@ -661,13 +661,13 @@ skills:
             payments: { hasPaidFeatures: true, refundPolicy: '30-day money back' },
             termination: { companyCanTerminate: true, userCanTerminate: true },
           }
-        source: 'packages/core/src/types.ts'
+        source: "packages/core/src/types.ts"
         priority: MEDIUM
         status: active
 
 tensions:
   - name: Minimal working setup vs legally complete config
-    skills: ['getting-started', 'define-config']
+    skills: ["getting-started", "define-config"]
     description: >
       A minimal getting-started config compiles and renders, but may omit
       legally required fields (jurisdictions, legalBasis for GDPR, governingLaw
@@ -678,7 +678,7 @@ tensions:
       compliance intent before generating the config.
 
   - name: Auto-annotation vs explicit declaration
-    skills: ['annotate-data-collection', 'annotate-third-parties']
+    skills: ["annotate-data-collection", "annotate-third-parties"]
     description: >
       autoCollect() plus collecting()/thirdParty() provides automatic coverage,
       but usePackageJson is a blunter instrument that may over-report services.
@@ -689,7 +689,7 @@ tensions:
       approach and miss the other entirely.
 
   - name: Runtime rendering vs static generation
-    skills: ['render-policies', 'vite-setup']
+    skills: ["render-policies", "vite-setup"]
     description: >
       The React rendering path (current) and the openPolicy() static file
       generation path (legacy) are mutually exclusive approaches that look

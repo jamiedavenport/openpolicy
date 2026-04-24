@@ -8,11 +8,7 @@ import {
 	ConversationEmptyState,
 	ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
-import {
-	Message,
-	MessageContent,
-	MessageResponse,
-} from "@/components/ai-elements/message";
+import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import {
 	PromptInput,
 	PromptInputBody,
@@ -77,8 +73,7 @@ export default function ChatPage() {
 							.filter((p) => p.type === "text")
 							.map((p) => p.text)
 							.join("");
-						const isLastAssistant =
-							msg.role === "assistant" && i === messages.length - 1;
+						const isLastAssistant = msg.role === "assistant" && i === messages.length - 1;
 						return (
 							<Message key={msg.id} from={msg.role}>
 								<MessageContent>

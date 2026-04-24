@@ -7,7 +7,7 @@ author: "OpenPolicy Team"
 
 Most teams adopt OpenPolicy for two things: a privacy policy page that doesn't go stale, and a cookie banner that doesn't ship as a third-party script. Both are good reasons. Neither is the whole story.
 
-The privacy page and the cookie banner are the two surfaces users see *when they go looking*. Most users don't. What they do encounter — the signup form, the settings panel, a new feature rolling out — is where trust is actually built or lost. And that's the surface our primitives were always meant to cover.
+The privacy page and the cookie banner are the two surfaces users see _when they go looking_. Most users don't. What they do encounter — the signup form, the settings panel, a new feature rolling out — is where trust is actually built or lost. And that's the surface our primitives were always meant to cover.
 
 ## The config is a data source
 
@@ -40,14 +40,18 @@ const { dataCollected, thirdParties, cookies } = openpolicy;
 
 // Step 2 of your wizard
 <section>
-  <h2>What we collect</h2>
-  {Object.entries(dataCollected).map(([category, fields]) => (
-    <div key={category}>
-      <h3>{category}</h3>
-      <ul>{fields.map((f) => <li key={f}>{f}</li>)}</ul>
-    </div>
-  ))}
-</section>
+	<h2>What we collect</h2>
+	{Object.entries(dataCollected).map(([category, fields]) => (
+		<div key={category}>
+			<h3>{category}</h3>
+			<ul>
+				{fields.map((f) => (
+					<li key={f}>{f}</li>
+				))}
+			</ul>
+		</div>
+	))}
+</section>;
 ```
 
 Add a new field to a user schema with `collecting()` and it shows up in the wizard on the next deploy. Nobody has to remember to update an onboarding slide. We shipped a working version of exactly this in the [TanStack example](https://github.com/jamiedavenport/openpolicy/tree/main/examples/tanstack) — the route at `/onboarding-wizard` is ~150 lines and uses nothing but `openpolicy` and a handful of shadcn components.
@@ -60,16 +64,16 @@ Add a new field to a user schema with `collecting()` and it shows up in the wiza
 import openpolicy from "@/lib/openpolicy";
 
 export function TransparencyPanel() {
-  const { dataCollected, thirdParties } = openpolicy;
-  return (
-    <section>
-      <h2>Your data</h2>
-      <p>Here's everything we collect and who we share it with.</p>
-      <DataList data={dataCollected} />
-      <ServiceList services={thirdParties} />
-      <a href="/privacy">Full policy</a>
-    </section>
-  );
+	const { dataCollected, thirdParties } = openpolicy;
+	return (
+		<section>
+			<h2>Your data</h2>
+			<p>Here's everything we collect and who we share it with.</p>
+			<DataList data={dataCollected} />
+			<ServiceList services={thirdParties} />
+			<a href="/privacy">Full policy</a>
+		</section>
+	);
 }
 ```
 
@@ -85,9 +89,9 @@ const category = "Account Information";
 const fields = openpolicy.dataCollected?.[category] ?? [];
 
 <p className="text-xs text-muted-foreground">
-  We'll store your {fields.join(", ").toLowerCase()} to create your account.
-  See the <a href="/privacy">privacy policy</a> for details.
-</p>
+	We'll store your {fields.join(", ").toLowerCase()} to create your account. See the{" "}
+	<a href="/privacy">privacy policy</a> for details.
+</p>;
 ```
 
 Because the labels came from your `collecting()` call, the disclosure and the storage call can never disagree.
@@ -125,13 +129,13 @@ Build the privacy page. Build the cookie banner. Then keep going — onboarding,
 
 ## Where the primitives live
 
-| Primitive | What it gives you | Where it comes from |
-|---|---|---|
-| `dataCollected` | `Record<string, string[]>` of categories and fields | `collecting()` calls + manual entries |
-| `thirdParties` | `{ name, purpose, policyUrl? }[]` | `thirdParty()` calls + `usePackageJson` detection |
-| `cookies` | `{ essential, [category]: boolean }` | `<ConsentGate>` + `useCookies().has()` + manual entries |
-| `useCookies()` | React hook: consent state, toggles, route | `<OpenPolicy>` provider |
-| `<ConsentGate>` | Conditional render by consent expression | `<OpenPolicy>` provider |
+| Primitive       | What it gives you                                   | Where it comes from                                     |
+| --------------- | --------------------------------------------------- | ------------------------------------------------------- |
+| `dataCollected` | `Record<string, string[]>` of categories and fields | `collecting()` calls + manual entries                   |
+| `thirdParties`  | `{ name, purpose, policyUrl? }[]`                   | `thirdParty()` calls + `usePackageJson` detection       |
+| `cookies`       | `{ essential, [category]: boolean }`                | `<ConsentGate>` + `useCookies().has()` + manual entries |
+| `useCookies()`  | React hook: consent state, toggles, route           | `<OpenPolicy>` provider                                 |
+| `<ConsentGate>` | Conditional render by consent expression            | `<OpenPolicy>` provider                                 |
 
 All of them read from the same `openpolicy.ts`. All of them update together when you change it.
 

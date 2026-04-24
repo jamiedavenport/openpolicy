@@ -11,7 +11,7 @@ See the [Quick Start](/cookies/quick-start) to add the banner to your app.
 import { CookieBanner } from "@/components/ui/cookie-banner";
 
 // Place inside <OpenPolicy> in your root layout
-<CookieBanner />
+<CookieBanner />;
 ```
 
 The banner reads available categories from your `openpolicy.ts` config and disappears once the user makes a choice.
@@ -24,8 +24,8 @@ To let users revisit their consent decision â€” for example from a footer link â
 import { useCookies } from "@openpolicy/react";
 
 function Footer() {
-  const { setRoute } = useCookies();
-  return <button onClick={() => setRoute("cookie")}>Cookie settings</button>;
+	const { setRoute } = useCookies();
+	return <button onClick={() => setRoute("cookie")}>Cookie settings</button>;
 }
 ```
 

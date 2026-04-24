@@ -8,11 +8,7 @@ interface ConsentGateProps {
 	children: ReactNode;
 }
 
-export function ConsentGate({
-	requires,
-	fallback = null,
-	children,
-}: ConsentGateProps) {
+export function ConsentGate({ requires, fallback = null, children }: ConsentGateProps) {
 	const { has } = useCookies();
 	return has(requires) ? children : fallback;
 }

@@ -14,8 +14,7 @@ export default defineConfig({
 	},
 	legalBasis: "legitimate_interests",
 	retention: {
-		"All personal data":
-			"As long as necessary for the purposes described in this policy",
+		"All personal data": "As long as necessary for the purposes described in this policy",
 	},
 	cookies: {
 		essential: true,

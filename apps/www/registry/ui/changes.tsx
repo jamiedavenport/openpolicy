@@ -1,13 +1,7 @@
 import type { Change } from "@openpolicy/plus";
 import { useState } from "react";
 import { Button } from "#/components/ui/button";
-import {
-	Card,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "#/components/ui/card";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "#/components/ui/card";
 import {
 	Dialog,
 	DialogContent,
@@ -33,8 +27,7 @@ const policyLabel: Record<Change["policy"], string> = {
 const badgeClass: Record<Change["type"], string> = {
 	added: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
 	removed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-	modified:
-		"bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+	modified: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
 };
 
 export function ChangesNotification({ changes, onApprove }: Props) {
@@ -43,14 +36,11 @@ export function ChangesNotification({ changes, onApprove }: Props) {
 
 	if (changes.length === 0 || dismissed) return null;
 
-	const grouped = changes.reduce<Partial<Record<Change["policy"], Change[]>>>(
-		(acc, c) => {
-			// biome-ignore lint/suspicious/noAssignInExpressions: todo
-			(acc[c.policy] ??= []).push(c);
-			return acc;
-		},
-		{},
-	);
+	const grouped = changes.reduce<Partial<Record<Change["policy"], Change[]>>>((acc, c) => {
+		// biome-ignore lint/suspicious/noAssignInExpressions: todo
+		(acc[c.policy] ??= []).push(c);
+		return acc;
+	}, {});
 
 	return (
 		<>
@@ -64,8 +54,8 @@ export function ChangesNotification({ changes, onApprove }: Props) {
 				<CardHeader>
 					<CardTitle>Your policies have been updated</CardTitle>
 					<CardDescription>
-						{changes.length} section{changes.length !== 1 ? "s" : ""} changed
-						across your policy documents.
+						{changes.length} section{changes.length !== 1 ? "s" : ""} changed across your policy
+						documents.
 					</CardDescription>
 				</CardHeader>
 				<CardFooter className="gap-2">
@@ -91,15 +81,10 @@ export function ChangesNotification({ changes, onApprove }: Props) {
 							if (!policyChanges?.length) return null;
 							return (
 								<div key={policy}>
-									<p className="mb-2 text-sm font-semibold">
-										{policyLabel[policy]}
-									</p>
+									<p className="mb-2 text-sm font-semibold">{policyLabel[policy]}</p>
 									<ul className="space-y-1.5">
 										{policyChanges.map((c) => (
-											<li
-												key={c.sectionId}
-												className="flex items-center gap-2 text-sm"
-											>
+											<li key={c.sectionId} className="flex items-center gap-2 text-sm">
 												<span
 													className={cn(
 														"inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium",
@@ -108,9 +93,7 @@ export function ChangesNotification({ changes, onApprove }: Props) {
 												>
 													{c.type}
 												</span>
-												<span className="text-muted-foreground">
-													{c.sectionTitle}
-												</span>
+												<span className="text-muted-foreground">{c.sectionTitle}</span>
 											</li>
 										))}
 									</ul>

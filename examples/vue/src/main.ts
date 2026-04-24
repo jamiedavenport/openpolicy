@@ -1,11 +1,6 @@
 import { CookiePolicy, OpenPolicy, PrivacyPolicy } from "@openpolicy/vue";
 import { createApp, defineComponent, h } from "vue";
-import {
-	createRouter,
-	createWebHistory,
-	RouterLink,
-	RouterView,
-} from "vue-router";
+import { createRouter, createWebHistory, RouterLink, RouterView } from "vue-router";
 import openpolicy from "../openpolicy";
 import "./styles.css";
 
@@ -22,18 +17,11 @@ const HomePage = defineComponent({
 		return h("main", { class: "page" }, [
 			h("header", [
 				h("h1", "OpenPolicy Vue Example"),
-				h("p", [
-					"Runtime policy rendering with ",
-					h("code", "@openpolicy/vue"),
-					".",
-				]),
+				h("p", ["Runtime policy rendering with ", h("code", "@openpolicy/vue"), "."]),
 			]),
 			nav(),
 			h("section", { class: "card" }, [
-				h(
-					"p",
-					"This example uses a shared OpenPolicy config and renders each policy as a route.",
-				),
+				h("p", "This example uses a shared OpenPolicy config and renders each policy as a route."),
 			]),
 		]);
 	},

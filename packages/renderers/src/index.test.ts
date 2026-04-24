@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import type { PolicyInput } from "@openpolicy/core";
 import { compilePolicy } from "./index";
 
@@ -22,7 +22,7 @@ const input: PolicyInput = {
 
 test("compilePolicy routes privacy input to markdown", async () => {
 	const results = await compilePolicy(input);
-	expect(results).toBeArray();
+	expect(Array.isArray(results)).toBe(true);
 	expect(results[0]?.format).toBe("markdown");
 	expect(results[0]?.content).toContain("Acme Inc.");
 });

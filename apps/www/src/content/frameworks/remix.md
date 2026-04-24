@@ -23,9 +23,9 @@ bun add @openpolicy/sdk @openpolicy/react
 import { definePrivacyPolicy } from "@openpolicy/sdk";
 
 export const privacyPolicy = definePrivacyPolicy({
-  company: { name: "Acme Inc.", website: "https://acme.com" },
-  contact: { email: "privacy@acme.com" },
-  compliance: { gdpr: true, ccpa: true },
+	company: { name: "Acme Inc.", website: "https://acme.com" },
+	contact: { email: "privacy@acme.com" },
+	compliance: { gdpr: true, ccpa: true },
 });
 ```
 
@@ -37,18 +37,16 @@ import type { MetaFunction } from "@remix-run/node";
 import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
 import { privacyPolicy } from "../openpolicy";
 
-export const meta: MetaFunction = () => [
-  { title: "Privacy Policy — Acme" },
-];
+export const meta: MetaFunction = () => [{ title: "Privacy Policy — Acme" }];
 
 export default function PrivacyPolicyRoute() {
-  return (
-    <main>
-      <OpenPolicy config={privacyPolicy}>
-        <PrivacyPolicy />
-      </OpenPolicy>
-    </main>
-  );
+	return (
+		<main>
+			<OpenPolicy config={privacyPolicy}>
+				<PrivacyPolicy />
+			</OpenPolicy>
+		</main>
+	);
 }
 ```
 

@@ -38,11 +38,11 @@ import { OpenPolicy, CookiePolicy } from "@openpolicy/react";
 import openpolicy from "@/openpolicy";
 
 export function CookiePolicyPage() {
-  return (
-    <OpenPolicy config={openpolicy}>
-      <CookiePolicy />
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={openpolicy}>
+			<CookiePolicy />
+		</OpenPolicy>
+	);
 }
 ```
 

@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import { collecting, Ignore } from "./collecting";
 
 test("returns the exact same reference as value", () => {

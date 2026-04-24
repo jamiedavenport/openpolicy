@@ -9,9 +9,9 @@ See the [Quick Start](/cookies/quick-start) to get up and running.
 
 ## What's included
 
-| Component | Description |
-|---|---|
-| `<CookieBanner />` | Initial consent prompt shown to new visitors |
+| Component               | Description                                   |
+| ----------------------- | --------------------------------------------- |
+| `<CookieBanner />`      | Initial consent prompt shown to new visitors  |
 | `<CookiePreferences />` | Modal panel for updating consent per category |
 
 Both components are driven by the `<OpenPolicy>` provider — no props required.

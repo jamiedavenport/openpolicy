@@ -3,38 +3,39 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"analyze": "ANALYZE=true vite build",
+		"dev": "vp dev",
+		"build": "vp build",
+		"analyze": "ANALYZE=true vp build",
 		"test:e2e": "playwright test",
 		"test:e2e:ui": "playwright test --ui"
 	},
 	"dependencies": {
 		"@fontsource-variable/geist": "^5.2.8",
 		"@openpolicy/react": "workspace:*",
-		"resend": "^4.0.0",
 		"@tanstack/react-router": "^1.166.2",
 		"@tanstack/react-start": "^1.166.2",
 		"clsx": "^2.1.1",
 		"radix-ui": "^1.4.3",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
+		"resend": "^4.0.0",
 		"shadcn": "^4.0.8",
 		"tailwind-merge": "^3.5.0",
 		"tw-animate-css": "^1.4.0"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.53.2",
 		"@openpolicy/sdk": "workspace:*",
 		"@openpolicy/vite": "workspace:*",
+		"@playwright/test": "^1.53.2",
 		"@tailwindcss/vite": "^4.2.1",
 		"@types/node": "^25.3.5",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^5.1.4",
+		"rollup-plugin-visualizer": "^5.14.0",
 		"tailwindcss": "^4.2.1",
 		"vite": "catalog:",
-		"vite-tsconfig-paths": "^6.1.1",
-		"rollup-plugin-visualizer": "^5.14.0"
+		"vite-plus": "catalog:",
+		"vite-tsconfig-paths": "^6.1.1"
 	}
 }

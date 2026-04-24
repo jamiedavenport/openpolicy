@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import { extractFromFile } from "./analyse";
 
 // ---------------------------------------------------------------------------
@@ -363,10 +363,7 @@ test("defineCookie: multiple distinct categories collected in insertion order", 
 		defineCookie("analytics");
 		defineCookie("marketing");
 	`;
-	expect(extractFromFile("a.ts", code).cookies).toEqual([
-		"analytics",
-		"marketing",
-	]);
+	expect(extractFromFile("a.ts", code).cookies).toEqual(["analytics", "marketing"]);
 });
 
 test("defineCookie: duplicate categories deduped", () => {
@@ -428,10 +425,7 @@ test("ConsentGate: requires={{ or: [...] }} expression flattened", () => {
 			return <ConsentGate requires={{ or: ["analytics", "marketing"] }}>hi</ConsentGate>;
 		}
 	`;
-	expect(extractFromFile("a.tsx", code).cookies.sort()).toEqual([
-		"analytics",
-		"marketing",
-	]);
+	expect(extractFromFile("a.tsx", code).cookies.sort()).toEqual(["analytics", "marketing"]);
 });
 
 test("ConsentGate: requires={{ and: [...] }} expression flattened", () => {
@@ -441,10 +435,7 @@ test("ConsentGate: requires={{ and: [...] }} expression flattened", () => {
 			return <ConsentGate requires={{ and: ["analytics", "functional"] }}>hi</ConsentGate>;
 		}
 	`;
-	expect(extractFromFile("a.tsx", code).cookies.sort()).toEqual([
-		"analytics",
-		"functional",
-	]);
+	expect(extractFromFile("a.tsx", code).cookies.sort()).toEqual(["analytics", "functional"]);
 });
 
 test("ConsentGate: requires={{ not: 'marketing' }} expression flattened", () => {
@@ -485,10 +476,7 @@ test("useCookies().has: nested { or: [...] } expression flattened", () => {
 			return useCookies().has({ or: ["analytics", "marketing"] });
 		}
 	`;
-	expect(extractFromFile("a.ts", code).cookies.sort()).toEqual([
-		"analytics",
-		"marketing",
-	]);
+	expect(extractFromFile("a.ts", code).cookies.sort()).toEqual(["analytics", "marketing"]);
 });
 
 test("useCookies().has: deeply nested expression flattened", () => {

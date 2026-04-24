@@ -47,12 +47,7 @@ function readPackageManagerField(dir: string): PackageManagerName | null {
 		if (!field) return null;
 		const at = field.indexOf("@");
 		const name = (at === -1 ? field : field.slice(0, at)) as PackageManagerName;
-		if (
-			name === "bun" ||
-			name === "pnpm" ||
-			name === "yarn" ||
-			name === "npm"
-		) {
+		if (name === "bun" || name === "pnpm" || name === "yarn" || name === "npm") {
 			return name;
 		}
 		return null;

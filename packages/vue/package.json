@@ -1,7 +1,6 @@
 {
 	"name": "@openpolicy/vue",
 	"version": "0.0.26",
-	"type": "module",
 	"description": "Vue components for OpenPolicy",
 	"license": "Apache-2.0",
 	"repository": {
@@ -14,26 +13,12 @@
 		"README.md",
 		"NOTICE.md"
 	],
+	"type": "module",
 	"exports": {
 		".": {
 			"import": "./dist/index.js",
 			"types": "./dist/index.d.ts"
 		}
-	},
-	"scripts": {
-		"dev": "rolldown -c --watch",
-		"build": "rolldown -c",
-		"check-types": "tsc --noEmit",
-		"test": "bun test"
-	},
-	"peerDependencies": {
-		"vue": ">=3.5"
-	},
-	"dependencies": {},
-	"devDependencies": {
-		"@openpolicy/core": "workspace:*",
-		"@openpolicy/tooling": "workspace:*",
-		"vue": "^3.5.0"
 	},
 	"publishConfig": {
 		"exports": {
@@ -42,5 +27,21 @@
 				"types": "./dist/index.d.ts"
 			}
 		}
+	},
+	"scripts": {
+		"dev": "vp pack --watch",
+		"build": "vp pack",
+		"check-types": "tsc --noEmit",
+		"test": "vp test"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@openpolicy/core": "workspace:*",
+		"@openpolicy/tooling": "workspace:*",
+		"vite-plus": "catalog:",
+		"vue": "^3.5.0"
+	},
+	"peerDependencies": {
+		"vue": ">=3.5"
 	}
 }

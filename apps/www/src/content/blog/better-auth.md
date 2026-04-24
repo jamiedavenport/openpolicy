@@ -5,7 +5,7 @@ pubDate: 2026-04-20
 author: "OpenPolicy Team"
 ---
 
-Consent is easy to ship and hard to prove. You need a record of *who* agreed to *which version* of your policy, *when*, and from *where* — and you need it to hold up months later when a user, auditor, or regulator asks what they signed up for.
+Consent is easy to ship and hard to prove. You need a record of _who_ agreed to _which version_ of your policy, _when_, and from _where_ — and you need it to hold up months later when a user, auditor, or regulator asks what they signed up for.
 
 Today we're shipping the **OpenPolicy Better Auth plugin** to make that record automatic.
 
@@ -25,12 +25,12 @@ import { openpolicy } from "@openpolicy/better-auth";
 import config from "./openpolicy";
 
 export const auth = betterAuth({
-  plugins: [
-    openpolicy({
-      config,
-      apiKey: env.OPENPOLICY_API_KEY,
-    }),
-  ],
+	plugins: [
+		openpolicy({
+			config,
+			apiKey: env.OPENPOLICY_API_KEY,
+		}),
+	],
 });
 ```
 
@@ -42,7 +42,7 @@ That's it. Every signup and policy-relevant event now flows into OpenPolicy+ wit
 
 ## Why the same config matters
 
-The `config` you pass to the plugin is the same object that `@openpolicy/vite` and `@openpolicy/cli` use to render your privacy and cookie policies. That means the policy your users *see* and the policy they're recorded as *accepting* can't drift apart — they're generated from a single source of truth, version by version.
+The `config` you pass to the plugin is the same object that `@openpolicy/vite` and `@openpolicy/cli` use to render your privacy and cookie policies. That means the policy your users _see_ and the policy they're recorded as _accepting_ can't drift apart — they're generated from a single source of truth, version by version.
 
 When you update `openpolicy.ts`, the hash changes. OpenPolicy+ sees a new version, and every subsequent acceptance is pinned to it. Previous consent records stay attached to the version they were actually shown.
 

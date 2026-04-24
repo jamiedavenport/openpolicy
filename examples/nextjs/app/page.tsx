@@ -17,8 +17,7 @@ export default function Home() {
 			</nav>
 
 			<p className="text-gray-500 mt-6 text-sm">
-				Ask our AI assistant about your rights and what our policies mean for
-				you.
+				Ask our AI assistant about your rights and what our policies mean for you.
 			</p>
 		</main>
 	);

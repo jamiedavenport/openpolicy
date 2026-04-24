@@ -5,7 +5,7 @@ pubDate: 2026-04-22
 author: "OpenPolicy Team"
 ---
 
-Privacy work doesn't happen all at once. It starts when you launch and need a policy that isn't embarrassing, changes shape when the product starts moving faster than anyone can remember to update config, and changes shape *again* when you have enough users that a regulator or auditor could credibly show up at the door.
+Privacy work doesn't happen all at once. It starts when you launch and need a policy that isn't embarrassing, changes shape when the product starts moving faster than anyone can remember to update config, and changes shape _again_ when you have enough users that a regulator or auditor could credibly show up at the door.
 
 OpenPolicy is built for all three moments. Here's what each level looks like, the scenario that makes it the right call, and what makes it worth graduating to the next one.
 
@@ -28,22 +28,22 @@ The config is a plain TypeScript object:
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-01-01",
-  jurisdictions: ["eu", "uk", "us-ca"],
-  dataCollected: {
-    "Account Information": ["Name", "Email address"],
-    "Usage Data": ["Pages visited", "Features used"],
-  },
-  legalBasis: ["legitimate_interests", "consent"],
-  retention: { "Account Information": "Until account deletion" },
-  thirdParties: [],
-  cookies: { essential: true, analytics: true, marketing: false },
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["eu", "uk", "us-ca"],
+	dataCollected: {
+		"Account Information": ["Name", "Email address"],
+		"Usage Data": ["Pages visited", "Features used"],
+	},
+	legalBasis: ["legitimate_interests", "consent"],
+	retention: { "Account Information": "Until account deletion" },
+	thirdParties: [],
+	cookies: { essential: true, analytics: true, marketing: false },
 });
 ```
 
@@ -55,13 +55,13 @@ import { CookieBanner, CookiePreferences } from "@/components/ui/cookie-banner";
 import openpolicy from "@/openpolicy";
 
 export default function RootLayout({ children }) {
-  return (
-    <OpenPolicy config={openpolicy}>
-      {children}
-      <CookieBanner />
-      <CookiePreferences />
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={openpolicy}>
+			{children}
+			<CookieBanner />
+			<CookiePreferences />
+		</OpenPolicy>
+	);
 }
 ```
 
@@ -80,12 +80,12 @@ This is the drift problem, and it's a workflow problem, not a discipline one. Th
 import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [
-    openPolicy({
-      thirdParties: { usePackageJson: true },
-      cookies: { usePackageJson: true },
-    }),
-  ],
+	plugins: [
+		openPolicy({
+			thirdParties: { usePackageJson: true },
+			cookies: { usePackageJson: true },
+		}),
+	],
 });
 ```
 
@@ -99,13 +99,11 @@ For data collection, annotate the call where the write happens:
 import { collecting } from "@openpolicy/sdk";
 
 export async function createUser(name: string, email: string) {
-  return db.insert(users).values(
-    collecting(
-      "Account Information",
-      { name, email },
-      { name: "Name", email: "Email address" },
-    ),
-  );
+	return db
+		.insert(users)
+		.values(
+			collecting("Account Information", { name, email }, { name: "Name", email: "Email address" }),
+		);
 }
 ```
 
@@ -115,7 +113,7 @@ For cookie categories the plugin can't infer from `package.json`, declare them a
 
 You're still at the same surface area as Level 1 — one config file, the same components, the same output. The difference is that the parts most likely to go stale are now derived from code. The policy, the cookie banner, and the third-party list follow the product instead of trailing it.
 
-Most teams are happy here for a long time. You move on to Level 3 when drift isn't the risk anymore — *proof* is.
+Most teams are happy here for a long time. You move on to Level 3 when drift isn't the risk anymore — _proof_ is.
 
 ## Level 3 — Compliance risk is now a real number
 

@@ -1,15 +1,11 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import { EventEmitter } from "node:events";
 import { toPackageManager } from "./detect-pm";
 import { formatCommand, runInstall } from "./install";
 
 test("formatCommand composes the shell command", () => {
-	expect(formatCommand(toPackageManager("bun"), ["a", "b"], true)).toBe(
-		"bun add -d a b",
-	);
-	expect(formatCommand(toPackageManager("npm"), ["a"], false)).toBe(
-		"npm install a",
-	);
+	expect(formatCommand(toPackageManager("bun"), ["a", "b"], true)).toBe("bun add -d a b");
+	expect(formatCommand(toPackageManager("npm"), ["a"], false)).toBe("npm install a");
 });
 
 test("runInstall resolves immediately when deps is empty", async () => {
@@ -89,7 +85,5 @@ test("runInstall builds dev-flag args", async () => {
 		log: () => {},
 		spawnImpl,
 	});
-	expect(calls).toEqual([
-		{ bin: "yarn", args: ["add", "-D", "@openpolicy/vite"] },
-	]);
+	expect(calls).toEqual([{ bin: "yarn", args: ["add", "-D", "@openpolicy/vite"] }]);
 });

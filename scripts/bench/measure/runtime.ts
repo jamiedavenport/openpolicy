@@ -33,10 +33,7 @@ function p95(nums: number[]): number {
 	return sorted[idx];
 }
 
-function agg(
-	samples: RuntimeSample[],
-	fn: (nums: number[]) => number,
-): RuntimeSample {
+function agg(samples: RuntimeSample[], fn: (nums: number[]) => number): RuntimeSample {
 	const nonNull = (k: keyof RuntimeSample) =>
 		samples.map((s) => s[k]).filter((v): v is number => v !== null);
 	return {
@@ -147,9 +144,7 @@ async function collectSample(url: string): Promise<RuntimeSample> {
 
 	const metrics = await page.evaluate(() => {
 		const perf = performance.getEntriesByType("paint");
-		const fcp = perf.find(
-			(e) => e.name === "first-contentful-paint",
-		)?.startTime;
+		const fcp = perf.find((e) => e.name === "first-contentful-paint")?.startTime;
 		const w = window as unknown as { __lcp?: number; __cls?: number };
 		const lcp = w.__lcp && w.__lcp > 0 ? w.__lcp : null;
 		const cls = w.__cls ?? 0;
@@ -180,10 +175,7 @@ async function collectSample(url: string): Promise<RuntimeSample> {
 	};
 }
 
-export async function measureRuntime(
-	url: string,
-	iterations: number,
-): Promise<RuntimeResult> {
+export async function measureRuntime(url: string, iterations: number): Promise<RuntimeResult> {
 	const samples: RuntimeSample[] = [];
 	for (let i = 0; i < iterations; i++) {
 		samples.push(await collectSample(url));

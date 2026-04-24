@@ -20,13 +20,13 @@ import { CookieBanner, CookiePreferences } from "@/components/ui/cookie-banner";
 import openpolicy from "@/openpolicy";
 
 export default function RootLayout({ children }) {
-  return (
-    <OpenPolicy config={openpolicy}>
-      {children}
-      <CookieBanner />
-      <CookiePreferences />
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={openpolicy}>
+			{children}
+			<CookieBanner />
+			<CookiePreferences />
+		</OpenPolicy>
+	);
 }
 ```
 
@@ -63,26 +63,26 @@ import { OpenPolicy, useCookies } from "@openpolicy/react";
 import openpolicy from "@/openpolicy";
 
 function Banner() {
-  const { route, acceptAll, acceptNecessary, setRoute } = useCookies();
-  if (route !== "cookie") return null;
+	const { route, acceptAll, acceptNecessary, setRoute } = useCookies();
+	if (route !== "cookie") return null;
 
-  return (
-    <div>
-      <p>We use cookies to improve your experience.</p>
-      <button onClick={acceptAll}>Accept all</button>
-      <button onClick={acceptNecessary}>Accept necessary only</button>
-      <button onClick={() => setRoute("preferences")}>Preferences</button>
-    </div>
-  );
+	return (
+		<div>
+			<p>We use cookies to improve your experience.</p>
+			<button onClick={acceptAll}>Accept all</button>
+			<button onClick={acceptNecessary}>Accept necessary only</button>
+			<button onClick={() => setRoute("preferences")}>Preferences</button>
+		</div>
+	);
 }
 
 export default function RootLayout({ children }) {
-  return (
-    <OpenPolicy config={openpolicy}>
-      {children}
-      <Banner />
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={openpolicy}>
+			{children}
+			<Banner />
+		</OpenPolicy>
+	);
 }
 ```
 

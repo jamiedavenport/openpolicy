@@ -1,9 +1,4 @@
-import type {
-	Document,
-	InlineNode,
-	ListItemNode,
-	ListNode,
-} from "@openpolicy/core";
+import type { Document, InlineNode, ListItemNode, ListNode } from "@openpolicy/core";
 
 function escapeHtml(str: string): string {
 	return str
@@ -28,11 +23,7 @@ function renderInline(node: InlineNode): string {
 
 function renderListItem(item: ListItemNode): string {
 	const content = item.children
-		.map((child) =>
-			child.type === "list"
-				? renderList(child)
-				: renderInline(child as InlineNode),
-		)
+		.map((child) => (child.type === "list" ? renderList(child) : renderInline(child as InlineNode)))
 		.join("");
 	return `<li>${content}</li>`;
 }

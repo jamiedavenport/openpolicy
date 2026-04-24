@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import type { OpenPolicyConfig } from "./index";
 import { defineConfig } from "./index";
 

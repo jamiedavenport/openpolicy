@@ -18,18 +18,18 @@ If you're building a custom integration (e.g. a framework plugin not covered by 
 import { compilePolicy } from "@openpolicy/core";
 
 const results = await compilePolicy(
-  {
-    type: "privacy",
-    effectiveDate: "2026-01-01",
-    company: { name: "Acme", legalName: "Acme, Inc.", address: "...", contact: "privacy@acme.com" },
-    // ... rest of config
-  },
-  { formats: ["markdown", "html", "pdf"] },
+	{
+		type: "privacy",
+		effectiveDate: "2026-01-01",
+		company: { name: "Acme", legalName: "Acme, Inc.", address: "...", contact: "privacy@acme.com" },
+		// ... rest of config
+	},
+	{ formats: ["markdown", "html", "pdf"] },
 );
 
 for (const result of results) {
-  // result.content is string for markdown/html, Buffer for pdf
-  console.log(result.format, result.filename);
+	// result.content is string for markdown/html, Buffer for pdf
+	console.log(result.format, result.filename);
 }
 ```
 

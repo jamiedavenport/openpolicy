@@ -6,25 +6,26 @@
 git clone https://github.com/jamiedavenport/openpolicy
 cd openpolicy
 bun install
-bun lefthook install
+vp config
 ```
 
-`bun lefthook install` activates two git hooks:
-- **pre-commit** — runs Biome format/lint on staged files (auto-fixes in place)
-- **pre-push** — runs `bun run check-types` across all packages
+`vp config` installs git hooks into `.vite-hooks/` and points `core.hooksPath` at them:
+
+- **pre-commit** — `vp staged`: runs Oxfmt + Oxlint on staged files (auto-fixes in place)
+- **pre-push** — `vp run -r check-types`: runs `tsc --noEmit` across all packages
 
 ## Project Structure
 
 This is a Bun monorepo under `packages/`:
 
-| Package | Description |
-|---|---|
-| `packages/sdk` | `@openpolicy/sdk` — public API (`defineConfig`) |
-| `packages/core` | `@openpolicy/core` — compilation engine |
-| `packages/vite` | `@openpolicy/vite` — Vite plugin |
-| `packages/cli` | `@openpolicy/cli` — CLI tool |
-| `apps/docs` | Documentation site (Next.js + Fumadocs) |
-| `tooling/tsconfig` | Shared TypeScript base config |
+| Package            | Description                                     |
+| ------------------ | ----------------------------------------------- |
+| `packages/sdk`     | `@openpolicy/sdk` — public API (`defineConfig`) |
+| `packages/core`    | `@openpolicy/core` — compilation engine         |
+| `packages/vite`    | `@openpolicy/vite` — Vite plugin                |
+| `packages/cli`     | `@openpolicy/cli` — CLI tool                    |
+| `apps/docs`        | Documentation site (Next.js + Fumadocs)         |
+| `tooling/tsconfig` | Shared TypeScript base config                   |
 
 ## Development Workflow
 
@@ -86,10 +87,10 @@ Tests use `bun:test` (Jest-compatible API). Keep tests co-located or in the same
 
 ## Code Style
 
-Biome handles formatting and linting. The pre-commit hook auto-fixes staged files — you generally don't need to run it manually. To check manually:
+Oxfmt handles formatting and Oxlint handles linting, both via Vite+. The pre-commit hook auto-fixes staged files — you generally don't need to run it manually. To check manually:
 
 ```bash
-bun biome check --write .
+vp check --fix
 ```
 
 TypeScript strict mode is on (`verbatimModuleSyntax`, `moduleResolution: bundler`). Use `import type` for type-only imports.
@@ -99,9 +100,11 @@ TypeScript strict mode is on (`verbatimModuleSyntax`, `moduleResolution: bundler
 This repo uses [Changesets](https://github.com/changesets/changesets) for versioning.
 
 1. After making your changes, run:
+
    ```bash
    bun run changeset
    ```
+
    Follow the prompts to describe what changed and which packages are affected.
 
 2. Commit the generated `.changeset/*.md` file alongside your code changes.

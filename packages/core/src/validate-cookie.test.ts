@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import type { CookiePolicyConfig } from "./types";
 import { validateCookiePolicy } from "./validate-cookie";
 
@@ -51,9 +51,7 @@ test("missing company.legalName is an error", () => {
 		...validConfig,
 		company: { ...validConfig.company, legalName: "" },
 	});
-	expect(issues.some((i) => i.message.includes("company.legalName"))).toBe(
-		true,
-	);
+	expect(issues.some((i) => i.message.includes("company.legalName"))).toBe(true);
 });
 
 test("missing company.address is an error", () => {
@@ -82,21 +80,17 @@ test("all cookies disabled is an error", () => {
 			marketing: false,
 		},
 	});
-	expect(
-		issues.some(
-			(i) => i.level === "error" && i.message.includes("At least one cookie"),
-		),
-	).toBe(true);
+	expect(issues.some((i) => i.level === "error" && i.message.includes("At least one cookie"))).toBe(
+		true,
+	);
 });
 
 test("no consentMechanism is a warning", () => {
 	const { consentMechanism: _, ...configWithout } = validConfig;
 	const issues = validateCookiePolicy(configWithout as CookiePolicyConfig);
-	expect(
-		issues.some(
-			(i) => i.level === "warning" && i.message.includes("consentMechanism"),
-		),
-	).toBe(true);
+	expect(issues.some((i) => i.level === "warning" && i.message.includes("consentMechanism"))).toBe(
+		true,
+	);
 });
 
 test("eu jurisdiction with canWithdraw false is a warning", () => {
@@ -109,9 +103,7 @@ test("eu jurisdiction with canWithdraw false is a warning", () => {
 			canWithdraw: false,
 		},
 	});
-	expect(
-		issues.some((i) => i.level === "warning" && i.message.includes("withdraw")),
-	).toBe(true);
+	expect(issues.some((i) => i.level === "warning" && i.message.includes("withdraw"))).toBe(true);
 });
 
 test("eu jurisdiction with canWithdraw true has no gdpr warning", () => {
@@ -124,9 +116,7 @@ test("eu jurisdiction with canWithdraw true has no gdpr warning", () => {
 			canWithdraw: true,
 		},
 	});
-	expect(
-		issues.some((i) => i.level === "warning" && i.message.includes("withdraw")),
-	).toBe(false);
+	expect(issues.some((i) => i.level === "warning" && i.message.includes("withdraw"))).toBe(false);
 });
 
 test("uk jurisdiction with canWithdraw false is a warning (UK-GDPR parity)", () => {
@@ -139,7 +129,5 @@ test("uk jurisdiction with canWithdraw false is a warning (UK-GDPR parity)", () 
 			canWithdraw: false,
 		},
 	});
-	expect(
-		issues.some((i) => i.level === "warning" && i.message.includes("withdraw")),
-	).toBe(true);
+	expect(issues.some((i) => i.level === "warning" && i.message.includes("withdraw"))).toBe(true);
 });

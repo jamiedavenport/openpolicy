@@ -22,11 +22,7 @@ import { OpenPolicy } from "@openpolicy/react";
 import openpolicy from "@/openpolicy";
 
 export default function RootLayout({ children }) {
-  return (
-    <OpenPolicy config={openpolicy}>
-      {children}
-    </OpenPolicy>
-  );
+	return <OpenPolicy config={openpolicy}>{children}</OpenPolicy>;
 }
 ```
 
@@ -36,7 +32,7 @@ Then render the component on the relevant page:
 import { PrivacyPolicy } from "@/components/ui/openpolicy/privacy-policy";
 
 export default function PrivacyPolicyPage() {
-  return <PrivacyPolicy />;
+	return <PrivacyPolicy />;
 }
 ```
 
@@ -55,11 +51,11 @@ import { OpenPolicy, PrivacyPolicy, CookiePolicy } from "@openpolicy/react";
 import openpolicy from "@/openpolicy";
 
 export function PrivacyPolicyPage() {
-  return (
-    <OpenPolicy config={openpolicy}>
-      <PrivacyPolicy />
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={openpolicy}>
+			<PrivacyPolicy />
+		</OpenPolicy>
+	);
 }
 ```
 

@@ -25,42 +25,42 @@ Create a single `openpolicy.ts` at the root of your project. The unified `define
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-03-13",
-  jurisdictions: ["eu", "us-ca"],
-  dataCollected: {
-    "Account information": ["Email address", "Display name"],
-    "Usage data": ["Pages visited", "Session duration"],
-  },
-  legalBasis: ["legitimate_interests", "consent"],
-  retention: {
-    "Account data": "Until account deletion",
-    "Analytics data": "13 months",
-  },
-  thirdParties: [
-    {
-      name: "Plausible",
-      purpose: "Privacy-friendly analytics",
-      policyUrl: "https://plausible.io/privacy",
-    },
-    { name: "Vercel", purpose: "Hosting and edge delivery" },
-  ],
-  cookies: {
-    essential: true,
-    analytics: true,
-    functional: false,
-    marketing: false,
-  },
-  consentMechanism: {
-    hasBanner: true,
-    hasPreferencePanel: false,
-    canWithdraw: true,
-  },
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-03-13",
+	jurisdictions: ["eu", "us-ca"],
+	dataCollected: {
+		"Account information": ["Email address", "Display name"],
+		"Usage data": ["Pages visited", "Session duration"],
+	},
+	legalBasis: ["legitimate_interests", "consent"],
+	retention: {
+		"Account data": "Until account deletion",
+		"Analytics data": "13 months",
+	},
+	thirdParties: [
+		{
+			name: "Plausible",
+			purpose: "Privacy-friendly analytics",
+			policyUrl: "https://plausible.io/privacy",
+		},
+		{ name: "Vercel", purpose: "Hosting and edge delivery" },
+	],
+	cookies: {
+		essential: true,
+		analytics: true,
+		functional: false,
+		marketing: false,
+	},
+	consentMechanism: {
+		hasBanner: true,
+		hasPreferencePanel: false,
+		canWithdraw: true,
+	},
 });
 ```
 
@@ -75,13 +75,13 @@ import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [
-    sveltekit(),
-    openPolicy({
-      formats: ["html"],
-      outDir: "src/lib/policies",
-    }),
-  ],
+	plugins: [
+		sveltekit(),
+		openPolicy({
+			formats: ["html"],
+			outDir: "src/lib/policies",
+		}),
+	],
 });
 ```
 

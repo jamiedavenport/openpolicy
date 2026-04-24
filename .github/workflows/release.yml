@@ -20,21 +20,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - uses: voidzero-dev/setup-vp@v1
         with:
           node-version: "24"
+          cache: true
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - run: bun install --frozen-lockfile
+      - run: vp install --frozen-lockfile
 
       - name: Create Release PR or Publish
         uses: changesets/action@v1
         with:
-          publish: bun run publish-packages
-          version: bun run version-packages
+          publish: vp run publish-packages
+          version: vp run version-packages
           title: "chore: version packages"
           commit: "chore: version packages"
           createGithubReleases: true

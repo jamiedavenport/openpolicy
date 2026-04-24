@@ -16,11 +16,7 @@ interface PrivacyPolicyProps {
 	style?: CSSProperties;
 }
 
-export function PrivacyPolicy({
-	config: configProp,
-	components,
-	style,
-}: PrivacyPolicyProps) {
+export function PrivacyPolicy({ config: configProp, components, style }: PrivacyPolicyProps) {
 	const { config: contextConfig } = useContext(OpenPolicyContext);
 	const config = configProp ?? contextConfig ?? undefined;
 	if (!config) return null;

@@ -1,12 +1,5 @@
-import { afterEach, beforeEach, expect, test } from "bun:test";
-import {
-	existsSync,
-	mkdirSync,
-	mkdtempSync,
-	readFileSync,
-	rmSync,
-	writeFileSync,
-} from "node:fs";
+import { afterEach, beforeEach, expect, test } from "vite-plus/test";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { getStubContents, resolveStubPath, writeStub } from "./stub";
@@ -32,9 +25,7 @@ test("resolveStubPath falls back to ./openpolicy.ts when no src/", () => {
 
 test("resolveStubPath honors --out override (relative)", () => {
 	mkdirSync(join(dir, "src"));
-	expect(resolveStubPath(dir, "configs/policy.ts")).toBe(
-		join(dir, "configs/policy.ts"),
-	);
+	expect(resolveStubPath(dir, "configs/policy.ts")).toBe(join(dir, "configs/policy.ts"));
 });
 
 test("resolveStubPath honors --out override (absolute)", () => {

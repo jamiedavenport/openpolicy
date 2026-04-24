@@ -1,10 +1,6 @@
 import { readdir, readFile } from "node:fs/promises";
 import { extname, join, relative } from "node:path";
-import {
-	brotliCompressSync,
-	gzipSync,
-	constants as zlibConstants,
-} from "node:zlib";
+import { brotliCompressSync, gzipSync, constants as zlibConstants } from "node:zlib";
 
 export type AssetType = "js" | "css" | "html" | "font" | "image" | "other";
 

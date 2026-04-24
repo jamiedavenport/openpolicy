@@ -66,10 +66,10 @@ import { client } from "@openpolicy/plus";
 const changes = await client.changes(session.userId);
 
 if (changes.length > 0) {
-  showPolicyUpdateBanner({
-    changes,
-    onAccept: () => client.consent(session.userId),
-  });
+	showPolicyUpdateBanner({
+		changes,
+		onAccept: () => client.consent(session.userId),
+	});
 }
 ```
 
@@ -82,15 +82,15 @@ import { client } from "@openpolicy/plus";
 
 const changes = await client.changes(session.userId);
 const materialChanges = changes.filter(
-  (c) => c.section !== "definitions" && c.section !== "contact_info"
+	(c) => c.section !== "definitions" && c.section !== "contact_info",
 );
 
 if (materialChanges.length > 0) {
-  showPolicyModal({
-    changes: materialChanges,
-    onAccept: () => client.consent(session.userId),
-    blocking: true, // user must accept to continue
-  });
+	showPolicyModal({
+		changes: materialChanges,
+		onAccept: () => client.consent(session.userId),
+		blocking: true, // user must accept to continue
+	});
 }
 ```
 
@@ -106,15 +106,15 @@ import { getUsers } from "./db";
 const users = await getUsers();
 
 for (const user of users) {
-  const changes = await client.changes(user.id);
+	const changes = await client.changes(user.id);
 
-  if (changes.length === 0) continue;
+	if (changes.length === 0) continue;
 
-  await sendEmail({
-    to: user.email,
-    subject: "We've updated our privacy policy",
-    body: renderChangesEmail(changes),
-  });
+	await sendEmail({
+		to: user.email,
+		subject: "We've updated our privacy policy",
+		body: renderChangesEmail(changes),
+	});
 }
 ```
 
@@ -132,14 +132,14 @@ const changes = await client.changes("user_123");
 
 const anthropic = new Anthropic();
 const message = await anthropic.messages.create({
-  model: "claude-opus-4-6",
-  max_tokens: 1024,
-  messages: [
-    {
-      role: "user",
-      content: `Summarize these privacy policy changes in 2-3 friendly, plain-English sentences. Be specific about what changed but avoid legal language.\n\n${JSON.stringify(changes, null, 2)}`,
-    },
-  ],
+	model: "claude-opus-4-6",
+	max_tokens: 1024,
+	messages: [
+		{
+			role: "user",
+			content: `Summarize these privacy policy changes in 2-3 friendly, plain-English sentences. Be specific about what changed but avoid legal language.\n\n${JSON.stringify(changes, null, 2)}`,
+		},
+	],
 });
 
 const summary = message.content[0].type === "text" ? message.content[0].text : "";

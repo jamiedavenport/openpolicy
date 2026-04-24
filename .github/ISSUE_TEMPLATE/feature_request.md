@@ -18,8 +18,8 @@ Describe what you'd like to happen. If you have ideas about the API or config sh
 
 ```ts
 defineConfig({
-  // proposed new field or behavior
-})
+	// proposed new field or behavior
+});
 ```
 
 ## Alternatives considered

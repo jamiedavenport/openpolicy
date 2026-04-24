@@ -1,24 +1,24 @@
 {
 	"name": "@openpolicy/vite",
 	"version": "0.0.26",
-	"type": "module",
 	"description": "Vite plugin that scans source files for @openpolicy/sdk collecting()/thirdParty() calls and populates the auto-collected registry at build time",
+	"keywords": [
+		"openpolicy",
+		"privacy-policy",
+		"vite-plugin"
+	],
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/jamiedavenport/openpolicy",
 		"directory": "packages/vite"
 	},
-	"keywords": [
-		"vite-plugin",
-		"openpolicy",
-		"privacy-policy"
-	],
 	"files": [
 		"dist",
 		"README.md",
 		"NOTICE.md"
 	],
+	"type": "module",
 	"exports": {
 		".": {
 			"import": "./dist/index.js",
@@ -26,13 +26,10 @@
 		}
 	},
 	"scripts": {
-		"dev": "rolldown -c --watch",
-		"build": "rolldown -c",
+		"dev": "vp pack --watch",
+		"build": "vp pack",
 		"check-types": "tsc --noEmit",
-		"test": "bun test"
-	},
-	"peerDependencies": {
-		"vite": ">=4.0.0"
+		"test": "vp test"
 	},
 	"dependencies": {
 		"oxc-parser": "^0.124.0"
@@ -40,6 +37,10 @@
 	"devDependencies": {
 		"@openpolicy/sdk": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
-		"vite": "catalog:"
+		"vite": "catalog:",
+		"vite-plus": "catalog:"
+	},
+	"peerDependencies": {
+		"vite": ">=4.0.0"
 	}
 }
