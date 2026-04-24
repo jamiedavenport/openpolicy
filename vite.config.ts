@@ -3,6 +3,7 @@ import { defineConfig } from "vite-plus";
 export default defineConfig({
 	fmt: {
 		useTabs: true,
+		ignorePatterns: ["**/*.gen.ts"],
 	},
 	test: {
 		exclude: ["**/node_modules/**", "**/dist/**", "examples/tanstack/e2e/**"],
