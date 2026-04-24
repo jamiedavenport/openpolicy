@@ -18,6 +18,7 @@ jobs:
           cache: true
       - run: vp install --frozen-lockfile
       - run: vp check
+      - run: vp run -r build
       - run: vp run -r check-types
       - run: vp test --run
       # - run: vp run knip
