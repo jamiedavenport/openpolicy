@@ -23,9 +23,9 @@ bun add @openpolicy/sdk @openpolicy/core @openpolicy/renderers
 import { definePrivacyPolicy } from "@openpolicy/sdk";
 
 export default definePrivacyPolicy({
-  company: { name: "Acme Inc.", website: "https://acme.com" },
-  contact: { email: "privacy@acme.com" },
-  compliance: { gdpr: true, ccpa: true },
+	company: { name: "Acme Inc.", website: "https://acme.com" },
+	contact: { email: "privacy@acme.com" },
+	compliance: { gdpr: true, ccpa: true },
 });
 ```
 

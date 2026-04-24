@@ -31,10 +31,7 @@ export default defineConfig({
 
 export type WriteStubResult = { path: string; written: boolean };
 
-export async function writeStub(
-	path: string,
-	force: boolean,
-): Promise<WriteStubResult> {
+export async function writeStub(path: string, force: boolean): Promise<WriteStubResult> {
 	if (existsSync(path) && !force) {
 		return { path, written: false };
 	}

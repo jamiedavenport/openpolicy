@@ -18,66 +18,64 @@ OpenPolicy treats policies like code: they live in your repo, they're reviewed i
 
 ```ts
 // policy.ts
-import { defineConfig } from '@openpolicy/sdk'
+import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: 'Acme Inc.',
-    legalName: 'Acme Incorporated',
-    address: '123 Market St, San Francisco, CA 94105',
-    contact: 'privacy@acme.com',
-  },
-  privacy: {
-    effectiveDate: '2026-01-01',
-    dataCollected: {
-      'Account Information': ['Email', 'Name'],
-      'Usage Data': ['IP address', 'Browser', 'Pages visited'],
-    },
-    legalBasis: 'Legitimate interests and consent',
-    retention: {
-      'Account data': '3 years after account closure',
-      'Usage logs': '90 days',
-    },
-    cookies: {
-      essential: true,
-      analytics: true,
-      marketing: false,
-    },
-    thirdParties: [
-      { name: 'Stripe', purpose: 'Payment processing' },
-      { name: 'PostHog', purpose: 'Product analytics' },
-    ],
-    jurisdictions: ['us-ca'],
-  },
-})
+	company: {
+		name: "Acme Inc.",
+		legalName: "Acme Incorporated",
+		address: "123 Market St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	privacy: {
+		effectiveDate: "2026-01-01",
+		dataCollected: {
+			"Account Information": ["Email", "Name"],
+			"Usage Data": ["IP address", "Browser", "Pages visited"],
+		},
+		legalBasis: "Legitimate interests and consent",
+		retention: {
+			"Account data": "3 years after account closure",
+			"Usage logs": "90 days",
+		},
+		cookies: {
+			essential: true,
+			analytics: true,
+			marketing: false,
+		},
+		thirdParties: [
+			{ name: "Stripe", purpose: "Payment processing" },
+			{ name: "PostHog", purpose: "Product analytics" },
+		],
+		jurisdictions: ["us-ca"],
+	},
+});
 ```
 
 **2. Add the Vite plugin**
 
 ```ts
 // vite.config.ts
-import { defineConfig } from 'vite'
-import { openPolicy } from '@openpolicy/vite'
+import { defineConfig } from "vite";
+import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [
-    openPolicy({
-      formats: ['jsx', 'pdf', 'markdown'],
-    }),
-  ],
-})
+	plugins: [
+		openPolicy({
+			formats: ["jsx", "pdf", "markdown"],
+		}),
+	],
+});
 ```
 
 **3. Import the generated component**
 
 ```tsx
 // routes/privacy-policy.tsx
-import { PrivacyPolicy } from '@openpolicy/generated/privacy'
+import { PrivacyPolicy } from "@openpolicy/generated/privacy";
 
 export default function Route() {
-  return (
-    <PrivacyPolicy />
-  );
+	return <PrivacyPolicy />;
 }
 ```
 
@@ -85,17 +83,17 @@ That's it. Your privacy policy page is now generated directly from your `policy.
 
 ## Features
 
-| | |
-|---|---|
-| **TypeScript-first** | Define policies in the language you already know. Full type safety and autocomplete. |
-| **Multi-format output** | Generate HTML, PDF, and Markdown at build time — use whichever you need. |
-| **Vite integration** | Drops into your existing build pipeline in minutes. |
-| **GDPR & CCPA ready** | Built-in templates for the regulations that matter most. |
-| **Version controlled** | Policies live in your repo and ship with your code. |
-| **Always in sync** | Regenerated on every build — never out of date with your actual implementation. |
-| **Multi-jurisdiction** | US, EU, UK and more supported out of the box. |
-| **Audit trail** | Every policy change is tracked in git, reviewable in PRs. |
-| **Framework agnostic** | Works with React, Vue, Svelte, or plain HTML. |
+|                         |                                                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------ |
+| **TypeScript-first**    | Define policies in the language you already know. Full type safety and autocomplete. |
+| **Multi-format output** | Generate HTML, PDF, and Markdown at build time — use whichever you need.             |
+| **Vite integration**    | Drops into your existing build pipeline in minutes.                                  |
+| **GDPR & CCPA ready**   | Built-in templates for the regulations that matter most.                             |
+| **Version controlled**  | Policies live in your repo and ship with your code.                                  |
+| **Always in sync**      | Regenerated on every build — never out of date with your actual implementation.      |
+| **Multi-jurisdiction**  | US, EU, UK and more supported out of the box.                                        |
+| **Audit trail**         | Every policy change is tracked in git, reviewable in PRs.                            |
+| **Framework agnostic**  | Works with React, Vue, Svelte, or plain HTML.                                        |
 
 ## AI-assisted policy generation
 

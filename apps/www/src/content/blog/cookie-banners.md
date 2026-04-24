@@ -49,11 +49,7 @@ import openpolicy from "@/lib/openpolicy";
 import { OpenPolicy } from "@openpolicy/react";
 
 export default function RootLayout({ children }) {
-  return (
-    <OpenPolicy config={openpolicy}>
-      {children}
-    </OpenPolicy>
-  );
+	return <OpenPolicy config={openpolicy}>{children}</OpenPolicy>;
 }
 ```
 
@@ -62,19 +58,16 @@ export default function RootLayout({ children }) {
 Both components read from `useCookies()` internally — no props needed:
 
 ```tsx
-import {
-  CookieBanner,
-  CookiePreferences,
-} from "@/components/ui/openpolicy/cookie-banner";
+import { CookieBanner, CookiePreferences } from "@/components/ui/openpolicy/cookie-banner";
 
 export default function RootLayout({ children }) {
-  return (
-    <OpenPolicy config={openpolicy}>
-      {children}
-      <CookieBanner />
-      <CookiePreferences />
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={openpolicy}>
+			{children}
+			<CookieBanner />
+			<CookiePreferences />
+		</OpenPolicy>
+	);
 }
 ```
 
@@ -108,13 +101,13 @@ If shadcn isn't part of your project, or you want a fully custom banner, `useCoo
 
 ```tsx
 const {
-  route,           // "cookie" | "preferences" | "closed"
-  acceptAll,       // () => void
-  acceptNecessary, // () => void
-  categories,      // [{ key, label, enabled, locked }]
-  toggle,          // (key: string) => void
-  save,            // () => void
-  has,             // (expr: string | ConsentExpr) => boolean
+	route, // "cookie" | "preferences" | "closed"
+	acceptAll, // () => void
+	acceptNecessary, // () => void
+	categories, // [{ key, label, enabled, locked }]
+	toggle, // (key: string) => void
+	save, // () => void
+	has, // (expr: string | ConsentExpr) => boolean
 } = useCookies();
 ```
 

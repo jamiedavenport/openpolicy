@@ -26,22 +26,22 @@ bun add @openpolicy/sdk
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme Inc.",
-    legalName: "Acme Corporation",
-    address: "123 Main St, Springfield, USA",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-01-01",
-  jurisdictions: ["eu", "us-ca"],
-  dataCollected: {
-    "Account Information": ["Name", "Email address"],
-    "Usage Data": ["Pages visited", "IP address"],
-  },
-  legalBasis: ["legitimate_interests", "consent"],
-  retention: { "Account data": "Until account deletion" },
-  thirdParties: [],
-  cookies: { essential: true, analytics: false, marketing: false },
+	company: {
+		name: "Acme Inc.",
+		legalName: "Acme Corporation",
+		address: "123 Main St, Springfield, USA",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["eu", "us-ca"],
+	dataCollected: {
+		"Account Information": ["Name", "Email address"],
+		"Usage Data": ["Pages visited", "IP address"],
+	},
+	legalBasis: ["legitimate_interests", "consent"],
+	retention: { "Account data": "Until account deletion" },
+	thirdParties: [],
+	cookies: { essential: true, analytics: false, marketing: false },
 });
 ```
 

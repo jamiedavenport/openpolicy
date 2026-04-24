@@ -3,16 +3,8 @@ import { execFile as execFileCb } from "node:child_process";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
-import {
-	type BundleResult,
-	formatBytes,
-	measureBundle,
-} from "./measure/bundle.ts";
-import {
-	measureRuntime,
-	type RuntimeResult,
-	startPreviewServer,
-} from "./measure/runtime.ts";
+import { type BundleResult, formatBytes, measureBundle } from "./measure/bundle.ts";
+import { measureRuntime, type RuntimeResult, startPreviewServer } from "./measure/runtime.ts";
 import { EXAMPLE_DIR, type ScenarioName, scenarios } from "./scenarios.ts";
 
 const execFile = promisify(execFileCb);
@@ -30,8 +22,7 @@ function parseArgs(): { only: Phase; iterations: number } {
 	let iterations = 5;
 	for (const arg of process.argv.slice(2)) {
 		if (arg.startsWith("--only=")) only = arg.slice(7) as Phase;
-		else if (arg.startsWith("--iterations="))
-			iterations = Number(arg.slice(13));
+		else if (arg.startsWith("--iterations=")) iterations = Number(arg.slice(13));
 	}
 	return { only, iterations };
 }
@@ -69,9 +60,7 @@ async function runScenario(
 			console.log(`  → starting preview server on :${port}…`);
 			const server = await startPreviewServer(EXAMPLE_DIR, port);
 			try {
-				console.log(
-					`  → measuring runtime (${iterations} iterations) at ${server.url}…`,
-				);
+				console.log(`  → measuring runtime (${iterations} iterations) at ${server.url}…`);
 				result.runtime = await measureRuntime(server.url, iterations);
 			} finally {
 				await server.stop();
@@ -140,14 +129,7 @@ function renderMarkdown(
 		lines.push("");
 		lines.push(`| Type | Baseline | Full | Δ |`);
 		lines.push(`| --- | --- | --- | --- |`);
-		for (const type of [
-			"js",
-			"css",
-			"html",
-			"font",
-			"image",
-			"other",
-		] as const) {
+		for (const type of ["js", "css", "html", "font", "image", "other"] as const) {
 			const bt = baseline.bundle.byType[type];
 			const ft = full.bundle.byType[type];
 			if (bt.count === 0 && ft.count === 0) continue;
@@ -165,12 +147,7 @@ function renderMarkdown(
 		lines.push("");
 		lines.push(`| Metric | Baseline | Full | Δ |`);
 		lines.push(`| --- | --- | --- | --- |`);
-		const row = (
-			label: string,
-			bv: number | null,
-			fv: number | null,
-			unit: string,
-		) => {
+		const row = (label: string, bv: number | null, fv: number | null, unit: string) => {
 			if (bv === null || fv === null) {
 				lines.push(`| ${label} | — | — | — |`);
 				return;
@@ -234,10 +211,7 @@ async function main() {
 		meta,
 		scenarios: results,
 	};
-	await writeFile(
-		join(outDir, "latest.json"),
-		`${JSON.stringify(json, null, 2)}\n`,
-	);
+	await writeFile(join(outDir, "latest.json"), `${JSON.stringify(json, null, 2)}\n`);
 
 	const md = renderMarkdown(results.baseline, results.full, meta);
 	await writeFile(join(outDir, "latest.md"), md);
@@ -248,12 +222,8 @@ async function main() {
 	// Print summary to stdout
 	if (results.baseline.bundle && results.full.bundle) {
 		console.log(`\nBundle (gzip):`);
-		console.log(
-			`  baseline: ${formatBytes(results.baseline.bundle.totals.gzipBytes)}`,
-		);
-		console.log(
-			`  full:     ${formatBytes(results.full.bundle.totals.gzipBytes)}`,
-		);
+		console.log(`  baseline: ${formatBytes(results.baseline.bundle.totals.gzipBytes)}`);
+		console.log(`  full:     ${formatBytes(results.full.bundle.totals.gzipBytes)}`);
 		console.log(
 			`  delta:    ${delta(results.baseline.bundle.totals.gzipBytes, results.full.bundle.totals.gzipBytes)} (${pctDelta(results.baseline.bundle.totals.gzipBytes, results.full.bundle.totals.gzipBytes)})`,
 		);

@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import { compile, type PolicyInput } from "@openpolicy/core";
 import { renderPDF } from "./pdf";
 

@@ -1,15 +1,11 @@
 import type { CookiePolicyConfig, ValidationIssue } from "./types";
 
-export function validateCookiePolicy(
-	config: CookiePolicyConfig,
-): ValidationIssue[] {
+export function validateCookiePolicy(config: CookiePolicyConfig): ValidationIssue[] {
 	const issues: ValidationIssue[] = [];
 
 	// Required fields
-	if (!config.effectiveDate)
-		issues.push({ level: "error", message: "effectiveDate is required" });
-	if (!config.company.name)
-		issues.push({ level: "error", message: "company.name is required" });
+	if (!config.effectiveDate) issues.push({ level: "error", message: "effectiveDate is required" });
+	if (!config.company.name) issues.push({ level: "error", message: "company.name is required" });
 	if (!config.company.legalName)
 		issues.push({ level: "error", message: "company.legalName is required" });
 	if (!config.company.address)
@@ -37,8 +33,7 @@ export function validateCookiePolicy(
 
 	// GDPR / UK-GDPR consent withdrawal check
 	if (
-		(config.jurisdictions.includes("eu") ||
-			config.jurisdictions.includes("uk")) &&
+		(config.jurisdictions.includes("eu") || config.jurisdictions.includes("uk")) &&
 		config.consentMechanism &&
 		!config.consentMechanism.canWithdraw
 	) {

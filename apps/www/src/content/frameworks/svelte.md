@@ -25,10 +25,7 @@ import { openPolicy } from "@openpolicy/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [
-    sveltekit(),
-    openPolicy({ configs: ["./src/openpolicy.ts"] }),
-  ],
+	plugins: [sveltekit(), openPolicy({ configs: ["./src/openpolicy.ts"] })],
 });
 ```
 
@@ -39,9 +36,9 @@ export default defineConfig({
 import { definePrivacyPolicy } from "@openpolicy/sdk";
 
 export default definePrivacyPolicy({
-  company: { name: "Acme Inc.", website: "https://acme.com" },
-  contact: { email: "privacy@acme.com" },
-  compliance: { gdpr: true, ccpa: true },
+	company: { name: "Acme Inc.", website: "https://acme.com" },
+	contact: { email: "privacy@acme.com" },
+	compliance: { gdpr: true, ccpa: true },
 });
 ```
 

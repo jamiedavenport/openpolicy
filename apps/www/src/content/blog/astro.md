@@ -24,32 +24,32 @@ Create a single `openpolicy.ts` at the root of your project. The unified `define
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-03-05",
-  jurisdictions: ["eu", "us-ca"],
-  dataCollected: {
-    "Account information": ["Email address", "Display name"],
-    "Usage data": ["Pages visited", "Session duration"],
-  },
-  legalBasis: ["legitimate_interests", "consent"],
-  retention: {
-    "Account data": "Until account deletion",
-    "Analytics data": "13 months",
-  },
-  thirdParties: [
-    { name: "Vercel", purpose: "Hosting and edge delivery" },
-    { name: "Plausible", purpose: "Privacy-friendly analytics" },
-  ],
-  cookies: {
-    essential: true,
-    analytics: true,
-    marketing: false,
-  },
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-03-05",
+	jurisdictions: ["eu", "us-ca"],
+	dataCollected: {
+		"Account information": ["Email address", "Display name"],
+		"Usage data": ["Pages visited", "Session duration"],
+	},
+	legalBasis: ["legitimate_interests", "consent"],
+	retention: {
+		"Account data": "Until account deletion",
+		"Analytics data": "13 months",
+	},
+	thirdParties: [
+		{ name: "Vercel", purpose: "Hosting and edge delivery" },
+		{ name: "Plausible", purpose: "Privacy-friendly analytics" },
+	],
+	cookies: {
+		essential: true,
+		analytics: true,
+		marketing: false,
+	},
 });
 ```
 

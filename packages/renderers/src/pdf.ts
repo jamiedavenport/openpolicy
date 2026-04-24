@@ -21,31 +21,19 @@ function headingSize(level: number): number {
 	return Math.max(10, SIZE_HEADING_BASE - (level - 1) * 1.5);
 }
 
-function renderInlineNodes(
-	doc: InstanceType<typeof PDFDocument>,
-	nodes: InlineNode[],
-): void {
+function renderInlineNodes(doc: InstanceType<typeof PDFDocument>, nodes: InlineNode[]): void {
 	for (let i = 0; i < nodes.length; i++) {
 		const node = nodes[i];
 		const continued = i < nodes.length - 1;
 		switch (node!.type) {
 			case "text":
-				doc
-					.font(FONT_REGULAR)
-					.fillColor(COLOR_BODY)
-					.text(node!.value, { continued });
+				doc.font(FONT_REGULAR).fillColor(COLOR_BODY).text(node!.value, { continued });
 				break;
 			case "bold":
-				doc
-					.font(FONT_BOLD)
-					.fillColor(COLOR_HEADING)
-					.text(node!.value, { continued });
+				doc.font(FONT_BOLD).fillColor(COLOR_HEADING).text(node!.value, { continued });
 				break;
 			case "italic":
-				doc
-					.font(FONT_ITALIC)
-					.fillColor(COLOR_BODY)
-					.text(node!.value, { continued });
+				doc.font(FONT_ITALIC).fillColor(COLOR_BODY).text(node!.value, { continued });
 				break;
 			case "link":
 				doc
@@ -68,11 +56,8 @@ function renderListItem(
 	const indent = doc.page.margins.left + 10 + depth * 15;
 	const bullet = ordered ? `${index + 1}.` : depth === 0 ? "•" : "◦";
 
-	const inlineNodes = item.children.filter(
-		(c): c is InlineNode => c.type !== "list",
-	);
-	const nested =
-		item.children.find((c): c is ListNode => c.type === "list") ?? null;
+	const inlineNodes = item.children.filter((c): c is InlineNode => c.type !== "list");
+	const nested = item.children.find((c): c is ListNode => c.type === "list") ?? null;
 
 	doc
 		.font(FONT_REGULAR)
@@ -88,13 +73,7 @@ function renderListItem(
 
 	if (nested) {
 		for (let i = 0; i < nested.items.length; i++) {
-			renderListItem(
-				doc,
-				nested.items[i]!,
-				depth + 1,
-				nested.ordered ?? false,
-				i,
-			);
+			renderListItem(doc, nested.items[i]!, depth + 1, nested.ordered ?? false, i);
 		}
 	}
 }

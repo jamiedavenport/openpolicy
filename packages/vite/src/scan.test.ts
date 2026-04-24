@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, expect, test } from "bun:test";
+import { afterEach, beforeEach, expect, test } from "vite-plus/test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
@@ -37,11 +37,7 @@ test("walks nested directories", async () => {
 	await touch("nested/deep/c.ts", "");
 
 	const files = await walkSources(tmp, [".ts"]);
-	expect(files.map((f) => relative(tmp, f))).toEqual([
-		"a.ts",
-		"nested/b.ts",
-		"nested/deep/c.ts",
-	]);
+	expect(files.map((f) => relative(tmp, f))).toEqual(["a.ts", "nested/b.ts", "nested/deep/c.ts"]);
 });
 
 test("filters by extension", async () => {

@@ -17,19 +17,7 @@ export type {
 	PolicyType,
 	TextNode,
 } from "./documents";
-export {
-	bold,
-	compile,
-	heading,
-	italic,
-	li,
-	link,
-	ol,
-	p,
-	section,
-	text,
-	ul,
-} from "./documents";
+export { bold, compile, heading, italic, li, link, ol, p, section, text, ul } from "./documents";
 export { isJurisdiction, JURISDICTIONS } from "./jurisdictions";
 export type {
 	ChildrenConfig,
@@ -59,20 +47,10 @@ export { validatePrivacyPolicy } from "./validate";
 export { validateOpenPolicyConfig } from "./validate-config";
 export { validateCookiePolicy } from "./validate-cookie";
 
-import type {
-	CookiePolicyCookies,
-	OpenPolicyConfig,
-	PolicyCategory,
-	PolicyInput,
-} from "./types";
+import type { CookiePolicyCookies, OpenPolicyConfig, PolicyCategory, PolicyInput } from "./types";
 import { deriveUserRights } from "./user-rights";
 
-const PRIVACY_FIELDS = [
-	"dataCollected",
-	"legalBasis",
-	"retention",
-	"children",
-] as const;
+const PRIVACY_FIELDS = ["dataCollected", "legalBasis", "retention", "children"] as const;
 
 function hasAnyPrivacyField(config: OpenPolicyConfig): boolean {
 	return PRIVACY_FIELDS.some((field) => config[field] !== undefined);
@@ -82,21 +60,14 @@ function hasCookieField(config: OpenPolicyConfig): boolean {
 	return config.cookies !== undefined;
 }
 
-export function shouldEmit(
-	category: PolicyCategory,
-	config: OpenPolicyConfig,
-): boolean {
+export function shouldEmit(category: PolicyCategory, config: OpenPolicyConfig): boolean {
 	if (config.policies) return config.policies.includes(category);
-	return category === "privacy"
-		? hasAnyPrivacyField(config)
-		: hasCookieField(config);
+	return category === "privacy" ? hasAnyPrivacyField(config) : hasCookieField(config);
 }
 
 const EMPTY_COOKIES: CookiePolicyCookies = { essential: true };
 
-export function expandOpenPolicyConfig(
-	config: OpenPolicyConfig,
-): PolicyInput[] {
+export function expandOpenPolicyConfig(config: OpenPolicyConfig): PolicyInput[] {
 	const inputs: PolicyInput[] = [];
 	if (shouldEmit("privacy", config)) {
 		inputs.push({

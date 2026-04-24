@@ -12,30 +12,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: voidzero-dev/setup-vp@v1
         with:
           node-version: "24"
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-      - run: bun install --frozen-lockfile
-      - run: bun run check-types
-      - run: bun run lint
-      - run: bun run test
-      # - run: bun run knip
+          cache: true
+      - run: vp install --frozen-lockfile
+      - run: vp check
+      - run: vp run -r check-types
+      - run: vp test --run
+      # - run: vp run knip
   e2e:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: voidzero-dev/setup-vp@v1
         with:
           node-version: "24"
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-      - run: bun install --frozen-lockfile
-      - run: bun run build
-      - run: bunx playwright install --with-deps chromium
+          cache: true
+      - run: vp install --frozen-lockfile
+      - run: vp run -r build
+      - run: vp exec playwright install --with-deps chromium
         working-directory: examples/tanstack
-      - run: bun run test:e2e
+      - run: vp run test:e2e
         working-directory: examples/tanstack

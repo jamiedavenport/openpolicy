@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import type { PrivacyPolicyConfig } from "@openpolicy/core";
 import { compile } from "@openpolicy/core";
 import { isValidElement } from "react";

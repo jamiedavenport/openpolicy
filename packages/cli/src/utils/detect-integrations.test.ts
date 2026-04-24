@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, expect, test } from "bun:test";
+import { afterEach, beforeEach, expect, test } from "vite-plus/test";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -25,17 +25,13 @@ test("returns empty when no package.json", () => {
 test("detects vite as a devDep integration", () => {
 	writePkg({ devDependencies: { vite: "^5.0.0" } });
 	const got = detectIntegrations(dir);
-	expect(got).toEqual([
-		{ trigger: "vite", pkg: "@openpolicy/vite", dev: true },
-	]);
+	expect(got).toEqual([{ trigger: "vite", pkg: "@openpolicy/vite", dev: true }]);
 });
 
 test("detects react as a prod dep integration", () => {
 	writePkg({ dependencies: { react: "^19.0.0" } });
 	const got = detectIntegrations(dir);
-	expect(got).toEqual([
-		{ trigger: "react", pkg: "@openpolicy/react", dev: false },
-	]);
+	expect(got).toEqual([{ trigger: "react", pkg: "@openpolicy/react", dev: false }]);
 });
 
 test("detects vue as a prod dep integration", () => {
@@ -50,10 +46,7 @@ test("detects multiple integrations (vite + react)", () => {
 		devDependencies: { vite: "^5.0.0" },
 	});
 	const got = detectIntegrations(dir);
-	expect(got.map((i) => i.pkg).sort()).toEqual([
-		"@openpolicy/react",
-		"@openpolicy/vite",
-	]);
+	expect(got.map((i) => i.pkg).sort()).toEqual(["@openpolicy/react", "@openpolicy/vite"]);
 });
 
 test("returns empty when no triggers match", () => {

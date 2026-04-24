@@ -6,21 +6,13 @@ export const DataCategories = {
 		"Session Data": ["IP address", "User agent", "Browser type"],
 	},
 	PaymentInfo: {
-		"Payment Information": [
-			"Card last 4 digits",
-			"Billing name",
-			"Billing address",
-		],
+		"Payment Information": ["Card last 4 digits", "Billing name", "Billing address"],
 	},
 	UsageData: {
 		"Usage Data": ["Pages visited", "Features used", "Time spent"],
 	},
 	DeviceInfo: {
-		"Device Information": [
-			"Device type",
-			"Operating system",
-			"Browser version",
-		],
+		"Device Information": ["Device type", "Operating system", "Browser version"],
 	},
 	LocationData: { "Location Data": ["Country", "City", "Timezone"] },
 	Communications: {

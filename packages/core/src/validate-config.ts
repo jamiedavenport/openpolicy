@@ -1,22 +1,14 @@
 import { shouldEmit } from "./index";
 import { isJurisdiction, JURISDICTIONS } from "./jurisdictions";
-import type {
-	OpenPolicyConfig,
-	PolicyCategory,
-	ValidationIssue,
-} from "./types";
+import type { OpenPolicyConfig, PolicyCategory, ValidationIssue } from "./types";
 
 const PRIVACY_REQUIRED = "dataCollected";
 
-export function validateOpenPolicyConfig(
-	config: OpenPolicyConfig,
-): ValidationIssue[] {
+export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIssue[] {
 	const issues: ValidationIssue[] = [];
 
-	if (!config.effectiveDate)
-		issues.push({ level: "error", message: "effectiveDate is required" });
-	if (!config.company?.name)
-		issues.push({ level: "error", message: "company.name is required" });
+	if (!config.effectiveDate) issues.push({ level: "error", message: "effectiveDate is required" });
+	if (!config.company?.name) issues.push({ level: "error", message: "company.name is required" });
 	if (!config.company?.legalName)
 		issues.push({ level: "error", message: "company.legalName is required" });
 	if (!config.company?.address)

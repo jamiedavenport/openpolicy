@@ -16,11 +16,7 @@ interface CookiePolicyProps {
 	style?: CSSProperties;
 }
 
-export function CookiePolicy({
-	config: configProp,
-	components,
-	style,
-}: CookiePolicyProps) {
+export function CookiePolicy({ config: configProp, components, style }: CookiePolicyProps) {
 	const { config: contextConfig } = useContext(OpenPolicyContext);
 	const config = configProp ?? contextConfig ?? undefined;
 	if (!config) return null;

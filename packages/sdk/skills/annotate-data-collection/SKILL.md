@@ -37,13 +37,13 @@ Install and wire `openPolicy()` first (see openpolicy/vite-setup). Then follow t
 import { collecting } from "@openpolicy/sdk";
 
 export async function createUser(name: string, email: string) {
-  return db.insert(users).values(
-    collecting(
-      "Account Information",          // category — must be a string literal
-      { name, email },                // value — returned unchanged at runtime
-      { name: "Name", email: "Email address" }, // labels — values must be string literals
-    ),
-  );
+	return db.insert(users).values(
+		collecting(
+			"Account Information", // category — must be a string literal
+			{ name, email }, // value — returned unchanged at runtime
+			{ name: "Name", email: "Email address" }, // labels — values must be string literals
+		),
+	);
 }
 ```
 
@@ -54,17 +54,17 @@ export async function createUser(name: string, email: string) {
 import { defineConfig, dataCollected } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-01-01",
-  dataCollected: {
-    ...dataCollected,              // populated by openPolicy() at build time
-    // add manually-tracked categories here if needed
-  },
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-01-01",
+	dataCollected: {
+		...dataCollected, // populated by openPolicy() at build time
+		// add manually-tracked categories here if needed
+	},
 });
 ```
 
@@ -76,7 +76,7 @@ import { defineConfig } from "vite";
 import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [openPolicy()],
+	plugins: [openPolicy()],
 });
 ```
 
@@ -93,18 +93,18 @@ import { collecting } from "@openpolicy/sdk";
 
 // Database insert
 const row = collecting(
-  "Contact Information",
-  { email, phone },
-  { email: "Email address", phone: "Phone number" },
+	"Contact Information",
+	{ email, phone },
+	{ email: "Email address", phone: "Phone number" },
 );
 await db.insert(contacts).values(row);
 
 // Form submission
 const payload = collecting(
-  "Support Request",
-  { subject, body, userId },
-  { subject: "Subject line", body: "Message content" },
-  // userId omitted — not included in the policy
+	"Support Request",
+	{ subject, body, userId },
+	{ subject: "Subject line", body: "Message content" },
+	// userId omitted — not included in the policy
 );
 ```
 
@@ -118,16 +118,16 @@ import { collecting, DataCategories } from "@openpolicy/sdk";
 // DataCategories.AccountInfo = { "Account Information": ["Name", "Email address"] }
 // Use the category string from the preset key
 const user = collecting(
-  "Account Information",
-  { name, email },
-  { name: "Name", email: "Email address" },
+	"Account Information",
+	{ name, email },
+	{ name: "Name", email: "Email address" },
 );
 
 // DataCategories.SessionData = { "Session Data": ["IP address", "User agent", "Browser type"] }
 const session = collecting(
-  "Session Data",
-  { ip, userAgent },
-  { ip: "IP address", userAgent: "User agent" },
+	"Session Data",
+	{ ip, userAgent },
+	{ ip: "IP address", userAgent: "User agent" },
 );
 ```
 
@@ -143,14 +143,16 @@ The sentinel must be spread with `...dataCollected` — not assigned directly. Y
 import { defineConfig, dataCollected } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: { /* ... */ },
-  effectiveDate: "2026-01-01",
-  jurisdictions: ["eu", "us-ca"],
-  legalBasis: "legitimate_interests",
-  dataCollected: {
-    ...dataCollected,                              // auto-collected at build time
-    "Analytics": ["Page views", "Click events"],  // manually declared
-  },
+	company: {
+		/* ... */
+	},
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["eu", "us-ca"],
+	legalBasis: "legitimate_interests",
+	dataCollected: {
+		...dataCollected, // auto-collected at build time
+		Analytics: ["Page views", "Click events"], // manually declared
+	},
 });
 ```
 
@@ -175,11 +177,7 @@ collecting("Account Information", { name, email }, { name: "Name", email: label 
 
 ```ts
 // CORRECT: every argument the plugin reads is a string literal
-collecting(
-  "Account Information",
-  { name, email },
-  { name: "Name", email: "Email address" },
-);
+collecting("Account Information", { name, email }, { name: "Name", email: "Email address" });
 ```
 
 The `value` argument (second position) is never read by the scanner and can be any expression.
@@ -191,9 +189,9 @@ Even with `collecting()` calls throughout your codebase and `openPolicy()` wired
 ```ts
 // WRONG: sentinel not imported or spread
 export default defineConfig({
-  dataCollected: {
-    "Account Information": ["Email"],  // only manually-declared items appear
-  },
+	dataCollected: {
+		"Account Information": ["Email"], // only manually-declared items appear
+	},
 });
 ```
 
@@ -202,10 +200,10 @@ export default defineConfig({
 import { defineConfig, dataCollected } from "@openpolicy/sdk";
 
 export default defineConfig({
-  dataCollected: {
-    ...dataCollected,                  // auto-collected entries merged here
-    "Account Information": ["Email"],  // any manual additions
-  },
+	dataCollected: {
+		...dataCollected, // auto-collected entries merged here
+		"Account Information": ["Email"], // any manual additions
+	},
 });
 ```
 
@@ -223,9 +221,5 @@ collecting("Account Information");
 
 ```ts
 // CORRECT: all three arguments present
-collecting(
-  "Account Information",
-  { name, email },
-  { name: "Name", email: "Email address" },
-);
+collecting("Account Information", { name, email }, { name: "Name", email: "Email address" });
 ```

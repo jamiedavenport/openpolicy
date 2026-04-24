@@ -3,10 +3,7 @@ import { join, relative, resolve } from "node:path";
 import { defineCommand } from "citty";
 import consola from "consola";
 import { AGENT_PROMPT } from "../prompt";
-import {
-	detectIntegrations,
-	type Integration,
-} from "../utils/detect-integrations";
+import { detectIntegrations, type Integration } from "../utils/detect-integrations";
 import {
 	detectPackageManager,
 	type PackageManager,
@@ -62,9 +59,7 @@ export async function runInit(args: InitArgs): Promise<void> {
 	const cwd = resolve(args.cwd);
 
 	if (!existsSync(join(cwd, "package.json"))) {
-		consola.error(
-			`No package.json found in ${cwd}. Run \`npm init -y\` (or equivalent) first.`,
-		);
+		consola.error(`No package.json found in ${cwd}. Run \`npm init -y\` (or equivalent) first.`);
 		process.exitCode = 1;
 		return;
 	}
@@ -73,15 +68,10 @@ export async function runInit(args: InitArgs): Promise<void> {
 		"Welcome to OpenPolicy\nInstalling packages and preparing a setup prompt for your coding agent.",
 	);
 
-	const pm = args.pm
-		? toPackageManager(args.pm as PackageManagerName)
-		: detectPackageManager(cwd);
+	const pm = args.pm ? toPackageManager(args.pm as PackageManagerName) : detectPackageManager(cwd);
 
 	const integrations = detectIntegrations(cwd);
-	const prodDeps = [
-		SDK_PACKAGE,
-		...integrations.filter((i) => !i.dev).map((i) => i.pkg),
-	];
+	const prodDeps = [SDK_PACKAGE, ...integrations.filter((i) => !i.dev).map((i) => i.pkg)];
 	const devDeps = integrations.filter((i) => i.dev).map((i) => i.pkg);
 
 	const plan = [
@@ -93,9 +83,7 @@ export async function runInit(args: InitArgs): Promise<void> {
 	const stubExists = existsSync(stubPath);
 
 	if (integrations.length > 0) {
-		consola.info(
-			`Detected: ${integrations.map((i: Integration) => i.trigger).join(", ")}`,
-		);
+		consola.info(`Detected: ${integrations.map((i: Integration) => i.trigger).join(", ")}`);
 	}
 	summarize(pm, plan, stubPath, stubExists, cwd);
 

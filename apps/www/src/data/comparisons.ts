@@ -32,8 +32,7 @@ export const comparisons: Comparison[] = [
 		slug: "lawyers",
 		competitor: "Lawyers",
 		tagline: "OpenPolicy vs hiring a lawyer",
-		verdict:
-			"Get correct, up-to-date policies in minutes — not weeks — without a $3,000 invoice.",
+		verdict: "Get correct, up-to-date policies in minutes — not weeks — without a $3,000 invoice.",
 		rows: [
 			{
 				feature: "Time to first policy",

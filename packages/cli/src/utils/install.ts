@@ -9,11 +9,7 @@ export type InstallOptions = {
 	log?: (line: string) => void;
 };
 
-export function formatCommand(
-	pm: PackageManager,
-	deps: string[],
-	dev: boolean,
-): string {
+export function formatCommand(pm: PackageManager, deps: string[], dev: boolean): string {
 	return [pm.bin, ...pm.addArgs(deps, dev)].join(" ");
 }
 

@@ -35,11 +35,11 @@ import { defineConfig } from "vite";
 import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [
-    openPolicy({
-      thirdParties: { usePackageJson: true }, // optional — see below
-    }),
-  ],
+	plugins: [
+		openPolicy({
+			thirdParties: { usePackageJson: true }, // optional — see below
+		}),
+	],
 });
 ```
 
@@ -60,14 +60,14 @@ thirdParty("Stripe", "Payment processing", "https://stripe.com/privacy");
 import { defineConfig, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-01-01",
-  thirdParties: [...thirdParties],
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-01-01",
+	thirdParties: [...thirdParties],
 });
 ```
 
@@ -98,7 +98,7 @@ This is the fastest way to cover common services (Stripe, Sentry, PostHog, Verce
 
 ```ts
 // vite.config.ts
-openPolicy({ thirdParties: { usePackageJson: true } })
+openPolicy({ thirdParties: { usePackageJson: true } });
 ```
 
 See [references/known-packages.md](references/known-packages.md) for the full list of ~30 auto-detected packages.
@@ -108,12 +108,13 @@ See [references/known-packages.md](references/known-packages.md) for the full li
 `thirdParty()` annotations and `usePackageJson` are merged at build time. The plugin deduplicates by service name — `thirdParty()` entries from source files are added first (sorted file order), then package.json detections fill in any remaining services not already seen.
 
 Use this combination when:
+
 - Most services are covered by the KNOWN_PACKAGES registry (`usePackageJson: true`)
 - A few services are not in the registry and need explicit `thirdParty()` calls
 
 ```ts
 // vite.config.ts
-openPolicy({ thirdParties: { usePackageJson: true } })
+openPolicy({ thirdParties: { usePackageJson: true } });
 
 // src/lib/custom-analytics.ts
 import { thirdParty } from "@openpolicy/sdk";
@@ -125,7 +126,7 @@ thirdParty("Fathom Analytics", "Privacy-friendly web analytics", "https://usefat
 import { defineConfig, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
-  thirdParties: [...thirdParties],
+	thirdParties: [...thirdParties],
 });
 ```
 
@@ -137,12 +138,16 @@ export default defineConfig({
 import { defineConfig, Providers } from "@openpolicy/sdk";
 
 export default defineConfig({
-  thirdParties: [
-    Providers.Stripe,
-    Providers.Sentry,
-    Providers.Vercel,
-    { name: "Custom Service", purpose: "Internal logging", policyUrl: "https://example.com/privacy" },
-  ],
+	thirdParties: [
+		Providers.Stripe,
+		Providers.Sentry,
+		Providers.Vercel,
+		{
+			name: "Custom Service",
+			purpose: "Internal logging",
+			policyUrl: "https://example.com/privacy",
+		},
+	],
 });
 ```
 
@@ -185,7 +190,7 @@ Even when `openPolicy()` scans the source and populates the sentinel, the popula
 ```ts
 // WRONG: thirdParties not imported or spread
 export default defineConfig({
-  thirdParties: [], // static empty array, discards plugin output
+	thirdParties: [], // static empty array, discards plugin output
 });
 ```
 
@@ -194,9 +199,9 @@ export default defineConfig({
 import { defineConfig, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
-  thirdParties: [...thirdParties],
-  // or combine with static entries:
-  // thirdParties: [...thirdParties, Providers.Cloudflare],
+	thirdParties: [...thirdParties],
+	// or combine with static entries:
+	// thirdParties: [...thirdParties, Providers.Cloudflare],
 });
 ```
 
@@ -206,12 +211,12 @@ The KNOWN_PACKAGES registry covers ~30 common npm packages. Without `usePackageJ
 
 ```ts
 // WRONG: usePackageJson not enabled — known packages not auto-detected
-openPolicy()
+openPolicy();
 ```
 
 ```ts
 // Correct
-openPolicy({ thirdParties: { usePackageJson: true } })
+openPolicy({ thirdParties: { usePackageJson: true } });
 ```
 
 ## References

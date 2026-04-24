@@ -1,8 +1,4 @@
-import type {
-	CompileOptions,
-	OutputFormat,
-	PolicyInput,
-} from "@openpolicy/core";
+import type { CompileOptions, OutputFormat, PolicyInput } from "@openpolicy/core";
 import { compile } from "@openpolicy/core";
 
 export { renderHTML } from "./html";
@@ -21,9 +17,7 @@ function filenameFor(type: PolicyInput["type"], ext: string): string {
 export async function compilePolicy(
 	input: PolicyInput,
 	options?: CompileOptions,
-): Promise<
-	{ format: OutputFormat; filename: string; content: string | Buffer }[]
-> {
+): Promise<{ format: OutputFormat; filename: string; content: string | Buffer }[]> {
 	const doc = compile(input);
 	const formats = options?.formats ?? ["markdown"];
 	return Promise.all(

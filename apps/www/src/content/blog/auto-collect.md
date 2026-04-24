@@ -31,7 +31,7 @@ Before:
 
 ```ts
 export async function createUser(name: string, email: string) {
-  return db.insert(users).values({ name, email });
+	return db.insert(users).values({ name, email });
 }
 ```
 
@@ -41,13 +41,11 @@ After:
 import { collecting } from "@openpolicy/sdk";
 
 export async function createUser(name: string, email: string) {
-  return db.insert(users).values(
-    collecting(
-      "Account Information",
-      { name, email },
-      { name: "Name", email: "Email address" },
-    ),
-  );
+	return db
+		.insert(users)
+		.values(
+			collecting("Account Information", { name, email }, { name: "Name", email: "Email address" }),
+		);
 }
 ```
 
@@ -88,7 +86,7 @@ Enable `usePackageJson: true` in the plugin config and the plugin reads your `de
 import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [openPolicy({ thirdParties: { usePackageJson: true } })],
+	plugins: [openPolicy({ thirdParties: { usePackageJson: true } })],
 });
 ```
 
@@ -109,7 +107,7 @@ bun add -D @openpolicy/vite
 import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [openPolicy({ thirdParties: { usePackageJson: true } })],
+	plugins: [openPolicy({ thirdParties: { usePackageJson: true } })],
 });
 ```
 

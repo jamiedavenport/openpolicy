@@ -40,14 +40,14 @@ After install you'll have three things:
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "legal@acme.com",
-  },
-  effectiveDate: "2026-03-27",
-  // ... fill in your data practices
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "legal@acme.com",
+	},
+	effectiveDate: "2026-03-27",
+	// ... fill in your data practices
 });
 ```
 
@@ -58,23 +58,23 @@ export default defineConfig({
 ```tsx
 import { PrivacyPolicy as OpenPolicyPrivacy } from "@openpolicy/react";
 import {
-  PolicyHeading,
-  PolicyList,
-  PolicyListItem,
-  PolicyParagraph,
-  PolicySection,
+	PolicyHeading,
+	PolicyList,
+	PolicyListItem,
+	PolicyParagraph,
+	PolicySection,
 } from "@/components/ui/openpolicy/policy-components";
 
 const components = {
-  Section: PolicySection,
-  Heading: PolicyHeading,
-  Paragraph: PolicyParagraph,
-  List: PolicyList,
-  ListItem: PolicyListItem,
+	Section: PolicySection,
+	Heading: PolicyHeading,
+	Paragraph: PolicyParagraph,
+	List: PolicyList,
+	ListItem: PolicyListItem,
 };
 
 export function PrivacyPolicy() {
-  return <OpenPolicyPrivacy components={components} />;
+	return <OpenPolicyPrivacy components={components} />;
 }
 ```
 
@@ -92,13 +92,13 @@ import { OpenPolicy } from "@openpolicy/react";
 import { PrivacyPolicy } from "@/components/ui/privacy-policy";
 
 export default function PrivacyPolicyPage() {
-  return (
-    <main className="max-w-2xl mx-auto px-6 py-16">
-      <OpenPolicy config={openpolicy}>
-        <PrivacyPolicy />
-      </OpenPolicy>
-    </main>
-  );
+	return (
+		<main className="max-w-2xl mx-auto px-6 py-16">
+			<OpenPolicy config={openpolicy}>
+				<PrivacyPolicy />
+			</OpenPolicy>
+		</main>
+	);
 }
 ```
 
@@ -121,11 +121,11 @@ The components are regular React. Override any renderer by passing a `components
 
 ```tsx
 <PrivacyPolicy
-  components={{
-    Heading: ({ node }) => (
-      <h2 className="text-3xl font-black tracking-tight mb-4">{node.value}</h2>
-    ),
-  }}
+	components={{
+		Heading: ({ node }) => (
+			<h2 className="text-3xl font-black tracking-tight mb-4">{node.value}</h2>
+		),
+	}}
 />
 ```
 
@@ -135,12 +135,12 @@ For static generation, use the [Vite plugin](https://docs.openpolicy.sh/generati
 
 ## What's available
 
-| Registry item | What it installs |
-|---|---|
-| `@openpolicy/config` | Starter `openpolicy.ts` config |
-| `@openpolicy/policy-components` | 5 primitive render components |
-| `@openpolicy/privacy-policy` | Full privacy policy component |
-| `@openpolicy/cookie-policy` | Full cookie policy component |
+| Registry item                   | What it installs               |
+| ------------------------------- | ------------------------------ |
+| `@openpolicy/config`            | Starter `openpolicy.ts` config |
+| `@openpolicy/policy-components` | 5 primitive render components  |
+| `@openpolicy/privacy-policy`    | Full privacy policy component  |
+| `@openpolicy/cookie-policy`     | Full cookie policy component   |
 
 Start with whichever policy you need. The config and primitive components install automatically as dependencies of each policy component, so you only need one command.
 

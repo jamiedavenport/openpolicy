@@ -9,18 +9,18 @@ There is no `"us"` code. US privacy law is state-level — pick the specific sta
 
 ## Codes
 
-| Code       | Region                | Regulation(s)              | 0.1.0 content |
-| ---------- | --------------------- | -------------------------- | ------------- |
-| `eu`       | European Union        | GDPR                       | ✅ shipped    |
-| `uk`       | United Kingdom        | UK-GDPR + DPA 2018         | ✅ shipped    |
-| `us-ca`    | California, USA       | CCPA / CPRA                | ✅ shipped    |
-| `us-va`    | Virginia, USA         | VCDPA                      | reserved      |
-| `us-co`    | Colorado, USA         | CPA                        | reserved      |
-| `br`       | Brazil                | LGPD                       | reserved      |
-| `ca`       | Canada                | PIPEDA                     | reserved      |
-| `au`       | Australia             | Privacy Act 1988           | reserved      |
-| `jp`       | Japan                 | APPI                       | reserved      |
-| `sg`       | Singapore             | PDPA                       | reserved      |
+| Code    | Region          | Regulation(s)      | 0.1.0 content |
+| ------- | --------------- | ------------------ | ------------- |
+| `eu`    | European Union  | GDPR               | ✅ shipped    |
+| `uk`    | United Kingdom  | UK-GDPR + DPA 2018 | ✅ shipped    |
+| `us-ca` | California, USA | CCPA / CPRA        | ✅ shipped    |
+| `us-va` | Virginia, USA   | VCDPA              | reserved      |
+| `us-co` | Colorado, USA   | CPA                | reserved      |
+| `br`    | Brazil          | LGPD               | reserved      |
+| `ca`    | Canada          | PIPEDA             | reserved      |
+| `au`    | Australia       | Privacy Act 1988   | reserved      |
+| `jp`    | Japan           | APPI               | reserved      |
+| `sg`    | Singapore       | PDPA               | reserved      |
 
 **Shipped** means the renderer adds a jurisdiction-specific supplement section to your policy and derives the relevant user rights. **Reserved** means the code is accepted (so you can declare your regulatory surface now without a breaking change later) but no content renders for it yet.
 

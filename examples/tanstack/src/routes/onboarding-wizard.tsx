@@ -1,22 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-	ArrowLeft,
-	ArrowRight,
-	Check,
-	Cookie,
-	Database,
-	ExternalLink,
-	Users,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Cookie, Database, ExternalLink, Users } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import openpolicy from "../openpolicy";
@@ -25,11 +11,7 @@ export const Route = createFileRoute("/onboarding-wizard")({
 	component: RouteComponent,
 });
 
-const {
-	dataCollected = {},
-	thirdParties = [],
-	cookies = { essential: true },
-} = openpolicy;
+const { dataCollected = {}, thirdParties = [], cookies = { essential: true } } = openpolicy;
 
 type StepId = "welcome" | "data" | "third-parties" | "cookies" | "done";
 
@@ -50,12 +32,10 @@ function RouteComponent() {
 	return (
 		<main className="mx-auto max-w-2xl px-6 py-12">
 			<div className="mb-8">
-				<h1 className="mb-2 text-2xl font-semibold tracking-tight">
-					Welcome to Acme
-				</h1>
+				<h1 className="mb-2 text-2xl font-semibold tracking-tight">Welcome to Acme</h1>
 				<p className="text-sm text-muted-foreground">
-					Before you get started, here's a quick tour of what we collect — all
-					pulled directly from your OpenPolicy config at build time.
+					Before you get started, here's a quick tour of what we collect — all pulled directly from
+					your OpenPolicy config at build time.
 				</p>
 			</div>
 
@@ -88,11 +68,7 @@ function RouteComponent() {
 						<Link to="/">Finish</Link>
 					</Button>
 				) : (
-					<Button
-						onClick={() =>
-							setStepIndex((i) => Math.min(steps.length - 1, i + 1))
-						}
-					>
+					<Button onClick={() => setStepIndex((i) => Math.min(steps.length - 1, i + 1))}>
 						Next
 						<ArrowRight className="size-3.5" />
 					</Button>
@@ -137,10 +113,9 @@ function WelcomeStep() {
 			<CardHeader>
 				<CardTitle>A transparent welcome</CardTitle>
 				<CardDescription>
-					We believe in being upfront. Over the next few screens we'll show you
-					exactly what we collect, who we share it with, and what cookies we
-					set. Everything you'll see is generated from the same config that
-					powers our privacy policy — so it's always in sync.
+					We believe in being upfront. Over the next few screens we'll show you exactly what we
+					collect, who we share it with, and what cookies we set. Everything you'll see is generated
+					from the same config that powers our privacy policy — so it's always in sync.
 				</CardDescription>
 			</CardHeader>
 		</Card>
@@ -256,11 +231,7 @@ function CookiesStep() {
 												: "border text-muted-foreground",
 									)}
 								>
-									{category === "essential"
-										? "Always on"
-										: enabled
-											? "Default on"
-											: "Opt-in"}
+									{category === "essential" ? "Always on" : enabled ? "Default on" : "Opt-in"}
 								</span>
 							</li>
 						))}
@@ -278,10 +249,7 @@ function DoneStep({ onRestart }: { onRestart: () => void }) {
 				<CardTitle>You're all set</CardTitle>
 				<CardDescription>
 					That's everything. For the full legal text, see our{" "}
-					<Link
-						to="/tailwind"
-						className="underline underline-offset-2 hover:opacity-80"
-					>
+					<Link to="/tailwind" className="underline underline-offset-2 hover:opacity-80">
 						privacy policy
 					</Link>
 					.

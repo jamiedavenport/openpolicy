@@ -27,18 +27,18 @@ Create `openpolicy.ts` at the project root:
 import { defineConfig, dataCollected, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-01-01",
-  dataCollected: {
-    ...dataCollected,
-    "Account Information": ["Email address", "Display name"],
-  },
-  thirdParties: [...thirdParties],
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-01-01",
+	dataCollected: {
+		...dataCollected,
+		"Account Information": ["Email address", "Display name"],
+	},
+	thirdParties: [...thirdParties],
 });
 ```
 
@@ -50,10 +50,7 @@ import react from "@vitejs/plugin-react";
 import { openPolicy } from "@openpolicy/vite";
 
 export default defineConfig({
-  plugins: [
-    openPolicy({ thirdParties: { usePackageJson: true } }),
-    react(),
-  ],
+	plugins: [openPolicy({ thirdParties: { usePackageJson: true } }), react()],
 });
 ```
 
@@ -65,7 +62,7 @@ import { OpenPolicy } from "@openpolicy/react";
 import config from "./openpolicy";
 
 export function App({ children }: { children: React.ReactNode }) {
-  return <OpenPolicy config={config}>{children}</OpenPolicy>;
+	return <OpenPolicy config={config}>{children}</OpenPolicy>;
 }
 ```
 
@@ -75,7 +72,7 @@ Render a policy page:
 import { PrivacyPolicy } from "@openpolicy/react";
 
 export default function PrivacyPage() {
-  return <PrivacyPolicy />;
+	return <PrivacyPolicy />;
 }
 ```
 
@@ -90,12 +87,12 @@ import { collecting } from "@openpolicy/sdk";
 
 // Call next to the point of collection; openPolicy() scans for these at build time
 export async function createUser(name: string, email: string) {
-  const user = collecting(
-    "Account Information",
-    { name, email },
-    { name: "Display name", email: "Email address" },
-  );
-  return db.users.create(user);
+	const user = collecting(
+		"Account Information",
+		{ name, email },
+		{ name: "Display name", email: "Email address" },
+	);
+	return db.users.create(user);
 }
 ```
 
@@ -118,18 +115,18 @@ The `openPolicy({ thirdParties: { usePackageJson: true } })` option also auto-de
 import { defineConfig, dataCollected, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-01-01",
-  dataCollected: {
-    ...dataCollected,                          // populated by openPolicy() at build time
-    "Manual Category": ["Manually added field"], // additional hand-declared entries
-  },
-  thirdParties: [...thirdParties],             // populated by openPolicy() at build time
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-01-01",
+	dataCollected: {
+		...dataCollected, // populated by openPolicy() at build time
+		"Manual Category": ["Manually added field"], // additional hand-declared entries
+	},
+	thirdParties: [...thirdParties], // populated by openPolicy() at build time
 });
 ```
 
@@ -140,30 +137,32 @@ Both `dataCollected` and `thirdParties` are placeholder objects in `@openpolicy/
 ### HIGH: Rendering policy components without `<OpenPolicy>` provider
 
 Wrong:
+
 ```tsx
 // privacy-page.tsx
 import { PrivacyPolicy } from "@openpolicy/react";
 
 export default function PrivacyPage() {
-  return <PrivacyPolicy />;
+	return <PrivacyPolicy />;
 }
 ```
 
 Correct:
+
 ```tsx
 // layout.tsx — wrap at the root
 import { OpenPolicy } from "@openpolicy/react";
 import config from "./openpolicy";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <OpenPolicy config={config}>{children}</OpenPolicy>;
+	return <OpenPolicy config={config}>{children}</OpenPolicy>;
 }
 
 // privacy-page.tsx — component reads from context
 import { PrivacyPolicy } from "@openpolicy/react";
 
 export default function PrivacyPage() {
-  return <PrivacyPolicy />;
+	return <PrivacyPolicy />;
 }
 ```
 
@@ -176,38 +175,40 @@ Source: packages/react/src/context.tsx
 ### HIGH: Not spreading `dataCollected` and `thirdParties` sentinels into config
 
 Wrong:
+
 ```ts
 // openpolicy.ts
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-01-01",
-  dataCollected: { "Account Information": ["Email address"] },
-  thirdParties: [],
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-01-01",
+	dataCollected: { "Account Information": ["Email address"] },
+	thirdParties: [],
 });
 ```
 
 Correct:
+
 ```ts
 // openpolicy.ts
 import { defineConfig, dataCollected, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-01-01",
-  dataCollected: { ...dataCollected, "Account Information": ["Email address"] },
-  thirdParties: [...thirdParties],
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-01-01",
+	dataCollected: { ...dataCollected, "Account Information": ["Email address"] },
+	thirdParties: [...thirdParties],
 });
 ```
 

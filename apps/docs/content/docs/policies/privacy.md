@@ -32,11 +32,10 @@ import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
 import openpolicy from "@/openpolicy";
 
 export function PrivacyPolicyPage() {
-  return (
-    <OpenPolicy config={openpolicy}>
-      <PrivacyPolicy />
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={openpolicy}>
+			<PrivacyPolicy />
+		</OpenPolicy>
+	);
 }
 ```
-

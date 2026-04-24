@@ -1,8 +1,10 @@
 {
 	"name": "@openpolicy/sdk",
 	"version": "0.0.26",
-	"type": "module",
 	"description": "Public API for defining privacy policies with OpenPolicy",
+	"keywords": [
+		"tanstack-intent"
+	],
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
@@ -15,6 +17,7 @@
 		"NOTICE.md",
 		"skills"
 	],
+	"type": "module",
 	"exports": {
 		".": {
 			"import": "./dist/index.js",
@@ -22,18 +25,16 @@
 		}
 	},
 	"scripts": {
-		"dev": "rolldown --watch -c",
-		"build": "rolldown -c",
+		"dev": "vp pack --watch",
+		"build": "vp pack",
 		"check-types": "tsc --noEmit",
-		"test": "bun test"
+		"test": "vp test"
 	},
 	"dependencies": {},
 	"devDependencies": {
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
-		"@tanstack/intent": "^0.0.29"
-	},
-	"keywords": [
-		"tanstack-intent"
-	]
+		"@tanstack/intent": "^0.0.29",
+		"vite-plus": "catalog:"
+	}
 }

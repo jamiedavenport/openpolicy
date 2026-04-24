@@ -6,16 +6,16 @@
 
 library:
   name: openpolicy
-  version: '0.0.19'
-  repository: 'https://github.com/jamiedavenport/openpolicy'
+  version: "0.0.19"
+  repository: "https://github.com/jamiedavenport/openpolicy"
   description: >
     Policy-as-code library that compiles privacy policies, terms of service,
     and cookie policies from TypeScript configs, rendered at runtime via React.
 
 generated_from:
-  domain_map: '_artifacts/domain_map.yaml'
-  skill_spec: '_artifacts/skill_spec.md'
-generated_at: '2026-04-12'
+  domain_map: "_artifacts/domain_map.yaml"
+  skill_spec: "_artifacts/skill_spec.md"
+generated_at: "2026-04-12"
 
 # Flat skill structure — 8 task-focused skills across 3 packages.
 # No router skill (< 15 skills). No core overview (tasks are distinct enough).
@@ -34,11 +34,11 @@ skills:
       spread dataCollected and thirdParties sentinels; render <PrivacyPolicy>.
     requires: []
     sources:
-      - 'jamiedavenport/openpolicy:packages/sdk/src/index.ts'
-      - 'jamiedavenport/openpolicy:packages/sdk/src/auto-collected.ts'
-      - 'jamiedavenport/openpolicy:packages/react/src/context.tsx'
-      - 'jamiedavenport/openpolicy:packages/vite-auto-collect/src/index.ts'
-      - 'jamiedavenport/openpolicy:packages/sdk/README.md'
+      - "jamiedavenport/openpolicy:packages/sdk/src/index.ts"
+      - "jamiedavenport/openpolicy:packages/sdk/src/auto-collected.ts"
+      - "jamiedavenport/openpolicy:packages/react/src/context.tsx"
+      - "jamiedavenport/openpolicy:packages/vite-auto-collect/src/index.ts"
+      - "jamiedavenport/openpolicy:packages/sdk/README.md"
     subsystems: []
     references: []
 
@@ -57,15 +57,15 @@ skills:
       Retention/Rights/Providers presets.
     requires: []
     sources:
-      - 'jamiedavenport/openpolicy:packages/core/src/types.ts'
-      - 'jamiedavenport/openpolicy:packages/sdk/src/constants.ts'
-      - 'jamiedavenport/openpolicy:packages/core/src/validate.ts'
-      - 'jamiedavenport/openpolicy:packages/core/src/validate-terms.ts'
-      - 'jamiedavenport/openpolicy:packages/sdk/README.md'
+      - "jamiedavenport/openpolicy:packages/core/src/types.ts"
+      - "jamiedavenport/openpolicy:packages/sdk/src/constants.ts"
+      - "jamiedavenport/openpolicy:packages/core/src/validate.ts"
+      - "jamiedavenport/openpolicy:packages/core/src/validate-terms.ts"
+      - "jamiedavenport/openpolicy:packages/sdk/README.md"
     subsystems: []
     references:
-      - 'references/privacy-config.md'
-      - 'references/terms-config.md'
+      - "references/privacy-config.md"
+      - "references/terms-config.md"
 
   - name: Vite Setup
     slug: vite-setup
@@ -81,10 +81,10 @@ skills:
     requires:
       - define-config
     sources:
-      - 'jamiedavenport/openpolicy:packages/vite-auto-collect/src/index.ts'
-      - 'jamiedavenport/openpolicy:packages/vite-auto-collect/src/scan.ts'
-      - 'jamiedavenport/openpolicy:packages/vite-auto-collect/src/analyse.ts'
-      - 'jamiedavenport/openpolicy:packages/vite-auto-collect/README.md'
+      - "jamiedavenport/openpolicy:packages/vite-auto-collect/src/index.ts"
+      - "jamiedavenport/openpolicy:packages/vite-auto-collect/src/scan.ts"
+      - "jamiedavenport/openpolicy:packages/vite-auto-collect/src/analyse.ts"
+      - "jamiedavenport/openpolicy:packages/vite-auto-collect/README.md"
     subsystems: []
     references: []
 
@@ -103,10 +103,10 @@ skills:
     requires:
       - vite-setup
     sources:
-      - 'jamiedavenport/openpolicy:packages/sdk/src/collecting.ts'
-      - 'jamiedavenport/openpolicy:packages/sdk/src/auto-collected.ts'
-      - 'jamiedavenport/openpolicy:packages/vite-auto-collect/src/analyse.ts'
-      - 'jamiedavenport/openpolicy:packages/sdk/src/constants.ts'
+      - "jamiedavenport/openpolicy:packages/sdk/src/collecting.ts"
+      - "jamiedavenport/openpolicy:packages/sdk/src/auto-collected.ts"
+      - "jamiedavenport/openpolicy:packages/vite-auto-collect/src/analyse.ts"
+      - "jamiedavenport/openpolicy:packages/sdk/src/constants.ts"
     subsystems: []
     references: []
 
@@ -125,14 +125,14 @@ skills:
     requires:
       - vite-setup
     sources:
-      - 'jamiedavenport/openpolicy:packages/sdk/src/third-parties.ts'
-      - 'jamiedavenport/openpolicy:packages/sdk/src/auto-collected.ts'
-      - 'jamiedavenport/openpolicy:packages/vite-auto-collect/src/analyse.ts'
-      - 'jamiedavenport/openpolicy:packages/vite-auto-collect/src/known-packages.ts'
-      - 'jamiedavenport/openpolicy:packages/sdk/src/constants.ts'
+      - "jamiedavenport/openpolicy:packages/sdk/src/third-parties.ts"
+      - "jamiedavenport/openpolicy:packages/sdk/src/auto-collected.ts"
+      - "jamiedavenport/openpolicy:packages/vite-auto-collect/src/analyse.ts"
+      - "jamiedavenport/openpolicy:packages/vite-auto-collect/src/known-packages.ts"
+      - "jamiedavenport/openpolicy:packages/sdk/src/constants.ts"
     subsystems: []
     references:
-      - 'references/known-packages.md'
+      - "references/known-packages.md"
 
   - name: Render Policies
     slug: render-policies
@@ -149,11 +149,11 @@ skills:
     requires:
       - define-config
     sources:
-      - 'jamiedavenport/openpolicy:packages/react/src/components'
-      - 'jamiedavenport/openpolicy:packages/react/src/context.tsx'
-      - 'jamiedavenport/openpolicy:packages/react/src/render.tsx'
-      - 'jamiedavenport/openpolicy:packages/react/src/styles.ts'
-      - 'jamiedavenport/openpolicy:packages/react/src/types.ts'
+      - "jamiedavenport/openpolicy:packages/react/src/components"
+      - "jamiedavenport/openpolicy:packages/react/src/context.tsx"
+      - "jamiedavenport/openpolicy:packages/react/src/render.tsx"
+      - "jamiedavenport/openpolicy:packages/react/src/styles.ts"
+      - "jamiedavenport/openpolicy:packages/react/src/types.ts"
     subsystems: []
     references: []
 
@@ -174,10 +174,10 @@ skills:
       - define-config
       - render-policies
     sources:
-      - 'jamiedavenport/openpolicy:packages/react/src/hooks'
-      - 'jamiedavenport/openpolicy:packages/react/src/context.tsx'
-      - 'jamiedavenport/openpolicy:packages/react/src/components'
-      - 'jamiedavenport/openpolicy:apps/www/registry/cookie-banner.tsx'
+      - "jamiedavenport/openpolicy:packages/react/src/hooks"
+      - "jamiedavenport/openpolicy:packages/react/src/context.tsx"
+      - "jamiedavenport/openpolicy:packages/react/src/components"
+      - "jamiedavenport/openpolicy:apps/www/registry/cookie-banner.tsx"
     subsystems: []
     references: []
 
@@ -197,8 +197,8 @@ skills:
     requires:
       - define-config
     sources:
-      - 'jamiedavenport/openpolicy:packages/core/src/types.ts'
-      - 'jamiedavenport/openpolicy:packages/sdk/src/constants.ts'
-      - 'jamiedavenport/openpolicy:packages/core/src/validate.ts'
+      - "jamiedavenport/openpolicy:packages/core/src/types.ts"
+      - "jamiedavenport/openpolicy:packages/sdk/src/constants.ts"
+      - "jamiedavenport/openpolicy:packages/core/src/validate.ts"
     subsystems: []
     references: []

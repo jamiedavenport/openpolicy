@@ -24,13 +24,13 @@ OpenPolicy starts with a typed configuration object. You declare facts about you
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Your Company",
-    legalName: "Your Company, Inc.",
-    contact: "privacy@yourcompany.com",
-  },
-  jurisdictions: ["us-ca"],
-  dataCollected: { "Personal Information": ["Full name", "Email address"] },
+	company: {
+		name: "Your Company",
+		legalName: "Your Company, Inc.",
+		contact: "privacy@yourcompany.com",
+	},
+	jurisdictions: ["us-ca"],
+	dataCollected: { "Personal Information": ["Full name", "Email address"] },
 });
 ```
 
@@ -49,9 +49,7 @@ import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import openpolicy from "../../../openpolicy";
 
 const inputs = expandOpenPolicyConfig(openpolicy);
-const policiesMarkdown = inputs
-  .map((input) => renderMarkdown(compile(input)))
-  .join("\n\n---\n\n");
+const policiesMarkdown = inputs.map((input) => renderMarkdown(compile(input))).join("\n\n---\n\n");
 
 const SYSTEM_PROMPT = `You are a legal assistant for ${openpolicy.company.name}. \
 Answer questions about the following policy clearly and concisely. \
@@ -60,13 +58,13 @@ Cite specific sections when relevant. Do not speculate beyond what the policy st
 ${policiesMarkdown}`;
 
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
-  const result = streamText({
-    model: anthropic("claude-sonnet-4-6"),
-    system: SYSTEM_PROMPT,
-    messages: await convertToModelMessages(messages),
-  });
-  return result.toUIMessageStreamResponse();
+	const { messages }: { messages: UIMessage[] } = await req.json();
+	const result = streamText({
+		model: anthropic("claude-sonnet-4-6"),
+		system: SYSTEM_PROMPT,
+		messages: await convertToModelMessages(messages),
+	});
+	return result.toUIMessageStreamResponse();
 }
 ```
 
@@ -83,9 +81,7 @@ The UI is built with [AI SDK](https://sdk.vercel.ai/docs)'s `useChat` hook and a
 ```tsx
 const isLastAssistant = msg.role === "assistant" && i === messages.length - 1;
 
-<MessageResponse isAnimating={isLastAssistant && isStreaming}>
-  {text}
-</MessageResponse>
+<MessageResponse isAnimating={isLastAssistant && isStreaming}>{text}</MessageResponse>;
 ```
 
 `isAnimating` enables typewriter-style streaming rendering. The guard matters: without it, every completed message re-animates on each render cycle. You only want animation on the message that's actively streaming.
@@ -94,10 +90,10 @@ Starter questions help users get started without staring at a blank input:
 
 ```tsx
 const STARTERS = [
-  "What data do you collect about me?",
-  "How can I delete my data?",
-  "Do you share my data with third parties?",
-  "What rights do I have over my data?",
+	"What data do you collect about me?",
+	"How can I delete my data?",
+	"Do you share my data with third parties?",
+	"What rights do I have over my data?",
 ];
 ```
 

@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import type { Document } from "@openpolicy/core";
 import { renderHTML } from "./html";
 
@@ -64,9 +64,7 @@ test("renders link as <a>", () => {
 				content: [
 					{
 						type: "paragraph",
-						children: [
-							{ type: "link", href: "https://example.com", value: "here" },
-						],
+						children: [{ type: "link", href: "https://example.com", value: "here" }],
 					},
 				],
 			},

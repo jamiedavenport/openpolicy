@@ -73,11 +73,7 @@ export function DefaultList({
 	return <Tag data-op-list>{children}</Tag>;
 }
 
-export function renderNode(
-	node: Node,
-	components: PolicyComponents,
-	key?: number,
-): ReactNode {
+export function renderNode(node: Node, components: PolicyComponents, key?: number): ReactNode {
 	switch (node.type) {
 		case "document":
 			return <>{node.sections.map((s, i) => renderNode(s, components, i))}</>;
@@ -97,9 +93,7 @@ export function renderNode(
 		}
 
 		case "paragraph": {
-			const children = node.children.map((n, i) =>
-				renderNode(n, components, i),
-			);
+			const children = node.children.map((n, i) => renderNode(n, components, i));
 			if (components.Paragraph)
 				return (
 					<components.Paragraph key={key} node={node}>
@@ -114,9 +108,7 @@ export function renderNode(
 		}
 
 		case "list": {
-			const children = node.items.map((item, i) =>
-				renderNode(item, components, i),
-			);
+			const children = node.items.map((item, i) => renderNode(item, components, i));
 			if (components.List)
 				return (
 					<components.List key={key} node={node}>

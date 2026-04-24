@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import type { ParagraphNode } from "./documents";
 import { compile } from "./documents";
 import type { PrivacyPolicyConfig } from "./types";

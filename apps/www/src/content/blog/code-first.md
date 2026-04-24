@@ -28,16 +28,16 @@ With OpenPolicy, you define your policy as a TypeScript object and render it dir
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    contact: "legal@acme.com",
-  },
-  jurisdictions: ["eu", "us-ca"],
-  dataCollected: {
-    "Account Information": ["Full name", "Email address"],
-    "Usage Data": ["Pages visited", "Feature usage"],
-  },
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		contact: "legal@acme.com",
+	},
+	jurisdictions: ["eu", "us-ca"],
+	dataCollected: {
+		"Account Information": ["Full name", "Email address"],
+		"Usage Data": ["Pages visited", "Feature usage"],
+	},
 });
 ```
 

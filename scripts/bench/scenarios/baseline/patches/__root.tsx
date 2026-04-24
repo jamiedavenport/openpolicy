@@ -1,12 +1,6 @@
-/// <reference types="vite/client" />
+/// <reference types="vite-plus/client" />
 
-import {
-	createRootRoute,
-	HeadContent,
-	Link,
-	Outlet,
-	Scripts,
-} from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import appCss from "../styles.css?url";

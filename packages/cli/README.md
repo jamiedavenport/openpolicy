@@ -18,15 +18,15 @@ That's it — the CLI detects your package manager from lockfiles, installs the 
 
 ### Flags
 
-| Flag | Default | Description |
-|---|---|---|
-| `--cwd <path>` | `.` | Working directory |
-| `--pm <bun\|pnpm\|yarn\|npm>` | auto-detected | Override package-manager detection |
-| `--skip-install` | `false` | Print the prompt only; don't install packages |
-| `--dry-run` | `false` | Show planned actions without executing |
-| `--yes`, `-y` | `false` | Skip the confirmation prompt |
-| `--out <path>` | `src/openpolicy.ts` or `openpolicy.ts` | Output path for the stub |
-| `--force` | `false` | Overwrite an existing stub |
+| Flag                          | Default                                | Description                                   |
+| ----------------------------- | -------------------------------------- | --------------------------------------------- |
+| `--cwd <path>`                | `.`                                    | Working directory                             |
+| `--pm <bun\|pnpm\|yarn\|npm>` | auto-detected                          | Override package-manager detection            |
+| `--skip-install`              | `false`                                | Print the prompt only; don't install packages |
+| `--dry-run`                   | `false`                                | Show planned actions without executing        |
+| `--yes`, `-y`                 | `false`                                | Skip the confirmation prompt                  |
+| `--out <path>`                | `src/openpolicy.ts` or `openpolicy.ts` | Output path for the stub                      |
+| `--force`                     | `false`                                | Overwrite an existing stub                    |
 
 ## What gets installed
 

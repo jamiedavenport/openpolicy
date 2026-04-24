@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import { isJurisdiction, JURISDICTIONS } from "./jurisdictions";
 import type { OpenPolicyConfig } from "./types";
 import { validateOpenPolicyConfig } from "./validate-config";
@@ -37,9 +37,7 @@ test("validateOpenPolicyConfig rejects retired 'us' code with a helpful message"
 		...baseConfig,
 		jurisdictions: ["us" as never],
 	});
-	const bad = issues.find((i) =>
-		i.message.startsWith('Unknown jurisdiction "us"'),
-	);
+	const bad = issues.find((i) => i.message.startsWith('Unknown jurisdiction "us"'));
 	expect(bad).toBeDefined();
 	expect(bad?.level).toBe("error");
 	for (const code of JURISDICTIONS) {
@@ -54,9 +52,7 @@ test("validateOpenPolicyConfig rejects a typo'd code", () => {
 	});
 	expect(
 		issues.some(
-			(i) =>
-				i.level === "error" &&
-				i.message.startsWith('Unknown jurisdiction "uss-ca"'),
+			(i) => i.level === "error" && i.message.startsWith('Unknown jurisdiction "uss-ca"'),
 		),
 	).toBe(true);
 });
@@ -67,9 +63,7 @@ test("validateOpenPolicyConfig accepts every documented code", () => {
 			...baseConfig,
 			jurisdictions: [code],
 		});
-		expect(
-			issues.some((i) => i.message.startsWith("Unknown jurisdiction")),
-		).toBe(false);
+		expect(issues.some((i) => i.message.startsWith("Unknown jurisdiction"))).toBe(false);
 	}
 });
 
@@ -77,9 +71,7 @@ test("validateOpenPolicyConfig still errors on empty jurisdictions array", () =>
 	const issues = validateOpenPolicyConfig({ ...baseConfig, jurisdictions: [] });
 	expect(
 		issues.some(
-			(i) =>
-				i.level === "error" &&
-				i.message === "jurisdictions must have at least one entry",
+			(i) => i.level === "error" && i.message === "jurisdictions must have at least one entry",
 		),
 	).toBe(true);
 });

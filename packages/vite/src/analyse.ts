@@ -65,32 +65,12 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 	}
 
 	const program = result.program as unknown as AnyNode;
-	const collectingNames = collectBindings(
-		program,
-		SDK_SPECIFIER,
-		COLLECTING_NAME,
-	);
-	const thirdPartyNames = collectBindings(
-		program,
-		SDK_SPECIFIER,
-		THIRD_PARTY_NAME,
-	);
+	const collectingNames = collectBindings(program, SDK_SPECIFIER, COLLECTING_NAME);
+	const thirdPartyNames = collectBindings(program, SDK_SPECIFIER, THIRD_PARTY_NAME);
 	const ignoreNames = collectBindings(program, SDK_SPECIFIER, IGNORE_NAME);
-	const defineCookieNames = collectBindings(
-		program,
-		SDK_SPECIFIER,
-		DEFINE_COOKIE_NAME,
-	);
-	const useCookiesNames = collectBindings(
-		program,
-		REACT_SPECIFIER,
-		USE_COOKIES_NAME,
-	);
-	const consentGateNames = collectBindings(
-		program,
-		REACT_SPECIFIER,
-		CONSENT_GATE_NAME,
-	);
+	const defineCookieNames = collectBindings(program, SDK_SPECIFIER, DEFINE_COOKIE_NAME);
+	const useCookiesNames = collectBindings(program, REACT_SPECIFIER, USE_COOKIES_NAME);
+	const consentGateNames = collectBindings(program, REACT_SPECIFIER, CONSENT_GATE_NAME);
 	if (
 		collectingNames.size === 0 &&
 		thirdPartyNames.size === 0 &&
@@ -187,11 +167,7 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 			for (const attr of attrs) {
 				if (attr.type !== "JSXAttribute") continue;
 				const attrName = attr.name as AnyNode | undefined;
-				if (
-					!attrName ||
-					attrName.type !== "JSXIdentifier" ||
-					attrName.name !== "requires"
-				)
+				if (!attrName || attrName.type !== "JSXIdentifier" || attrName.name !== "requires")
 					continue;
 				const value = attr.value as AnyNode | undefined;
 				if (!value) continue;
@@ -213,11 +189,7 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
  * `exportName` imported from `moduleName`. Skips type-only imports and
  * specifiers whose imported name doesn't match.
  */
-function collectBindings(
-	program: AnyNode,
-	moduleName: string,
-	exportName: string,
-): Set<string> {
+function collectBindings(program: AnyNode, moduleName: string, exportName: string): Set<string> {
 	const names = new Set<string>();
 	const body = program.body as AnyNode[] | undefined;
 	if (!body) return names;
@@ -309,10 +281,7 @@ function extractHasExpression(node: AnyNode, out: Set<string>): void {
  * skipped silently — producing the same observable result as omitting the
  * field from the record did before.
  */
-function extractLabelKeys(
-	node: AnyNode | undefined,
-	ignoreNames: Set<string>,
-): string[] | null {
+function extractLabelKeys(node: AnyNode | undefined, ignoreNames: Set<string>): string[] | null {
 	if (!node || node.type !== "ObjectExpression") return null;
 	const properties = node.properties as AnyNode[] | undefined;
 	if (!properties) return null;

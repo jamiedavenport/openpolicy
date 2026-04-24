@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vite-plus/test";
 import { defineCookie } from "./define-cookie";
 
 test("defineCookie is a no-op that returns undefined", () => {

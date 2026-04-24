@@ -78,25 +78,16 @@ interface PromptInputControllerProps {
 	textInput: TextInputContext;
 	attachments: AttachmentsContext;
 	/** INTERNAL: Allows PromptInput to register its file textInput + "open" callback */
-	__registerFileInput: (
-		ref: RefObject<HTMLInputElement | null>,
-		open: () => void,
-	) => void;
+	__registerFileInput: (ref: RefObject<HTMLInputElement | null>, open: () => void) => void;
 }
 
-const PromptInputController = createContext<PromptInputControllerProps | null>(
-	null,
-);
-const ProviderAttachmentsContext = createContext<AttachmentsContext | null>(
-	null,
-);
+const PromptInputController = createContext<PromptInputControllerProps | null>(null);
+const ProviderAttachmentsContext = createContext<AttachmentsContext | null>(null);
 
 // Optional variants (do NOT throw). Useful for dual-mode components.
-const useOptionalPromptInputController = () =>
-	useContext(PromptInputController);
+const useOptionalPromptInputController = () => useContext(PromptInputController);
 
-const useOptionalProviderAttachments = () =>
-	useContext(ProviderAttachmentsContext);
+const useOptionalProviderAttachments = () => useContext(ProviderAttachmentsContext);
 
 // ============================================================================
 // Component Context & Hooks
@@ -128,18 +119,14 @@ interface ReferencedSourcesContext {
 	clear: () => void;
 }
 
-const LocalReferencedSourcesContext =
-	createContext<ReferencedSourcesContext | null>(null);
+const LocalReferencedSourcesContext = createContext<ReferencedSourcesContext | null>(null);
 
 interface PromptInputMessage {
 	text: string;
 	files: FileUIPart[];
 }
 
-type PromptInputProps = Omit<
-	HTMLAttributes<HTMLFormElement>,
-	"onSubmit" | "onError"
-> & {
+type PromptInputProps = Omit<HTMLAttributes<HTMLFormElement>, "onSubmit" | "onError"> & {
 	// e.g., "image/*" or leave undefined for any
 	accept?: string;
 	multiple?: boolean;
@@ -151,10 +138,7 @@ type PromptInputProps = Omit<
 	maxFiles?: number;
 	// bytes
 	maxFileSize?: number;
-	onError?: (err: {
-		code: "max_files" | "max_file_size" | "accept";
-		message: string;
-	}) => void;
+	onError?: (err: { code: "max_files" | "max_file_size" | "accept"; message: string }) => void;
 	onSubmit: (
 		message: PromptInputMessage,
 		event: FormEvent<HTMLFormElement>,
@@ -236,8 +220,7 @@ export const PromptInput = ({
 				});
 				return;
 			}
-			const withinSize = (f: File) =>
-				maxFileSize ? f.size <= maxFileSize : true;
+			const withinSize = (f: File) => (maxFileSize ? f.size <= maxFileSize : true);
 			const sized = accepted.filter(withinSize);
 			if (accepted.length > 0 && sized.length === 0) {
 				onError?.({
@@ -249,11 +232,8 @@ export const PromptInput = ({
 
 			setItems((prev) => {
 				const capacity =
-					typeof maxFiles === "number"
-						? Math.max(0, maxFiles - prev.length)
-						: undefined;
-				const capped =
-					typeof capacity === "number" ? sized.slice(0, capacity) : sized;
+					typeof maxFiles === "number" ? Math.max(0, maxFiles - prev.length) : undefined;
+				const capped = typeof capacity === "number" ? sized.slice(0, capacity) : sized;
 				if (typeof capacity === "number" && sized.length > capacity) {
 					onError?.({
 						code: "max_files",
@@ -300,8 +280,7 @@ export const PromptInput = ({
 				});
 				return;
 			}
-			const withinSize = (f: File) =>
-				maxFileSize ? f.size <= maxFileSize : true;
+			const withinSize = (f: File) => (maxFileSize ? f.size <= maxFileSize : true);
 			const sized = accepted.filter(withinSize);
 			if (accepted.length > 0 && sized.length === 0) {
 				onError?.({
@@ -313,11 +292,8 @@ export const PromptInput = ({
 
 			const currentCount = files.length;
 			const capacity =
-				typeof maxFiles === "number"
-					? Math.max(0, maxFiles - currentCount)
-					: undefined;
-			const capped =
-				typeof capacity === "number" ? sized.slice(0, capacity) : sized;
+				typeof maxFiles === "number" ? Math.max(0, maxFiles - currentCount) : undefined;
+			const capped = typeof capacity === "number" ? sized.slice(0, capacity) : sized;
 			if (typeof capacity === "number" && sized.length > capacity) {
 				onError?.({
 					code: "max_files",
@@ -347,10 +323,7 @@ export const PromptInput = ({
 		[usingProvider, controller],
 	);
 
-	const clearReferencedSources = useCallback(
-		() => setReferencedSources([]),
-		[],
-	);
+	const clearReferencedSources = useCallback(() => setReferencedSources([]), []);
 
 	const add = usingProvider ? addWithProviderValidation : addLocal;
 	const remove = usingProvider ? controller.attachments.remove : removeLocal;
@@ -477,10 +450,7 @@ export const PromptInput = ({
 		() => ({
 			add: (incoming: SourceDocumentUIPart[] | SourceDocumentUIPart) => {
 				const array = Array.isArray(incoming) ? incoming : [incoming];
-				setReferencedSources((prev) => [
-					...prev,
-					...array.map((s) => ({ ...s, id: nanoid() })),
-				]);
+				setReferencedSources((prev) => [...prev, ...array.map((s) => ({ ...s, id: nanoid() }))]);
 			},
 			clear: clearReferencedSources,
 			remove: (id: string) => {
@@ -565,12 +535,7 @@ export const PromptInput = ({
 				title="Upload files"
 				type="file"
 			/>
-			<form
-				className={cn("w-full", className)}
-				onSubmit={handleSubmit}
-				ref={formRef}
-				{...props}
-			>
+			<form className={cn("w-full", className)} onSubmit={handleSubmit} ref={formRef} {...props}>
 				<InputGroup className="overflow-hidden">{children}</InputGroup>
 			</form>
 		</>
@@ -592,10 +557,7 @@ export const PromptInput = ({
 
 type PromptInputBodyProps = HTMLAttributes<HTMLDivElement>;
 
-export const PromptInputBody = ({
-	className,
-	...props
-}: PromptInputBodyProps) => (
+export const PromptInputBody = ({ className, ...props }: PromptInputBodyProps) => (
 	<div className={cn("contents", className)} {...props} />
 );
 
@@ -644,11 +606,7 @@ export const PromptInputTextarea = ({
 			}
 
 			// Remove last attachment when Backspace is pressed and textarea is empty
-			if (
-				e.key === "Backspace" &&
-				e.currentTarget.value === "" &&
-				attachments.files.length > 0
-			) {
+			if (e.key === "Backspace" && e.currentTarget.value === "" && attachments.files.length > 0) {
 				e.preventDefault();
 				const lastAttachment = attachments.files.at(-1);
 				if (lastAttachment) {
@@ -716,15 +674,9 @@ export const PromptInputTextarea = ({
 	);
 };
 
-type PromptInputFooterProps = Omit<
-	ComponentProps<typeof InputGroupAddon>,
-	"align"
->;
+type PromptInputFooterProps = Omit<ComponentProps<typeof InputGroupAddon>, "align">;
 
-export const PromptInputFooter = ({
-	className,
-	...props
-}: PromptInputFooterProps) => (
+export const PromptInputFooter = ({ className, ...props }: PromptInputFooterProps) => (
 	<InputGroupAddon
 		align="block-end"
 		className={cn("justify-between gap-1", className)}
@@ -734,14 +686,8 @@ export const PromptInputFooter = ({
 
 type PromptInputToolsProps = HTMLAttributes<HTMLDivElement>;
 
-export const PromptInputTools = ({
-	className,
-	...props
-}: PromptInputToolsProps) => (
-	<div
-		className={cn("flex min-w-0 items-center gap-1", className)}
-		{...props}
-	/>
+export const PromptInputTools = ({ className, ...props }: PromptInputToolsProps) => (
+	<div className={cn("flex min-w-0 items-center gap-1", className)} {...props} />
 );
 
 type PromptInputSubmitProps = ComponentProps<typeof InputGroupButton> & {

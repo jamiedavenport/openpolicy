@@ -23,9 +23,9 @@ bun add @openpolicy/sdk @openpolicy/react
 import { definePrivacyPolicy } from "@openpolicy/sdk";
 
 export const privacyPolicy = definePrivacyPolicy({
-  company: { name: "Acme Inc.", website: "https://acme.com" },
-  contact: { email: "privacy@acme.com" },
-  compliance: { gdpr: true, ccpa: true },
+	company: { name: "Acme Inc.", website: "https://acme.com" },
+	contact: { email: "privacy@acme.com" },
+	compliance: { gdpr: true, ccpa: true },
 });
 ```
 
@@ -38,17 +38,17 @@ import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
 import { privacyPolicy } from "../openpolicy";
 
 export const Route = createFileRoute("/privacy-policy")({
-  component: PrivacyPolicyPage,
+	component: PrivacyPolicyPage,
 });
 
 function PrivacyPolicyPage() {
-  return (
-    <main>
-      <OpenPolicy config={privacyPolicy}>
-        <PrivacyPolicy />
-      </OpenPolicy>
-    </main>
-  );
+	return (
+		<main>
+			<OpenPolicy config={privacyPolicy}>
+				<PrivacyPolicy />
+			</OpenPolicy>
+		</main>
+	);
 }
 ```
 

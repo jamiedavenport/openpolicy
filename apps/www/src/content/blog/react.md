@@ -26,32 +26,32 @@ Create a single `openpolicy.ts` at the root of your project. The unified `define
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-03-18",
-  jurisdictions: ["eu", "us-ca"],
-  dataCollected: {
-    "Account information": ["Email address", "Display name"],
-    "Usage data": ["Pages visited", "Session duration"],
-  },
-  legalBasis: ["legitimate_interests", "consent"],
-  retention: {
-    "Account data": "Until account deletion",
-    "Analytics data": "13 months",
-  },
-  thirdParties: [
-    { name: "Vercel", purpose: "Hosting and edge delivery" },
-    { name: "Plausible", purpose: "Privacy-friendly analytics" },
-  ],
-  cookies: {
-    essential: true,
-    analytics: true,
-    marketing: false,
-  },
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-03-18",
+	jurisdictions: ["eu", "us-ca"],
+	dataCollected: {
+		"Account information": ["Email address", "Display name"],
+		"Usage data": ["Pages visited", "Session duration"],
+	},
+	legalBasis: ["legitimate_interests", "consent"],
+	retention: {
+		"Account data": "Until account deletion",
+		"Analytics data": "13 months",
+	},
+	thirdParties: [
+		{ name: "Vercel", purpose: "Hosting and edge delivery" },
+		{ name: "Plausible", purpose: "Privacy-friendly analytics" },
+	],
+	cookies: {
+		essential: true,
+		analytics: true,
+		marketing: false,
+	},
 });
 ```
 
@@ -64,11 +64,11 @@ import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
 import openpolicy from "./openpolicy";
 
 export function PrivacyPolicyPage() {
-  return (
-    <OpenPolicy config={openpolicy}>
-      <PrivacyPolicy />
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={openpolicy}>
+			<PrivacyPolicy />
+		</OpenPolicy>
+	);
 }
 ```
 
@@ -80,30 +80,31 @@ Every part of the document is customisable — headings, paragraphs, sections, l
 
 ```tsx
 const Section = ({ section, children }) => (
-  <section id={section.id} className="mb-10 border-b pb-10 last:border-b-0">
-    {children}
-  </section>
+	<section id={section.id} className="mb-10 border-b pb-10 last:border-b-0">
+		{children}
+	</section>
 );
 
 const Heading = ({ node }) => {
-  const Tag = `h${node.level}` as "h2" | "h3";
-  return <Tag className="text-xl font-semibold mb-3 text-gray-900">{node.value}</Tag>;
+	const Tag = `h${node.level}` as "h2" | "h3";
+	return <Tag className="text-xl font-semibold mb-3 text-gray-900">{node.value}</Tag>;
 };
 
 const Paragraph = ({ children }) => (
-  <p className="text-gray-600 leading-relaxed mb-4">{children}</p>
+	<p className="text-gray-600 leading-relaxed mb-4">{children}</p>
 );
 
 export function PrivacyPolicyPage() {
-  return (
-    <main className="max-w-2xl mx-auto px-6 py-16">
-      <OpenPolicy config={openpolicy}>
-        <PrivacyPolicy components={{ Section, Heading, Paragraph }} />
-      </OpenPolicy>
-    </main>
-  );
+	return (
+		<main className="max-w-2xl mx-auto px-6 py-16">
+			<OpenPolicy config={openpolicy}>
+				<PrivacyPolicy components={{ Section, Heading, Paragraph }} />
+			</OpenPolicy>
+		</main>
+	);
 }
 ```
+
 ## Why this is better than a static page
 
 - **Builds trust.** A policy page that matches your product's design tells users you care about the details — including the ones that protect them.

@@ -11,9 +11,7 @@ export async function getStaticPaths() {
 	return posts.map((post) => ({ params: { slug: post.slug } }));
 }
 
-const fontData = fs.readFileSync(
-	path.join(process.cwd(), "src/fonts/GeistMono-Bold.woff"),
-);
+const fontData = fs.readFileSync(path.join(process.cwd(), "src/fonts/GeistMono-Bold.woff"));
 
 export const GET: APIRoute = async ({ params }) => {
 	const posts = await getCollection("blog");

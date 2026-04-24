@@ -62,9 +62,4 @@ export type Document = {
 };
 
 // Every node in the document tree
-export type Node =
-	| Document
-	| DocumentSection
-	| ContentNode
-	| ListItemNode
-	| InlineNode;
+export type Node = Document | DocumentSection | ContentNode | ListItemNode | InlineNode;

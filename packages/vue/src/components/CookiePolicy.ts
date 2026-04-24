@@ -5,13 +5,7 @@ import {
 	isOpenPolicyConfig,
 	type OpenPolicyConfig,
 } from "@openpolicy/core";
-import {
-	type CSSProperties,
-	defineComponent,
-	h,
-	inject,
-	type PropType,
-} from "vue";
+import { type CSSProperties, defineComponent, h, inject, type PropType } from "vue";
 import { OpenPolicyContextKey } from "../context";
 import { renderDocument } from "../render";
 import type { PolicyComponents } from "../types";

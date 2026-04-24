@@ -1,9 +1,4 @@
-import type {
-	Document,
-	InlineNode,
-	ListItemNode,
-	ListNode,
-} from "@openpolicy/core";
+import type { Document, InlineNode, ListItemNode, ListNode } from "@openpolicy/core";
 
 function renderInline(node: InlineNode): string {
 	switch (node.type) {
@@ -18,12 +13,7 @@ function renderInline(node: InlineNode): string {
 	}
 }
 
-function renderListItem(
-	item: ListItemNode,
-	indent = "",
-	ordered = false,
-	index = 0,
-): string {
+function renderListItem(item: ListItemNode, indent = "", ordered = false, index = 0): string {
 	const parts: string[] = [];
 	let nestedList: ListNode | null = null;
 	for (const child of item.children) {
@@ -37,9 +27,7 @@ function renderListItem(
 	const line = `${indent}${bullet} ${parts.join("")}`;
 	if (nestedList) {
 		const nested = nestedList.items
-			.map((i, idx) =>
-				renderListItem(i, `${indent}  `, nestedList!.ordered, idx),
-			)
+			.map((i, idx) => renderListItem(i, `${indent}  `, nestedList!.ordered, idx))
 			.join("\n");
 		return `${line}\n${nested}`;
 	}

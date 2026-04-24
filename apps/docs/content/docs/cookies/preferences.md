@@ -11,7 +11,7 @@ See the [Quick Start](/cookies/quick-start) to add preferences to your app.
 import { CookiePreferences } from "@/components/ui/cookie-banner";
 
 // Place inside <OpenPolicy> in your root layout, alongside CookieBanner
-<CookiePreferences />
+<CookiePreferences />;
 ```
 
 Categories marked `essential` are always enabled and their toggles are locked. All other categories can be toggled individually. Changes are not saved until the user clicks "Save preferences".
@@ -22,8 +22,8 @@ Categories marked `essential` are always enabled and their toggles are locked. A
 import { useCookies } from "@openpolicy/react";
 
 function Footer() {
-  const { setRoute } = useCookies();
-  return <button onClick={() => setRoute("preferences")}>Cookie preferences</button>;
+	const { setRoute } = useCookies();
+	return <button onClick={() => setRoute("preferences")}>Cookie preferences</button>;
 }
 ```
 

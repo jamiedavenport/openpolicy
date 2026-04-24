@@ -42,15 +42,13 @@ export const italic = (value: string, context?: NodeContext): ItalicNode => ({
 	value,
 	...(context && { context }),
 });
-export const link = (
-	href: string,
-	value: string,
-	context?: NodeContext,
-): LinkNode => ({ type: "link", href, value, ...(context && { context }) });
-export const p = (
-	children: (string | InlineNode)[],
-	context?: NodeContext,
-): ParagraphNode => ({
+export const link = (href: string, value: string, context?: NodeContext): LinkNode => ({
+	type: "link",
+	href,
+	value,
+	...(context && { context }),
+});
+export const p = (children: (string | InlineNode)[], context?: NodeContext): ParagraphNode => ({
 	type: "paragraph",
 	children: children.map((c) => (typeof c === "string" ? text(c) : c)),
 	...(context && { context }),

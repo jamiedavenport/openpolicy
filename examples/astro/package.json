@@ -1,7 +1,7 @@
 {
 	"name": "astro-example",
-	"type": "module",
 	"private": true,
+	"type": "module",
 	"scripts": {
 		"dev": "astro dev",
 		"build": "astro build",
@@ -9,9 +9,9 @@
 		"astro": "astro"
 	},
 	"dependencies": {
-		"astro": "^5.17.1",
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/renderers": "workspace:*",
-		"@openpolicy/sdk": "workspace:*"
+		"@openpolicy/sdk": "workspace:*",
+		"astro": "^5.17.1"
 	}
 }

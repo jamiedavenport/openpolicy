@@ -24,14 +24,14 @@ import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [
-    openPolicy({
-      formats: ["html"],
-      outDir: "src/policies",
-    }),
-    tanstackStart(),
-    viteReact(),
-  ],
+	plugins: [
+		openPolicy({
+			formats: ["html"],
+			outDir: "src/policies",
+		}),
+		tanstackStart(),
+		viteReact(),
+	],
 });
 ```
 
@@ -46,32 +46,32 @@ Create a single `openpolicy.ts` at the root of your project. The unified `define
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-03-06",
-  jurisdictions: ["eu", "us-ca"],
-  dataCollected: {
-    "Account information": ["Email address", "Display name"],
-    "Usage data": ["Pages visited", "Session duration"],
-  },
-  legalBasis: ["legitimate_interests", "consent"],
-  retention: {
-    "Account data": "Until account deletion",
-    "Analytics data": "13 months",
-  },
-  thirdParties: [
-    { name: "Vercel", purpose: "Hosting and edge delivery" },
-    { name: "Plausible", purpose: "Privacy-friendly analytics" },
-  ],
-  cookies: {
-    essential: true,
-    analytics: true,
-    marketing: false,
-  },
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-03-06",
+	jurisdictions: ["eu", "us-ca"],
+	dataCollected: {
+		"Account information": ["Email address", "Display name"],
+		"Usage data": ["Pages visited", "Session duration"],
+	},
+	legalBasis: ["legitimate_interests", "consent"],
+	retention: {
+		"Account data": "Until account deletion",
+		"Analytics data": "13 months",
+	},
+	thirdParties: [
+		{ name: "Vercel", purpose: "Hosting and edge delivery" },
+		{ name: "Plausible", purpose: "Privacy-friendly analytics" },
+	],
+	cookies: {
+		essential: true,
+		analytics: true,
+		marketing: false,
+	},
 });
 ```
 
@@ -96,11 +96,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import html from "../policies/privacy-policy.html?raw";
 
 export const Route = createFileRoute("/privacy")({
-  component: RouteComponent,
+	component: RouteComponent,
 });
 
 function RouteComponent() {
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+	return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
 ```
 

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, expect, test } from "bun:test";
+import { afterEach, beforeEach, expect, test } from "vite-plus/test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -60,42 +60,15 @@ test("falls back to npm when nothing is detected", () => {
 
 test("lockfile wins over packageManager field", () => {
 	writeFileSync(join(dir, "bun.lock"), "");
-	writeFileSync(
-		join(dir, "package.json"),
-		JSON.stringify({ packageManager: "npm@10.0.0" }),
-	);
+	writeFileSync(join(dir, "package.json"), JSON.stringify({ packageManager: "npm@10.0.0" }));
 	expect(detectPackageManager(dir).name).toBe("bun");
 });
 
 test("addArgs builds correct install args per PM", () => {
-	expect(toPackageManager("bun").addArgs(["a", "b"], false)).toEqual([
-		"add",
-		"a",
-		"b",
-	]);
-	expect(toPackageManager("bun").addArgs(["a"], true)).toEqual([
-		"add",
-		"-d",
-		"a",
-	]);
-	expect(toPackageManager("pnpm").addArgs(["a"], true)).toEqual([
-		"add",
-		"-D",
-		"a",
-	]);
-	expect(toPackageManager("yarn").addArgs(["a"], true)).toEqual([
-		"add",
-		"-D",
-		"a",
-	]);
-	expect(toPackageManager("npm").addArgs(["a"], true)).toEqual([
-		"install",
-		"-D",
-		"a",
-	]);
-	expect(toPackageManager("npm").addArgs(["a", "b"], false)).toEqual([
-		"install",
-		"a",
-		"b",
-	]);
+	expect(toPackageManager("bun").addArgs(["a", "b"], false)).toEqual(["add", "a", "b"]);
+	expect(toPackageManager("bun").addArgs(["a"], true)).toEqual(["add", "-d", "a"]);
+	expect(toPackageManager("pnpm").addArgs(["a"], true)).toEqual(["add", "-D", "a"]);
+	expect(toPackageManager("yarn").addArgs(["a"], true)).toEqual(["add", "-D", "a"]);
+	expect(toPackageManager("npm").addArgs(["a"], true)).toEqual(["install", "-D", "a"]);
+	expect(toPackageManager("npm").addArgs(["a", "b"], false)).toEqual(["install", "a", "b"]);
 });

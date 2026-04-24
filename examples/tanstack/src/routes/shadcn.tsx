@@ -1,19 +1,11 @@
 import { CookiePolicy, PrivacyPolicy } from "@openpolicy/react";
 import { createFileRoute } from "@tanstack/react-router";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const Route = createFileRoute("/shadcn")({ component: RouteComponent });
 
 const components = {
-	Heading: ({
-		node,
-	}: {
-		node: { value: string; context?: { reason?: string } };
-	}) => {
+	Heading: ({ node }: { node: { value: string; context?: { reason?: string } } }) => {
 		if (node.context?.reason) {
 			return (
 				<Tooltip>

@@ -19,17 +19,17 @@ Must be called inside an `<OpenPolicy>` provider.
 
 ### Return value
 
-| Property | Type | Description |
-|---|---|---|
-| `route` | `"cookie" \| "preferences" \| "closed"` | Which UI screen to show |
-| `categories` | `{ key, label, enabled, locked }[]` | Consent categories from config |
-| `acceptAll` | `() => void` | Enable all categories and close |
-| `acceptNecessary` | `() => void` | Enable only essential categories and close |
-| `toggle` | `(key: string) => void` | Toggle a category in the preferences panel |
-| `save` | `() => void` | Persist current toggle state and close |
-| `reject` | `() => void` | Disable all non-essential categories and close |
-| `setRoute` | `(screen: "cookie" \| "preferences" \| "closed") => void` | Programmatically set which UI screen to show |
-| `has` | `(expr: string \| ConsentExpr) => boolean` | Check consent for a category or expression |
+| Property          | Type                                                      | Description                                    |
+| ----------------- | --------------------------------------------------------- | ---------------------------------------------- |
+| `route`           | `"cookie" \| "preferences" \| "closed"`                   | Which UI screen to show                        |
+| `categories`      | `{ key, label, enabled, locked }[]`                       | Consent categories from config                 |
+| `acceptAll`       | `() => void`                                              | Enable all categories and close                |
+| `acceptNecessary` | `() => void`                                              | Enable only essential categories and close     |
+| `toggle`          | `(key: string) => void`                                   | Toggle a category in the preferences panel     |
+| `save`            | `() => void`                                              | Persist current toggle state and close         |
+| `reject`          | `() => void`                                              | Disable all non-essential categories and close |
+| `setRoute`        | `(screen: "cookie" \| "preferences" \| "closed") => void` | Programmatically set which UI screen to show   |
+| `has`             | `(expr: string \| ConsentExpr) => boolean`                | Check consent for a category or expression     |
 
 ### Consent storage
 
@@ -55,7 +55,7 @@ import { ConsentGate } from "@openpolicy/react";
 </ConsentGate>
 ```
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `requires` | `string \| ConsentExpr` | — | Category key or `{ and }` / `{ or }` expression |
-| `fallback` | `ReactNode` | `null` | Rendered when consent is not granted |
+| Prop       | Type                    | Default | Description                                     |
+| ---------- | ----------------------- | ------- | ----------------------------------------------- |
+| `requires` | `string \| ConsentExpr` | —       | Category key or `{ and }` / `{ or }` expression |
+| `fallback` | `ReactNode`             | `null`  | Rendered when consent is not granted            |

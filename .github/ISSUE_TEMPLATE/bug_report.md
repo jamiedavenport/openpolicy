@@ -19,11 +19,11 @@ Steps to reproduce the behavior:
 **Policy config (if applicable):**
 
 ```ts
-import { defineConfig } from '@openpolicy/sdk'
+import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  // ...
-})
+	// ...
+});
 ```
 
 **Command or Vite config (if applicable):**

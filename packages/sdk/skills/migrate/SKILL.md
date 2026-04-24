@@ -57,47 +57,40 @@ Contact: privacy@acme.com | Acme, Inc., 123 Main St, San Francisco, CA 94105
 ```ts
 // openpolicy.ts
 import {
-  defineConfig,
-  Compliance,
-  DataCategories,
-  Retention,
-  Providers,
-  dataCollected,
-  thirdParties,
+	defineConfig,
+	Compliance,
+	DataCategories,
+	Retention,
+	Providers,
+	dataCollected,
+	thirdParties,
 } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme",
-    legalName: "Acme, Inc.",
-    address: "123 Main St, San Francisco, CA 94105",
-    contact: "privacy@acme.com",
-  },
-  effectiveDate: "2026-01-01",
-  // GDPR + CCPA: spread both presets, then union the array fields
-  ...Compliance.GDPR,
-  jurisdictions: [
-    ...Compliance.GDPR.jurisdictions,
-    ...Compliance.CCPA.jurisdictions,
-  ],
-  dataCollected: {
-    ...dataCollected,
-    ...DataCategories.AccountInfo,
-    ...DataCategories.PaymentInfo,
-    ...DataCategories.UsageData,
-    ...DataCategories.DeviceInfo,
-  },
-  retention: {
-    "Account Information": Retention.UntilAccountDeletion,
-    "Usage Data": Retention.NinetyDays,
-    "Payment Information": Retention.ThreeYears,
-  },
-  thirdParties: [
-    ...thirdParties,
-    Providers.GoogleAnalytics,
-    Providers.Stripe,
-  ],
-  cookies: { essential: true, analytics: true, marketing: false },
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA 94105",
+		contact: "privacy@acme.com",
+	},
+	effectiveDate: "2026-01-01",
+	// GDPR + CCPA: spread both presets, then union the array fields
+	...Compliance.GDPR,
+	jurisdictions: [...Compliance.GDPR.jurisdictions, ...Compliance.CCPA.jurisdictions],
+	dataCollected: {
+		...dataCollected,
+		...DataCategories.AccountInfo,
+		...DataCategories.PaymentInfo,
+		...DataCategories.UsageData,
+		...DataCategories.DeviceInfo,
+	},
+	retention: {
+		"Account Information": Retention.UntilAccountDeletion,
+		"Usage Data": Retention.NinetyDays,
+		"Payment Information": Retention.ThreeYears,
+	},
+	thirdParties: [...thirdParties, Providers.GoogleAnalytics, Providers.Stripe],
+	cookies: { essential: true, analytics: true, marketing: false },
 });
 ```
 
@@ -109,15 +102,15 @@ Read each "data we collect" section and identify the category name and the speci
 
 `DataCategories` presets cover the most common categories. Check if the existing policy's categories match before reaching for custom keys:
 
-| Preset | Generated key | Fields |
-|---|---|---|
-| `DataCategories.AccountInfo` | `"Account Information"` | Name, Email address |
-| `DataCategories.SessionData` | `"Session Data"` | IP address, User agent, Browser type |
-| `DataCategories.PaymentInfo` | `"Payment Information"` | Card last 4 digits, Billing name, Billing address |
-| `DataCategories.UsageData` | `"Usage Data"` | Pages visited, Features used, Time spent |
-| `DataCategories.DeviceInfo` | `"Device Information"` | Device type, Operating system, Browser version |
-| `DataCategories.LocationData` | `"Location Data"` | Country, City, Timezone |
-| `DataCategories.Communications` | `"Communications"` | Email content, Support tickets |
+| Preset                          | Generated key           | Fields                                            |
+| ------------------------------- | ----------------------- | ------------------------------------------------- |
+| `DataCategories.AccountInfo`    | `"Account Information"` | Name, Email address                               |
+| `DataCategories.SessionData`    | `"Session Data"`        | IP address, User agent, Browser type              |
+| `DataCategories.PaymentInfo`    | `"Payment Information"` | Card last 4 digits, Billing name, Billing address |
+| `DataCategories.UsageData`      | `"Usage Data"`          | Pages visited, Features used, Time spent          |
+| `DataCategories.DeviceInfo`     | `"Device Information"`  | Device type, Operating system, Browser version    |
+| `DataCategories.LocationData`   | `"Location Data"`       | Country, City, Timezone                           |
+| `DataCategories.Communications` | `"Communications"`      | Email content, Support tickets                    |
 
 For categories not covered by a preset, add a custom key with short field labels:
 
@@ -135,22 +128,22 @@ Always spread `dataCollected` first so the `openPolicy()` Vite plugin's output i
 
 Scan the existing policy for jurisdiction signals:
 
-| Prose signal | Maps to |
-|---|---|
-| "GDPR", "EU", "EEA", "European" | `jurisdictions: ["eu"]` |
-| "UK-GDPR", "UK", "United Kingdom", "ICO", "British" | `jurisdictions: ["uk"]` |
-| "CCPA", "CPRA", "California", "California residents" | `jurisdictions: ["us-ca"]` |
-| "Australian Privacy Act" | `jurisdictions: ["au"]` |
-| No specific regulation cited | Pick the specific region(s) where the business operates — there is no federal `"us"` code. See [Supported jurisdictions](https://docs.openpolicy.sh/references/jurisdictions). |
+| Prose signal                                         | Maps to                                                                                                                                                                        |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| "GDPR", "EU", "EEA", "European"                      | `jurisdictions: ["eu"]`                                                                                                                                                        |
+| "UK-GDPR", "UK", "United Kingdom", "ICO", "British"  | `jurisdictions: ["uk"]`                                                                                                                                                        |
+| "CCPA", "CPRA", "California", "California residents" | `jurisdictions: ["us-ca"]`                                                                                                                                                     |
+| "Australian Privacy Act"                             | `jurisdictions: ["au"]`                                                                                                                                                        |
+| No specific regulation cited                         | Pick the specific region(s) where the business operates — there is no federal `"us"` code. See [Supported jurisdictions](https://docs.openpolicy.sh/references/jurisdictions). |
 
 For legal basis (GDPR policies only), map the stated basis:
 
-| Prose | `legalBasis` value |
-|---|---|
-| "legitimate interests" | `"legitimate_interests"` |
-| "your consent" / "you have agreed" | `"consent"` |
-| "to perform a contract" / "to provide the service" | `"contract"` |
-| "legal obligation" / "required by law" | `"legal_obligation"` |
+| Prose                                              | `legalBasis` value       |
+| -------------------------------------------------- | ------------------------ |
+| "legitimate interests"                             | `"legitimate_interests"` |
+| "your consent" / "you have agreed"                 | `"consent"`              |
+| "to perform a contract" / "to provide the service" | `"contract"`             |
+| "legal obligation" / "required by law"             | `"legal_obligation"`     |
 
 When the policy states more than one basis, use an array:
 
@@ -175,15 +168,15 @@ Prefer preset constants over raw strings wherever the meaning matches exactly. T
 
 **Retention periods** — match common prose to preset keys:
 
-| Prose | Preset |
-|---|---|
+| Prose                           | Preset                           |
+| ------------------------------- | -------------------------------- |
 | "until you delete your account" | `Retention.UntilAccountDeletion` |
-| "until your session ends" | `Retention.UntilSessionExpiry` |
-| "30 days" | `Retention.ThirtyDays` |
-| "90 days" | `Retention.NinetyDays` |
-| "1 year" | `Retention.OneYear` |
-| "3 years" | `Retention.ThreeYears` |
-| "as required by law" | `Retention.AsRequiredByLaw` |
+| "until your session ends"       | `Retention.UntilSessionExpiry`   |
+| "30 days"                       | `Retention.ThirtyDays`           |
+| "90 days"                       | `Retention.NinetyDays`           |
+| "1 year"                        | `Retention.OneYear`              |
+| "3 years"                       | `Retention.ThreeYears`           |
+| "as required by law"            | `Retention.AsRequiredByLaw`      |
 
 For a period not in the preset list, use a plain string:
 
@@ -195,16 +188,16 @@ retention: {
 
 **User rights** — `UserRight` enum values and their prose equivalents:
 
-| Prose | Value |
-|---|---|
-| right of access / to view your data | `"access"` |
-| right to correct / rectify | `"rectification"` |
-| right to delete / erasure / "right to be forgotten" | `"erasure"` |
-| right to data portability | `"portability"` |
-| right to restrict processing | `"restriction"` |
-| right to object | `"objection"` |
-| right to opt out of sale | `"opt_out_sale"` |
-| right to non-discrimination | `"non_discrimination"` |
+| Prose                                               | Value                  |
+| --------------------------------------------------- | ---------------------- |
+| right of access / to view your data                 | `"access"`             |
+| right to correct / rectify                          | `"rectification"`      |
+| right to delete / erasure / "right to be forgotten" | `"erasure"`            |
+| right to data portability                           | `"portability"`        |
+| right to restrict processing                        | `"restriction"`        |
+| right to object                                     | `"objection"`          |
+| right to opt out of sale                            | `"opt_out_sale"`       |
+| right to non-discrimination                         | `"non_discrimination"` |
 
 ## Common Mistakes
 
@@ -213,24 +206,32 @@ retention: {
 OpenPolicy generates all human-readable sentences from the config structure. Passing paragraph text into fields produces malformed or legally duplicated output.
 
 Wrong:
+
 ```ts
 defineConfig({
-  company: { /* ... */ },
-  dataCollected: {
-    // WRONG: prose sentence passed as a field label
-    "Data": ["We collect information you provide when you register for an account, including your name and email address."],
-  },
-})
+	company: {
+		/* ... */
+	},
+	dataCollected: {
+		// WRONG: prose sentence passed as a field label
+		Data: [
+			"We collect information you provide when you register for an account, including your name and email address.",
+		],
+	},
+});
 ```
 
 Correct:
+
 ```ts
 defineConfig({
-  company: { /* ... */ },
-  dataCollected: {
-    "Account Information": ["Name", "Email address"],
-  },
-})
+	company: {
+		/* ... */
+	},
+	dataCollected: {
+		"Account Information": ["Name", "Email address"],
+	},
+});
 ```
 
 Source: `packages/core/src/types.ts`
