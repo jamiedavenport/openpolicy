@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/core",
-	"version": "0.0.25",
+	"version": "0.0.26",
 	"type": "module",
 	"description": "Core package for OpenPolicy",
 	"license": "Apache-2.0",
