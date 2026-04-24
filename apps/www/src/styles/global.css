@@ -154,3 +154,50 @@ body {
 	padding: 0;
 	color: inherit;
 }
+
+.prose table {
+	width: 100%;
+	font-size: var(--text-sm);
+	line-height: --spacing(6);
+	text-align: left;
+	border-collapse: collapse;
+}
+
+.prose thead {
+	border-bottom: 1px solid var(--color-gray-300);
+}
+
+.prose th {
+	padding: --spacing(2) --spacing(4) --spacing(2) 0;
+	font-family: var(--font-mono);
+	font-size: var(--text-xs);
+	font-weight: var(--font-weight-medium);
+	color: var(--color-gray-500);
+	white-space: nowrap;
+}
+
+.prose th:last-child {
+	padding-right: 0;
+}
+
+.prose tbody tr {
+	border-bottom: 1px solid var(--color-gray-200);
+}
+
+.prose tbody tr:last-child {
+	border-bottom: none;
+}
+
+.prose td {
+	padding: --spacing(3) --spacing(4) --spacing(3) 0;
+	vertical-align: top;
+	color: var(--color-gray-700);
+}
+
+.prose td:last-child {
+	padding-right: 0;
+}
+
+.prose td:first-child {
+	color: var(--color-gray-900);
+}

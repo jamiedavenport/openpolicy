@@ -51,6 +51,14 @@ const demos = [
 		code: "<CookieBanner.CustomizeButton onClick={() => setShowPreferences(true)} />",
 		badge: "New",
 	},
+	{
+		to: "/onboarding-wizard" as const,
+		label: "Onboarding Wizard",
+		description:
+			"Walks new users through what the app collects by reading dataCollected, thirdParties, and cookies straight off the config — auto-collected metadata as a runtime value.",
+		code: "const { dataCollected, thirdParties, cookies } = openpolicy",
+		badge: "New",
+	},
 ];
 
 function RouteComponent() {
