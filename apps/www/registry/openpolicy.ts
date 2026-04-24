@@ -9,9 +9,15 @@ export default defineConfig({
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "us-ca"],
-	dataCollected: {
-		"Personal Information": ["Full name", "Email address"],
-		"Usage Data": ["Pages visited", "Time spent on site"],
+	data: {
+		collected: {
+			"Personal Information": ["Full name", "Email address"],
+			"Usage Data": ["Pages visited", "Time spent on site"],
+		},
+		purposes: {
+			"Personal Information": "To create and manage user accounts",
+			"Usage Data": "To understand product usage and improve the service",
+		},
 	},
 	legalBasis: ["legitimate_interests", "consent"],
 	retention: {

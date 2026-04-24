@@ -1,25 +1,37 @@
 /**
- * Placeholder populated by `@openpolicy/vite` during a Vite
- * build. The plugin intercepts this module's resolution and replaces it with
- * the scanned categories, so the literal default below is only used as a
- * fallback when the plugin is not active — in which case spreading
- * it into `dataCollected` is a no-op.
+ * Populated by `@openpolicy/vite` during a Vite build from `collecting()` calls
+ * across the project. The plugin also emits `openpolicy.gen.ts` (alongside
+ * your `openpolicy.ts`, meant to be committed) which augments
+ * `ScannedCollectionKeys` so `defineConfig` requires `data.purposes` to cover
+ * every scanned key.
  *
  * @example
  * ```ts
  * import { dataCollected, defineConfig } from "@openpolicy/sdk";
  *
  * export default defineConfig({
- *   privacy: {
- *     dataCollected: {
- *       ...dataCollected,
- *       "Manually-tracked Category": ["Field A"],
+ *   data: {
+ *     collected: dataCollected,
+ *     purposes: {
+ *       "Account Information": "To authenticate users",
  *     },
  *   },
  * });
  * ```
  */
-export const dataCollected: Record<string, string[]> = {};
+export const dataCollected: Record<keyof ScannedCollectionKeys & string, string[]> = {} as Record<
+	keyof ScannedCollectionKeys & string,
+	string[]
+>;
+
+/**
+ * Augmented by `openpolicy.gen.ts` (emitted by `@openpolicy/vite` alongside
+ * your config, meant to be committed) with one key per scanned `collecting()`
+ * category. `defineConfig` reads this interface to require a `data.purposes`
+ * entry for every scanned key.
+ */
+// biome-ignore lint/suspicious/noEmptyInterface: augmented by codegen
+export interface ScannedCollectionKeys {}
 
 /**
  * Placeholder populated by `@openpolicy/vite` during a Vite

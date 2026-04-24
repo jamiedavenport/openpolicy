@@ -1,9 +1,9 @@
 ---
 title: Auto-collect
-description: Automatically populate dataCollected and thirdParties from your source code
+description: Automatically populate data.collected and thirdParties from your source code
 ---
 
-Auto-collect scans your source files at build time and populates the `dataCollected` and `thirdParties` fields of your privacy policy automatically — no need to keep those arrays up to date by hand.
+Auto-collect scans your source files at build time and populates the `data.collected` and `thirdParties` fields of your privacy policy automatically — no need to keep those arrays up to date by hand. You still write `data.purposes` by hand; for scanned categories, `defineConfig` requires a matching `data.purposes` entry via a generated `openpolicy.gen.ts` (written next to your `openpolicy.ts` and meant to be committed).
 
 It works through two complementary mechanisms:
 

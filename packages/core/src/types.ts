@@ -45,6 +45,13 @@ export type EffectiveDate = `${number}-${number}-${number}`;
 
 export type DataCollection = Record<string, string[]>;
 
+export type Purposes = Record<string, string>;
+
+export type DataConfig = {
+	collected: DataCollection;
+	purposes: Purposes;
+};
+
 export type Retention = Record<string, string>;
 
 export type ThirdParty = { name: string; purpose: string; policyUrl?: string };
@@ -72,7 +79,7 @@ export type ConsentMechanism = {
 export type PrivacyPolicyConfig = {
 	effectiveDate: EffectiveDate;
 	company: CompanyConfig;
-	dataCollected: DataCollection;
+	data: DataConfig;
 	legalBasis: LegalBasis | LegalBasis[];
 	retention: Retention;
 	cookies: CookiePolicyCookies;
@@ -105,7 +112,7 @@ export type OpenPolicyConfig = {
 	jurisdictions: Jurisdiction[];
 
 	// Data handling — feeds the privacy policy.
-	dataCollected?: DataCollection;
+	data?: DataConfig;
 	legalBasis?: LegalBasis | LegalBasis[];
 	retention?: Retention;
 	children?: ChildrenConfig;

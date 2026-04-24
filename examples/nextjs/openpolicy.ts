@@ -9,8 +9,13 @@ export default defineConfig({
 	},
 	effectiveDate: "2026-03-09",
 	jurisdictions: ["us-ca"],
-	dataCollected: {
-		"Personal Information": ["Full name", "Email address"],
+	data: {
+		collected: {
+			"Personal Information": ["Full name", "Email address"],
+		},
+		purposes: {
+			"Personal Information": "To create and manage user accounts and provide customer support",
+		},
 	},
 	legalBasis: "legitimate_interests",
 	retention: {

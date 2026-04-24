@@ -12,7 +12,10 @@ const baseConfig: OpenPolicyConfig = {
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu"],
-	dataCollected: { "Account Information": ["Name", "Email"] },
+	data: {
+		collected: { "Account Information": ["Name", "Email"] },
+		purposes: { "Account Information": "To authenticate users" },
+	},
 	legalBasis: "legitimate_interests",
 	retention: { "Account data": "Until deletion" },
 };

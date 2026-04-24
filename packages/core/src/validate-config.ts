@@ -2,8 +2,6 @@ import { shouldEmit } from "./index";
 import { isJurisdiction, JURISDICTIONS } from "./jurisdictions";
 import type { OpenPolicyConfig, PolicyCategory, ValidationIssue } from "./types";
 
-const PRIVACY_REQUIRED = "dataCollected";
-
 export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIssue[] {
 	const issues: ValidationIssue[] = [];
 
@@ -38,7 +36,7 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 		issues.push({
 			level: "error",
 			message:
-				"Config must produce at least one policy — provide data-handling fields (dataCollected, legalBasis, retention, children) or cookies",
+				"Config must produce at least one policy — provide data-handling fields (data, legalBasis, retention, children) or cookies",
 		});
 	}
 
@@ -48,7 +46,7 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 				issues.push({
 					level: "error",
 					message:
-						'policies includes "privacy" but no data-handling fields are set — add dataCollected, legalBasis, retention, or children',
+						'policies includes "privacy" but no data-handling fields are set — add data, legalBasis, retention, or children',
 				});
 			}
 			if (category === "cookie" && !config.cookies) {
@@ -60,10 +58,10 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 		}
 	}
 
-	if (wantPrivacy && !config.dataCollected) {
+	if (wantPrivacy && !config.data) {
 		issues.push({
 			level: "warning",
-			message: `${PRIVACY_REQUIRED} is not set — the privacy policy will render a placeholder section`,
+			message: "data is not set — the privacy policy will render a placeholder section",
 		});
 	}
 
@@ -72,7 +70,7 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 
 function hasAnyPrivacyField(config: OpenPolicyConfig): boolean {
 	return (
-		config.dataCollected !== undefined ||
+		config.data !== undefined ||
 		config.legalBasis !== undefined ||
 		config.retention !== undefined ||
 		config.children !== undefined

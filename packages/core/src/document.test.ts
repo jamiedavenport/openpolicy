@@ -11,7 +11,10 @@ const minimalPrivacyConfig: PrivacyPolicyConfig = {
 		address: "123 Main St, Springfield, USA",
 		contact: "privacy@acme.com",
 	},
-	dataCollected: { "Account Information": ["Name", "Email address"] },
+	data: {
+		collected: { "Account Information": ["Name", "Email address"] },
+		purposes: { "Account Information": "To authenticate users and send service notifications" },
+	},
 	legalBasis: ["legitimate_interests", "consent"],
 	retention: { "Account data": "Until account deletion" },
 	cookies: { essential: true, analytics: false, marketing: false },
@@ -128,10 +131,14 @@ test("children-privacy has noticeUrl link when provided", () => {
 	expect(linkNode).toBeDefined();
 });
 
-test("compile throws when dataCollected is empty", () => {
-	expect(() => compile({ type: "privacy", ...minimalPrivacyConfig, dataCollected: {} })).toThrow(
-		/no data collected/i,
-	);
+test("compile throws when data.collected is empty", () => {
+	expect(() =>
+		compile({
+			type: "privacy",
+			...minimalPrivacyConfig,
+			data: { collected: {}, purposes: {} },
+		}),
+	).toThrow(/no data collected/i);
 });
 
 test("data-collected section lists at least one category", () => {
@@ -139,6 +146,28 @@ test("data-collected section lists at least one category", () => {
 	const s = doc.sections.find((x) => x.id === "data-collected")!;
 	const list = s.content.find((n) => n.type === "list") as ListNode;
 	expect(list.items.length).toBeGreaterThan(0);
+});
+
+test("data-collected section includes purpose paragraph for each category", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		data: {
+			collected: {
+				"Account Information": ["Name", "Email"],
+				"Session Data": ["IP address"],
+			},
+			purposes: {
+				"Account Information": "To authenticate users",
+				"Session Data": "To secure sessions",
+			},
+		},
+	});
+	const s = doc.sections.find((x) => x.id === "data-collected")!;
+	const blob = JSON.stringify(s);
+	expect(blob).toContain("To authenticate users");
+	expect(blob).toContain("To secure sessions");
+	expect(blob).toContain("Purpose:");
 });
 
 test("introduction section has ParagraphNode children", () => {

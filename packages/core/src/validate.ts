@@ -12,11 +12,36 @@ export function validatePrivacyPolicy(config: PrivacyPolicyConfig): ValidationIs
 		issues.push({ level: "error", message: "company.address is required" });
 	if (!config.company.contact)
 		issues.push({ level: "error", message: "company.contact is required" });
-	if (Object.keys(config.dataCollected).length === 0)
+	const { collected, purposes } = config.data;
+	if (Object.keys(collected).length === 0)
 		issues.push({
 			level: "error",
-			message: "dataCollected must have at least one entry",
+			message: "data.collected must have at least one entry",
 		});
+	for (const category of Object.keys(collected)) {
+		const purpose = purposes[category];
+		if (purpose === undefined) {
+			issues.push({
+				level: "error",
+				message: `data.purposes["${category}"] is missing — every collected category requires a processing purpose (GDPR Art. 13(1)(c))`,
+			});
+			continue;
+		}
+		if (purpose.trim().length === 0) {
+			issues.push({
+				level: "error",
+				message: `data.purposes["${category}"] must be a non-empty string`,
+			});
+		}
+	}
+	for (const category of Object.keys(purposes)) {
+		if (!(category in collected)) {
+			issues.push({
+				level: "error",
+				message: `data.purposes["${category}"] has no matching entry in data.collected — remove it or declare the collected fields`,
+			});
+		}
+	}
 
 	// GDPR / UK-GDPR checks
 	if (config.jurisdictions.includes("eu") || config.jurisdictions.includes("uk")) {

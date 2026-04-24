@@ -64,7 +64,10 @@ test("buildUserRights: privacy policy omits 'Your Rights' section when derivatio
 			address: "123 Main St, Springfield, USA",
 			contact: "privacy@acme.com",
 		},
-		dataCollected: { "Account Information": ["Name", "Email"] },
+		data: {
+			collected: { "Account Information": ["Name", "Email"] },
+			purposes: { "Account Information": "To authenticate users" },
+		},
 		legalBasis: "legitimate_interests",
 		retention: { "Account data": "Until deletion" },
 		cookies: { essential: true, analytics: false, marketing: false },
@@ -87,7 +90,10 @@ test("validateOpenPolicyConfig: emits no userRights-related issues", () => {
 		},
 		effectiveDate: "2026-01-01",
 		jurisdictions: ["us-ca"],
-		dataCollected: { "Account Information": ["Name", "Email"] },
+		data: {
+			collected: { "Account Information": ["Name", "Email"] },
+			purposes: { "Account Information": "To authenticate users" },
+		},
 		legalBasis: "legitimate_interests",
 		retention: { "Account data": "Until deletion" },
 	};

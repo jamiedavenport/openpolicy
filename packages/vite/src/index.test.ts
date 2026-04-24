@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, test } from "vite-plus/test";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import type { ThirdPartyEntry } from "./analyse";
@@ -861,3 +861,54 @@ function runConfigureServer(
 	}
 	throw new Error("plugin has no configureServer hook");
 }
+
+test("buildStart writes openpolicy.gen.ts with scanned keys", async () => {
+	await touch(
+		"src/a.ts",
+		`import { collecting } from "@openpolicy/sdk";\n` +
+			`collecting("Account Information", v, { email: "Email" });\n` +
+			`collecting("Session Data", v, { ip: "IP" });\n`,
+	);
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp);
+	const dts = await readFile(join(tmp, "openpolicy.gen.ts"), "utf8");
+	expect(dts).toContain('declare module "@openpolicy/sdk"');
+	expect(dts).toContain("interface ScannedCollectionKeys");
+	expect(dts).toContain('"Account Information": true');
+	expect(dts).toContain('"Session Data": true');
+});
+
+test("buildStart writes an empty ScannedCollectionKeys interface when no calls are found", async () => {
+	await touch("src/a.ts", "export const noop = 1;\n");
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp);
+	const dts = await readFile(join(tmp, "openpolicy.gen.ts"), "utf8");
+	expect(dts).toContain("interface ScannedCollectionKeys {");
+	expect(dts).not.toContain('"Account Information"');
+});
+
+test("buildStart emits openpolicy.gen.ts next to openpolicy.ts inside src/", async () => {
+	await touch("src/openpolicy.ts", "export default {} as const;\n");
+	await touch(
+		"src/a.ts",
+		`import { collecting } from "@openpolicy/sdk";\n` +
+			`collecting("Account Information", v, { email: "Email" });\n`,
+	);
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp);
+	const dts = await readFile(join(tmp, "src/openpolicy.gen.ts"), "utf8");
+	expect(dts).toContain('"Account Information": true');
+});
+
+test("buildStart emits openpolicy.gen.ts next to openpolicy.ts inside src/lib/", async () => {
+	await touch("src/lib/openpolicy.ts", "export default {} as const;\n");
+	await touch(
+		"src/a.ts",
+		`import { collecting } from "@openpolicy/sdk";\n` +
+			`collecting("Account Information", v, { email: "Email" });\n`,
+	);
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp);
+	const dts = await readFile(join(tmp, "src/lib/openpolicy.gen.ts"), "utf8");
+	expect(dts).toContain('"Account Information": true');
+});

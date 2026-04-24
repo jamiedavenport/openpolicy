@@ -9,9 +9,15 @@ export default defineConfig({
 	},
 	effectiveDate: "2026-03-03",
 	jurisdictions: ["eu", "us-ca"],
-	dataCollected: {
-		...dataCollected,
-		"Usage Data": ["Pages visited", "Browser type", "IP address"],
+	data: {
+		collected: {
+			...dataCollected,
+			"Usage Data": ["Pages visited", "Browser type", "IP address"],
+		},
+		purposes: {
+			"Account Information": "To authenticate users and send service notifications",
+			"Usage Data": "To understand product usage and improve the service",
+		},
 	},
 	legalBasis: "legitimate_interests",
 	retention: {

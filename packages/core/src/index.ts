@@ -27,6 +27,7 @@ export type {
 	CookiePolicyConfig,
 	CookiePolicyCookies,
 	DataCollection,
+	DataConfig,
 	EffectiveDate,
 	Jurisdiction,
 	LegalBasis,
@@ -35,6 +36,7 @@ export type {
 	PolicyCategory,
 	PolicyInput,
 	PrivacyPolicyConfig,
+	Purposes,
 	Retention,
 	ThirdParty,
 	TrackingTechnology,
@@ -50,7 +52,7 @@ export { validateCookiePolicy } from "./validate-cookie";
 import type { CookiePolicyCookies, OpenPolicyConfig, PolicyCategory, PolicyInput } from "./types";
 import { deriveUserRights } from "./user-rights";
 
-const PRIVACY_FIELDS = ["dataCollected", "legalBasis", "retention", "children"] as const;
+const PRIVACY_FIELDS = ["data", "legalBasis", "retention", "children"] as const;
 
 function hasAnyPrivacyField(config: OpenPolicyConfig): boolean {
 	return PRIVACY_FIELDS.some((field) => config[field] !== undefined);
@@ -75,7 +77,7 @@ export function expandOpenPolicyConfig(config: OpenPolicyConfig): PolicyInput[] 
 			company: config.company,
 			effectiveDate: config.effectiveDate,
 			jurisdictions: config.jurisdictions,
-			dataCollected: config.dataCollected ?? {},
+			data: config.data ?? { collected: {}, purposes: {} },
 			legalBasis: config.legalBasis ?? [],
 			retention: config.retention ?? {},
 			cookies: config.cookies ?? EMPTY_COOKIES,

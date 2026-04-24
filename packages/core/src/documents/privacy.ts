@@ -1,6 +1,6 @@
 import type { PrivacyPolicyConfig } from "../types";
 import { bold, heading, li, link, p, section, ul } from "./helpers";
-import type { DocumentSection } from "./types";
+import type { ContentNode, DocumentSection } from "./types";
 
 const LEGAL_BASIS_LABELS: Record<string, string> = {
 	consent: "Consent (Article 6(1)(a))",
@@ -47,14 +47,26 @@ function buildChildrenPrivacy(config: PrivacyPolicyConfig): DocumentSection | nu
 }
 
 function buildDataCollected(config: PrivacyPolicyConfig): DocumentSection {
-	const items = Object.entries(config.dataCollected).map(([category, fields]) =>
-		li([bold(category), ul(fields.map((f) => li([f])))]),
-	);
-	return section("data-collected", [
-		heading("Information We Collect"),
-		p(["We collect the following categories of information:"]),
-		ul(items),
-	]);
+	const { collected, purposes } = config.data;
+	const content: ContentNode[] = [
+		heading("Information We Collect", {
+			reason: "Required by GDPR Article 13(1)(c)",
+		}),
+		p(["We collect the following categories of personal data for the purposes described below:"]),
+	];
+	for (const [category, fields] of Object.entries(collected)) {
+		const purpose = purposes[category];
+		if (!purpose) {
+			throw new Error(
+				`OpenPolicy: data.collected["${category}"] has no matching entry in data.purposes. ` +
+					"Every collected category must declare its processing purpose (GDPR Art. 13(1)(c)).",
+			);
+		}
+		content.push(heading(category, 3));
+		content.push(p([bold("Purpose:"), " ", purpose]));
+		content.push(ul(fields.map((f) => li([f]))));
+	}
+	return section("data-collected", content);
 }
 
 function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
@@ -225,10 +237,10 @@ const SECTION_BUILDERS: ((config: PrivacyPolicyConfig) => DocumentSection | null
 ];
 
 export function compilePrivacyDocument(config: PrivacyPolicyConfig): DocumentSection[] {
-	if (Object.keys(config.dataCollected).length === 0) {
+	if (Object.keys(config.data.collected).length === 0) {
 		throw new Error(
 			"OpenPolicy: cannot compile a privacy policy with no data collected. " +
-				"Populate `dataCollected` in your config, or instrument `collecting()` calls and use `autoCollect()` from @openpolicy/vite-auto-collect.",
+				"Populate `data.collected` in your config, or instrument `collecting()` calls and use the `openPolicy()` Vite plugin.",
 		);
 	}
 	return SECTION_BUILDERS.map((builder) => builder(config)).filter(

@@ -14,7 +14,10 @@ const company = {
 const privacyConfig: PrivacyPolicyConfig = {
 	effectiveDate: "2026-01-01",
 	company,
-	dataCollected: { account: ["email", "name"] },
+	data: {
+		collected: { account: ["email", "name"] },
+		purposes: { account: "To authenticate users" },
+	},
 	legalBasis: "consent",
 	retention: { account: "2 years" },
 	cookies: { essential: true, analytics: false, marketing: false },
