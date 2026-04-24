@@ -1,5 +1,28 @@
 # @openpolicy/vue
 
+## 0.0.26
+
+### Patch Changes
+
+- 21b6670: OpenPolicy is now licensed under Apache-2.0 (previously GPL-3.0-only).
+  The `LICENSE.md` file and the `license` field in every published package
+  manifest have been updated, and each published tarball now ships
+  `LICENSE.md` and `NOTICE.md` at its root. No code changes accompany
+  this relicense.
+- 21b6670: Breaking: `@openpolicy/react` and `@openpolicy/vue` no longer ship default
+  styles. The inline `<style>` injection and the `./styles.css` export have
+  been removed, the `className`/`class="op-*"` strings are gone, and the
+  `PolicyTheme` type and `defaultStyles` export are no longer exported.
+  Components still emit `data-op-*` attributes — use them as styling hooks
+  (see the TanStack example's `/tailwind` and `/css-vars` routes).
+
+  The React peer dependency widens to `>=18`. The `<style precedence>` API
+  was the only React 19–specific dependency; removing it unblocks React 18
+  apps (Next.js 14, older shadcn setups).
+
+  To restore the old look, copy the CSS from the v0.0.25 release into your
+  own stylesheet.
+
 ## 0.0.25
 
 ## 0.0.24
