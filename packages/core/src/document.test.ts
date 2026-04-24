@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import type { ParagraphNode } from "./documents";
+import type { ListNode, ParagraphNode } from "./documents";
 import { compile } from "./documents";
 import type { PrivacyPolicyConfig } from "./types";
 
@@ -126,6 +126,19 @@ test("children-privacy has noticeUrl link when provided", () => {
 	const children = (secondPara as ParagraphNode).children;
 	const linkNode = children.find((c) => c.type === "link");
 	expect(linkNode).toBeDefined();
+});
+
+test("compile throws when dataCollected is empty", () => {
+	expect(() => compile({ type: "privacy", ...minimalPrivacyConfig, dataCollected: {} })).toThrow(
+		/no data collected/i,
+	);
+});
+
+test("data-collected section lists at least one category", () => {
+	const doc = compile({ type: "privacy", ...minimalPrivacyConfig });
+	const s = doc.sections.find((x) => x.id === "data-collected")!;
+	const list = s.content.find((n) => n.type === "list") as ListNode;
+	expect(list.items.length).toBeGreaterThan(0);
 });
 
 test("introduction section has ParagraphNode children", () => {

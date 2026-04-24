@@ -225,6 +225,12 @@ const SECTION_BUILDERS: ((config: PrivacyPolicyConfig) => DocumentSection | null
 ];
 
 export function compilePrivacyDocument(config: PrivacyPolicyConfig): DocumentSection[] {
+	if (Object.keys(config.dataCollected).length === 0) {
+		throw new Error(
+			"OpenPolicy: cannot compile a privacy policy with no data collected. " +
+				"Populate `dataCollected` in your config, or instrument `collecting()` calls and use `autoCollect()` from @openpolicy/vite-auto-collect.",
+		);
+	}
 	return SECTION_BUILDERS.map((builder) => builder(config)).filter(
 		(s): s is DocumentSection => s !== null,
 	);
