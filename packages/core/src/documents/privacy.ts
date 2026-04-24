@@ -1,6 +1,6 @@
 import type { PrivacyPolicyConfig } from "../types";
 import { bold, heading, li, link, p, section, ul } from "./helpers";
-import type { ContentNode, DocumentSection } from "./types";
+import type { ContentNode, DocumentSection, InlineNode } from "./types";
 
 const LEGAL_BASIS_LABELS: Record<string, string> = {
 	consent: "Consent (Article 6(1)(a))",
@@ -147,6 +147,30 @@ function buildUserRights(config: PrivacyPolicyConfig): DocumentSection | null {
 	]);
 }
 
+function dpoParagraph(config: PrivacyPolicyConfig): ContentNode {
+	const { dpo } = config.company;
+	if (dpo && "email" in dpo) {
+		const parts: (string | InlineNode)[] = [bold("Data Protection Officer:"), " "];
+		if (dpo.name) parts.push(dpo.name, ", ");
+		parts.push(dpo.email);
+		if (dpo.phone) parts.push(", ", dpo.phone);
+		if (dpo.address) parts.push(", ", dpo.address);
+		parts.push(
+			". You may contact our Data Protection Officer directly with any questions about this policy or how we handle your personal data.",
+		);
+		return p(parts);
+	}
+	if (dpo && "required" in dpo && dpo.required === false) {
+		const trailing = dpo.reason ? ` ${dpo.reason}` : "";
+		return p([
+			`We have not appointed a Data Protection Officer. Our processing activities do not meet the thresholds in GDPR Article 37(1) that would require one.${trailing}`,
+		]);
+	}
+	return p([
+		"We have not appointed a Data Protection Officer. Our processing activities do not meet the thresholds in GDPR Article 37(1) that would require one. For any questions about this policy or how we handle your personal data, please use the contact details above.",
+	]);
+}
+
 function buildGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | null {
 	if (!config.jurisdictions.includes("eu")) return null;
 	return section("gdpr-supplement", [
@@ -157,6 +181,7 @@ function buildGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | nul
 			"This section applies to individuals in the European Economic Area (EEA) under the General Data Protection Regulation (GDPR).",
 		]),
 		p(["Data Controller: ", bold(config.company.legalName), `, ${config.company.address}`]),
+		dpoParagraph(config),
 		p([
 			"In addition to the rights listed above, you have the right to lodge a complaint with your local data protection authority if you believe we have not handled your data in accordance with applicable law.",
 		]),
@@ -176,6 +201,7 @@ function buildUkGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | n
 			"This section applies to individuals in the United Kingdom under the UK General Data Protection Regulation (UK-GDPR), as tailored by the Data Protection Act 2018.",
 		]),
 		p(["Data Controller: ", bold(config.company.legalName), `, ${config.company.address}`]),
+		dpoParagraph(config),
 		p([
 			"The supervisory authority for data protection in the UK is the ",
 			bold("Information Commissioner's Office (ICO)"),
@@ -210,15 +236,21 @@ function buildCcpaSupplement(config: PrivacyPolicyConfig): DocumentSection | nul
 }
 
 function buildContact(config: PrivacyPolicyConfig): DocumentSection {
-	return section("contact", [
-		heading("Contact Us"),
-		p(["Contact us:"]),
-		ul([
-			li([bold("Legal Name:"), " ", config.company.legalName]),
-			li([bold("Address:"), " ", config.company.address]),
-			li([bold("Email:"), " ", config.company.contact]),
-		]),
-	]);
+	const items = [
+		li([bold("Legal Name:"), " ", config.company.legalName]),
+		li([bold("Address:"), " ", config.company.address]),
+		li([bold("Email:"), " ", config.company.contact]),
+	];
+	const { dpo } = config.company;
+	if (dpo && "email" in dpo) {
+		const dpoParts: (string | InlineNode)[] = [bold("Data Protection Officer:"), " "];
+		if (dpo.name) dpoParts.push(dpo.name, ", ");
+		dpoParts.push(dpo.email);
+		if (dpo.phone) dpoParts.push(", ", dpo.phone);
+		if (dpo.address) dpoParts.push(", ", dpo.address);
+		items.push(li(dpoParts));
+	}
+	return section("contact", [heading("Contact Us"), p(["Contact us:"]), ul(items)]);
 }
 
 const SECTION_BUILDERS: ((config: PrivacyPolicyConfig) => DocumentSection | null)[] = [

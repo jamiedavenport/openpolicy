@@ -78,3 +78,31 @@ test("validateOpenPolicyConfig still errors on empty jurisdictions array", () =>
 		),
 	).toBe(true);
 });
+
+test("validateOpenPolicyConfig warns when EU/UK jurisdiction has no company.dpo", () => {
+	const issues = validateOpenPolicyConfig(baseConfig);
+	expect(
+		issues.some((i) => i.level === "warning" && i.message.includes("company.dpo is not set")),
+	).toBe(true);
+});
+
+test("validateOpenPolicyConfig does not warn about DPO when company.dpo is provided", () => {
+	const issues = validateOpenPolicyConfig({
+		...baseConfig,
+		company: { ...baseConfig.company, dpo: { email: "dpo@acme.com" } },
+	});
+	expect(issues.some((i) => i.message.includes("company.dpo"))).toBe(false);
+});
+
+test("validateOpenPolicyConfig does not warn about DPO when dpo.required === false", () => {
+	const issues = validateOpenPolicyConfig({
+		...baseConfig,
+		company: { ...baseConfig.company, dpo: { required: false } },
+	});
+	expect(issues.some((i) => i.message.includes("company.dpo"))).toBe(false);
+});
+
+test("validateOpenPolicyConfig does not warn about DPO for non-EU/UK jurisdictions", () => {
+	const issues = validateOpenPolicyConfig({ ...baseConfig, jurisdictions: ["us-ca"] });
+	expect(issues.some((i) => i.message.includes("company.dpo"))).toBe(false);
+});

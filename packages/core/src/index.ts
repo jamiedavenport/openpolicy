@@ -28,6 +28,7 @@ export type {
 	CookiePolicyCookies,
 	DataCollection,
 	DataConfig,
+	Dpo,
 	EffectiveDate,
 	Jurisdiction,
 	LegalBasis,

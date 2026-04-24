@@ -170,6 +170,84 @@ test("data-collected section includes purpose paragraph for each category", () =
 	expect(blob).toContain("Purpose:");
 });
 
+test("gdpr-supplement mentions DPO when one is configured", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		company: {
+			...minimalPrivacyConfig.company,
+			dpo: { email: "dpo@acme.com", name: "Jane Doe", phone: "+1 555 010 2030" },
+		},
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).toContain("Data Protection Officer");
+	expect(blob).toContain("dpo@acme.com");
+	expect(blob).toContain("Jane Doe");
+	expect(blob).toContain("+1 555 010 2030");
+});
+
+test("gdpr-supplement states no DPO when company.dpo.required === false", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		company: {
+			...minimalPrivacyConfig.company,
+			dpo: { required: false, reason: "Small-scale processing only." },
+		},
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).toContain("have not appointed a Data Protection Officer");
+	expect(blob).toContain("Article 37(1)");
+	expect(blob).toContain("Small-scale processing only.");
+});
+
+test("gdpr-supplement falls back to no-DPO disclosure when unset", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).toContain("Data Protection Officer");
+	expect(blob).toContain("Article 37(1)");
+});
+
+test("uk-gdpr-supplement includes DPO contact when configured", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["uk"],
+		company: {
+			...minimalPrivacyConfig.company,
+			dpo: { email: "dpo@acme.co.uk" },
+		},
+	});
+	const uk = doc.sections.find((s) => s.id === "uk-gdpr-supplement")!;
+	const blob = JSON.stringify(uk);
+	expect(blob).toContain("Data Protection Officer");
+	expect(blob).toContain("dpo@acme.co.uk");
+});
+
+test("contact section lists DPO when configured", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		company: {
+			...minimalPrivacyConfig.company,
+			dpo: { email: "dpo@acme.com", name: "Jane Doe" },
+		},
+	});
+	const contact = doc.sections.find((s) => s.id === "contact")!;
+	const blob = JSON.stringify(contact);
+	expect(blob).toContain("Data Protection Officer");
+	expect(blob).toContain("dpo@acme.com");
+});
+
 test("introduction section has ParagraphNode children", () => {
 	const doc = compile({ type: "privacy", ...minimalPrivacyConfig });
 	const intro = doc.sections.find((s) => s.id === "introduction")!;

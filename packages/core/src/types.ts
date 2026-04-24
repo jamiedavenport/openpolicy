@@ -34,11 +34,16 @@ export type LegalBasis =
 	| "public_task"
 	| "legitimate_interests";
 
+export type Dpo =
+	| { email: string; name?: string; phone?: string; address?: string }
+	| { required: false; reason?: string };
+
 export type CompanyConfig = {
 	name: string;
 	legalName: string;
 	address: string;
 	contact: string;
+	dpo?: Dpo;
 };
 
 export type EffectiveDate = `${number}-${number}-${number}`;

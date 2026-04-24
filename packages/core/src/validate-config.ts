@@ -65,6 +65,15 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 		});
 	}
 
+	const gdprScope = config.jurisdictions?.includes("eu") || config.jurisdictions?.includes("uk");
+	if (wantPrivacy && gdprScope && config.company?.dpo === undefined) {
+		issues.push({
+			level: "warning",
+			message:
+				"company.dpo is not set — GDPR Article 13(1)(b) requires Data Protection Officer contact details if one is appointed. Set company.dpo, or set company.dpo = { required: false } to declare that none is needed.",
+		});
+	}
+
 	return issues;
 }
 
