@@ -1,15 +1,13 @@
 import type { OpenPolicyConfig } from "@openpolicy/core";
 import {
-	Fragment,
-	type InjectionKey,
 	defineComponent,
 	h,
-	provide,
+	type InjectionKey,
 	type PropType,
-	toRef,
+	provide,
 	type Ref,
+	toRef,
 } from "vue";
-import { defaultStyles } from "./styles";
 
 interface OpenPolicyContextValue {
 	config: Ref<OpenPolicyConfig | null>;
@@ -31,10 +29,6 @@ export const OpenPolicyProvider = defineComponent({
 			config: toRef(props, "config"),
 		});
 
-		return () =>
-			h(Fragment, [
-				h("style", { "data-openpolicy-vue": "" }, defaultStyles),
-				slots.default?.(),
-			]);
+		return () => slots.default?.();
 	},
 });

@@ -23,7 +23,5 @@ export { useCookies } from "./hooks/useCookies";
 export { useShouldShowCookieBanner } from "./hooks/useShouldShowCookieBanner";
 // Render
 export { renderDocument } from "./render";
-// Styles
-export { defaultStyles } from "./styles";
 // Types
-export type { PolicyComponents, PolicyTheme } from "./types";
+export type { PolicyComponents } from "./types";

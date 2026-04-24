@@ -19,7 +19,6 @@ import {
 	useSyncExternalStore,
 } from "react";
 import { useShouldShowCookieBanner } from "./hooks/useShouldShowCookieBanner";
-import { defaultStyles } from "./styles";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -333,31 +332,26 @@ export function OpenPolicyProvider({
 	};
 
 	return (
-		<>
-			<style href="@openpolicy/react" precedence="default">
-				{defaultStyles}
-			</style>
-			<OpenPolicyContext.Provider
-				value={{
-					config,
-					cookieConfig,
-					route,
-					setRoute,
-					status,
-					consent,
-					accept,
-					reject,
-					update,
-					reset,
-					has,
-					categories,
-					toggle,
-					save,
-					rejectAll: rejectAllCategories,
-				}}
-			>
-				{children}
-			</OpenPolicyContext.Provider>
-		</>
+		<OpenPolicyContext.Provider
+			value={{
+				config,
+				cookieConfig,
+				route,
+				setRoute,
+				status,
+				consent,
+				accept,
+				reject,
+				update,
+				reset,
+				has,
+				categories,
+				toggle,
+				save,
+				rejectAll: rejectAllCategories,
+			}}
+		>
+			{children}
+		</OpenPolicyContext.Provider>
 	);
 }

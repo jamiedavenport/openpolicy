@@ -16,7 +16,5 @@ export { PrivacyPolicy } from "./components/PrivacyPolicy";
 export { OpenPolicyProvider as OpenPolicy } from "./context";
 // Render
 export { renderDocument } from "./render";
-// Styles
-export { defaultStyles } from "./styles";
 // Types
-export type { PolicyComponents, PolicyTheme } from "./types";
+export type { PolicyComponents } from "./types";

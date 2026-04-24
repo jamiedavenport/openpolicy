@@ -59,8 +59,6 @@ export default {
 - `PrivacyPolicy`
 - `CookiePolicy`
 - `renderDocument`
-- `defaultStyles`
-- `./styles.css`
 
 ## Links
 

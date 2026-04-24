@@ -57,11 +57,10 @@ export default defineConfig({
 
 ## Render it directly into your app
 
-Wrap your page in `<OpenPolicy>` and drop in `<PrivacyPolicy />`. Import the default styles to get sensible typography out of the box:
+Wrap your page in `<OpenPolicy>` and drop in `<PrivacyPolicy />`. Components are unstyled by default and emit `data-op-*` attributes (`data-op-heading`, `data-op-section`, `data-op-paragraph`, `data-op-list`, `data-op-policy`) as styling hooks — target them from Tailwind or your own CSS. The TanStack example's `/tailwind` and `/css-vars` routes show both approaches.
 
 ```tsx
 import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
-import "@openpolicy/react/styles.css";
 import openpolicy from "./openpolicy";
 
 export function PrivacyPolicyPage() {

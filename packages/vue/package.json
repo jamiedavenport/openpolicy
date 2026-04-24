@@ -11,15 +11,13 @@
 	},
 	"files": [
 		"dist",
-		"styles.css",
 		"README.md"
 	],
 	"exports": {
 		".": {
 			"import": "./dist/index.js",
 			"types": "./dist/index.d.ts"
-		},
-		"./styles.css": "./styles.css"
+		}
 	},
 	"scripts": {
 		"dev": "rolldown -c --watch",
@@ -41,8 +39,7 @@
 			".": {
 				"import": "./dist/index.js",
 				"types": "./dist/index.d.ts"
-			},
-			"./styles.css": "./styles.css"
+			}
 		}
 	}
 }

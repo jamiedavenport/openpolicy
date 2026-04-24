@@ -45,7 +45,7 @@ export const PrivacyPolicy = defineComponent({
 			const doc = compile(input);
 			return h(
 				"div",
-				{ "data-op-policy": "", class: "op-policy", style: props.style },
+				{ "data-op-policy": "", style: props.style },
 				renderDocument(doc, props.components) ?? undefined,
 			);
 		};

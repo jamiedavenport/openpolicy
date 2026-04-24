@@ -73,12 +73,13 @@ Render a policy page:
 
 ```tsx
 import { PrivacyPolicy } from "@openpolicy/react";
-import "@openpolicy/react/styles.css";
 
 export default function PrivacyPage() {
   return <PrivacyPolicy />;
 }
 ```
+
+Components ship unstyled and emit `data-op-*` attributes. Hook Tailwind or your own CSS onto `data-op-policy`, `data-op-heading`, `data-op-section`, `data-op-paragraph`, `data-op-list` to theme them.
 
 ## Core Patterns
 
