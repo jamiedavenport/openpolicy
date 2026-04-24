@@ -3,7 +3,7 @@
 	"version": "0.0.25",
 	"type": "module",
 	"description": "CLI to install OpenPolicy and print a setup prompt for coding agents",
-	"license": "GPL-3.0-only",
+	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/jamiedavenport/openpolicy",
@@ -11,7 +11,8 @@
 	},
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"NOTICE.md"
 	],
 	"bin": {
 		"openpolicy": "./dist/cli.js"
