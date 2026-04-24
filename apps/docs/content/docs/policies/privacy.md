@@ -29,7 +29,7 @@ retention: {
 thirdParties: [],
 ```
 
-Each key in `data.collected` must have a matching entry in `data.purposes` disclosing *why* you process that category (GDPR Article 13(1)(c)). `defineConfig` enforces this at type-check time, and the `openPolicy()` Vite plugin re-validates it at build time. With auto-collect, the plugin emits `openpolicy.gen.ts` alongside your config — commit it so the same constraint applies to scanned categories in CI.
+Each key in `data.collected` must have a matching entry in `data.purposes` disclosing _why_ you process that category (GDPR Article 13(1)(c)). `defineConfig` enforces this at type-check time, and the `openPolicy()` Vite plugin re-validates it at build time. With auto-collect, the plugin emits `openpolicy.gen.ts` alongside your config — commit it so the same constraint applies to scanned categories in CI.
 
 `data.collected` and `thirdParties` can also be populated automatically — see [Auto-collect](/policies/auto-collect).
 
