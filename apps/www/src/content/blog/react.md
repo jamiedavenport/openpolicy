@@ -55,6 +55,7 @@ export default defineConfig({
 		analytics: true,
 		marketing: false,
 	},
+	automatedDecisionMaking: [],
 });
 ```
 

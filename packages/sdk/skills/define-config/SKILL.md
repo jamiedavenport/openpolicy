@@ -36,6 +36,7 @@ export default defineConfig({
 	retention: { "Account Information": "Until account deletion" },
 	thirdParties: [...thirdParties],
 	cookies: { essential: true, analytics: false, marketing: false },
+	automatedDecisionMaking: [],
 });
 ```
 
@@ -81,6 +82,7 @@ export default defineConfig({
 	thirdParties: [...thirdParties, Providers.Stripe, Providers.PostHog],
 	children: { underAge: 13 },
 	cookies: { essential: true, analytics: true, marketing: false },
+	automatedDecisionMaking: [],
 });
 ```
 

@@ -94,6 +94,45 @@ function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
 	return section("legal-basis", content);
 }
 
+function buildAutomatedDecisionMaking(config: PrivacyPolicyConfig): DocumentSection | null {
+	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
+	const decisions = config.automatedDecisionMaking;
+	if (decisions === undefined) return null;
+
+	const content: ContentNode[] = [
+		heading("Automated Decision-Making and Profiling", {
+			reason: "Required by GDPR and UK-GDPR Article 13(2)(f) and Article 22",
+		}),
+	];
+
+	if (decisions.length === 0) {
+		content.push(
+			p([
+				"We do not engage in automated decision-making or profiling that produces legal effects concerning you or similarly significantly affects you within the meaning of GDPR Article 22.",
+			]),
+		);
+		return section("automated-decision-making", content);
+	}
+
+	content.push(
+		p([
+			"We use the following automated processing that may produce legal effects concerning you or similarly significantly affect you. For each, we describe the logic involved and the significance and envisaged consequences:",
+		]),
+	);
+	for (const d of decisions) {
+		content.push(
+			p([bold(d.name), " — ", d.logic, " ", bold("Significance:"), " ", d.significance]),
+		);
+	}
+	content.push(
+		p([
+			bold("Right to human review."),
+			` You have the right not to be subject to a decision based solely on automated processing, including profiling. To request human intervention, express your point of view, or contest a decision, contact us at ${config.company.contact}.`,
+		]),
+	);
+	return section("automated-decision-making", content);
+}
+
 function buildDataRetention(config: PrivacyPolicyConfig): DocumentSection {
 	const items = Object.entries(config.retention).map(([category, period]) =>
 		li([bold(category), ": ", period]),
@@ -271,6 +310,7 @@ const SECTION_BUILDERS: ((config: PrivacyPolicyConfig) => DocumentSection | null
 	buildChildrenPrivacy,
 	buildDataCollected,
 	buildLegalBasis,
+	buildAutomatedDecisionMaking,
 	buildDataRetention,
 	buildCookies,
 	buildThirdParties,

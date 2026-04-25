@@ -153,6 +153,7 @@ export default defineConfig({
 		...dataCollected, // auto-collected at build time
 		Analytics: ["Page views", "Click events"], // manually declared
 	},
+	automatedDecisionMaking: [],
 });
 ```
 

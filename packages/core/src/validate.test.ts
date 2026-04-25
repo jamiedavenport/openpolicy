@@ -145,3 +145,51 @@ test("validatePrivacyPolicy: well-formed per-purpose legalBasis under GDPR has n
 	});
 	expect(issues.some((i) => i.code === "lawful-basis-per-purpose")).toBe(false);
 });
+
+test("validatePrivacyPolicy: warns automated-decision-making when EU jurisdiction omits the field", () => {
+	const issues = validatePrivacyPolicy({
+		...baseConfig,
+		jurisdictions: ["eu"],
+	});
+	const hit = issues.find((i) => i.code === "automated-decision-making");
+	expect(hit).toBeDefined();
+	expect(hit?.level).toBe("warning");
+});
+
+test("validatePrivacyPolicy: warns automated-decision-making when UK jurisdiction omits the field", () => {
+	const issues = validatePrivacyPolicy({
+		...baseConfig,
+		jurisdictions: ["uk"],
+	});
+	expect(issues.some((i) => i.code === "automated-decision-making" && i.level === "warning")).toBe(
+		true,
+	);
+});
+
+test("validatePrivacyPolicy: does NOT warn automated-decision-making when explicitly empty under EU", () => {
+	const issues = validatePrivacyPolicy({
+		...baseConfig,
+		jurisdictions: ["eu"],
+		automatedDecisionMaking: [],
+	});
+	expect(issues.some((i) => i.code === "automated-decision-making")).toBe(false);
+});
+
+test("validatePrivacyPolicy: does NOT warn automated-decision-making when populated under EU", () => {
+	const issues = validatePrivacyPolicy({
+		...baseConfig,
+		jurisdictions: ["eu"],
+		automatedDecisionMaking: [
+			{ name: "Fraud scoring", logic: "Rules engine", significance: "May decline" },
+		],
+	});
+	expect(issues.some((i) => i.code === "automated-decision-making")).toBe(false);
+});
+
+test("validatePrivacyPolicy: does NOT warn automated-decision-making for non-GDPR jurisdictions", () => {
+	const issues = validatePrivacyPolicy({
+		...baseConfig,
+		jurisdictions: ["us-ca"],
+	});
+	expect(issues.some((i) => i.code === "automated-decision-making")).toBe(false);
+});

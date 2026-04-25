@@ -321,3 +321,62 @@ test("legal-basis section is omitted entirely when legalBasis map is empty (non-
 	});
 	expect(doc.sections.find((s) => s.id === "legal-basis")).toBeUndefined();
 });
+
+test("automated-decision-making section is omitted under non-EU/UK jurisdictions even when set", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["us-ca"],
+		automatedDecisionMaking: [],
+	});
+	expect(doc.sections.find((s) => s.id === "automated-decision-making")).toBeUndefined();
+});
+
+test("automated-decision-making section is omitted when field is undefined under EU", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+	});
+	expect(doc.sections.find((s) => s.id === "automated-decision-making")).toBeUndefined();
+});
+
+test("automated-decision-making section emits explicit-none paragraph when [] under EU", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		automatedDecisionMaking: [],
+	});
+	const adm = doc.sections.find((s) => s.id === "automated-decision-making")!;
+	expect(adm).toBeDefined();
+	const blob = JSON.stringify(adm);
+	expect(blob).toContain("We do not engage in automated decision-making");
+	expect(blob).toContain("Article 22");
+	expect(blob).not.toContain("Right to human review");
+});
+
+test("automated-decision-making section enumerates each activity and appends Art. 22 right-to-human-review", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		automatedDecisionMaking: [
+			{
+				name: "Fraud scoring",
+				logic:
+					"Transactions are scored by a rules engine combining device fingerprint and transaction history.",
+				significance:
+					"A high score may delay or decline a transaction; you can request human review.",
+			},
+		],
+	});
+	const adm = doc.sections.find((s) => s.id === "automated-decision-making")!;
+	expect(adm).toBeDefined();
+	const blob = JSON.stringify(adm);
+	expect(blob).toContain("Fraud scoring");
+	expect(blob).toContain("rules engine");
+	expect(blob).toContain("Significance");
+	expect(blob).toContain("Right to human review");
+	expect(blob).toContain(minimalPrivacyConfig.company.contact);
+});

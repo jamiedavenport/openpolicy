@@ -47,6 +47,7 @@ export default defineConfig({
 	retention: { "Account Information": "Until account deletion" },
 	thirdParties: [],
 	cookies: { essential: true, analytics: true, marketing: false },
+	automatedDecisionMaking: [],
 });
 ```
 

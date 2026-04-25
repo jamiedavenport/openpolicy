@@ -2,6 +2,8 @@ import type { OpenPolicyConfig } from "@openpolicy/core";
 import type { ScannedCollectionKeys } from "./auto-collected";
 
 export type {
+	AutomatedDecision,
+	AutomatedDecisionMaking,
 	ChildrenConfig,
 	CompanyConfig,
 	ConsentMechanism,

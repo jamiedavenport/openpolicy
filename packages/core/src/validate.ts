@@ -92,6 +92,23 @@ export function validatePrivacyPolicy(config: PrivacyPolicyConfig): ValidationIs
 		}
 	}
 
+	// GDPR / UK-GDPR Art. 13(2)(f): controllers must disclose whether
+	// automated decision-making (including profiling per Art. 22) is used —
+	// even an explicit "we don't" is required. Warning, not error: the rule
+	// reads "where applicable," but the external validator (and best practice)
+	// wants a positive declaration either way.
+	if (
+		(config.jurisdictions.includes("eu") || config.jurisdictions.includes("uk")) &&
+		config.automatedDecisionMaking === undefined
+	) {
+		issues.push({
+			code: "automated-decision-making",
+			level: "warning",
+			message:
+				"GDPR Article 13(2)(f) requires disclosure of whether automated decision-making (including profiling under Article 22) is used. Set `automatedDecisionMaking: []` to declare none, or list each activity with its logic and significance.",
+		});
+	}
+
 	// children config sanity
 	if (config.children) {
 		if (config.children.underAge <= 0) {

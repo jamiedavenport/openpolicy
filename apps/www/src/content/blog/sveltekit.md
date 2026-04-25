@@ -64,6 +64,7 @@ export default defineConfig({
 		hasPreferencePanel: false,
 		canWithdraw: true,
 	},
+	automatedDecisionMaking: [],
 });
 ```
 

@@ -51,6 +51,7 @@ export default defineConfig({
 	retention: { "Account data": "Until account deletion" },
 	thirdParties: [],
 	cookies: { essential: true, analytics: false, marketing: false },
+	automatedDecisionMaking: [],
 });
 ```
 
@@ -85,6 +86,22 @@ company: {
 ```
 
 Omitting `dpo` emits a validation warning when `jurisdictions` includes `eu` or `uk`.
+
+### Automated decision-making and profiling
+
+GDPR Article 13(2)(f) requires you to disclose whether you use automated decision-making or profiling (Article 22) — even an explicit "we don't" is required. Set `automatedDecisionMaking: []` to declare none, or list each activity with its `name`, `logic`, and `significance`:
+
+```ts
+automatedDecisionMaking: [
+  {
+    name: "Fraud scoring",
+    logic: "Transactions are scored by a rules engine combining device fingerprint and historical patterns.",
+    significance: "A high score may delay or decline a transaction; you can request human review.",
+  },
+],
+```
+
+Omitting the field entirely emits a validation warning under EU/UK jurisdictions. When at least one activity is listed, the rendered policy automatically appends the Article 22(3) right-to-human-review paragraph referencing `company.contact`.
 
 `data.collected` is a map of category label → fields; `data.purposes` is a map of the same category label → prose describing _why_ you process it (GDPR Article 13(1)(c)). Every key in `data.collected` must have a matching entry in `data.purposes`; `defineConfig` enforces this at type-check time, and the `openPolicy()` Vite plugin re-validates it at build time. When auto-collect is enabled, the plugin also emits `openpolicy.gen.ts` alongside your config (check it in) so the same constraint applies to scanned `collecting()` categories even without running Vite first.
 

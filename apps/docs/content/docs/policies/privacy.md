@@ -30,7 +30,10 @@ retention: {
   "Usage logs": "90 days",
 },
 thirdParties: [],
+automatedDecisionMaking: [],
 ```
+
+Set `automatedDecisionMaking: []` to declare that you don't use automated decision-making or profiling (GDPR Art. 13(2)(f) / Art. 22). To declare activities, list each with `name`, `logic`, and `significance` — see [Configuration](/configuration#automated-decision-making-and-profiling).
 
 Each key in `data.collected` must have a matching entry in `data.purposes` disclosing _why_ you process that category (GDPR Article 13(1)(c)). `defineConfig` enforces this at type-check time, and the `openPolicy()` Vite plugin re-validates it at build time. With auto-collect, the plugin emits `openpolicy.gen.ts` alongside your config — commit it so the same constraint applies to scanned categories in CI.
 

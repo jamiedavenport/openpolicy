@@ -20,6 +20,8 @@ export type {
 export { bold, compile, heading, italic, li, link, ol, p, section, text, ul } from "./documents";
 export { isJurisdiction, JURISDICTIONS } from "./jurisdictions";
 export type {
+	AutomatedDecision,
+	AutomatedDecisionMaking,
 	ChildrenConfig,
 	CompanyConfig,
 	CompileOptions,
@@ -86,6 +88,7 @@ export function expandOpenPolicyConfig(config: OpenPolicyConfig): PolicyInput[] 
 			thirdParties: config.thirdParties ?? [],
 			userRights: deriveUserRights(config.jurisdictions),
 			children: config.children,
+			automatedDecisionMaking: config.automatedDecisionMaking,
 		});
 	}
 	if (shouldEmit("cookie", config)) {

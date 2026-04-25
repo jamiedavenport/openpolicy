@@ -39,6 +39,17 @@ export type LegalBasis =
 // values are the Article 6 basis that applies to that purpose.
 export type LegalBasisMap = Record<string, LegalBasis>;
 
+// GDPR Art. 13(2)(f) requires disclosing each automated-decision-making
+// or profiling activity (Art. 22) — the existence, the logic involved,
+// and the significance and envisaged consequences for the data subject.
+export type AutomatedDecision = {
+	name: string;
+	logic: string;
+	significance: string;
+};
+
+export type AutomatedDecisionMaking = AutomatedDecision[];
+
 export type Dpo =
 	| { email: string; name?: string; phone?: string; address?: string }
 	| { required: false; reason?: string };
@@ -97,6 +108,7 @@ export type PrivacyPolicyConfig = {
 	userRights: UserRight[];
 	jurisdictions: Jurisdiction[];
 	children?: ChildrenConfig;
+	automatedDecisionMaking?: AutomatedDecisionMaking;
 };
 
 // Internal type consumed by section builders via PolicyInput.
@@ -127,6 +139,7 @@ export type OpenPolicyConfig = {
 	retention?: Retention;
 	children?: ChildrenConfig;
 	thirdParties?: ThirdParty[];
+	automatedDecisionMaking?: AutomatedDecisionMaking;
 
 	// Cookie posture — feeds the cookie policy and the privacy cookie-overview section.
 	cookies?: CookiePolicyCookies;

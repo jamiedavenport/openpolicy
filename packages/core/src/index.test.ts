@@ -106,6 +106,35 @@ test("expandOpenPolicyConfig returns empty array when nothing to emit", () => {
 	expect(inputs).toHaveLength(0);
 });
 
+test("expandOpenPolicyConfig passes automatedDecisionMaking through unchanged when set", () => {
+	const inputs = expandOpenPolicyConfig({
+		...fullConfig,
+		automatedDecisionMaking: [
+			{ name: "Fraud scoring", logic: "Rules engine", significance: "May decline" },
+		],
+	});
+	const privacy = inputs.find((i) => i.type === "privacy");
+	expect(privacy?.type).toBe("privacy");
+	if (privacy?.type !== "privacy") throw new Error("expected privacy input");
+	expect(privacy.automatedDecisionMaking).toEqual([
+		{ name: "Fraud scoring", logic: "Rules engine", significance: "May decline" },
+	]);
+});
+
+test("expandOpenPolicyConfig preserves undefined automatedDecisionMaking (no default)", () => {
+	const inputs = expandOpenPolicyConfig(fullConfig);
+	const privacy = inputs.find((i) => i.type === "privacy");
+	if (privacy?.type !== "privacy") throw new Error("expected privacy input");
+	expect(privacy.automatedDecisionMaking).toBeUndefined();
+});
+
+test("expandOpenPolicyConfig preserves explicit empty automatedDecisionMaking array", () => {
+	const inputs = expandOpenPolicyConfig({ ...fullConfig, automatedDecisionMaking: [] });
+	const privacy = inputs.find((i) => i.type === "privacy");
+	if (privacy?.type !== "privacy") throw new Error("expected privacy input");
+	expect(privacy.automatedDecisionMaking).toEqual([]);
+});
+
 test("shouldEmit honours explicit policies override", () => {
 	const config: OpenPolicyConfig = {
 		...fullConfig,

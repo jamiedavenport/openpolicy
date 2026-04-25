@@ -32,4 +32,5 @@ export default defineConfig({
 		marketing: false,
 	},
 	thirdParties: [],
+	automatedDecisionMaking: [],
 });

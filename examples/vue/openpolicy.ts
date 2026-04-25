@@ -47,4 +47,5 @@ export default defineConfig({
 		canWithdraw: true,
 	},
 	children: { underAge: 16, noticeUrl: "https://acme.com/parental-notice" },
+	automatedDecisionMaking: [],
 });
