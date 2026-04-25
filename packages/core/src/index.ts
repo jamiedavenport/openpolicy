@@ -28,10 +28,12 @@ export type {
 	ConsentMechanism,
 	CookiePolicyConfig,
 	CookiePolicyCookies,
+	CookieUsage,
 	DataCollection,
 	DataConfig,
 	Dpo,
 	EffectiveDate,
+	EuRepresentative,
 	Jurisdiction,
 	LegalBasis,
 	LegalBasisMap,
@@ -40,6 +42,9 @@ export type {
 	PolicyCategory,
 	PolicyInput,
 	PrivacyPolicyConfig,
+	ProvisionBasis,
+	ProvisionRequirement,
+	ProvisionRequirementMap,
 	Purposes,
 	Retention,
 	ThirdParty,
@@ -53,10 +58,16 @@ export { validatePrivacyPolicy } from "./validate";
 export { validateOpenPolicyConfig } from "./validate-config";
 export { validateCookiePolicy } from "./validate-cookie";
 
-import type { CookiePolicyCookies, OpenPolicyConfig, PolicyCategory, PolicyInput } from "./types";
+import type {
+	CookiePolicyCookies,
+	DataConfig,
+	OpenPolicyConfig,
+	PolicyCategory,
+	PolicyInput,
+} from "./types";
 import { deriveUserRights } from "./user-rights";
 
-const PRIVACY_FIELDS = ["data", "legalBasis", "retention", "children"] as const;
+const PRIVACY_FIELDS = ["data", "children"] as const;
 
 function hasAnyPrivacyField(config: OpenPolicyConfig): boolean {
 	return PRIVACY_FIELDS.some((field) => config[field] !== undefined);
@@ -71,7 +82,14 @@ export function shouldEmit(category: PolicyCategory, config: OpenPolicyConfig): 
 	return category === "privacy" ? hasAnyPrivacyField(config) : hasCookieField(config);
 }
 
-const EMPTY_COOKIES: CookiePolicyCookies = { essential: true };
+const EMPTY_DATA: DataConfig = {
+	collected: {},
+	purposes: {},
+	lawfulBasis: {},
+	retention: {},
+	provisionRequirement: {},
+};
+const EMPTY_COOKIES: CookiePolicyCookies = { used: { essential: true }, lawfulBasis: {} };
 
 export function expandOpenPolicyConfig(config: OpenPolicyConfig): PolicyInput[] {
 	const inputs: PolicyInput[] = [];
@@ -81,9 +99,7 @@ export function expandOpenPolicyConfig(config: OpenPolicyConfig): PolicyInput[] 
 			company: config.company,
 			effectiveDate: config.effectiveDate,
 			jurisdictions: config.jurisdictions,
-			data: config.data ?? { collected: {}, purposes: {} },
-			legalBasis: config.legalBasis ?? {},
-			retention: config.retention ?? {},
+			data: config.data ?? EMPTY_DATA,
 			cookies: config.cookies ?? EMPTY_COOKIES,
 			thirdParties: config.thirdParties ?? [],
 			userRights: deriveUserRights(config.jurisdictions),

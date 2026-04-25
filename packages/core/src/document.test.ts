@@ -14,13 +14,19 @@ const minimalPrivacyConfig: PrivacyPolicyConfig = {
 	data: {
 		collected: { "Account Information": ["Name", "Email address"] },
 		purposes: { "Account Information": "To authenticate users and send service notifications" },
+		lawfulBasis: { "Account Information": "contract" },
+		retention: { "Account Information": "Until account deletion" },
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+		},
 	},
-	legalBasis: {
-		"Providing the service": "legitimate_interests",
-		"Marketing communications": "consent",
+	cookies: {
+		used: { essential: true, analytics: false, marketing: false },
+		lawfulBasis: { essential: "legal_obligation", analytics: "consent", marketing: "consent" },
 	},
-	retention: { "Account data": "Until account deletion" },
-	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
 	userRights: ["access"],
 	jurisdictions: ["ca"],
@@ -139,7 +145,13 @@ test("compile throws when data.collected is empty", () => {
 		compile({
 			type: "privacy",
 			...minimalPrivacyConfig,
-			data: { collected: {}, purposes: {} },
+			data: {
+				collected: {},
+				purposes: {},
+				lawfulBasis: {},
+				retention: {},
+				provisionRequirement: {},
+			},
 		}),
 	).toThrow(/no data collected/i);
 });
@@ -163,6 +175,24 @@ test("data-collected section includes purpose paragraph for each category", () =
 			purposes: {
 				"Account Information": "To authenticate users",
 				"Session Data": "To secure sessions",
+			},
+			lawfulBasis: {
+				"Account Information": "contract",
+				"Session Data": "legitimate_interests",
+			},
+			retention: {
+				"Account Information": "Until account deletion",
+				"Session Data": "30 days",
+			},
+			provisionRequirement: {
+				"Account Information": {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
+				"Session Data": {
+					basis: "voluntary",
+					consequences: "None — your service is unaffected.",
+				},
 			},
 		},
 	});
@@ -262,14 +292,38 @@ test("introduction section has ParagraphNode children", () => {
 	expect(firstPara.children[0]?.type).toBe("text");
 });
 
-test("legal-basis section renders one block per processing purpose with Article 6 sub-clause", () => {
+test("legal-basis section renders one block per data category with Article 6 sub-clause", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
 		jurisdictions: ["eu"],
-		legalBasis: {
-			"Providing the service": "contract",
-			"Marketing communications": "consent",
+		data: {
+			collected: {
+				"Personal Information": ["Name", "Email"],
+				"Marketing Data": ["Mailing list signup"],
+			},
+			purposes: {
+				"Personal Information": "Providing the service",
+				"Marketing Data": "Marketing communications",
+			},
+			lawfulBasis: {
+				"Personal Information": "contract",
+				"Marketing Data": "consent",
+			},
+			retention: {
+				"Personal Information": "Until account deletion",
+				"Marketing Data": "Until consent is withdrawn",
+			},
+			provisionRequirement: {
+				"Personal Information": {
+					basis: "contract-prerequisite",
+					consequences: "We cannot provide the service.",
+				},
+				"Marketing Data": {
+					basis: "voluntary",
+					consequences: "None — your service is unaffected.",
+				},
+			},
 		},
 	});
 	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
@@ -280,31 +334,135 @@ test("legal-basis section renders one block per processing purpose with Article 
 	expect(blob).toContain("Consent (Article 6(1)(a))");
 });
 
-test("legal-basis section appends consent-withdrawal paragraph when any purpose uses consent", () => {
+test("consent-withdrawal section is rendered when any data category uses consent (EU)", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
 		jurisdictions: ["eu"],
-		legalBasis: {
-			"Providing the service": "contract",
-			"Marketing communications": "consent",
+		data: {
+			collected: {
+				"Personal Information": ["Name"],
+				"Marketing Data": ["Mailing list signup"],
+			},
+			purposes: {
+				"Personal Information": "Providing the service",
+				"Marketing Data": "Marketing communications",
+			},
+			lawfulBasis: {
+				"Personal Information": "contract",
+				"Marketing Data": "consent",
+			},
+			retention: {
+				"Personal Information": "Until account deletion",
+				"Marketing Data": "Until consent is withdrawn",
+			},
+			provisionRequirement: {
+				"Personal Information": {
+					basis: "contract-prerequisite",
+					consequences: "We cannot provide the service.",
+				},
+				"Marketing Data": {
+					basis: "voluntary",
+					consequences: "None — your service is unaffected.",
+				},
+			},
 		},
 	});
-	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
-	const blob = JSON.stringify(legalBasis);
-	expect(blob).toContain("Right to withdraw consent");
+	const cw = doc.sections.find((s) => s.id === "consent-withdrawal")!;
+	expect(cw).toBeDefined();
+	const blob = JSON.stringify(cw);
+	expect(blob).toContain("Right to Withdraw Consent");
+	expect(blob).toContain("Article 7(3)");
 	expect(blob).toContain(minimalPrivacyConfig.company.contact);
 	expect(blob).toContain("does not affect the lawfulness");
 });
 
-test("legal-basis section omits consent-withdrawal paragraph when no purpose uses consent", () => {
+test("consent-withdrawal section is rendered when only cookies use consent (EU)", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
 		jurisdictions: ["eu"],
-		legalBasis: {
-			"Providing the service": "contract",
-			"Service communications": "legitimate_interests",
+		cookies: {
+			used: { essential: true, analytics: true },
+			lawfulBasis: { essential: "legal_obligation", analytics: "consent" },
+		},
+	});
+	const cw = doc.sections.find((s) => s.id === "consent-withdrawal")!;
+	expect(cw).toBeDefined();
+	const blob = JSON.stringify(cw);
+	expect(blob).toContain("Right to Withdraw Consent");
+});
+
+test("consent-withdrawal section is omitted when no data or cookie basis is consent (EU)", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		data: {
+			collected: {
+				"Personal Information": ["Name"],
+				"Service Data": ["Logs"],
+			},
+			purposes: {
+				"Personal Information": "Providing the service",
+				"Service Data": "Service communications",
+			},
+			lawfulBasis: {
+				"Personal Information": "contract",
+				"Service Data": "legitimate_interests",
+			},
+			retention: {
+				"Personal Information": "Until account deletion",
+				"Service Data": "30 days",
+			},
+			provisionRequirement: {
+				"Personal Information": {
+					basis: "contract-prerequisite",
+					consequences: "We cannot provide the service.",
+				},
+				"Service Data": {
+					basis: "voluntary",
+					consequences: "None — your service is unaffected.",
+				},
+			},
+		},
+		cookies: {
+			used: { essential: true },
+			lawfulBasis: { essential: "legal_obligation" },
+		},
+	});
+	expect(doc.sections.find((s) => s.id === "consent-withdrawal")).toBeUndefined();
+});
+
+test("consent-withdrawal section is omitted under non-EU/UK jurisdictions even when consent is used", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["us-ca"],
+		cookies: {
+			used: { essential: true, analytics: true },
+			lawfulBasis: { essential: "legal_obligation", analytics: "consent" },
+		},
+	});
+	expect(doc.sections.find((s) => s.id === "consent-withdrawal")).toBeUndefined();
+});
+
+test("legal-basis section no longer carries the consent-withdrawal paragraph (it's its own section now)", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		data: {
+			collected: { "Marketing Data": ["Email"] },
+			purposes: { "Marketing Data": "Marketing communications" },
+			lawfulBasis: { "Marketing Data": "consent" },
+			retention: { "Marketing Data": "Until consent is withdrawn" },
+			provisionRequirement: {
+				"Marketing Data": {
+					basis: "voluntary",
+					consequences: "None — your service is unaffected.",
+				},
+			},
 		},
 	});
 	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
@@ -312,12 +470,11 @@ test("legal-basis section omits consent-withdrawal paragraph when no purpose use
 	expect(blob).not.toContain("Right to withdraw consent");
 });
 
-test("legal-basis section is omitted entirely when legalBasis map is empty (non-GDPR)", () => {
+test("legal-basis section is omitted entirely under non-GDPR jurisdictions", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
 		jurisdictions: ["ca"],
-		legalBasis: {},
 	});
 	expect(doc.sections.find((s) => s.id === "legal-basis")).toBeUndefined();
 });
@@ -354,6 +511,166 @@ test("automated-decision-making section emits explicit-none paragraph when [] un
 	expect(blob).toContain("We do not engage in automated decision-making");
 	expect(blob).toContain("Article 22");
 	expect(blob).not.toContain("Right to human review");
+});
+
+test("gdpr-supplement complaint paragraph links to EDPB members directory", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).toContain("edpb.europa.eu/about-edpb/about-edpb/members_en");
+	expect(blob).toContain("supervisory authority");
+	expect(blob).not.toContain("your local data protection authority");
+});
+
+test("gdpr-supplement does not mention Article 27 representative when unset", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).not.toContain("Article 27");
+	expect(blob).not.toContain("representative in the European Union");
+});
+
+test("gdpr-supplement renders Article 27 representative paragraph when configured", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		company: {
+			...minimalPrivacyConfig.company,
+			euRepresentative: {
+				name: "Acme EU Ltd.",
+				address: "1 Rue de la Loi, Brussels",
+				email: "eu-rep@acme.com",
+			},
+		},
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).toContain("Article 27 GDPR");
+	expect(blob).toContain("Acme EU Ltd.");
+	expect(blob).toContain("1 Rue de la Loi, Brussels");
+	expect(blob).toContain("eu-rep@acme.com");
+});
+
+test("gdpr-supplement names specific Article 46 transfer safeguards and links the adequacy registry", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).toContain("Chapter V");
+	expect(blob).toContain("Standard Contractual Clauses");
+	expect(blob).toContain("Binding Corporate Rules");
+	expect(blob).toContain("adequate level of data protection");
+	expect(blob).toContain(
+		"commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en",
+	);
+	expect(blob).toContain(minimalPrivacyConfig.company.contact);
+	expect(blob).not.toContain("we ensure adequate safeguards are in place");
+});
+
+test("uk-gdpr-supplement still names the ICO with its complaint URL", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["uk"],
+	});
+	const uk = doc.sections.find((s) => s.id === "uk-gdpr-supplement")!;
+	const blob = JSON.stringify(uk);
+	expect(blob).toContain("Information Commissioner");
+	expect(blob).toContain("ico.org.uk/make-a-complaint");
+});
+
+test("provision-requirement section renders one paragraph per category covering each basis (EU)", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		data: {
+			collected: {
+				"Account Information": ["Email"],
+				"Billing Address": ["Street", "City"],
+				"Marketing Preferences": ["Newsletter opt-in"],
+				"Cover Letter": ["Free-text"],
+			},
+			purposes: {
+				"Account Information": "To authenticate users",
+				"Billing Address": "To issue invoices",
+				"Marketing Preferences": "To send marketing emails",
+				"Cover Letter": "To enter into an employment contract",
+			},
+			lawfulBasis: {
+				"Account Information": "contract",
+				"Billing Address": "legal_obligation",
+				"Marketing Preferences": "consent",
+				"Cover Letter": "contract",
+			},
+			retention: {
+				"Account Information": "Until account deletion",
+				"Billing Address": "7 years",
+				"Marketing Preferences": "Until consent is withdrawn",
+				"Cover Letter": "12 months",
+			},
+			provisionRequirement: {
+				"Account Information": {
+					basis: "contractual",
+					consequences: "We cannot operate your account.",
+				},
+				"Billing Address": {
+					basis: "statutory",
+					consequences: "We cannot lawfully invoice you.",
+				},
+				"Marketing Preferences": {
+					basis: "voluntary",
+					consequences: "None — you may decline without affecting your service.",
+				},
+				"Cover Letter": {
+					basis: "contract-prerequisite",
+					consequences: "We cannot consider your application.",
+				},
+			},
+		},
+	});
+	const pr = doc.sections.find((s) => s.id === "provision-requirement")!;
+	expect(pr).toBeDefined();
+	const blob = JSON.stringify(pr);
+	expect(blob).toContain("Article 13(2)(e)");
+	expect(blob).toContain("Required by law");
+	expect(blob).toContain("Required under our contract with you");
+	expect(blob).toContain("Required to enter into a contract");
+	expect(blob).toContain("Voluntary");
+	expect(blob).toContain("We cannot operate your account.");
+	expect(blob).toContain("We cannot lawfully invoice you.");
+	expect(blob).toContain("We cannot consider your application.");
+	expect(blob).toContain("Consequences");
+});
+
+test("provision-requirement section is omitted under non-EU/UK jurisdictions", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["us-ca"],
+	});
+	expect(doc.sections.find((s) => s.id === "provision-requirement")).toBeUndefined();
+});
+
+test("provision-requirement section is rendered under UK jurisdiction", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["uk"],
+	});
+	expect(doc.sections.find((s) => s.id === "provision-requirement")).toBeDefined();
 });
 
 test("automated-decision-making section enumerates each activity and appends Art. 22 right-to-human-review", () => {

@@ -19,7 +19,7 @@ bun add @openpolicy/sdk
 
 ```ts
 // openpolicy.ts
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -28,32 +28,38 @@ export default defineConfig({
 		address: "123 Main St, San Francisco, CA 94105",
 		contact: "privacy@acme.com",
 	},
-	privacy: {
-		effectiveDate: "2026-01-01",
-		dataCollected: {
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["eu", "us-ca"],
+	data: {
+		collected: {
 			"Account information": ["Email address", "Display name"],
 			"Usage data": ["Pages visited", "Session duration"],
 		},
-		legalBasis: "Legitimate interests and user consent",
-		retention: {
-			"Account data": "Until account deletion",
-			"Analytics data": "13 months",
+		purposes: {
+			"Account information": "To create and manage user accounts",
+			"Usage data": "To understand product usage and improve the service",
 		},
-		cookies: { essential: true, analytics: true, marketing: false },
-		thirdParties: [
-			{ name: "Vercel", purpose: "Hosting" },
-			{ name: "Plausible", purpose: "Privacy-friendly analytics" },
-		],
-		jurisdictions: ["eu", "us-ca"],
+		lawfulBasis: {
+			"Account information": LegalBases.Contract,
+			"Usage data": LegalBases.LegitimateInterests,
+		},
+		retention: {
+			"Account information": "Until account deletion",
+			"Usage data": "13 months",
+		},
 	},
+	thirdParties: [
+		{ name: "Vercel", purpose: "Hosting" },
+		{ name: "Plausible", purpose: "Privacy-friendly analytics" },
+	],
 });
 ```
 
 ### Cookie policy
 
 ```ts
-// cookies.config.ts
-import { defineConfig } from "@openpolicy/sdk";
+// openpolicy.ts
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -62,10 +68,15 @@ export default defineConfig({
 		address: "123 Main St, San Francisco, CA 94105",
 		contact: "privacy@acme.com",
 	},
-	cookie: {
-		effectiveDate: "2026-01-01",
-		cookies: { essential: true, analytics: true, marketing: false },
-		jurisdictions: ["eu", "us-ca"],
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["eu", "us-ca"],
+	cookies: {
+		used: { essential: true, analytics: true, marketing: false },
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			marketing: LegalBases.Consent,
+		},
 	},
 });
 ```

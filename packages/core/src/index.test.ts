@@ -14,10 +14,19 @@ const input: PolicyInput = {
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
 		purposes: { "Account Information": "To authenticate users" },
+		lawfulBasis: { "Account Information": "contract" },
+		retention: { "Account Information": "Until deletion" },
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+		},
 	},
-	legalBasis: { "Providing the service": "legitimate_interests" },
-	retention: { "Account data": "Until deletion" },
-	cookies: { essential: true, analytics: false, marketing: false },
+	cookies: {
+		used: { essential: true, analytics: false, marketing: false },
+		lawfulBasis: { essential: "legal_obligation", analytics: "consent", marketing: "consent" },
+	},
 	thirdParties: [],
 	userRights: ["access"],
 	jurisdictions: ["ca"],
@@ -37,10 +46,19 @@ const fullConfig: OpenPolicyConfig = {
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
 		purposes: { "Account Information": "To authenticate users" },
+		lawfulBasis: { "Account Information": "contract" },
+		retention: { "Account Information": "Until deletion" },
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+		},
 	},
-	legalBasis: { "Providing the service": "legitimate_interests" },
-	retention: { "Account data": "Until deletion" },
-	cookies: { essential: true, analytics: false, marketing: false },
+	cookies: {
+		used: { essential: true, analytics: false, marketing: false },
+		lawfulBasis: { essential: "legal_obligation", analytics: "consent", marketing: "consent" },
+	},
 	thirdParties: [],
 };
 
@@ -91,7 +109,10 @@ test("expandOpenPolicyConfig auto-detects cookie-only when no privacy fields", (
 		company,
 		effectiveDate: "2026-01-01",
 		jurisdictions: ["ca"],
-		cookies: { essential: true },
+		cookies: {
+			used: { essential: true },
+			lawfulBasis: { essential: "legal_obligation" },
+		},
 	});
 	expect(inputs).toHaveLength(1);
 	expect(inputs[0]?.type).toBe("cookie");

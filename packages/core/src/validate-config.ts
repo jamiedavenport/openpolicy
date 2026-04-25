@@ -72,7 +72,7 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 					code: "policy-privacy-empty",
 					level: "error",
 					message:
-						'policies includes "privacy" but no data-handling fields are set — add data, legalBasis, retention, or children',
+						'policies includes "privacy" but no data-handling fields are set — add data or children',
 				});
 			}
 			if (category === "cookie" && !config.cookies) {
@@ -93,6 +93,60 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 		});
 	}
 
+	if (wantPrivacy && config.data) {
+		const collectedKeys = Object.keys(config.data.collected);
+		const gdprScope = config.jurisdictions?.includes("eu") || config.jurisdictions?.includes("uk");
+		if (gdprScope) {
+			for (const category of collectedKeys) {
+				if (!config.data.lawfulBasis?.[category]) {
+					issues.push({
+						code: "lawful-basis-incomplete",
+						level: "error",
+						message: `data.lawfulBasis["${category}"] is missing — every collected category requires an Article 6 lawful basis (GDPR Art. 13(1)(c)).`,
+					});
+				}
+				const pr = config.data.provisionRequirement?.[category];
+				if (!pr || !pr.basis) {
+					issues.push({
+						code: "statutory-contractual-obligation",
+						level: "error",
+						message: `data.provisionRequirement["${category}"] is missing — GDPR Art. 13(2)(e) requires disclosure of whether provision is statutory, contractual, a contract-prerequisite, or voluntary, and the consequences of failure to provide it.`,
+					});
+				} else if (typeof pr.consequences !== "string" || pr.consequences.trim().length === 0) {
+					issues.push({
+						code: "statutory-contractual-obligation",
+						level: "error",
+						message: `data.provisionRequirement["${category}"].consequences is empty — GDPR Art. 13(2)(e) requires the consequences of failure to provide this data.`,
+					});
+				}
+			}
+		}
+		for (const category of collectedKeys) {
+			const period = config.data.retention?.[category];
+			if (period === undefined || period.trim().length === 0) {
+				issues.push({
+					code: "retention-incomplete",
+					level: "error",
+					message: `data.retention["${category}"] is missing — declare a retention period for every collected category.`,
+				});
+			}
+		}
+	}
+
+	if (config.cookies) {
+		const used = config.cookies.used ?? {};
+		for (const [key, enabled] of Object.entries(used)) {
+			if (!enabled) continue;
+			if (!config.cookies.lawfulBasis?.[key]) {
+				issues.push({
+					code: "cookie-lawful-basis-missing",
+					level: "error",
+					message: `cookies.lawfulBasis["${key}"] is missing — every enabled cookie category requires an Article 6 lawful basis.`,
+				});
+			}
+		}
+	}
+
 	const gdprScope = config.jurisdictions?.includes("eu") || config.jurisdictions?.includes("uk");
 	if (wantPrivacy && gdprScope && config.company?.dpo === undefined) {
 		issues.push({
@@ -107,12 +161,7 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 }
 
 function hasAnyPrivacyField(config: OpenPolicyConfig): boolean {
-	return (
-		config.data !== undefined ||
-		config.legalBasis !== undefined ||
-		config.retention !== undefined ||
-		config.children !== undefined
-	);
+	return config.data !== undefined || config.children !== undefined;
 }
 
 export type { PolicyCategory };

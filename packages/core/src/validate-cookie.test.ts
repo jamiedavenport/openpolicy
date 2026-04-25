@@ -11,10 +11,18 @@ const validConfig: CookiePolicyConfig = {
 		contact: "privacy@acme.com",
 	},
 	cookies: {
-		essential: true,
-		analytics: false,
-		functional: false,
-		marketing: false,
+		used: {
+			essential: true,
+			analytics: false,
+			functional: false,
+			marketing: false,
+		},
+		lawfulBasis: {
+			essential: "legal_obligation",
+			analytics: "consent",
+			functional: "consent",
+			marketing: "consent",
+		},
 	},
 	thirdParties: [],
 	jurisdictions: ["ca"],
@@ -74,10 +82,18 @@ test("all cookies disabled is an error", () => {
 	const issues = validateCookiePolicy({
 		...validConfig,
 		cookies: {
-			essential: false,
-			analytics: false,
-			functional: false,
-			marketing: false,
+			used: {
+				essential: false as unknown as true,
+				analytics: false,
+				functional: false,
+				marketing: false,
+			},
+			lawfulBasis: {
+				essential: "legal_obligation",
+				analytics: "consent",
+				functional: "consent",
+				marketing: "consent",
+			},
 		},
 	});
 	expect(issues.some((i) => i.level === "error" && i.message.includes("At least one cookie"))).toBe(

@@ -49,13 +49,27 @@ export default defineConfig({
 	effectiveDate: "2026-04-01",
 	jurisdictions: ["eu", "us-ca"],
 	// Privacy policy fields — auto-detected from field presence
-	dataCollected: {
-		/* ... */
+	data: {
+		collected: {
+			/* ... */
+		},
+		purposes: {
+			/* ... */
+		},
+		lawfulBasis: {
+			/* ... */
+		},
+		retention: {
+			/* ... */
+		},
 	},
 	// ...
 	// Cookie policy fields — auto-detected from field presence
 	cookies: {
-		/* ... */
+		used: { essential: true /* ... */ },
+		lawfulBasis: {
+			/* ... */
+		},
 	},
 	// ...
 });

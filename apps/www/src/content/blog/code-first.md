@@ -25,7 +25,7 @@ With OpenPolicy, you define your policy as a TypeScript object and render it dir
 
 ```ts
 // openpolicy.ts
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -33,10 +33,25 @@ export default defineConfig({
 		legalName: "Acme, Inc.",
 		contact: "legal@acme.com",
 	},
+	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "us-ca"],
-	dataCollected: {
-		"Account Information": ["Full name", "Email address"],
-		"Usage Data": ["Pages visited", "Feature usage"],
+	data: {
+		collected: {
+			"Account Information": ["Full name", "Email address"],
+			"Usage Data": ["Pages visited", "Feature usage"],
+		},
+		purposes: {
+			"Account Information": "To create and manage user accounts",
+			"Usage Data": "To understand product usage and improve the service",
+		},
+		lawfulBasis: {
+			"Account Information": LegalBases.Contract,
+			"Usage Data": LegalBases.LegitimateInterests,
+		},
+		retention: {
+			"Account Information": "Until account deletion",
+			"Usage Data": "90 days",
+		},
 	},
 });
 ```
@@ -61,7 +76,7 @@ AI-assisted development is shipping features at a pace that the traditional "upd
 
 A static policy can't keep up with that pace. But a policy defined in code can.
 
-When you ship a new feature that touches user data, the policy update goes in the same PR. When you add an analytics provider, the `dataCollected` field gets updated alongside the integration. Compliance becomes part of the development loop, not a annual scramble before an audit.
+When you ship a new feature that touches user data, the policy update goes in the same PR. When you add an analytics provider, the `data.collected` field gets updated alongside the integration. Compliance becomes part of the development loop, not a annual scramble before an audit.
 
 ## Full audit trail, PR-based review
 

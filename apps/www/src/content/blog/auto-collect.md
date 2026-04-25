@@ -7,9 +7,9 @@ author: "OpenPolicy Team"
 
 The hardest part of a code-first policy isn't the initial setup. It's keeping it accurate.
 
-You write your `openpolicy.ts`, fill in `dataCollected`, list your third-party services, and ship. Six months later you've added Stripe, integrated PostHog, and started storing phone numbers. The policy still describes your product from launch day. Nothing warned you — it just drifted.
+You write your `openpolicy.ts`, fill in `data.collected`, list your third-party services, and ship. Six months later you've added Stripe, integrated PostHog, and started storing phone numbers. The policy still describes your product from launch day. Nothing warned you — it just drifted.
 
-This is the version of the drift problem that no amount of "policies in code" solves on its own. As long as `dataCollected` and `thirdParties` are fields you maintain by hand, they will go stale. It's not a discipline problem; it's a workflow problem. The signal is in the wrong place.
+This is the version of the drift problem that no amount of "policies in code" solves on its own. As long as `data.collected` and `thirdParties` are fields you maintain by hand, they will go stale. It's not a discipline problem; it's a workflow problem. The signal is in the wrong place.
 
 Auto-collect moves the signal to where the behaviour actually lives: the call site.
 
@@ -55,7 +55,7 @@ The three arguments are: the data category (appears as a section in your policy)
 
 The label record is also where you control what appears in the policy. If your insert includes `hashedPassword`, leave it out of the labels and it won't appear in the policy. The scan only surfaces what you explicitly name.
 
-At build time, the plugin walks your source files, finds every `collecting()` call, extracts the category and labels, and merges them into the `dataCollected` field of your policy config — before your `openpolicy.ts` is evaluated.
+At build time, the plugin walks your source files, finds every `collecting()` call, extracts the category and labels, and merges them into the `data.collected` field of your policy config — before your `openpolicy.ts` is evaluated.
 
 ## `thirdParty()` — annotate at the integration point
 

@@ -67,10 +67,19 @@ test("buildUserRights: privacy policy omits 'Your Rights' section when derivatio
 		data: {
 			collected: { "Account Information": ["Name", "Email"] },
 			purposes: { "Account Information": "To authenticate users" },
+			lawfulBasis: { "Account Information": "contract" },
+			retention: { "Account Information": "Until deletion" },
+			provisionRequirement: {
+				"Account Information": {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
+			},
 		},
-		legalBasis: { "Providing the service": "legitimate_interests" },
-		retention: { "Account data": "Until deletion" },
-		cookies: { essential: true, analytics: false, marketing: false },
+		cookies: {
+			used: { essential: true, analytics: false, marketing: false },
+			lawfulBasis: { essential: "legal_obligation", analytics: "consent", marketing: "consent" },
+		},
 		thirdParties: [],
 		userRights: [],
 		jurisdictions: ["ca"],
@@ -93,9 +102,15 @@ test("validateOpenPolicyConfig: emits no userRights-related issues", () => {
 		data: {
 			collected: { "Account Information": ["Name", "Email"] },
 			purposes: { "Account Information": "To authenticate users" },
+			lawfulBasis: { "Account Information": "contract" },
+			retention: { "Account Information": "Until deletion" },
+			provisionRequirement: {
+				"Account Information": {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
+			},
 		},
-		legalBasis: { "Providing the service": "legitimate_interests" },
-		retention: { "Account data": "Until deletion" },
 	};
 	const issues = validateOpenPolicyConfig(config);
 	expect(issues.some((i) => i.message.toLowerCase().includes("userrights"))).toBe(false);

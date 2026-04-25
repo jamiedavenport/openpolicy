@@ -36,7 +36,7 @@ The following is a complete minimal implementation using plain divs and buttons 
 
 ```ts
 // openpolicy.ts
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -45,11 +45,18 @@ export default defineConfig({
 		address: "123 Main St, San Francisco, CA",
 		contact: "privacy@acme.com",
 	},
-	cookie: {
-		cookies: {
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["eu"],
+	cookies: {
+		used: {
 			essential: true,
 			analytics: true,
 			marketing: false,
+		},
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			marketing: LegalBases.Consent,
 		},
 	},
 });

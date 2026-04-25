@@ -1,5 +1,5 @@
-import type { OpenPolicyConfig } from "@openpolicy/core";
-import type { ScannedCollectionKeys } from "./auto-collected";
+import type { LegalBasis, OpenPolicyConfig, ProvisionRequirement } from "@openpolicy/core";
+import type { ScannedCollectionKeys, ScannedCookieKeys } from "./auto-collected";
 
 export type {
 	AutomatedDecision,
@@ -8,22 +8,33 @@ export type {
 	CompanyConfig,
 	ConsentMechanism,
 	CookiePolicyCookies,
+	CookieUsage,
 	DataCollection,
 	DataConfig,
 	Dpo,
 	EffectiveDate,
+	EuRepresentative,
 	Jurisdiction,
 	LegalBasis,
 	LegalBasisMap,
 	OpenPolicyConfig,
 	PolicyCategory,
+	ProvisionBasis,
+	ProvisionRequirement,
+	ProvisionRequirementMap,
 	Purposes,
 	Retention as RetentionMap,
 	ThirdParty,
 	TrackingTechnology,
 } from "@openpolicy/core";
 
-export { cookies, dataCollected, type ScannedCollectionKeys, thirdParties } from "./auto-collected";
+export {
+	cookies,
+	dataCollected,
+	type ScannedCollectionKeys,
+	type ScannedCookieKeys,
+	thirdParties,
+} from "./auto-collected";
 export { collecting, Ignore } from "./collecting";
 export { Compliance } from "./compliance";
 export { DataCategories, LegalBases, Retention } from "./data";
@@ -31,20 +42,35 @@ export { defineCookie } from "./define-cookie";
 export { Providers } from "./providers";
 export { thirdParty } from "./third-parties";
 
-type ScannedKey = keyof ScannedCollectionKeys & string;
+type ScannedDataKey = keyof ScannedCollectionKeys & string;
+type ScannedCookieKey = keyof ScannedCookieKeys & string;
 
-type OpenPolicyConfigWithPurposes<Collected extends Record<string, string[]>> = Omit<
-	OpenPolicyConfig,
-	"data"
-> & {
+type DataKey<Collected> = Extract<keyof Collected, string> | ScannedDataKey;
+type CookieKey<Used> = Extract<keyof Used, string> | ScannedCookieKey;
+
+type OpenPolicyConfigWithGenerics<
+	Collected extends Record<string, string[]>,
+	CookieUsed extends { essential: true; [k: string]: boolean },
+> = Omit<OpenPolicyConfig, "data" | "cookies"> & {
 	data?: {
 		collected: Collected;
-		purposes: { [P in Extract<keyof Collected, string> | ScannedKey]: string };
+		purposes: { [P in DataKey<Collected>]: string };
+		lawfulBasis: { [P in DataKey<Collected>]: LegalBasis };
+		retention: { [P in DataKey<Collected>]: string };
+		provisionRequirement: { [P in DataKey<Collected>]: ProvisionRequirement };
+	};
+	cookies?: {
+		used: CookieUsed;
+		lawfulBasis: { [P in CookieKey<CookieUsed>]: LegalBasis };
 	};
 };
 
-export function defineConfig<Collected extends Record<string, string[]> = Record<string, string[]>>(
-	config: OpenPolicyConfigWithPurposes<Collected>,
-): OpenPolicyConfig {
+export function defineConfig<
+	Collected extends Record<string, string[]> = Record<string, string[]>,
+	CookieUsed extends { essential: true; [k: string]: boolean } = {
+		essential: true;
+		[k: string]: boolean;
+	},
+>(config: OpenPolicyConfigWithGenerics<Collected, CookieUsed>): OpenPolicyConfig {
 	return config as OpenPolicyConfig;
 }

@@ -57,12 +57,14 @@ Contact: privacy@acme.com | Acme, Inc., 123 Main St, San Francisco, CA 94105
 ```ts
 // openpolicy.ts
 import {
-	defineConfig,
+	cookies,
 	Compliance,
 	DataCategories,
-	Retention,
-	Providers,
 	dataCollected,
+	defineConfig,
+	LegalBases,
+	Providers,
+	Retention,
 	thirdParties,
 } from "@openpolicy/sdk";
 
@@ -74,23 +76,44 @@ export default defineConfig({
 		contact: "privacy@acme.com",
 	},
 	effectiveDate: "2026-01-01",
-	// GDPR + CCPA: spread both presets, then union the array fields
-	...Compliance.GDPR,
 	jurisdictions: [...Compliance.GDPR.jurisdictions, ...Compliance.CCPA.jurisdictions],
-	dataCollected: {
-		...dataCollected,
-		...DataCategories.AccountInfo,
-		...DataCategories.PaymentInfo,
-		...DataCategories.UsageData,
-		...DataCategories.DeviceInfo,
-	},
-	retention: {
-		"Account Information": Retention.UntilAccountDeletion,
-		"Usage Data": Retention.NinetyDays,
-		"Payment Information": Retention.ThreeYears,
+	data: {
+		collected: {
+			...dataCollected,
+			...DataCategories.AccountInfo,
+			...DataCategories.PaymentInfo,
+			...DataCategories.UsageData,
+			...DataCategories.DeviceInfo,
+		},
+		purposes: {
+			"Account Information": "To create and manage user accounts",
+			"Payment Information": "To process payments and prevent fraud",
+			"Usage Data": "To understand product usage and improve the service",
+			"Device Information": "To diagnose issues and tailor the experience to your device",
+		},
+		lawfulBasis: {
+			"Account Information": LegalBases.Contract,
+			"Payment Information": LegalBases.Contract,
+			"Usage Data": LegalBases.LegitimateInterests,
+			"Device Information": LegalBases.LegitimateInterests,
+		},
+		retention: {
+			"Account Information": Retention.UntilAccountDeletion,
+			"Payment Information": Retention.ThreeYears,
+			"Usage Data": Retention.NinetyDays,
+			"Device Information": Retention.NinetyDays,
+		},
 	},
 	thirdParties: [...thirdParties, Providers.GoogleAnalytics, Providers.Stripe],
-	cookies: { essential: true, analytics: true, marketing: false },
+	cookies: {
+		used: { ...cookies, analytics: true, marketing: false },
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			marketing: LegalBases.Consent,
+		},
+	},
+	automatedDecisionMaking: [],
 });
 ```
 
@@ -115,14 +138,19 @@ Read each "data we collect" section and identify the category name and the speci
 For categories not covered by a preset, add a custom key with short field labels:
 
 ```ts
-dataCollected: {
-  ...dataCollected,
-  ...DataCategories.AccountInfo,
-  "Health Data": ["Blood glucose readings", "Heart rate"],
+data: {
+  collected: {
+    ...dataCollected,
+    ...DataCategories.AccountInfo,
+    "Health Data": ["Blood glucose readings", "Heart rate"],
+  },
+  purposes: { /* ... */ },
+  lawfulBasis: { /* ... */ },
+  retention: { /* ... */ },
 },
 ```
 
-Always spread `dataCollected` first so the `openPolicy()` Vite plugin's output is included alongside the explicit entries.
+Always spread `dataCollected` first so the `openPolicy()` Vite plugin's output is included alongside the explicit entries. Every key you add to `data.collected` must appear in the three sibling maps too — `defineConfig` enforces this at type-check time.
 
 ### 2. Mapping jurisdiction and legal basis from GDPR/CCPA language
 
@@ -136,36 +164,35 @@ Scan the existing policy for jurisdiction signals:
 | "Australian Privacy Act"                             | `jurisdictions: ["au"]`                                                                                                                                                        |
 | No specific regulation cited                         | Pick the specific region(s) where the business operates — there is no federal `"us"` code. See [Supported jurisdictions](https://docs.openpolicy.sh/references/jurisdictions). |
 
-For legal basis (GDPR policies only), the value is `Record<PurposeName, LegalBasis>` — each named processing purpose maps to its Article 6 basis. GDPR Art. 13(1)(c) requires the lawful basis to be stated for each distinct processing purpose. Map prose phrases to basis values:
+For lawful basis (GDPR policies only), `data.lawfulBasis` is keyed by the same category names as `data.collected` — each data category maps to its Article 6 basis. GDPR Art. 13(1)(c) requires the lawful basis to be stated per category, and the renderer joins category + purpose + basis into a single line. Map prose phrases to `LegalBases` constants:
 
-| Prose                                              | basis value              |
-| -------------------------------------------------- | ------------------------ |
-| "legitimate interests"                             | `"legitimate_interests"` |
-| "your consent" / "you have agreed"                 | `"consent"`              |
-| "to perform a contract" / "to provide the service" | `"contract"`             |
-| "legal obligation" / "required by law"             | `"legal_obligation"`     |
+| Prose                                              | LegalBases constant              |
+| -------------------------------------------------- | -------------------------------- |
+| "legitimate interests"                             | `LegalBases.LegitimateInterests` |
+| "your consent" / "you have agreed"                 | `LegalBases.Consent`             |
+| "to perform a contract" / "to provide the service" | `LegalBases.Contract`            |
+| "legal obligation" / "required by law"             | `LegalBases.LegalObligation`     |
 
-Build the map by naming each purpose the existing policy describes:
+Build the map using the same keys as `data.collected`:
 
 ```ts
-legalBasis: {
-  "Providing the service": "legitimate_interests",
-  "Marketing communications": "consent",
+data: {
+  collected: { "Account Information": ["Name", "Email"], "Usage Data": [...] },
+  purposes:    { "Account Information": "Account creation", "Usage Data": "Analytics" },
+  lawfulBasis: { "Account Information": LegalBases.Contract, "Usage Data": LegalBases.LegitimateInterests },
+  retention:   { "Account Information": Retention.UntilAccountDeletion, "Usage Data": Retention.NinetyDays },
 },
 ```
 
-When any value is `"consent"`, the rendered policy automatically appends a GDPR Art. 13(2)(c) right-to-withdraw paragraph — no extra config needed.
+When any value in `data.lawfulBasis` is `LegalBases.Consent`, the rendered policy automatically appends a GDPR Art. 13(2)(c) right-to-withdraw paragraph — no extra config needed.
 
-Use `Compliance.GDPR` or `Compliance.CCPA` as a starting point when the existing policy explicitly targets those regulations. Merge the array fields when both apply:
+Use `Compliance.GDPR` or `Compliance.CCPA` as a starting point when the existing policy explicitly targets those regulations. Each preset only sets `jurisdictions`; merge them when both apply:
 
 ```ts
-...Compliance.GDPR,
 jurisdictions: [...Compliance.GDPR.jurisdictions, ...Compliance.CCPA.jurisdictions],
 ```
 
-The user-rights list is derived from the resulting `jurisdictions` array — no need to merge a separate array.
-
-`Compliance.CCPA` does not include `legalBasis` — only add it when the existing policy states an EU legal basis.
+The user-rights list is derived from the resulting `jurisdictions` array — no need to merge a separate array. The Article 6 basis per data category lives in `data.lawfulBasis` (you choose), not the preset.
 
 ### 3. Using presets to standardize values
 
@@ -183,11 +210,13 @@ Prefer preset constants over raw strings wherever the meaning matches exactly. T
 | "3 years"                       | `Retention.ThreeYears`           |
 | "as required by law"            | `Retention.AsRequiredByLaw`      |
 
-For a period not in the preset list, use a plain string:
+For a period not in the preset list, use a plain string. `data.retention` is keyed by `data.collected` category names:
 
 ```ts
-retention: {
-  "Audit Logs": "7 years",
+data: {
+  retention: {
+    "Audit Logs": "7 years",
+  },
 },
 ```
 
@@ -217,11 +246,16 @@ defineConfig({
 	company: {
 		/* ... */
 	},
-	dataCollected: {
-		// WRONG: prose sentence passed as a field label
-		Data: [
-			"We collect information you provide when you register for an account, including your name and email address.",
-		],
+	data: {
+		collected: {
+			// WRONG: prose sentence passed as a field label
+			Data: [
+				"We collect information you provide when you register for an account, including your name and email address.",
+			],
+		},
+		purposes: { Data: "Account creation" },
+		lawfulBasis: { Data: LegalBases.Contract },
+		retention: { Data: "Until account deletion" },
 	},
 });
 ```
@@ -233,8 +267,11 @@ defineConfig({
 	company: {
 		/* ... */
 	},
-	dataCollected: {
-		"Account Information": ["Name", "Email address"],
+	data: {
+		collected: { "Account Information": ["Name", "Email address"] },
+		purposes: { "Account Information": "To create and manage user accounts" },
+		lawfulBasis: { "Account Information": LegalBases.Contract },
+		retention: { "Account Information": "Until account deletion" },
 	},
 });
 ```

@@ -58,6 +58,28 @@ This is a Bun monorepo with `apps/*`, `packages/*`, `tooling/*`, and `examples/*
 - **Compliance targets**: GDPR, CCPA, and multi-jurisdiction templates
 - **`llms.txt`**: AI-readable reference for auto-generating policy configs from existing codebases
 
+## Config shape must stay compatible with the Vite plugin
+
+Any change to `OpenPolicyConfig` (`packages/core/src/types.ts`) or `defineConfig` (`packages/sdk/src/index.ts`) MUST keep the `@openpolicy/vite` auto-collect pipeline working. The plugin populates user configs at build time via spread sentinels — those spreads have to land in the right place after any reshape.
+
+The plugin emits three sentinels into a virtual module that users spread into their config:
+
+- `...dataCollected` → spread into `data.collected` (`Record<string, string[]>`)
+- `...thirdParties` → spread into top-level `thirdParties` (`ThirdPartyEntry[]`)
+- `...cookies` → spread into `cookies.used` (`{ essential: true; [k]: boolean }`)
+
+It also writes `openpolicy.gen.ts` augmenting two interfaces in `@openpolicy/sdk` so `defineConfig`'s generic forces every scanned key to appear in the sibling sub-maps:
+
+- `ScannedCollectionKeys` — every scanned data category must appear in `data.purposes`, `data.lawfulBasis`, and `data.retention`
+- `ScannedCookieKeys` — every scanned cookie category must appear in `cookies.lawfulBasis`
+
+When changing the config shape:
+
+- The three spread targets above must remain assignable from the plugin's emitted shapes — don't move `data.collected`, `thirdParties`, or `cookies.used` without also updating `writeAutoCollectedDts` and the virtual module body in `packages/vite/src/index.ts`.
+- Any new sub-map keyed off `data.collected` (or `cookies.used`) must thread through `defineConfig`'s `Collected`/`CookieUsed` generics so `ScannedCollectionKeys`/`ScannedCookieKeys` continue to enforce exhaustiveness.
+- `collecting()`, `thirdParty()`, and `defineCookie()` are the source-level call shapes the scanner recognises (`packages/vite/src/scan.ts`). Their argument shapes are part of the public contract — changing them is a breaking change to the plugin too.
+- After any config reshape, run the `examples/vue` (or any example with `openPolicy()` wired up) build and confirm `openpolicy.gen.ts` regenerates with both interface augmentations and that the resulting policy compiles without validator errors.
+
 ## Git Hooks
 
 Git hooks are managed by Vite+ (`vp config`) with scripts in `.vite-hooks/`. After cloning, run:

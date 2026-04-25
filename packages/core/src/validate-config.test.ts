@@ -15,9 +15,15 @@ const baseConfig: OpenPolicyConfig = {
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
 		purposes: { "Account Information": "To authenticate users" },
+		lawfulBasis: { "Account Information": "contract" },
+		retention: { "Account Information": "Until deletion" },
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+		},
 	},
-	legalBasis: { "Providing the service": "legitimate_interests" },
-	retention: { "Account data": "Until deletion" },
 };
 
 test("isJurisdiction is true for every documented code", () => {
@@ -105,4 +111,60 @@ test("validateOpenPolicyConfig does not warn about DPO when dpo.required === fal
 test("validateOpenPolicyConfig does not warn about DPO for non-EU/UK jurisdictions", () => {
 	const issues = validateOpenPolicyConfig({ ...baseConfig, jurisdictions: ["us-ca"] });
 	expect(issues.some((i) => i.message.includes("company.dpo"))).toBe(false);
+});
+
+test("validateOpenPolicyConfig emits statutory-contractual-obligation when provisionRequirement is missing under GDPR", () => {
+	const issues = validateOpenPolicyConfig({
+		...baseConfig,
+		data: {
+			collected: { "Account Information": ["Name", "Email"] },
+			purposes: { "Account Information": "To authenticate users" },
+			lawfulBasis: { "Account Information": "contract" },
+			retention: { "Account Information": "Until deletion" },
+			provisionRequirement: {},
+		},
+	});
+	const hit = issues.find(
+		(i) => i.code === "statutory-contractual-obligation" && i.level === "error",
+	);
+	expect(hit).toBeDefined();
+	expect(hit?.message).toContain('data.provisionRequirement["Account Information"]');
+	expect(hit?.message).toContain("Art. 13(2)(e)");
+});
+
+test("validateOpenPolicyConfig emits statutory-contractual-obligation when consequences string is empty", () => {
+	const issues = validateOpenPolicyConfig({
+		...baseConfig,
+		data: {
+			collected: { "Account Information": ["Name", "Email"] },
+			purposes: { "Account Information": "To authenticate users" },
+			lawfulBasis: { "Account Information": "contract" },
+			retention: { "Account Information": "Until deletion" },
+			provisionRequirement: {
+				"Account Information": { basis: "contractual", consequences: "   " },
+			},
+		},
+	});
+	expect(
+		issues.some(
+			(i) =>
+				i.code === "statutory-contractual-obligation" &&
+				i.message.includes("consequences is empty"),
+		),
+	).toBe(true);
+});
+
+test("validateOpenPolicyConfig does NOT emit statutory-contractual-obligation for non-GDPR jurisdictions", () => {
+	const issues = validateOpenPolicyConfig({
+		...baseConfig,
+		jurisdictions: ["us-ca"],
+		data: {
+			collected: { "Account Information": ["Name", "Email"] },
+			purposes: { "Account Information": "To authenticate users" },
+			lawfulBasis: { "Account Information": "contract" },
+			retention: { "Account Information": "Until deletion" },
+			provisionRequirement: {},
+		},
+	});
+	expect(issues.some((i) => i.code === "statutory-contractual-obligation")).toBe(false);
 });

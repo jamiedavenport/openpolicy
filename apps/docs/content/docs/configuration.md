@@ -23,7 +23,7 @@ bun add @openpolicy/sdk
 
 ```ts
 // openpolicy.ts
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -43,19 +43,41 @@ export default defineConfig({
 			"Account Information": "To authenticate users and send service notifications",
 			"Usage Data": "To understand product usage and improve the service",
 		},
+		lawfulBasis: {
+			"Account Information": LegalBases.Contract,
+			"Usage Data": LegalBases.LegitimateInterests,
+		},
+		retention: {
+			"Account Information": "Until account deletion",
+			"Usage Data": "90 days",
+		},
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+			"Usage Data": {
+				basis: "voluntary",
+				consequences: "None — your service is unaffected.",
+			},
+		},
 	},
-	legalBasis: {
-		"Providing the service": "legitimate_interests",
-		"Marketing communications": "consent",
-	},
-	retention: { "Account data": "Until account deletion" },
 	thirdParties: [],
-	cookies: { essential: true, analytics: false, marketing: false },
+	cookies: {
+		used: { essential: true, analytics: false, marketing: false },
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			marketing: LegalBases.Consent,
+		},
+	},
 	automatedDecisionMaking: [],
 });
 ```
 
-The `company` block is required and shared across all policy types. All other fields live at the top level: `effectiveDate` and `jurisdictions` are shared, and OpenPolicy auto-detects which policies to generate from the fields you provide — include privacy-specific fields (like `data`, `legalBasis`, `retention`) for a privacy policy, and cookie-specific fields (like `cookies`, `consentMechanism`) for a cookie policy.
+The `company` block is required and shared across all policy types. All other fields live at the top level: `effectiveDate` and `jurisdictions` are shared, and OpenPolicy auto-detects which policies to generate from the fields you provide — include the `data` block for a privacy policy, and the `cookies` block (or `consentMechanism` / `trackingTechnologies`) for a cookie policy.
+
+The `data` block keeps the five sibling maps together — `collected`, `purposes`, `lawfulBasis`, `retention`, and `provisionRequirement` all share the same set of category keys, and `defineConfig`'s generic enforces that you fill all five for every category. The `cookies` block mirrors the same shape: `cookies.used` lists the categories you enable (with `essential: true` always required), and `cookies.lawfulBasis` declares the Article 6 basis for each one.
 
 ### Data Protection Officer
 
@@ -103,7 +125,7 @@ automatedDecisionMaking: [
 
 Omitting the field entirely emits a validation warning under EU/UK jurisdictions. When at least one activity is listed, the rendered policy automatically appends the Article 22(3) right-to-human-review paragraph referencing `company.contact`.
 
-`data.collected` is a map of category label → fields; `data.purposes` is a map of the same category label → prose describing _why_ you process it (GDPR Article 13(1)(c)). Every key in `data.collected` must have a matching entry in `data.purposes`; `defineConfig` enforces this at type-check time, and the `openPolicy()` Vite plugin re-validates it at build time. When auto-collect is enabled, the plugin also emits `openpolicy.gen.ts` alongside your config (check it in) so the same constraint applies to scanned `collecting()` categories even without running Vite first.
+`data.collected` is a map of category label → fields; `data.purposes` is a map of the same category label → prose describing _why_ you process it (GDPR Article 13(1)(c)); `data.lawfulBasis` declares the Article 6 basis per category; `data.retention` declares how long you keep each one; `data.provisionRequirement` declares whether providing each category is statutory, contractual, a contract-prerequisite, or voluntary, plus the consequences of failing to provide it (GDPR Article 13(2)(e)). Every key in `data.collected` must appear in all four sibling maps; `defineConfig` enforces this at type-check time, and the `openPolicy()` Vite plugin re-validates it at build time. When auto-collect is enabled, the plugin also emits `openpolicy.gen.ts` alongside your config (check it in) so the same constraint applies to scanned `collecting()` categories even without running Vite first.
 
 The user rights you're legally required to disclose (access, erasure, portability, etc.) are derived automatically from `jurisdictions` — declare `eu` or `uk` and you get the six GDPR rights, declare `us-ca` and you get the four CCPA rights, declare any combination and you get the union. There's no `userRights` field to set. See [Supported jurisdictions](/references/jurisdictions) for the full list of codes.
 

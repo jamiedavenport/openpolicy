@@ -24,16 +24,25 @@ This drops `CookieBanner` and `CookiePreferences` into `components/ui/openpolicy
 Open `lib/openpolicy.ts` and add cookie fields — OpenPolicy auto-detects the cookie policy from the presence of `cookies`:
 
 ```ts
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
   company: { ... },
   effectiveDate: "2026-03-31",
+  jurisdictions: ["eu"],
   cookies: {
-    essential: true,
-    analytics: true,
-    functional: false,
-    marketing: false,
+    used: {
+      essential: true,
+      analytics: true,
+      functional: false,
+      marketing: false,
+    },
+    lawfulBasis: {
+      essential: LegalBases.LegalObligation,
+      analytics: LegalBases.Consent,
+      functional: LegalBases.Consent,
+      marketing: LegalBases.Consent,
+    },
   },
 });
 ```

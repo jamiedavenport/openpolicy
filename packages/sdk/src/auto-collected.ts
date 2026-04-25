@@ -68,18 +68,36 @@ export const thirdParties: {
  * The literal default below is only used as a fallback when no plugin is
  * active — `essential` is always true; other categories default to false.
  *
+ * Spread into `cookies.used` and pair with `cookies.lawfulBasis` (whose
+ * required keys are derived from this sentinel via `ScannedCookieKeys`).
+ *
  * @example
  * ```ts
- * import { cookies, defineConfig } from "@openpolicy/sdk";
+ * import { cookies, defineConfig, LegalBases } from "@openpolicy/sdk";
  *
  * export default defineConfig({
  *   company: { ... },
  *   effectiveDate: "2026-01-01",
  *   jurisdictions: ["eu", "us-ca"],
- *   cookies,
+ *   cookies: {
+ *     used: cookies,
+ *     lawfulBasis: {
+ *       essential: LegalBases.LegalObligation,
+ *       analytics: LegalBases.Consent,
+ *     },
+ *   },
  * });
  * ```
  */
-export const cookies: { essential: boolean; [key: string]: boolean } = {
+export const cookies: { essential: true; [key: string]: boolean } = {
 	essential: true,
 };
+
+/**
+ * Augmented by `openpolicy.gen.ts` (emitted by `@openpolicy/vite` alongside
+ * your config, meant to be committed) with one key per scanned cookie
+ * category. `defineConfig` reads this interface to require a
+ * `cookies.lawfulBasis` entry for every scanned cookie category.
+ */
+// biome-ignore lint/suspicious/noEmptyInterface: augmented by codegen
+export interface ScannedCookieKeys {}

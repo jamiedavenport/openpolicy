@@ -1,4 +1,4 @@
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -18,18 +18,36 @@ export default defineConfig({
 			"Personal Information": "To create and manage user accounts",
 			"Usage Data": "To understand product usage and improve the service",
 		},
-	},
-	legalBasis: {
-		"Providing the service": "legitimate_interests",
-		"Marketing communications": "consent",
-	},
-	retention: {
-		"Personal data": "As long as your account is active",
+		lawfulBasis: {
+			"Personal Information": LegalBases.Contract,
+			"Usage Data": LegalBases.LegitimateInterests,
+		},
+		retention: {
+			"Personal Information": "As long as your account is active",
+			"Usage Data": "90 days",
+		},
+		provisionRequirement: {
+			"Personal Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or manage your account.",
+			},
+			"Usage Data": {
+				basis: "voluntary",
+				consequences: "None — your service is unaffected.",
+			},
+		},
 	},
 	cookies: {
-		essential: true,
-		analytics: false,
-		marketing: false,
+		used: {
+			essential: true,
+			analytics: false,
+			marketing: false,
+		},
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			marketing: LegalBases.Consent,
+		},
 	},
 	thirdParties: [],
 	automatedDecisionMaking: [],

@@ -69,26 +69,60 @@ export function validatePrivacyPolicy(config: PrivacyPolicyConfig): ValidationIs
 		}
 	}
 
-	// GDPR / UK-GDPR checks: lawful basis must be stated for each distinct
-	// processing purpose (GDPR Art. 13(1)(c)).
+	// GDPR / UK-GDPR Art. 13(1)(c): lawful basis must be stated for each
+	// distinct processing purpose. Keys in data.lawfulBasis mirror
+	// data.collected, so every collected category needs a basis.
 	if (config.jurisdictions.includes("eu") || config.jurisdictions.includes("uk")) {
-		const entries = Object.entries(config.legalBasis ?? {});
-		if (entries.length === 0) {
-			issues.push({
-				code: "lawful-basis-per-purpose",
-				level: "error",
-				message:
-					"GDPR Article 13(1)(c): legalBasis must declare at least one processing purpose with its lawful basis.",
-			});
-		}
-		for (const [purpose, basis] of entries) {
+		for (const category of Object.keys(collected)) {
+			const basis = config.data.lawfulBasis[category];
 			if (!basis) {
 				issues.push({
-					code: "lawful-basis-per-purpose",
+					code: "lawful-basis-incomplete",
 					level: "error",
-					message: `GDPR Article 13(1)(c): processing purpose "${purpose}" must declare a lawful basis.`,
+					message: `GDPR Article 13(1)(c): data.lawfulBasis["${category}"] is missing — every collected category requires an Article 6 lawful basis.`,
 				});
 			}
+		}
+		for (const category of Object.keys(config.data.lawfulBasis)) {
+			if (!(category in collected)) {
+				issues.push({
+					code: "lawful-basis-orphan",
+					level: "error",
+					message: `data.lawfulBasis["${category}"] has no matching entry in data.collected — remove it or declare the collected fields`,
+				});
+			}
+		}
+
+		// GDPR / UK-GDPR Art. 13(2)(e): for each collected category, disclose
+		// whether provision is statutory, contractual, a contract-prerequisite,
+		// or voluntary, and the consequences of failure to provide it.
+		for (const category of Object.keys(collected)) {
+			const pr = config.data.provisionRequirement?.[category];
+			if (!pr || !pr.basis) {
+				issues.push({
+					code: "statutory-contractual-obligation",
+					level: "error",
+					message: `GDPR Article 13(2)(e): data.provisionRequirement["${category}"] is missing — disclose whether provision is statutory, contractual, a contract-prerequisite, or voluntary, and the consequences of failure to provide it.`,
+				});
+			} else if (typeof pr.consequences !== "string" || pr.consequences.trim().length === 0) {
+				issues.push({
+					code: "statutory-contractual-obligation",
+					level: "error",
+					message: `GDPR Article 13(2)(e): data.provisionRequirement["${category}"].consequences is empty — state the consequences of failure to provide this data.`,
+				});
+			}
+		}
+	}
+
+	// Retention must be declared for every collected category.
+	for (const category of Object.keys(collected)) {
+		const period = config.data.retention[category];
+		if (period === undefined || period.trim().length === 0) {
+			issues.push({
+				code: "retention-incomplete",
+				level: "error",
+				message: `data.retention["${category}"] is missing — declare a retention period for every collected category.`,
+			});
 		}
 	}
 

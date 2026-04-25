@@ -35,8 +35,9 @@ export type LegalBasis =
 	| "legitimate_interests";
 
 // GDPR Art. 13(1)(c) requires the lawful basis to be stated for each
-// distinct processing purpose — keys are human-readable purpose names,
-// values are the Article 6 basis that applies to that purpose.
+// distinct processing purpose. Keys mirror `DataConfig.collected` so every
+// declared data category carries its Article 6 basis; the renderer joins
+// the matching `purposes[category]` entry into the rendered chain.
 export type LegalBasisMap = Record<string, LegalBasis>;
 
 // GDPR Art. 13(2)(f) requires disclosing each automated-decision-making
@@ -54,12 +55,22 @@ export type Dpo =
 	| { email: string; name?: string; phone?: string; address?: string }
 	| { required: false; reason?: string };
 
+// Art. 27 GDPR designated representative — required for non-EEA controllers
+// subject to GDPR via Art. 3(2). Optional because EEA-established controllers
+// do not need to designate one.
+export type EuRepresentative = {
+	name: string;
+	address: string;
+	email: string;
+};
+
 export type CompanyConfig = {
 	name: string;
 	legalName: string;
 	address: string;
 	contact: string;
 	dpo?: Dpo;
+	euRepresentative?: EuRepresentative;
 };
 
 export type EffectiveDate = `${number}-${number}-${number}`;
@@ -68,12 +79,31 @@ export type DataCollection = Record<string, string[]>;
 
 export type Purposes = Record<string, string>;
 
+export type Retention = Record<string, string>;
+
+// GDPR Art. 13(2)(e) — for each collected category, disclose whether
+// provision of the data is required, and the consequences of failing to
+// provide it. Keys mirror `DataConfig.collected`.
+export type ProvisionBasis =
+	| "statutory" //              Required by law (e.g. tax record-keeping)
+	| "contractual" //            Required under an existing contract
+	| "contract-prerequisite" //  Necessary to enter into a contract
+	| "voluntary"; //             Optional — provision is not required
+
+export type ProvisionRequirement = {
+	basis: ProvisionBasis;
+	consequences: string;
+};
+
+export type ProvisionRequirementMap = Record<string, ProvisionRequirement>;
+
 export type DataConfig = {
 	collected: DataCollection;
 	purposes: Purposes;
+	lawfulBasis: LegalBasisMap;
+	retention: Retention;
+	provisionRequirement: ProvisionRequirementMap;
 };
-
-export type Retention = Record<string, string>;
 
 export type ThirdParty = { name: string; purpose: string; policyUrl?: string };
 
@@ -82,9 +112,14 @@ export type ChildrenConfig = {
 	noticeUrl?: string;
 };
 
-export type CookiePolicyCookies = {
-	essential: boolean;
+export type CookieUsage = {
+	essential: true;
 	[key: string]: boolean;
+};
+
+export type CookiePolicyCookies = {
+	used: CookieUsage;
+	lawfulBasis: LegalBasisMap;
 };
 
 export type TrackingTechnology = string;
@@ -101,8 +136,6 @@ export type PrivacyPolicyConfig = {
 	effectiveDate: EffectiveDate;
 	company: CompanyConfig;
 	data: DataConfig;
-	legalBasis: LegalBasisMap;
-	retention: Retention;
 	cookies: CookiePolicyCookies;
 	thirdParties: ThirdParty[];
 	userRights: UserRight[];
@@ -135,8 +168,6 @@ export type OpenPolicyConfig = {
 
 	// Data handling — feeds the privacy policy.
 	data?: DataConfig;
-	legalBasis?: LegalBasisMap;
-	retention?: Retention;
 	children?: ChildrenConfig;
 	thirdParties?: ThirdParty[];
 	automatedDecisionMaking?: AutomatedDecisionMaking;

@@ -1,4 +1,4 @@
-import { cookies, dataCollected, defineConfig, thirdParties } from "@openpolicy/sdk";
+import { cookies, dataCollected, defineConfig, LegalBases, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -18,16 +18,33 @@ export default defineConfig({
 			"Account Information": "To authenticate users and send service notifications",
 			"Usage Data": "To understand product usage and improve the service",
 		},
+		lawfulBasis: {
+			"Account Information": LegalBases.Contract,
+			"Usage Data": LegalBases.LegitimateInterests,
+		},
+		retention: {
+			"Account Information": "Until account deletion",
+			"Usage Data": "90 days",
+		},
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+			"Usage Data": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot deliver or secure the service.",
+			},
+		},
 	},
-	legalBasis: {
-		"Providing the service": "contract",
-		"Marketing emails": "consent",
+	cookies: {
+		used: cookies,
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			marketing: LegalBases.Consent,
+		},
 	},
-	retention: {
-		"Account data": "Until account deletion",
-		"Usage logs": "90 days",
-	},
-	cookies,
 	thirdParties,
 	trackingTechnologies: ["web beacons", "local storage"],
 	consentMechanism: {

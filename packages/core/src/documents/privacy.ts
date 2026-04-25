@@ -1,6 +1,6 @@
 import type { PrivacyPolicyConfig } from "../types";
 import { bold, heading, li, link, p, section, ul } from "./helpers";
-import type { ContentNode, DocumentSection, InlineNode } from "./types";
+import type { ContentNode, DocumentSection, InlineNode, ListItemNode } from "./types";
 
 const LEGAL_BASIS_LABELS: Record<string, string> = {
 	consent: "Consent (Article 6(1)(a))",
@@ -9,6 +9,13 @@ const LEGAL_BASIS_LABELS: Record<string, string> = {
 	vital_interests: "Protection of vital interests (Article 6(1)(d))",
 	public_task: "Performance of a public task (Article 6(1)(e))",
 	legitimate_interests: "Legitimate interests (Article 6(1)(f))",
+};
+
+const PROVISION_BASIS_LABELS: Record<string, string> = {
+	statutory: "Required by law",
+	contractual: "Required under our contract with you",
+	"contract-prerequisite": "Required to enter into a contract",
+	voluntary: "Voluntary",
 };
 
 const RIGHTS_LABELS: Record<string, string> = {
@@ -71,7 +78,7 @@ function buildDataCollected(config: PrivacyPolicyConfig): DocumentSection {
 
 function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
 	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
-	const entries = Object.entries(config.legalBasis);
+	const entries = Object.entries(config.data.lawfulBasis);
 	if (entries.length === 0) return null;
 	const content: ContentNode[] = [
 		heading("Legal Basis for Processing", {
@@ -79,19 +86,34 @@ function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
 		}),
 		p(["Under GDPR Article 6, we rely on the following lawful bases for each processing purpose:"]),
 	];
-	for (const [purpose, basis] of entries) {
+	for (const [category, basis] of entries) {
 		const label = LEGAL_BASIS_LABELS[basis] ?? basis;
-		content.push(p([bold(purpose), " — ", label]));
-	}
-	if (entries.some(([, basis]) => basis === "consent")) {
-		content.push(
-			p([
-				bold("Right to withdraw consent."),
-				` Where we rely on your consent, you may withdraw it at any time by contacting us at ${config.company.contact}. Withdrawing consent does not affect the lawfulness of any processing we carried out before you withdrew it.`,
-			]),
-		);
+		const purpose = config.data.purposes[category];
+		const line: (string | InlineNode)[] = [bold(category)];
+		if (purpose) line.push(" — used for ", purpose);
+		line.push(" — ", label);
+		content.push(p(line));
 	}
 	return section("legal-basis", content);
+}
+
+function usesConsent(config: PrivacyPolicyConfig): boolean {
+	if (Object.values(config.data.lawfulBasis).some((b) => b === "consent")) return true;
+	if (Object.values(config.cookies.lawfulBasis).some((b) => b === "consent")) return true;
+	return false;
+}
+
+function buildConsentWithdrawal(config: PrivacyPolicyConfig): DocumentSection | null {
+	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
+	if (!usesConsent(config)) return null;
+	return section("consent-withdrawal", [
+		heading("Right to Withdraw Consent", {
+			reason: "Required by GDPR Article 7(3) and Article 13(2)(c)",
+		}),
+		p([
+			`Where we rely on your consent for any processing of your personal data, you have the right to withdraw that consent at any time by contacting us at ${config.company.contact}. Withdrawing your consent does not affect the lawfulness of any processing we carried out before you withdrew it. Where consent is required to provide a particular feature or service, withdrawing it may mean we are no longer able to offer that feature or service.`,
+		]),
+	]);
 }
 
 function buildAutomatedDecisionMaking(config: PrivacyPolicyConfig): DocumentSection | null {
@@ -134,7 +156,7 @@ function buildAutomatedDecisionMaking(config: PrivacyPolicyConfig): DocumentSect
 }
 
 function buildDataRetention(config: PrivacyPolicyConfig): DocumentSection {
-	const items = Object.entries(config.retention).map(([category, period]) =>
+	const items = Object.entries(config.data.retention).map(([category, period]) =>
 		li([bold(category), ": ", period]),
 	);
 	return section("data-retention", [
@@ -144,16 +166,58 @@ function buildDataRetention(config: PrivacyPolicyConfig): DocumentSection {
 	]);
 }
 
-function buildCookies(config: PrivacyPolicyConfig): DocumentSection {
-	const enabled: string[] = [];
-	if (config.cookies.essential)
-		enabled.push("Essential cookies — required for the service to function");
-	if (config.cookies.analytics)
-		enabled.push("Analytics cookies — help us understand how the service is used");
-	if (config.cookies.marketing)
-		enabled.push("Marketing cookies — used to deliver relevant advertisements");
+function buildProvisionRequirement(config: PrivacyPolicyConfig): DocumentSection | null {
+	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
+	const entries = Object.entries(config.data.provisionRequirement);
+	if (entries.length === 0) return null;
+	const content: ContentNode[] = [
+		heading("Whether You Are Required to Provide This Data", {
+			reason: "Required by GDPR and UK-GDPR Article 13(2)(e)",
+		}),
+		p([
+			"For each category of personal data we collect, we set out below whether you are required to provide it — by law, under our contract with you, or as a precondition to entering into a contract — or whether provision is voluntary, together with the consequences of failing to provide it.",
+		]),
+	];
+	for (const [category, requirement] of entries) {
+		const label = PROVISION_BASIS_LABELS[requirement.basis] ?? requirement.basis;
+		content.push(
+			p([
+				bold(category),
+				" \u2014 ",
+				label,
+				" \u2014 ",
+				bold("Consequences:"),
+				" ",
+				requirement.consequences,
+			]),
+		);
+	}
+	return section("provision-requirement", content);
+}
 
-	if (enabled.length === 0) {
+const COOKIE_CATEGORY_LABELS: Record<string, string> = {
+	essential: "Essential cookies — required for the service to function",
+	analytics: "Analytics cookies — help us understand how the service is used",
+	functional: "Functional cookies — remember your preferences and settings",
+	marketing: "Marketing cookies — used to deliver relevant advertisements",
+};
+
+function cookieCategoryLabel(key: string): string {
+	return COOKIE_CATEGORY_LABELS[key] ?? `${key} cookies`;
+}
+
+function buildCookies(config: PrivacyPolicyConfig): DocumentSection {
+	const items: ListItemNode[] = [];
+	for (const [key, enabled] of Object.entries(config.cookies.used)) {
+		if (!enabled) continue;
+		const label = cookieCategoryLabel(key);
+		const basis = config.cookies.lawfulBasis[key];
+		const inline: (string | InlineNode)[] = [label];
+		if (basis) inline.push(" — ", LEGAL_BASIS_LABELS[basis] ?? basis);
+		items.push(li(inline));
+	}
+
+	if (items.length === 0) {
 		return section("cookies", [
 			heading("Cookies and Tracking"),
 			p(["We do not use cookies or similar tracking technologies."]),
@@ -162,7 +226,7 @@ function buildCookies(config: PrivacyPolicyConfig): DocumentSection {
 	return section("cookies", [
 		heading("Cookies and Tracking"),
 		p(["We use the following types of cookies and tracking technologies:"]),
-		ul(enabled.map((e) => li([e]))),
+		ul(items),
 	]);
 }
 
@@ -223,9 +287,19 @@ function dpoParagraph(config: PrivacyPolicyConfig): ContentNode {
 	]);
 }
 
+function euRepresentativeParagraph(config: PrivacyPolicyConfig): ContentNode | null {
+	const rep = config.company.euRepresentative;
+	if (!rep) return null;
+	return p([
+		"Our representative in the European Union for the purposes of Article 27 GDPR is ",
+		bold(rep.name),
+		`, ${rep.address}, ${rep.email}.`,
+	]);
+}
+
 function buildGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | null {
 	if (!config.jurisdictions.includes("eu")) return null;
-	return section("gdpr-supplement", [
+	const content: ContentNode[] = [
 		heading("GDPR Supplemental Disclosures", {
 			reason: "Required by GDPR Article 13",
 		}),
@@ -235,12 +309,27 @@ function buildGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | nul
 		p(["Data Controller: ", bold(config.company.legalName), `, ${config.company.address}`]),
 		dpoParagraph(config),
 		p([
-			"In addition to the rights listed above, you have the right to lodge a complaint with your local data protection authority if you believe we have not handled your data in accordance with applicable law.",
+			"You have the right to lodge a complaint with the data protection supervisory authority in your country of residence, place of work, or place of the alleged infringement. A list of EEA supervisory authorities is available at ",
+			link(
+				"https://edpb.europa.eu/about-edpb/about-edpb/members_en",
+				"edpb.europa.eu/about-edpb/about-edpb/members_en",
+			),
+			".",
 		]),
 		p([
-			"If we transfer your personal data outside the EEA, we ensure adequate safeguards are in place in accordance with GDPR requirements.",
+			"Where we transfer your personal data outside the EEA, we rely on one or more of the safeguards permitted under Chapter V of the GDPR: (a) transfers to countries the European Commission has determined provide an adequate level of data protection (the current list is published at ",
+			link(
+				"https://commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en",
+				"commission.europa.eu/.../adequacy-decisions_en",
+			),
+			"); (b) Standard Contractual Clauses (SCCs) adopted by the European Commission under Article 46(2)(c); and (c) Binding Corporate Rules approved under Article 47 where applicable. You may request further information about the specific safeguards applied to a particular transfer by contacting us at ",
+			config.company.contact,
+			".",
 		]),
-	]);
+	];
+	const rep = euRepresentativeParagraph(config);
+	if (rep) content.push(rep);
+	return section("gdpr-supplement", content);
 }
 
 function buildUkGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | null {
@@ -310,8 +399,10 @@ const SECTION_BUILDERS: ((config: PrivacyPolicyConfig) => DocumentSection | null
 	buildChildrenPrivacy,
 	buildDataCollected,
 	buildLegalBasis,
+	buildConsentWithdrawal,
 	buildAutomatedDecisionMaking,
 	buildDataRetention,
+	buildProvisionRequirement,
 	buildCookies,
 	buildThirdParties,
 	buildUserRights,
