@@ -35,14 +35,26 @@ export function validateCookiePolicy(config: CookiePolicyConfig): ValidationIssu
 			message: "company.contact is required",
 		});
 
-	const { essential, analytics, functional, marketing } = config.cookies;
-	if (!essential && !analytics && !functional && !marketing) {
+	const used = config.cookies.used;
+	const enabledKeys = Object.entries(used)
+		.filter(([, enabled]) => enabled)
+		.map(([key]) => key);
+	if (enabledKeys.length === 0) {
 		issues.push({
 			code: "cookies-empty",
 			level: "error",
 			message:
 				"At least one cookie type must be enabled (essential, analytics, functional, or marketing)",
 		});
+	}
+	for (const key of enabledKeys) {
+		if (!config.cookies.lawfulBasis?.[key]) {
+			issues.push({
+				code: "cookie-lawful-basis-missing",
+				level: "error",
+				message: `cookies.lawfulBasis["${key}"] is missing — every enabled cookie category requires an Article 6 lawful basis.`,
+			});
+		}
 	}
 
 	// Advisory checks

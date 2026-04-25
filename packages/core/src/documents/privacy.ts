@@ -1,6 +1,6 @@
 import type { PrivacyPolicyConfig } from "../types";
 import { bold, heading, li, link, p, section, ul } from "./helpers";
-import type { ContentNode, DocumentSection, InlineNode } from "./types";
+import type { ContentNode, DocumentSection, InlineNode, ListItemNode } from "./types";
 
 const LEGAL_BASIS_LABELS: Record<string, string> = {
 	consent: "Consent (Article 6(1)(a))",
@@ -71,7 +71,7 @@ function buildDataCollected(config: PrivacyPolicyConfig): DocumentSection {
 
 function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
 	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
-	const entries = Object.entries(config.legalBasis);
+	const entries = Object.entries(config.data.lawfulBasis);
 	if (entries.length === 0) return null;
 	const content: ContentNode[] = [
 		heading("Legal Basis for Processing", {
@@ -79,9 +79,13 @@ function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
 		}),
 		p(["Under GDPR Article 6, we rely on the following lawful bases for each processing purpose:"]),
 	];
-	for (const [purpose, basis] of entries) {
+	for (const [category, basis] of entries) {
 		const label = LEGAL_BASIS_LABELS[basis] ?? basis;
-		content.push(p([bold(purpose), " — ", label]));
+		const purpose = config.data.purposes[category];
+		const line: (string | InlineNode)[] = [bold(category)];
+		if (purpose) line.push(" — used for ", purpose);
+		line.push(" — ", label);
+		content.push(p(line));
 	}
 	if (entries.some(([, basis]) => basis === "consent")) {
 		content.push(
@@ -134,7 +138,7 @@ function buildAutomatedDecisionMaking(config: PrivacyPolicyConfig): DocumentSect
 }
 
 function buildDataRetention(config: PrivacyPolicyConfig): DocumentSection {
-	const items = Object.entries(config.retention).map(([category, period]) =>
+	const items = Object.entries(config.data.retention).map(([category, period]) =>
 		li([bold(category), ": ", period]),
 	);
 	return section("data-retention", [
@@ -144,16 +148,29 @@ function buildDataRetention(config: PrivacyPolicyConfig): DocumentSection {
 	]);
 }
 
-function buildCookies(config: PrivacyPolicyConfig): DocumentSection {
-	const enabled: string[] = [];
-	if (config.cookies.essential)
-		enabled.push("Essential cookies — required for the service to function");
-	if (config.cookies.analytics)
-		enabled.push("Analytics cookies — help us understand how the service is used");
-	if (config.cookies.marketing)
-		enabled.push("Marketing cookies — used to deliver relevant advertisements");
+const COOKIE_CATEGORY_LABELS: Record<string, string> = {
+	essential: "Essential cookies — required for the service to function",
+	analytics: "Analytics cookies — help us understand how the service is used",
+	functional: "Functional cookies — remember your preferences and settings",
+	marketing: "Marketing cookies — used to deliver relevant advertisements",
+};
 
-	if (enabled.length === 0) {
+function cookieCategoryLabel(key: string): string {
+	return COOKIE_CATEGORY_LABELS[key] ?? `${key} cookies`;
+}
+
+function buildCookies(config: PrivacyPolicyConfig): DocumentSection {
+	const items: ListItemNode[] = [];
+	for (const [key, enabled] of Object.entries(config.cookies.used)) {
+		if (!enabled) continue;
+		const label = cookieCategoryLabel(key);
+		const basis = config.cookies.lawfulBasis[key];
+		const inline: (string | InlineNode)[] = [label];
+		if (basis) inline.push(" — ", LEGAL_BASIS_LABELS[basis] ?? basis);
+		items.push(li(inline));
+	}
+
+	if (items.length === 0) {
 		return section("cookies", [
 			heading("Cookies and Tracking"),
 			p(["We do not use cookies or similar tracking technologies."]),
@@ -162,7 +179,7 @@ function buildCookies(config: PrivacyPolicyConfig): DocumentSection {
 	return section("cookies", [
 		heading("Cookies and Tracking"),
 		p(["We use the following types of cookies and tracking technologies:"]),
-		ul(enabled.map((e) => li([e]))),
+		ul(items),
 	]);
 }
 

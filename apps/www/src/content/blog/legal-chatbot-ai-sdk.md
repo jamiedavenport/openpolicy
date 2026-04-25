@@ -21,7 +21,7 @@ OpenPolicy starts with a typed configuration object. You declare facts about you
 
 ```ts
 // openpolicy.ts
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -29,8 +29,14 @@ export default defineConfig({
 		legalName: "Your Company, Inc.",
 		contact: "privacy@yourcompany.com",
 	},
+	effectiveDate: "2026-01-01",
 	jurisdictions: ["us-ca"],
-	dataCollected: { "Personal Information": ["Full name", "Email address"] },
+	data: {
+		collected: { "Personal Information": ["Full name", "Email address"] },
+		purposes: { "Personal Information": "To create and manage user accounts" },
+		lawfulBasis: { "Personal Information": LegalBases.Contract },
+		retention: { "Personal Information": "Until account deletion" },
+	},
 });
 ```
 

@@ -876,6 +876,22 @@ test("buildStart writes openpolicy.gen.ts with scanned keys", async () => {
 	expect(dts).toContain("interface ScannedCollectionKeys");
 	expect(dts).toContain('"Account Information": true');
 	expect(dts).toContain('"Session Data": true');
+	expect(dts).toContain("interface ScannedCookieKeys");
+});
+
+test("buildStart includes scanned cookie keys in ScannedCookieKeys", async () => {
+	await touch(
+		"src/cookies.ts",
+		`import { defineCookie } from "@openpolicy/sdk";\n` +
+			`defineCookie("analytics");\n` +
+			`defineCookie("marketing");\n`,
+	);
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp);
+	const dts = await readFile(join(tmp, "openpolicy.gen.ts"), "utf8");
+	expect(dts).toContain("interface ScannedCookieKeys");
+	expect(dts).toContain('"analytics": true');
+	expect(dts).toContain('"marketing": true');
 });
 
 test("buildStart writes an empty ScannedCollectionKeys interface when no calls are found", async () => {

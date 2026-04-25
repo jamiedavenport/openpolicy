@@ -16,10 +16,10 @@ When you write `defineConfig({ ... })`, you're not producing a document. You're 
 ```ts
 import openpolicy from "@/lib/openpolicy";
 
-const { dataCollected, thirdParties, cookies } = openpolicy;
+const { data, thirdParties, cookies } = openpolicy;
 ```
 
-Those three fields are the same ones that feed `<PrivacyPolicy />`. They're also already populated by auto-collect: every `collecting()` call in your codebase contributes to `dataCollected`, every `thirdParty()` call (or matched `package.json` entry) contributes to `thirdParties`, and every `<ConsentGate>` or `useCookies().has()` lookup contributes to `cookies`.
+Those three fields are the same ones that feed `<PrivacyPolicy />`. They're also already populated by auto-collect: every `collecting()` call in your codebase contributes to `data.collected`, every `thirdParty()` call (or matched `package.json` entry) contributes to `thirdParties`, and every `<ConsentGate>` or `useCookies().has()` lookup contributes to `cookies.used`.
 
 That means any UI you build on top of them inherits the same guarantee: change your product, and the UI updates on the next build. No second source of truth, no separate content CMS, no drift.
 
@@ -29,19 +29,19 @@ Here are four patterns teams are building on top of the same primitives. None of
 
 ### 1. An onboarding transparency wizard
 
-![The onboarding wizard in the TanStack example — a four-step tour through dataCollected, thirdParties, and cookies](../../assets/onboarding-wizard.png)
+![The onboarding wizard in the TanStack example — a four-step tour through data.collected, thirdParties, and cookies](../../assets/onboarding-wizard.png)
 
 The first time a user signs up, walk them through what you collect, who you share it with, and what cookies you set. Not as a wall of legalese — as a short, friendly tour.
 
 ```tsx
 import openpolicy from "@/lib/openpolicy";
 
-const { dataCollected, thirdParties, cookies } = openpolicy;
+const { data, thirdParties, cookies } = openpolicy;
 
 // Step 2 of your wizard
 <section>
 	<h2>What we collect</h2>
-	{Object.entries(dataCollected).map(([category, fields]) => (
+	{Object.entries(data.collected).map(([category, fields]) => (
 		<div key={category}>
 			<h3>{category}</h3>
 			<ul>
@@ -64,12 +64,12 @@ Add a new field to a user schema with `collecting()` and it shows up in the wiza
 import openpolicy from "@/lib/openpolicy";
 
 export function TransparencyPanel() {
-	const { dataCollected, thirdParties } = openpolicy;
+	const { data, thirdParties } = openpolicy;
 	return (
 		<section>
 			<h2>Your data</h2>
 			<p>Here's everything we collect and who we share it with.</p>
-			<DataList data={dataCollected} />
+			<DataList data={data.collected} />
 			<ServiceList services={thirdParties} />
 			<a href="/privacy">Full policy</a>
 		</section>
@@ -86,7 +86,7 @@ The strongest signal of trust isn't a page in your footer. It's a short sentence
 ```tsx
 // Somewhere near a signup form
 const category = "Account Information";
-const fields = openpolicy.dataCollected?.[category] ?? [];
+const fields = openpolicy.data?.collected?.[category] ?? [];
 
 <p className="text-xs text-muted-foreground">
 	We'll store your {fields.join(", ").toLowerCase()} to create your account. See the{" "}
@@ -129,13 +129,13 @@ Build the privacy page. Build the cookie banner. Then keep going — onboarding,
 
 ## Where the primitives live
 
-| Primitive       | What it gives you                                   | Where it comes from                                     |
-| --------------- | --------------------------------------------------- | ------------------------------------------------------- |
-| `dataCollected` | `Record<string, string[]>` of categories and fields | `collecting()` calls + manual entries                   |
-| `thirdParties`  | `{ name, purpose, policyUrl? }[]`                   | `thirdParty()` calls + `usePackageJson` detection       |
-| `cookies`       | `{ essential, [category]: boolean }`                | `<ConsentGate>` + `useCookies().has()` + manual entries |
-| `useCookies()`  | React hook: consent state, toggles, route           | `<OpenPolicy>` provider                                 |
-| `<ConsentGate>` | Conditional render by consent expression            | `<OpenPolicy>` provider                                 |
+| Primitive        | What it gives you                                   | Where it comes from                                     |
+| ---------------- | --------------------------------------------------- | ------------------------------------------------------- |
+| `data.collected` | `Record<string, string[]>` of categories and fields | `collecting()` calls + manual entries                   |
+| `thirdParties`   | `{ name, purpose, policyUrl? }[]`                   | `thirdParty()` calls + `usePackageJson` detection       |
+| `cookies.used`   | `{ essential: true, [category]: boolean }`          | `<ConsentGate>` + `useCookies().has()` + manual entries |
+| `useCookies()`   | React hook: consent state, toggles, route           | `<OpenPolicy>` provider                                 |
+| `<ConsentGate>`  | Conditional render by consent expression            | `<OpenPolicy>` provider                                 |
 
 All of them read from the same `openpolicy.ts`. All of them update together when you change it.
 

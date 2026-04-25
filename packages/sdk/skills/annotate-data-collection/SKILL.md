@@ -22,7 +22,7 @@ This skill builds on openpolicy/vite-setup. Read it first.
 
 `collecting(category, value, labels)` is a **pass-through at runtime** — it returns `value` unchanged. Its purpose is to serve as a static marker. During a Vite build, `openPolicy()` scans your source files using oxc-parser, finds every `collecting()` call, and merges the extracted category/label data into the `dataCollected` virtual module exported from `@openpolicy/sdk`.
 
-The scanned data only reaches your policy config if you import the `dataCollected` sentinel and spread it into the top-level `dataCollected` field. Without the spread, all collected annotations are silently discarded.
+The scanned data only reaches your policy config if you import the `dataCollected` sentinel and spread it into `data.collected`. Without the spread, all collected annotations are silently discarded. Every scanned category must also appear in `data.purposes`, `data.lawfulBasis`, and `data.retention` — `defineConfig`'s generic enforces this against the augmented `ScannedCollectionKeys` interface emitted into `openpolicy.gen.ts`.
 
 **Critical constraint: every argument that the plugin reads must be a string literal.** The AST scanner does not evaluate expressions. Variables, template literals, and computed values are silently skipped with no warning.
 
@@ -51,7 +51,7 @@ export async function createUser(name: string, email: string) {
 
 ```ts
 // openpolicy.ts
-import { defineConfig, dataCollected } from "@openpolicy/sdk";
+import { dataCollected, defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -61,9 +61,12 @@ export default defineConfig({
 		contact: "privacy@acme.com",
 	},
 	effectiveDate: "2026-01-01",
-	dataCollected: {
-		...dataCollected, // populated by openPolicy() at build time
-		// add manually-tracked categories here if needed
+	jurisdictions: ["eu"],
+	data: {
+		collected: { ...dataCollected }, // populated by openPolicy() at build time
+		purposes: { "Account Information": "To create and manage user accounts" },
+		lawfulBasis: { "Account Information": LegalBases.Contract },
+		retention: { "Account Information": "Until account deletion" },
 	},
 });
 ```
@@ -137,10 +140,10 @@ Note: `DataCategories` values are objects for spreading into `dataCollected` man
 
 ### 3. Spreading the sentinel into config
 
-The sentinel must be spread with `...dataCollected` — not assigned directly. You can add manually-tracked categories alongside the auto-collected ones.
+The sentinel must be spread with `...dataCollected` inside `data.collected` — not assigned directly. You can add manually-tracked categories alongside the auto-collected ones, but every category (auto or manual) must appear in the three sibling maps too.
 
 ```ts
-import { defineConfig, dataCollected } from "@openpolicy/sdk";
+import { dataCollected, defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -148,10 +151,23 @@ export default defineConfig({
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "us-ca"],
-	legalBasis: { "Providing the service": "legitimate_interests" },
-	dataCollected: {
-		...dataCollected, // auto-collected at build time
-		Analytics: ["Page views", "Click events"], // manually declared
+	data: {
+		collected: {
+			...dataCollected, // auto-collected at build time
+			Analytics: ["Page views", "Click events"], // manually declared
+		},
+		purposes: {
+			"Account Information": "To create and manage user accounts",
+			Analytics: "To understand product usage",
+		},
+		lawfulBasis: {
+			"Account Information": LegalBases.Contract,
+			Analytics: LegalBases.LegitimateInterests,
+		},
+		retention: {
+			"Account Information": "Until account deletion",
+			Analytics: "90 days",
+		},
 	},
 	automatedDecisionMaking: [],
 });
@@ -185,25 +201,31 @@ The `value` argument (second position) is never read by the scanner and can be a
 
 ### MISTAKE 2 (HIGH) — Not spreading `dataCollected` into the config
 
-Even with `collecting()` calls throughout your codebase and `openPolicy()` wired up in Vite, the plugin output has no effect unless you import `dataCollected` from `@openpolicy/sdk` and spread it into the top-level `dataCollected` field. Without the spread the sentinel is an empty object `{}` and the policy compiles with no auto-collected data.
+Even with `collecting()` calls throughout your codebase and `openPolicy()` wired up in Vite, the plugin output has no effect unless you import `dataCollected` from `@openpolicy/sdk` and spread it into `data.collected`. Without the spread the sentinel is an empty object `{}` and the policy compiles with no auto-collected data.
 
 ```ts
 // WRONG: sentinel not imported or spread
 export default defineConfig({
-	dataCollected: {
-		"Account Information": ["Email"], // only manually-declared items appear
+	data: {
+		collected: { "Account Information": ["Email"] }, // only manually-declared items appear
+		// ...
 	},
 });
 ```
 
 ```ts
 // CORRECT: sentinel imported and spread
-import { defineConfig, dataCollected } from "@openpolicy/sdk";
+import { dataCollected, defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
-	dataCollected: {
-		...dataCollected, // auto-collected entries merged here
-		"Account Information": ["Email"], // any manual additions
+	data: {
+		collected: {
+			...dataCollected, // auto-collected entries merged here
+			"Account Information": ["Email"], // any manual additions
+		},
+		purposes: { "Account Information": "Account creation" },
+		lawfulBasis: { "Account Information": LegalBases.Contract },
+		retention: { "Account Information": "Until account deletion" },
 	},
 });
 ```

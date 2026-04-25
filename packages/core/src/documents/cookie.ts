@@ -23,30 +23,37 @@ function buildWhatAreCookies(): DocumentSection {
 	]);
 }
 
+const COOKIE_TYPE_LABELS: Record<string, { label: string; description: string }> = {
+	essential: {
+		label: "Essential Cookies",
+		description: "Required for the basic functioning of our services. These cannot be disabled.",
+	},
+	analytics: {
+		label: "Analytics Cookies",
+		description:
+			"Help us understand how visitors interact with our services so we can improve them.",
+	},
+	functional: {
+		label: "Functional Cookies",
+		description:
+			"Enable enhanced functionality and personalisation, such as remembering your preferences.",
+	},
+	marketing: {
+		label: "Marketing Cookies",
+		description: "Used to deliver advertisements more relevant to you and your interests.",
+	},
+};
+
 function buildTypes(config: CookiePolicyConfig): DocumentSection {
 	const types: { label: string; description: string }[] = [];
-	if (config.cookies.essential)
-		types.push({
-			label: "Essential Cookies",
-			description: "Required for the basic functioning of our services. These cannot be disabled.",
-		});
-	if (config.cookies.analytics)
-		types.push({
-			label: "Analytics Cookies",
-			description:
-				"Help us understand how visitors interact with our services so we can improve them.",
-		});
-	if (config.cookies.functional)
-		types.push({
-			label: "Functional Cookies",
-			description:
-				"Enable enhanced functionality and personalisation, such as remembering your preferences.",
-		});
-	if (config.cookies.marketing)
-		types.push({
-			label: "Marketing Cookies",
-			description: "Used to deliver advertisements more relevant to you and your interests.",
-		});
+	for (const [key, enabled] of Object.entries(config.cookies.used)) {
+		if (!enabled) continue;
+		const meta = COOKIE_TYPE_LABELS[key] ?? {
+			label: `${key.charAt(0).toUpperCase()}${key.slice(1)} Cookies`,
+			description: "",
+		};
+		types.push(meta);
+	}
 
 	if (types.length === 0) {
 		return section("cookie-types", [

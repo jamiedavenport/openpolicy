@@ -35,8 +35,9 @@ export type LegalBasis =
 	| "legitimate_interests";
 
 // GDPR Art. 13(1)(c) requires the lawful basis to be stated for each
-// distinct processing purpose — keys are human-readable purpose names,
-// values are the Article 6 basis that applies to that purpose.
+// distinct processing purpose. Keys mirror `DataConfig.collected` so every
+// declared data category carries its Article 6 basis; the renderer joins
+// the matching `purposes[category]` entry into the rendered chain.
 export type LegalBasisMap = Record<string, LegalBasis>;
 
 // GDPR Art. 13(2)(f) requires disclosing each automated-decision-making
@@ -68,12 +69,14 @@ export type DataCollection = Record<string, string[]>;
 
 export type Purposes = Record<string, string>;
 
+export type Retention = Record<string, string>;
+
 export type DataConfig = {
 	collected: DataCollection;
 	purposes: Purposes;
+	lawfulBasis: LegalBasisMap;
+	retention: Retention;
 };
-
-export type Retention = Record<string, string>;
 
 export type ThirdParty = { name: string; purpose: string; policyUrl?: string };
 
@@ -82,9 +85,14 @@ export type ChildrenConfig = {
 	noticeUrl?: string;
 };
 
-export type CookiePolicyCookies = {
-	essential: boolean;
+export type CookieUsage = {
+	essential: true;
 	[key: string]: boolean;
+};
+
+export type CookiePolicyCookies = {
+	used: CookieUsage;
+	lawfulBasis: LegalBasisMap;
 };
 
 export type TrackingTechnology = string;
@@ -101,8 +109,6 @@ export type PrivacyPolicyConfig = {
 	effectiveDate: EffectiveDate;
 	company: CompanyConfig;
 	data: DataConfig;
-	legalBasis: LegalBasisMap;
-	retention: Retention;
 	cookies: CookiePolicyCookies;
 	thirdParties: ThirdParty[];
 	userRights: UserRight[];
@@ -135,8 +141,6 @@ export type OpenPolicyConfig = {
 
 	// Data handling — feeds the privacy policy.
 	data?: DataConfig;
-	legalBasis?: LegalBasisMap;
-	retention?: Retention;
 	children?: ChildrenConfig;
 	thirdParties?: ThirdParty[];
 	automatedDecisionMaking?: AutomatedDecisionMaking;

@@ -22,7 +22,7 @@ Create a single `openpolicy.ts` at the root of your project. The unified `define
 
 ```ts
 // openpolicy.ts
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -33,17 +33,23 @@ export default defineConfig({
 	},
 	effectiveDate: "2026-03-13",
 	jurisdictions: ["eu", "us-ca"],
-	dataCollected: {
-		"Account information": ["Email address", "Display name"],
-		"Usage data": ["Pages visited", "Session duration"],
-	},
-	legalBasis: {
-		"Providing the service": "legitimate_interests",
-		"Marketing communications": "consent",
-	},
-	retention: {
-		"Account data": "Until account deletion",
-		"Analytics data": "13 months",
+	data: {
+		collected: {
+			"Account information": ["Email address", "Display name"],
+			"Usage data": ["Pages visited", "Session duration"],
+		},
+		purposes: {
+			"Account information": "To create and manage user accounts",
+			"Usage data": "To understand product usage and improve the service",
+		},
+		lawfulBasis: {
+			"Account information": LegalBases.Contract,
+			"Usage data": LegalBases.LegitimateInterests,
+		},
+		retention: {
+			"Account information": "Until account deletion",
+			"Usage data": "13 months",
+		},
 	},
 	thirdParties: [
 		{
@@ -54,10 +60,13 @@ export default defineConfig({
 		{ name: "Vercel", purpose: "Hosting and edge delivery" },
 	],
 	cookies: {
-		essential: true,
-		analytics: true,
-		functional: false,
-		marketing: false,
+		used: { essential: true, analytics: true, functional: false, marketing: false },
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			functional: LegalBases.Consent,
+			marketing: LegalBases.Consent,
+		},
 	},
 	consentMechanism: {
 		hasBanner: true,

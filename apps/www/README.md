@@ -17,8 +17,8 @@ OpenPolicy treats policies like code: they live in your repo, they're reviewed i
 **1. Define your policy in TypeScript**
 
 ```ts
-// policy.ts
-import { defineConfig } from "@openpolicy/sdk";
+// openpolicy.ts
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -27,28 +27,38 @@ export default defineConfig({
 		address: "123 Market St, San Francisco, CA 94105",
 		contact: "privacy@acme.com",
 	},
-	privacy: {
-		effectiveDate: "2026-01-01",
-		dataCollected: {
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["us-ca"],
+	data: {
+		collected: {
 			"Account Information": ["Email", "Name"],
 			"Usage Data": ["IP address", "Browser", "Pages visited"],
 		},
-		legalBasis: "Legitimate interests and consent",
+		purposes: {
+			"Account Information": "To create and manage user accounts",
+			"Usage Data": "To understand product usage and improve the service",
+		},
+		lawfulBasis: {
+			"Account Information": LegalBases.Contract,
+			"Usage Data": LegalBases.LegitimateInterests,
+		},
 		retention: {
-			"Account data": "3 years after account closure",
-			"Usage logs": "90 days",
+			"Account Information": "3 years after account closure",
+			"Usage Data": "90 days",
 		},
-		cookies: {
-			essential: true,
-			analytics: true,
-			marketing: false,
-		},
-		thirdParties: [
-			{ name: "Stripe", purpose: "Payment processing" },
-			{ name: "PostHog", purpose: "Product analytics" },
-		],
-		jurisdictions: ["us-ca"],
 	},
+	cookies: {
+		used: { essential: true, analytics: true, marketing: false },
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			marketing: LegalBases.Consent,
+		},
+	},
+	thirdParties: [
+		{ name: "Stripe", purpose: "Payment processing" },
+		{ name: "PostHog", purpose: "Product analytics" },
+	],
 });
 ```
 
@@ -105,11 +115,10 @@ Read this codebase carefully, then generate a policy.ts using the OpenPolicy SDK
 SDK reference: https://openpolicy.sh/llms.txt
 
 Your output should capture:
-- Every category of data collected and why
+- Every category of data collected, why (data.purposes), the Article 6 basis (data.lawfulBasis), and how long it's kept (data.retention)
 - All third-party services integrated and their purpose
 - The applicable jurisdiction (US, EU, UK, etc.)
-- Legal basis for processing
-- User rights supported
+- Cookie categories and the lawful basis for each
 
 Output only a single openpolicy.ts using defineConfig(). No explanations.
 ```

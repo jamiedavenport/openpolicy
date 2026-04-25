@@ -41,13 +41,23 @@ bun add @openpolicy/react @openpolicy/sdk
 Add cookie fields to your `openpolicy.ts` — the cookie policy is auto-detected from the presence of `cookies` and related fields:
 
 ```ts
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
+
 effectiveDate: "2026-01-01",
 jurisdictions: ["eu", "us-ca"],
 cookies: {
-  essential: true,
-  analytics: true,
-  functional: false,
-  marketing: false,
+  used: {
+    essential: true,
+    analytics: true,
+    functional: false,
+    marketing: false,
+  },
+  lawfulBasis: {
+    essential: LegalBases.LegalObligation,
+    analytics: LegalBases.Consent,
+    functional: LegalBases.Consent,
+    marketing: LegalBases.Consent,
+  },
 },
 consentMechanism: {
   hasBanner: true,

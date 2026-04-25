@@ -24,7 +24,7 @@ bun add @openpolicy/sdk @openpolicy/react @openpolicy/vite
 Create `openpolicy.ts` at the project root:
 
 ```ts
-import { defineConfig, dataCollected, thirdParties } from "@openpolicy/sdk";
+import { dataCollected, defineConfig, LegalBases, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -34,9 +34,15 @@ export default defineConfig({
 		contact: "privacy@acme.com",
 	},
 	effectiveDate: "2026-01-01",
-	dataCollected: {
-		...dataCollected,
-		"Account Information": ["Email address", "Display name"],
+	jurisdictions: ["eu"],
+	data: {
+		collected: {
+			...dataCollected,
+			"Account Information": ["Email address", "Display name"],
+		},
+		purposes: { "Account Information": "To create and manage user accounts" },
+		lawfulBasis: { "Account Information": LegalBases.Contract },
+		retention: { "Account Information": "Until account deletion" },
 	},
 	thirdParties: [...thirdParties],
 });
@@ -112,7 +118,7 @@ The `openPolicy({ thirdParties: { usePackageJson: true } })` option also auto-de
 ### Spread both sentinels in `openpolicy.ts`
 
 ```ts
-import { defineConfig, dataCollected, thirdParties } from "@openpolicy/sdk";
+import { dataCollected, defineConfig, LegalBases, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -122,15 +128,30 @@ export default defineConfig({
 		contact: "privacy@acme.com",
 	},
 	effectiveDate: "2026-01-01",
-	dataCollected: {
-		...dataCollected, // populated by openPolicy() at build time
-		"Manual Category": ["Manually added field"], // additional hand-declared entries
+	jurisdictions: ["eu"],
+	data: {
+		collected: {
+			...dataCollected, // populated by openPolicy() at build time
+			"Manual Category": ["Manually added field"], // additional hand-declared entries
+		},
+		purposes: {
+			"Account Information": "To create and manage user accounts",
+			"Manual Category": "To enable a specific feature",
+		},
+		lawfulBasis: {
+			"Account Information": LegalBases.Contract,
+			"Manual Category": LegalBases.LegitimateInterests,
+		},
+		retention: {
+			"Account Information": "Until account deletion",
+			"Manual Category": "30 days",
+		},
 	},
 	thirdParties: [...thirdParties], // populated by openPolicy() at build time
 });
 ```
 
-Both `dataCollected` and `thirdParties` are placeholder objects in `@openpolicy/sdk`; `openPolicy()` replaces them via virtual module injection during the Vite build.
+`dataCollected` and `thirdParties` are placeholder objects in `@openpolicy/sdk`; `openPolicy()` replaces them via virtual module injection during the Vite build. Every category in `data.collected` (auto or manual) must appear in the three sibling maps too — `defineConfig`'s generic enforces this.
 
 ## Common Mistakes
 
@@ -178,7 +199,7 @@ Wrong:
 
 ```ts
 // openpolicy.ts
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -188,7 +209,12 @@ export default defineConfig({
 		contact: "privacy@acme.com",
 	},
 	effectiveDate: "2026-01-01",
-	dataCollected: { "Account Information": ["Email address"] },
+	data: {
+		collected: { "Account Information": ["Email address"] },
+		purposes: { "Account Information": "Account creation" },
+		lawfulBasis: { "Account Information": LegalBases.Contract },
+		retention: { "Account Information": "Until account deletion" },
+	},
 	thirdParties: [],
 });
 ```
@@ -197,7 +223,7 @@ Correct:
 
 ```ts
 // openpolicy.ts
-import { defineConfig, dataCollected, thirdParties } from "@openpolicy/sdk";
+import { dataCollected, defineConfig, LegalBases, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -207,7 +233,12 @@ export default defineConfig({
 		contact: "privacy@acme.com",
 	},
 	effectiveDate: "2026-01-01",
-	dataCollected: { ...dataCollected, "Account Information": ["Email address"] },
+	data: {
+		collected: { ...dataCollected, "Account Information": ["Email address"] },
+		purposes: { "Account Information": "Account creation" },
+		lawfulBasis: { "Account Information": LegalBases.Contract },
+		retention: { "Account Information": "Until account deletion" },
+	},
 	thirdParties: [...thirdParties],
 });
 ```

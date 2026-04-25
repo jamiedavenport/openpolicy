@@ -14,10 +14,17 @@ const input: PolicyInput = {
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
 		purposes: { "Account Information": "To authenticate users" },
+		lawfulBasis: { "Account Information": "contract" as const },
+		retention: { "Account Information": "Until deletion" },
 	},
-	legalBasis: { "Providing the service": "legitimate_interests" as const },
-	retention: { "Account data": "Until deletion" },
-	cookies: { essential: true, analytics: false, marketing: false },
+	cookies: {
+		used: { essential: true, analytics: false, marketing: false },
+		lawfulBasis: {
+			essential: "legal_obligation" as const,
+			analytics: "consent" as const,
+			marketing: "consent" as const,
+		},
+	},
 	thirdParties: [],
 	userRights: ["access" as const],
 	jurisdictions: ["ca" as const],

@@ -14,13 +14,62 @@ const fixture: OpenPolicyConfig = {
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
 		purposes: { "Account Information": "To authenticate users" },
+		lawfulBasis: { "Account Information": "contract" },
+		retention: { "Account Information": "Until deletion" },
 	},
-	legalBasis: { "Providing the service": "legitimate_interests" },
-	retention: { "Account data": "Until deletion" },
-	cookies: { essential: true, analytics: false, marketing: false },
+	cookies: {
+		used: { essential: true, analytics: false, marketing: false },
+		lawfulBasis: { essential: "legal_obligation", analytics: "consent", marketing: "consent" },
+	},
 	thirdParties: [],
 };
 
 test("defineConfig returns config unchanged", () => {
 	expect(defineConfig(fixture)).toBe(fixture);
+});
+
+test("defineConfig rejects data without lawfulBasis for every collected category", () => {
+	defineConfig({
+		company: fixture.company,
+		effectiveDate: "2026-01-01",
+		jurisdictions: ["eu"],
+		data: {
+			collected: { "Account Information": ["Email"] },
+			purposes: { "Account Information": "Auth" },
+			// @ts-expect-error — missing "Account Information" in lawfulBasis
+			lawfulBasis: {},
+			retention: { "Account Information": "Until deletion" },
+		},
+	});
+	expect(true).toBe(true);
+});
+
+test("defineConfig rejects data without retention for every collected category", () => {
+	defineConfig({
+		company: fixture.company,
+		effectiveDate: "2026-01-01",
+		jurisdictions: ["eu"],
+		data: {
+			collected: { "Account Information": ["Email"] },
+			purposes: { "Account Information": "Auth" },
+			lawfulBasis: { "Account Information": "contract" },
+			// @ts-expect-error — missing "Account Information" in retention
+			retention: {},
+		},
+	});
+	expect(true).toBe(true);
+});
+
+test("defineConfig rejects cookies.lawfulBasis without entry for every used cookie", () => {
+	defineConfig({
+		company: fixture.company,
+		effectiveDate: "2026-01-01",
+		jurisdictions: ["eu"],
+		cookies: {
+			used: { essential: true, analytics: true },
+			// @ts-expect-error — missing "analytics" in lawfulBasis
+			lawfulBasis: { essential: "legal_obligation" },
+		},
+	});
+	expect(true).toBe(true);
 });

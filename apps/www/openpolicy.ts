@@ -1,4 +1,4 @@
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -19,19 +19,26 @@ export default defineConfig({
 				"To authenticate users, send service notifications, and provide customer support",
 			"Session Data": "To secure sessions, detect abuse, and diagnose service issues",
 		},
-	},
-	legalBasis: {
-		"Providing the service": "legitimate_interests",
-		"Marketing communications": "consent",
-	},
-	retention: {
-		"Account information": "Until account deletion",
-		"Session data": "Until session expiry",
+		lawfulBasis: {
+			"Account Information": LegalBases.Contract,
+			"Session Data": LegalBases.LegitimateInterests,
+		},
+		retention: {
+			"Account Information": "Until account deletion",
+			"Session Data": "Until session expiry",
+		},
 	},
 	cookies: {
-		essential: true,
-		analytics: false,
-		marketing: false,
+		used: {
+			essential: true,
+			analytics: false,
+			marketing: false,
+		},
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			marketing: LegalBases.Consent,
+		},
 	},
 	thirdParties: [],
 	automatedDecisionMaking: [],

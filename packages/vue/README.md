@@ -14,7 +14,7 @@ bun add @openpolicy/vue @openpolicy/sdk
 
 ```ts
 // openpolicy.ts
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -23,15 +23,23 @@ export default defineConfig({
 		address: "123 Main St, Springfield, USA",
 		contact: "privacy@acme.com",
 	},
-	privacy: {
-		effectiveDate: "2026-01-01",
-		dataCollected: { "Account Information": ["Email", "Name"] },
-		legalBasis: "Legitimate interests and consent",
-		retention: { "Account data": "Until account deletion" },
-		cookies: { essential: true, analytics: false, marketing: false },
-		thirdParties: [],
-		jurisdictions: ["eu", "us-ca"],
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["eu", "us-ca"],
+	data: {
+		collected: { "Account Information": ["Email", "Name"] },
+		purposes: { "Account Information": "To create and manage user accounts" },
+		lawfulBasis: { "Account Information": LegalBases.Contract },
+		retention: { "Account Information": "Until account deletion" },
 	},
+	cookies: {
+		used: { essential: true, analytics: false, marketing: false },
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			marketing: LegalBases.Consent,
+		},
+	},
+	thirdParties: [],
 });
 ```
 

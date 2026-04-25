@@ -25,7 +25,7 @@ The config is a plain TypeScript object:
 
 ```ts
 // openpolicy.ts
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -36,17 +36,33 @@ export default defineConfig({
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "uk", "us-ca"],
-	dataCollected: {
-		"Account Information": ["Name", "Email address"],
-		"Usage Data": ["Pages visited", "Features used"],
+	data: {
+		collected: {
+			"Account Information": ["Name", "Email address"],
+			"Usage Data": ["Pages visited", "Features used"],
+		},
+		purposes: {
+			"Account Information": "To create and manage user accounts",
+			"Usage Data": "To understand product usage and improve the service",
+		},
+		lawfulBasis: {
+			"Account Information": LegalBases.Contract,
+			"Usage Data": LegalBases.LegitimateInterests,
+		},
+		retention: {
+			"Account Information": "Until account deletion",
+			"Usage Data": "90 days",
+		},
 	},
-	legalBasis: {
-		"Providing the service": "legitimate_interests",
-		"Marketing communications": "consent",
-	},
-	retention: { "Account Information": "Until account deletion" },
 	thirdParties: [],
-	cookies: { essential: true, analytics: true, marketing: false },
+	cookies: {
+		used: { essential: true, analytics: true, marketing: false },
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			marketing: LegalBases.Consent,
+		},
+	},
 	automatedDecisionMaking: [],
 });
 ```

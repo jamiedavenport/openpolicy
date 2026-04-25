@@ -20,7 +20,7 @@ Minimal config with privacy policy:
 
 ```ts
 // openpolicy.ts
-import { defineConfig, dataCollected, thirdParties } from "@openpolicy/sdk";
+import { cookies, dataCollected, defineConfig, LegalBases, thirdParties } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -31,16 +31,22 @@ export default defineConfig({
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["us-ca"],
-	dataCollected: { ...dataCollected },
-	legalBasis: { "Providing the service": "legitimate_interests" },
-	retention: { "Account Information": "Until account deletion" },
+	data: {
+		collected: { ...dataCollected },
+		purposes: { "Account Information": "To create and manage user accounts" },
+		lawfulBasis: { "Account Information": LegalBases.Contract },
+		retention: { "Account Information": "Until account deletion" },
+	},
 	thirdParties: [...thirdParties],
-	cookies: { essential: true, analytics: false, marketing: false },
+	cookies: {
+		used: cookies,
+		lawfulBasis: { essential: LegalBases.LegalObligation },
+	},
 	automatedDecisionMaking: [],
 });
 ```
 
-All policy fields live at the top level of `OpenPolicyConfig`. OpenPolicy auto-detects which policies to generate from the fields you provide: privacy-specific fields (like `dataCollected`, `legalBasis`, `retention`) produce a privacy policy, and cookie-specific fields (like `cookies`, `consentMechanism`) produce a cookie policy. `effectiveDate` and `jurisdictions` are shared across both.
+The `data` block holds privacy fields together: `collected`, `purposes`, `lawfulBasis`, and `retention` all share the same set of category keys (TS-enforced via `defineConfig`). The `cookies` block mirrors that pattern with `used` (categories) and `lawfulBasis` (Article 6 basis per category). OpenPolicy auto-detects which policies to generate from the fields you provide: a `data` block produces a privacy policy; a `cookies` block produces a cookie policy. `effectiveDate` and `jurisdictions` are shared across both.
 
 User rights (access, erasure, portability, etc.) are **derived automatically** from `jurisdictions` — declare `eu` (GDPR) or `uk` (UK-GDPR) for the six GDPR-style rights, `us-ca` for the four CCPA rights, or any combination for the union. There is no `userRights` field on the public config. See [Supported jurisdictions](https://docs.openpolicy.sh/references/jurisdictions) for the full list of codes.
 
@@ -48,16 +54,18 @@ User rights (access, erasure, portability, etc.) are **derived automatically** f
 
 ### 1. Privacy config with GDPR
 
-Use `Compliance.GDPR` to spread the required `jurisdictions` and `legalBasis` values in one step (rights are derived automatically from `jurisdictions`):
+Use `Compliance.GDPR` to spread the required `jurisdictions` (rights are derived automatically). Pair each collected category with its purpose, lawful basis, and retention:
 
 ```ts
 import {
-	defineConfig,
+	cookies,
 	Compliance,
 	DataCategories,
-	Retention,
-	Providers,
 	dataCollected,
+	defineConfig,
+	LegalBases,
+	Providers,
+	Retention,
 	thirdParties,
 } from "@openpolicy/sdk";
 
@@ -70,23 +78,40 @@ export default defineConfig({
 	},
 	effectiveDate: "2026-01-01",
 	...Compliance.GDPR,
-	dataCollected: {
-		...dataCollected,
-		...DataCategories.AccountInfo,
-		...DataCategories.UsageData,
-	},
-	retention: {
-		"Account Information": Retention.UntilAccountDeletion,
-		"Usage Data": Retention.NinetyDays,
+	data: {
+		collected: {
+			...dataCollected,
+			...DataCategories.AccountInfo,
+			...DataCategories.UsageData,
+		},
+		purposes: {
+			"Account Information": "To authenticate users and send service notifications",
+			"Usage Data": "To understand product usage and improve the service",
+		},
+		lawfulBasis: {
+			"Account Information": LegalBases.Contract,
+			"Usage Data": LegalBases.LegitimateInterests,
+		},
+		retention: {
+			"Account Information": Retention.UntilAccountDeletion,
+			"Usage Data": Retention.NinetyDays,
+		},
 	},
 	thirdParties: [...thirdParties, Providers.Stripe, Providers.PostHog],
 	children: { underAge: 13 },
-	cookies: { essential: true, analytics: true, marketing: false },
+	cookies: {
+		used: cookies,
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			marketing: LegalBases.Consent,
+		},
+	},
 	automatedDecisionMaking: [],
 });
 ```
 
-`Compliance.GDPR` expands to `{ jurisdictions: ["eu"], legalBasis: { "Providing the service": "legitimate_interests" } }`. The six GDPR user rights are derived automatically from `jurisdictions: ["eu"]`.
+`Compliance.GDPR` expands to `{ jurisdictions: ["eu"] }`. The six GDPR user rights are derived automatically from `jurisdictions: ["eu"]`. `defineConfig` infers the category set from `data.collected` and requires every category to appear in `purposes`, `lawfulBasis`, and `retention` — omitting any is a TS error.
 
 ### 2. Using Compliance presets
 
@@ -100,7 +125,6 @@ defineConfig({ ...Compliance.GDPR /* ... */ });
 
 // Multi-region — union the jurisdictions; user rights are derived automatically
 defineConfig({
-	...Compliance.GDPR,
 	jurisdictions: [
 		...Compliance.GDPR.jurisdictions,
 		...Compliance.UK_GDPR.jurisdictions,
@@ -110,7 +134,7 @@ defineConfig({
 });
 ```
 
-`Compliance.CCPA` does not include `legalBasis` — it provides only `jurisdictions: ["us-ca"]`. The four CCPA user rights are derived automatically.
+Each preset provides only `jurisdictions`. The Article 6 basis per data category lives in `data.lawfulBasis` (you choose), not the preset.
 
 Available preset groups from `@openpolicy/sdk`:
 
@@ -129,7 +153,14 @@ export default defineConfig({
   company: { ... },
   effectiveDate: "2026-01-01",
   jurisdictions: ["eu", "us-ca"],
-  cookies: { essential: true, analytics: true, marketing: false },
+  cookies: {
+    used: { essential: true, analytics: true, marketing: false },
+    lawfulBasis: {
+      essential: LegalBases.LegalObligation,
+      analytics: LegalBases.Consent,
+      marketing: LegalBases.Consent,
+    },
+  },
   consentMechanism: {
     hasBanner: true,
     hasPreferencePanel: true,
@@ -140,54 +171,44 @@ export default defineConfig({
 });
 ```
 
-The `cookies` field requires `essential: boolean` — all other keys are `boolean` and are treated as additional cookie categories. Presence of `cookies`, `consentMechanism`, or `trackingTechnologies` auto-detects a cookie policy.
+`cookies.used` requires `essential: true` — all other keys are `boolean` and are treated as additional cookie categories. Every enabled category in `cookies.used` must have a matching entry in `cookies.lawfulBasis` (TS-enforced via the `ScannedCookieKeys` interface). Presence of `cookies`, `consentMechanism`, or `trackingTechnologies` auto-detects a cookie policy.
 
 ## Common Mistakes
 
-### HIGH — Using standalone PrivacyPolicyConfig instead of flat OpenPolicyConfig
+### HIGH — Using free-form purpose names in lawfulBasis
 
 Wrong:
 
 ```ts
-// WRONG: standalone shape
-import type { PrivacyPolicyConfig } from "@openpolicy/sdk";
-
-const config: PrivacyPolicyConfig = {
-	company: { name: "Acme", legalName: "Acme, Inc.", address: "...", contact: "..." },
-	effectiveDate: "2026-01-01",
-	dataCollected: {},
-	legalBasis: { "Marketing communications": "consent" },
-	retention: {},
-	cookies: { essential: true, analytics: false, marketing: false },
-	thirdParties: [],
-	userRights: [],
-	jurisdictions: [],
-};
-// userRights is a REQUIRED field on the internal PrivacyPolicyConfig,
-// but this shape isn't what defineConfig() accepts.
+// WRONG: lawfulBasis keys must match data.collected keys (TS will reject this)
+defineConfig({
+	data: {
+		collected: { "Account Information": ["Name", "Email"] },
+		purposes: { "Account Information": "Account creation" },
+		lawfulBasis: {
+			"Providing the service": LegalBases.Contract, // ← unrelated string
+		},
+		retention: { "Account Information": "Until account deletion" },
+	},
+});
 ```
 
 Correct:
 
 ```ts
-// correct: flat OpenPolicyConfig via defineConfig()
-import { defineConfig } from "@openpolicy/sdk";
-
-export default defineConfig({
-	company: { name: "Acme", legalName: "Acme, Inc.", address: "...", contact: "privacy@acme.com" },
-	effectiveDate: "2026-01-01",
-	jurisdictions: [],
-	dataCollected: {},
-	legalBasis: { "Marketing communications": "consent" },
-	retention: {},
-	thirdParties: [],
-	cookies: { essential: true, analytics: false, marketing: false },
+defineConfig({
+	data: {
+		collected: { "Account Information": ["Name", "Email"] },
+		purposes: { "Account Information": "Account creation" },
+		lawfulBasis: { "Account Information": LegalBases.Contract },
+		retention: { "Account Information": "Until account deletion" },
+	},
 });
 ```
 
-React components and the `openPolicy()` Vite plugin's auto-collect pipeline read from `OpenPolicyConfig`; the standalone policy types are internal shapes not consumed by the rendering layer.
+`data.purposes`, `data.lawfulBasis`, and `data.retention` are all keyed by the same set of strings as `data.collected`. The renderer joins them into the GDPR Art. 13(1)(c) chain: `**Account Information** — used for Account creation — Performance of a contract (Article 6(1)(b))`.
 
-Source: `packages/core/src/types.ts`
+Source: `packages/core/src/types.ts`, `packages/core/src/documents/privacy.ts`
 
 ---
 
@@ -196,13 +217,13 @@ Source: `packages/core/src/types.ts`
 Wrong:
 
 ```ts
-// WRONG: jurisdictions missing — legalBasis section and GDPR/CCPA content will not appear,
+// WRONG: jurisdictions missing — Legal Basis section and GDPR/CCPA content will not appear,
 // and no user rights will be derived
 defineConfig({
 	company: {
 		/* ... */
 	},
-	legalBasis: { "Providing the service": "legitimate_interests" },
+	data: { collected: {}, purposes: {}, lawfulBasis: {}, retention: {} },
 	// jurisdictions omitted
 });
 ```
@@ -214,12 +235,17 @@ defineConfig({
 	company: {
 		/* ... */
 	},
-	legalBasis: { "Providing the service": "legitimate_interests" },
+	data: {
+		collected: { "Account Information": ["Name"] },
+		purposes: { "Account Information": "Account creation" },
+		lawfulBasis: { "Account Information": LegalBases.Contract },
+		retention: { "Account Information": "Until account deletion" },
+	},
 	jurisdictions: ["eu", "us-ca"],
 });
 ```
 
-Section builders for GDPR (`eu`), UK-GDPR (`uk`), and CCPA (`us-ca`) content check the top-level `jurisdictions` field before generating output, and the user rights list is derived from the same field. Omitting `jurisdictions` (or passing an empty array) causes those sections to be silently skipped and no rights to be listed. `Compliance.GDPR`, `Compliance.UK_GDPR`, and `Compliance.CCPA` include the correct `jurisdictions` values when spread.
+Section builders for GDPR (`eu`), UK-GDPR (`uk`), and CCPA (`us-ca`) content check the top-level `jurisdictions` field before generating output, and the user rights list is derived from the same field. Omitting `jurisdictions` (or passing an empty array) causes those sections to be silently skipped and no rights to be listed.
 
 Source: `packages/core/src/templates/privacy/`
 

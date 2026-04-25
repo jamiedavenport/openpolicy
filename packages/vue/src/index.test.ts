@@ -17,10 +17,13 @@ const privacyConfig: PrivacyPolicyConfig = {
 	data: {
 		collected: { account: ["email", "name"] },
 		purposes: { account: "To authenticate users" },
+		lawfulBasis: { account: "contract" },
+		retention: { account: "2 years" },
 	},
-	legalBasis: { "Marketing communications": "consent" },
-	retention: { account: "2 years" },
-	cookies: { essential: true, analytics: false, marketing: false },
+	cookies: {
+		used: { essential: true, analytics: false, marketing: false },
+		lawfulBasis: { essential: "legal_obligation", analytics: "consent", marketing: "consent" },
+	},
 	thirdParties: [],
 	userRights: ["access", "erasure"],
 	jurisdictions: ["ca"],

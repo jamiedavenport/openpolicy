@@ -2,19 +2,32 @@
 
 All fields below live at the top level of `OpenPolicyConfig` (the object passed to `defineConfig()`) alongside `company`. OpenPolicy auto-detects the privacy policy from the presence of privacy-specific fields.
 
-## PrivacyPolicyConfig
+## OpenPolicyConfig — privacy fields
 
-| Field                     | Type                                                             | Required               | Notes                                                                                                                                                                                                                                                                                                            |
-| ------------------------- | ---------------------------------------------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `effectiveDate`           | `string`                                                         | Yes                    | ISO date string (e.g. `"2026-01-01"`). Validation fails if empty.                                                                                                                                                                                                                                                |
-| `dataCollected`           | `Record<string, string[]>`                                       | Yes                    | At least one entry required. Keys are category labels; values are arrays of data point labels. Use `DataCategories.*` presets or spread `dataCollected` sentinel.                                                                                                                                                |
-| `legalBasis`              | `Record<PurposeName, LegalBasis>` (`LegalBasisMap`)              | Yes (GDPR)             | Required when `"eu"` or `"uk"` is in `jurisdictions`. Keys are human-readable processing-purpose names; values are the Article 6 basis for that purpose. GDPR Art. 13(1)(c) requires the lawful basis to be stated for each distinct processing purpose.                                                         |
-| `retention`               | `Record<string, string>`                                         | Yes                    | Keys should match `dataCollected` categories. Use `Retention.*` preset strings.                                                                                                                                                                                                                                  |
-| `cookies`                 | `{ essential: boolean; analytics: boolean; marketing: boolean }` | Yes                    | All three booleans required. Drives cookie policy sections.                                                                                                                                                                                                                                                      |
-| `thirdParties`            | `{ name: string; purpose: string; policyUrl?: string }[]`        | Yes                    | Can be empty array. Use `Providers.*` presets or spread `thirdParties` sentinel.                                                                                                                                                                                                                                 |
-| `jurisdictions`           | `Jurisdiction[]`                                                 | Yes                    | Controls which jurisdiction-specific sections appear and drives the auto-derived user rights list. See values below.                                                                                                                                                                                             |
-| `children`                | `{ underAge: number; noticeUrl?: string }`                       | No                     | Include when service is directed at children. `underAge` must be a positive integer.                                                                                                                                                                                                                             |
-| `automatedDecisionMaking` | `AutomatedDecision[]` (alias `AutomatedDecisionMaking`)          | No (warns under EU/UK) | GDPR Art. 13(2)(f) / Art. 22 disclosure. Set to `[]` to declare no automated decision-making is used. Each entry declares one activity with `name`, `logic`, and `significance`. Omitting under EU/UK emits a warning; populating triggers an Art. 22(3) right-to-human-review paragraph in the rendered policy. |
+| Field                     | Type                                                      | Required                | Notes                                                                                                                                                                                                                                                                                                            |
+| ------------------------- | --------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `effectiveDate`           | `string`                                                  | Yes                     | ISO date string (e.g. `"2026-01-01"`). Validation fails if empty.                                                                                                                                                                                                                                                |
+| `data`                    | `DataConfig`                                              | Yes (for privacy)       | `{ collected, purposes, lawfulBasis, retention }`. All four sub-maps are keyed by the same set of category names — `defineConfig` infers the set from `data.collected` and TS-enforces the others.                                                                                                               |
+| `cookies`                 | `CookiePolicyCookies`                                     | Yes (for cookie policy) | `{ used, lawfulBasis }`. `used` requires `essential: true`; `lawfulBasis` requires one entry per used category.                                                                                                                                                                                                  |
+| `thirdParties`            | `{ name: string; purpose: string; policyUrl?: string }[]` | No                      | Can be empty. Use `Providers.*` presets or spread `thirdParties` sentinel.                                                                                                                                                                                                                                       |
+| `jurisdictions`           | `Jurisdiction[]`                                          | Yes                     | Controls which jurisdiction-specific sections appear and drives the auto-derived user rights list. See values below.                                                                                                                                                                                             |
+| `children`                | `{ underAge: number; noticeUrl?: string }`                | No                      | Include when service is directed at children. `underAge` must be a positive integer.                                                                                                                                                                                                                             |
+| `automatedDecisionMaking` | `AutomatedDecision[]`                                     | No (warns under EU/UK)  | GDPR Art. 13(2)(f) / Art. 22 disclosure. Set to `[]` to declare no automated decision-making is used. Each entry declares one activity with `name`, `logic`, and `significance`. Omitting under EU/UK emits a warning; populating triggers an Art. 22(3) right-to-human-review paragraph in the rendered policy. |
+
+### DataConfig shape
+
+```ts
+type DataConfig = {
+	collected: Record<string, string[]>; // category → field labels
+	purposes: Record<string, string>; // category → human-readable purpose
+	lawfulBasis: Record<string, LegalBasis>; // category → Article 6 basis
+	retention: Record<string, string>; // category → retention period
+};
+```
+
+All four sub-maps share the same key set. The generic on `defineConfig` requires `purposes`, `lawfulBasis`, and `retention` to cover every key present in `collected` (plus every key the Vite plugin scans into `ScannedCollectionKeys`).
+
+The renderer joins all three sibling maps in the GDPR Art. 13(1)(c) "Legal Basis for Processing" section: `**[category]** — used for [purpose] — [Article 6 basis]`.
 
 ### LegalBasis values
 
@@ -59,7 +72,7 @@ When multiple jurisdictions are declared, the rights are unioned and rendered in
 
 ### DataCategories presets
 
-Each entry is a `Record<string, string[]>` safe to spread into `dataCollected`:
+Each entry is a `Record<string, string[]>` safe to spread into `data.collected`:
 
 | Constant                        | Category label          | Data points                                       |
 | ------------------------------- | ----------------------- | ------------------------------------------------- |
@@ -72,6 +85,8 @@ Each entry is a `Record<string, string[]>` safe to spread into `dataCollected`:
 | `DataCategories.Communications` | `"Communications"`      | Email content, Support tickets                    |
 
 ### Retention presets
+
+Each value is a string safe to use under `data.retention[category]`.
 
 | Constant                         | String value                      |
 | -------------------------------- | --------------------------------- |
@@ -101,47 +116,39 @@ Each entry is a `{ name: string; purpose: string; policyUrl: string }` safe to u
 
 ### Compliance presets
 
-| Preset               | Expands to                                                                                   |
-| -------------------- | -------------------------------------------------------------------------------------------- |
-| `Compliance.GDPR`    | `{ jurisdictions: ["eu"], legalBasis: { "Providing the service": "legitimate_interests" } }` |
-| `Compliance.UK_GDPR` | `{ jurisdictions: ["uk"], legalBasis: { "Providing the service": "legitimate_interests" } }` |
-| `Compliance.CCPA`    | `{ jurisdictions: ["us-ca"] }`                                                               |
+| Preset               | Expands to                     |
+| -------------------- | ------------------------------ |
+| `Compliance.GDPR`    | `{ jurisdictions: ["eu"] }`    |
+| `Compliance.UK_GDPR` | `{ jurisdictions: ["uk"] }`    |
+| `Compliance.CCPA`    | `{ jurisdictions: ["us-ca"] }` |
+
+The Article 6 lawful basis per data category lives in `data.lawfulBasis` (you choose), not the preset.
 
 ### Validation behavior
 
 - `effectiveDate` empty → fatal error
 - `company.*` fields empty → fatal error per field
-- `dataCollected` has zero keys → fatal error
-- `"eu"` or `"uk"` in jurisdictions + empty `legalBasis` map → fatal `lawful-basis-per-purpose` error
-- `"eu"` or `"uk"` in jurisdictions + any purpose with empty basis → fatal `lawful-basis-per-purpose` error
-- When any purpose's basis is `"consent"`, the rendered policy automatically appends an Art. 13(2)(c) right-to-withdraw paragraph
+- `data.collected` has zero keys → fatal error
+- For each `data.collected` category: missing `data.lawfulBasis[category]` under EU/UK jurisdictions → fatal `lawful-basis-incomplete` error
+- For each `data.collected` category: missing `data.retention[category]` → fatal `retention-incomplete` error
+- For each enabled cookie in `cookies.used`: missing `cookies.lawfulBasis[key]` → fatal `cookie-lawful-basis-missing` error
+- When any `data.lawfulBasis` value is `"consent"`, the rendered policy automatically appends an Art. 13(2)(c) right-to-withdraw paragraph
 - `"eu"` or `"uk"` in jurisdictions + `automatedDecisionMaking` omitted → `automated-decision-making` warning (set to `[]` to declare none, or populate)
 - Any unknown jurisdiction code → fatal error (lists valid codes in message)
 - `children.underAge` ≤ 0 → fatal error
 
-Source: `packages/core/src/validate.ts`
+Source: `packages/core/src/validate.ts`, `packages/core/src/validate-config.ts`, `packages/core/src/validate-cookie.ts`
 
 ---
 
-## CookiePolicyConfig
+## CookiePolicyCookies shape
 
-All fields below live at the top level of `OpenPolicyConfig` (the object passed to `defineConfig()`) alongside `company`. OpenPolicy auto-detects the cookie policy from the presence of `cookies`, `consentMechanism`, or `trackingTechnologies`.
-
-| Field                  | Type                                                                        | Required | Notes                                                                                                       |
-| ---------------------- | --------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------- |
-| `effectiveDate`        | `string`                                                                    | Yes      | ISO date string. Shared with privacy policy.                                                                |
-| `cookies`              | `CookiePolicyCookies`                                                       | Yes      | `essential: boolean` is required; all other keys are `boolean` and treated as additional cookie categories. |
-| `jurisdictions`        | `Jurisdiction[]`                                                            | Yes      | Same values as the privacy policy. Shared at the top level.                                                 |
-| `thirdParties`         | `{ name: string; purpose: string; policyUrl?: string }[]`                   | No       | Use `Providers.*` presets. Shared with privacy policy.                                                      |
-| `trackingTechnologies` | `string[]`                                                                  | No       | e.g. `["cookies", "localStorage", "sessionStorage", "pixel"]`                                               |
-| `consentMechanism`     | `{ hasBanner: boolean; hasPreferencePanel: boolean; canWithdraw: boolean }` | No       | Required when `"eu"` or `"uk"` is in jurisdictions (GDPR / UK-GDPR + PECR compliance).                      |
-
-### CookiePolicyCookies shape
+`cookies` is a single object with two keyed sub-maps that mirror the `data` block:
 
 ```ts
 type CookiePolicyCookies = {
-	essential: boolean; // required
-	[key: string]: boolean; // additional categories
+	used: { essential: true; [key: string]: boolean }; // categories enabled
+	lawfulBasis: Record<string, LegalBasis>; // Article 6 basis per category
 };
 ```
 
@@ -155,10 +162,27 @@ defineConfig({
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "us-ca"],
 	cookies: {
-		essential: true,
-		analytics: true,
-		marketing: false,
-		preferences: true,
+		used: {
+			essential: true,
+			analytics: true,
+			marketing: false,
+			preferences: true,
+		},
+		lawfulBasis: {
+			essential: LegalBases.LegalObligation,
+			analytics: LegalBases.Consent,
+			marketing: LegalBases.Consent,
+			preferences: LegalBases.Consent,
+		},
 	},
 });
 ```
+
+The Vite plugin auto-emits the discovered cookie categories into `ScannedCookieKeys`, so `defineConfig` requires `cookies.lawfulBasis` to cover every scanned category as well.
+
+| Field                  | Type                                                                        | Required | Notes                                                                                                      |
+| ---------------------- | --------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `cookies.used`         | `{ essential: true; [k: string]: boolean }`                                 | Yes      | `essential` is required and must be `true`; other keys are `boolean` and treated as additional categories. |
+| `cookies.lawfulBasis`  | `Record<keyof used, LegalBasis>`                                            | Yes      | One Article 6 basis per category.                                                                          |
+| `trackingTechnologies` | `string[]`                                                                  | No       | e.g. `["cookies", "localStorage", "sessionStorage", "pixel"]`                                              |
+| `consentMechanism`     | `{ hasBanner: boolean; hasPreferencePanel: boolean; canWithdraw: boolean }` | No       | Required when `"eu"` or `"uk"` is in jurisdictions (GDPR / UK-GDPR + PECR compliance).                     |

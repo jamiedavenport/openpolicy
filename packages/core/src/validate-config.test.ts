@@ -15,9 +15,9 @@ const baseConfig: OpenPolicyConfig = {
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
 		purposes: { "Account Information": "To authenticate users" },
+		lawfulBasis: { "Account Information": "contract" },
+		retention: { "Account Information": "Until deletion" },
 	},
-	legalBasis: { "Providing the service": "legitimate_interests" },
-	retention: { "Account data": "Until deletion" },
 };
 
 test("isJurisdiction is true for every documented code", () => {
