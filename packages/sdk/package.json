@@ -1,6 +1,6 @@
 {
 	"name": "@openpolicy/sdk",
-	"version": "0.0.27",
+	"version": "0.0.28",
 	"description": "Public API for defining privacy policies with OpenPolicy",
 	"keywords": [
 		"tanstack-intent"
