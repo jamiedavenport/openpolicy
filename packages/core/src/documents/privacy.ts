@@ -240,9 +240,19 @@ function dpoParagraph(config: PrivacyPolicyConfig): ContentNode {
 	]);
 }
 
+function euRepresentativeParagraph(config: PrivacyPolicyConfig): ContentNode | null {
+	const rep = config.company.euRepresentative;
+	if (!rep) return null;
+	return p([
+		"Our representative in the European Union for the purposes of Article 27 GDPR is ",
+		bold(rep.name),
+		`, ${rep.address}, ${rep.email}.`,
+	]);
+}
+
 function buildGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | null {
 	if (!config.jurisdictions.includes("eu")) return null;
-	return section("gdpr-supplement", [
+	const content: ContentNode[] = [
 		heading("GDPR Supplemental Disclosures", {
 			reason: "Required by GDPR Article 13",
 		}),
@@ -252,12 +262,20 @@ function buildGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | nul
 		p(["Data Controller: ", bold(config.company.legalName), `, ${config.company.address}`]),
 		dpoParagraph(config),
 		p([
-			"In addition to the rights listed above, you have the right to lodge a complaint with your local data protection authority if you believe we have not handled your data in accordance with applicable law.",
+			"You have the right to lodge a complaint with the data protection supervisory authority in your country of residence, place of work, or place of the alleged infringement. A list of EEA supervisory authorities is available at ",
+			link(
+				"https://edpb.europa.eu/about-edpb/about-edpb/members_en",
+				"edpb.europa.eu/about-edpb/about-edpb/members_en",
+			),
+			".",
 		]),
 		p([
 			"If we transfer your personal data outside the EEA, we ensure adequate safeguards are in place in accordance with GDPR requirements.",
 		]),
-	]);
+	];
+	const rep = euRepresentativeParagraph(config);
+	if (rep) content.push(rep);
+	return section("gdpr-supplement", content);
 }
 
 function buildUkGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | null {

@@ -55,12 +55,22 @@ export type Dpo =
 	| { email: string; name?: string; phone?: string; address?: string }
 	| { required: false; reason?: string };
 
+// Art. 27 GDPR designated representative — required for non-EEA controllers
+// subject to GDPR via Art. 3(2). Optional because EEA-established controllers
+// do not need to designate one.
+export type EuRepresentative = {
+	name: string;
+	address: string;
+	email: string;
+};
+
 export type CompanyConfig = {
 	name: string;
 	legalName: string;
 	address: string;
 	contact: string;
 	dpo?: Dpo;
+	euRepresentative?: EuRepresentative;
 };
 
 export type EffectiveDate = `${number}-${number}-${number}`;

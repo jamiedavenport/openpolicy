@@ -33,6 +33,7 @@ export type {
 	DataConfig,
 	Dpo,
 	EffectiveDate,
+	EuRepresentative,
 	Jurisdiction,
 	LegalBasis,
 	LegalBasisMap,

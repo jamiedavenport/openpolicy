@@ -405,6 +405,65 @@ test("automated-decision-making section emits explicit-none paragraph when [] un
 	expect(blob).not.toContain("Right to human review");
 });
 
+test("gdpr-supplement complaint paragraph links to EDPB members directory", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).toContain("edpb.europa.eu/about-edpb/about-edpb/members_en");
+	expect(blob).toContain("supervisory authority");
+	expect(blob).not.toContain("your local data protection authority");
+});
+
+test("gdpr-supplement does not mention Article 27 representative when unset", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).not.toContain("Article 27");
+	expect(blob).not.toContain("representative in the European Union");
+});
+
+test("gdpr-supplement renders Article 27 representative paragraph when configured", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		company: {
+			...minimalPrivacyConfig.company,
+			euRepresentative: {
+				name: "Acme EU Ltd.",
+				address: "1 Rue de la Loi, Brussels",
+				email: "eu-rep@acme.com",
+			},
+		},
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).toContain("Article 27 GDPR");
+	expect(blob).toContain("Acme EU Ltd.");
+	expect(blob).toContain("1 Rue de la Loi, Brussels");
+	expect(blob).toContain("eu-rep@acme.com");
+});
+
+test("uk-gdpr-supplement still names the ICO with its complaint URL", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["uk"],
+	});
+	const uk = doc.sections.find((s) => s.id === "uk-gdpr-supplement")!;
+	const blob = JSON.stringify(uk);
+	expect(blob).toContain("Information Commissioner");
+	expect(blob).toContain("ico.org.uk/make-a-complaint");
+});
+
 test("automated-decision-making section enumerates each activity and appends Art. 22 right-to-human-review", () => {
 	const doc = compile({
 		type: "privacy",
