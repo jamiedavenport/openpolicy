@@ -87,15 +87,26 @@ function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
 		line.push(" — ", label);
 		content.push(p(line));
 	}
-	if (entries.some(([, basis]) => basis === "consent")) {
-		content.push(
-			p([
-				bold("Right to withdraw consent."),
-				` Where we rely on your consent, you may withdraw it at any time by contacting us at ${config.company.contact}. Withdrawing consent does not affect the lawfulness of any processing we carried out before you withdrew it.`,
-			]),
-		);
-	}
 	return section("legal-basis", content);
+}
+
+function usesConsent(config: PrivacyPolicyConfig): boolean {
+	if (Object.values(config.data.lawfulBasis).some((b) => b === "consent")) return true;
+	if (Object.values(config.cookies.lawfulBasis).some((b) => b === "consent")) return true;
+	return false;
+}
+
+function buildConsentWithdrawal(config: PrivacyPolicyConfig): DocumentSection | null {
+	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
+	if (!usesConsent(config)) return null;
+	return section("consent-withdrawal", [
+		heading("Right to Withdraw Consent", {
+			reason: "Required by GDPR Article 7(3) and Article 13(2)(c)",
+		}),
+		p([
+			`Where we rely on your consent for any processing of your personal data, you have the right to withdraw that consent at any time by contacting us at ${config.company.contact}. Withdrawing your consent does not affect the lawfulness of any processing we carried out before you withdrew it. Where consent is required to provide a particular feature or service, withdrawing it may mean we are no longer able to offer that feature or service.`,
+		]),
+	]);
 }
 
 function buildAutomatedDecisionMaking(config: PrivacyPolicyConfig): DocumentSection | null {
@@ -352,6 +363,7 @@ const SECTION_BUILDERS: ((config: PrivacyPolicyConfig) => DocumentSection | null
 	buildChildrenPrivacy,
 	buildDataCollected,
 	buildLegalBasis,
+	buildConsentWithdrawal,
 	buildAutomatedDecisionMaking,
 	buildDataRetention,
 	buildCookies,

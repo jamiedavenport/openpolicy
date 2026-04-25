@@ -302,7 +302,7 @@ test("legal-basis section renders one block per data category with Article 6 sub
 	expect(blob).toContain("Consent (Article 6(1)(a))");
 });
 
-test("legal-basis section appends consent-withdrawal paragraph when any category uses consent", () => {
+test("consent-withdrawal section is rendered when any data category uses consent (EU)", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
@@ -326,14 +326,32 @@ test("legal-basis section appends consent-withdrawal paragraph when any category
 			},
 		},
 	});
-	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
-	const blob = JSON.stringify(legalBasis);
-	expect(blob).toContain("Right to withdraw consent");
+	const cw = doc.sections.find((s) => s.id === "consent-withdrawal")!;
+	expect(cw).toBeDefined();
+	const blob = JSON.stringify(cw);
+	expect(blob).toContain("Right to Withdraw Consent");
+	expect(blob).toContain("Article 7(3)");
 	expect(blob).toContain(minimalPrivacyConfig.company.contact);
 	expect(blob).toContain("does not affect the lawfulness");
 });
 
-test("legal-basis section omits consent-withdrawal paragraph when no category uses consent", () => {
+test("consent-withdrawal section is rendered when only cookies use consent (EU)", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		cookies: {
+			used: { essential: true, analytics: true },
+			lawfulBasis: { essential: "legal_obligation", analytics: "consent" },
+		},
+	});
+	const cw = doc.sections.find((s) => s.id === "consent-withdrawal")!;
+	expect(cw).toBeDefined();
+	const blob = JSON.stringify(cw);
+	expect(blob).toContain("Right to Withdraw Consent");
+});
+
+test("consent-withdrawal section is omitted when no data or cookie basis is consent (EU)", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
@@ -355,6 +373,38 @@ test("legal-basis section omits consent-withdrawal paragraph when no category us
 				"Personal Information": "Until account deletion",
 				"Service Data": "30 days",
 			},
+		},
+		cookies: {
+			used: { essential: true },
+			lawfulBasis: { essential: "legal_obligation" },
+		},
+	});
+	expect(doc.sections.find((s) => s.id === "consent-withdrawal")).toBeUndefined();
+});
+
+test("consent-withdrawal section is omitted under non-EU/UK jurisdictions even when consent is used", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["us-ca"],
+		cookies: {
+			used: { essential: true, analytics: true },
+			lawfulBasis: { essential: "legal_obligation", analytics: "consent" },
+		},
+	});
+	expect(doc.sections.find((s) => s.id === "consent-withdrawal")).toBeUndefined();
+});
+
+test("legal-basis section no longer carries the consent-withdrawal paragraph (it's its own section now)", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		data: {
+			collected: { "Marketing Data": ["Email"] },
+			purposes: { "Marketing Data": "Marketing communications" },
+			lawfulBasis: { "Marketing Data": "consent" },
+			retention: { "Marketing Data": "Until consent is withdrawn" },
 		},
 	});
 	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
