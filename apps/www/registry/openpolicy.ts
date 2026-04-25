@@ -26,6 +26,16 @@ export default defineConfig({
 			"Personal Information": "As long as your account is active",
 			"Usage Data": "90 days",
 		},
+		provisionRequirement: {
+			"Personal Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or manage your account.",
+			},
+			"Usage Data": {
+				basis: "voluntary",
+				consequences: "None — your service is unaffected.",
+			},
+		},
 	},
 	cookies: {
 		used: {

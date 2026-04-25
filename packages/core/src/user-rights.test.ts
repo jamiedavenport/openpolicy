@@ -69,6 +69,12 @@ test("buildUserRights: privacy policy omits 'Your Rights' section when derivatio
 			purposes: { "Account Information": "To authenticate users" },
 			lawfulBasis: { "Account Information": "contract" },
 			retention: { "Account Information": "Until deletion" },
+			provisionRequirement: {
+				"Account Information": {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
+			},
 		},
 		cookies: {
 			used: { essential: true, analytics: false, marketing: false },
@@ -98,6 +104,12 @@ test("validateOpenPolicyConfig: emits no userRights-related issues", () => {
 			purposes: { "Account Information": "To authenticate users" },
 			lawfulBasis: { "Account Information": "contract" },
 			retention: { "Account Information": "Until deletion" },
+			provisionRequirement: {
+				"Account Information": {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
+			},
 		},
 	};
 	const issues = validateOpenPolicyConfig(config);

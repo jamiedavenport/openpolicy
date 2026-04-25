@@ -19,6 +19,12 @@ const privacyConfig: PrivacyPolicyConfig = {
 		purposes: { account: "To authenticate users" },
 		lawfulBasis: { account: "contract" },
 		retention: { account: "2 years" },
+		provisionRequirement: {
+			account: {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+		},
 	},
 	cookies: {
 		used: { essential: true, analytics: false, marketing: false },

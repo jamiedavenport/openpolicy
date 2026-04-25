@@ -92,6 +92,26 @@ export function validatePrivacyPolicy(config: PrivacyPolicyConfig): ValidationIs
 				});
 			}
 		}
+
+		// GDPR / UK-GDPR Art. 13(2)(e): for each collected category, disclose
+		// whether provision is statutory, contractual, a contract-prerequisite,
+		// or voluntary, and the consequences of failure to provide it.
+		for (const category of Object.keys(collected)) {
+			const pr = config.data.provisionRequirement?.[category];
+			if (!pr || !pr.basis) {
+				issues.push({
+					code: "statutory-contractual-obligation",
+					level: "error",
+					message: `GDPR Article 13(2)(e): data.provisionRequirement["${category}"] is missing — disclose whether provision is statutory, contractual, a contract-prerequisite, or voluntary, and the consequences of failure to provide it.`,
+				});
+			} else if (typeof pr.consequences !== "string" || pr.consequences.trim().length === 0) {
+				issues.push({
+					code: "statutory-contractual-obligation",
+					level: "error",
+					message: `GDPR Article 13(2)(e): data.provisionRequirement["${category}"].consequences is empty — state the consequences of failure to provide this data.`,
+				});
+			}
+		}
 	}
 
 	// Retention must be declared for every collected category.

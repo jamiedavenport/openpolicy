@@ -51,6 +51,16 @@ export default defineConfig({
 			"Account Information": "Until account deletion",
 			"Usage Data": "90 days",
 		},
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+			"Usage Data": {
+				basis: "voluntary",
+				consequences: "None — your service is unaffected.",
+			},
+		},
 	},
 	thirdParties: [],
 	cookies: {
@@ -67,7 +77,7 @@ export default defineConfig({
 
 The `company` block is required and shared across all policy types. All other fields live at the top level: `effectiveDate` and `jurisdictions` are shared, and OpenPolicy auto-detects which policies to generate from the fields you provide — include the `data` block for a privacy policy, and the `cookies` block (or `consentMechanism` / `trackingTechnologies`) for a cookie policy.
 
-The `data` block keeps the four sibling maps together — `collected`, `purposes`, `lawfulBasis`, and `retention` all share the same set of category keys, and `defineConfig`'s generic enforces that you fill all four for every category. The `cookies` block mirrors the same shape: `cookies.used` lists the categories you enable (with `essential: true` always required), and `cookies.lawfulBasis` declares the Article 6 basis for each one.
+The `data` block keeps the five sibling maps together — `collected`, `purposes`, `lawfulBasis`, `retention`, and `provisionRequirement` all share the same set of category keys, and `defineConfig`'s generic enforces that you fill all five for every category. The `cookies` block mirrors the same shape: `cookies.used` lists the categories you enable (with `essential: true` always required), and `cookies.lawfulBasis` declares the Article 6 basis for each one.
 
 ### Data Protection Officer
 
@@ -115,7 +125,7 @@ automatedDecisionMaking: [
 
 Omitting the field entirely emits a validation warning under EU/UK jurisdictions. When at least one activity is listed, the rendered policy automatically appends the Article 22(3) right-to-human-review paragraph referencing `company.contact`.
 
-`data.collected` is a map of category label → fields; `data.purposes` is a map of the same category label → prose describing _why_ you process it (GDPR Article 13(1)(c)); `data.lawfulBasis` declares the Article 6 basis per category; `data.retention` declares how long you keep each one. Every key in `data.collected` must appear in all three sibling maps; `defineConfig` enforces this at type-check time, and the `openPolicy()` Vite plugin re-validates it at build time. When auto-collect is enabled, the plugin also emits `openpolicy.gen.ts` alongside your config (check it in) so the same constraint applies to scanned `collecting()` categories even without running Vite first.
+`data.collected` is a map of category label → fields; `data.purposes` is a map of the same category label → prose describing _why_ you process it (GDPR Article 13(1)(c)); `data.lawfulBasis` declares the Article 6 basis per category; `data.retention` declares how long you keep each one; `data.provisionRequirement` declares whether providing each category is statutory, contractual, a contract-prerequisite, or voluntary, plus the consequences of failing to provide it (GDPR Article 13(2)(e)). Every key in `data.collected` must appear in all four sibling maps; `defineConfig` enforces this at type-check time, and the `openPolicy()` Vite plugin re-validates it at build time. When auto-collect is enabled, the plugin also emits `openpolicy.gen.ts` alongside your config (check it in) so the same constraint applies to scanned `collecting()` categories even without running Vite first.
 
 The user rights you're legally required to disclose (access, erasure, portability, etc.) are derived automatically from `jurisdictions` — declare `eu` or `uk` and you get the six GDPR rights, declare `us-ca` and you get the four CCPA rights, declare any combination and you get the union. There's no `userRights` field to set. See [Supported jurisdictions](/references/jurisdictions) for the full list of codes.
 

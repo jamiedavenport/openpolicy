@@ -105,6 +105,20 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 						message: `data.lawfulBasis["${category}"] is missing — every collected category requires an Article 6 lawful basis (GDPR Art. 13(1)(c)).`,
 					});
 				}
+				const pr = config.data.provisionRequirement?.[category];
+				if (!pr || !pr.basis) {
+					issues.push({
+						code: "statutory-contractual-obligation",
+						level: "error",
+						message: `data.provisionRequirement["${category}"] is missing — GDPR Art. 13(2)(e) requires disclosure of whether provision is statutory, contractual, a contract-prerequisite, or voluntary, and the consequences of failure to provide it.`,
+					});
+				} else if (typeof pr.consequences !== "string" || pr.consequences.trim().length === 0) {
+					issues.push({
+						code: "statutory-contractual-obligation",
+						level: "error",
+						message: `data.provisionRequirement["${category}"].consequences is empty — GDPR Art. 13(2)(e) requires the consequences of failure to provide this data.`,
+					});
+				}
 			}
 		}
 		for (const category of collectedKeys) {

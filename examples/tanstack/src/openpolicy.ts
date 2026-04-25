@@ -26,6 +26,16 @@ export default defineConfig({
 			"Account Information": "Until account deletion",
 			"Usage Data": "90 days",
 		},
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+			"Usage Data": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot deliver or secure the service.",
+			},
+		},
 	},
 	cookies: {
 		used: cookies,

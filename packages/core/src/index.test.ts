@@ -16,6 +16,12 @@ const input: PolicyInput = {
 		purposes: { "Account Information": "To authenticate users" },
 		lawfulBasis: { "Account Information": "contract" },
 		retention: { "Account Information": "Until deletion" },
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+		},
 	},
 	cookies: {
 		used: { essential: true, analytics: false, marketing: false },
@@ -42,6 +48,12 @@ const fullConfig: OpenPolicyConfig = {
 		purposes: { "Account Information": "To authenticate users" },
 		lawfulBasis: { "Account Information": "contract" },
 		retention: { "Account Information": "Until deletion" },
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+		},
 	},
 	cookies: {
 		used: { essential: true, analytics: false, marketing: false },

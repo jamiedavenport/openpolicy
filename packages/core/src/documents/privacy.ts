@@ -11,6 +11,13 @@ const LEGAL_BASIS_LABELS: Record<string, string> = {
 	legitimate_interests: "Legitimate interests (Article 6(1)(f))",
 };
 
+const PROVISION_BASIS_LABELS: Record<string, string> = {
+	statutory: "Required by law",
+	contractual: "Required under our contract with you",
+	"contract-prerequisite": "Required to enter into a contract",
+	voluntary: "Voluntary",
+};
+
 const RIGHTS_LABELS: Record<string, string> = {
 	access: "Right to access your personal data",
 	rectification: "Right to correct inaccurate data",
@@ -157,6 +164,35 @@ function buildDataRetention(config: PrivacyPolicyConfig): DocumentSection {
 		p(["We retain your data for the following periods:"]),
 		ul(items),
 	]);
+}
+
+function buildProvisionRequirement(config: PrivacyPolicyConfig): DocumentSection | null {
+	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
+	const entries = Object.entries(config.data.provisionRequirement);
+	if (entries.length === 0) return null;
+	const content: ContentNode[] = [
+		heading("Whether You Are Required to Provide This Data", {
+			reason: "Required by GDPR and UK-GDPR Article 13(2)(e)",
+		}),
+		p([
+			"For each category of personal data we collect, we set out below whether you are required to provide it — by law, under our contract with you, or as a precondition to entering into a contract — or whether provision is voluntary, together with the consequences of failing to provide it.",
+		]),
+	];
+	for (const [category, requirement] of entries) {
+		const label = PROVISION_BASIS_LABELS[requirement.basis] ?? requirement.basis;
+		content.push(
+			p([
+				bold(category),
+				" \u2014 ",
+				label,
+				" \u2014 ",
+				bold("Consequences:"),
+				" ",
+				requirement.consequences,
+			]),
+		);
+	}
+	return section("provision-requirement", content);
 }
 
 const COOKIE_CATEGORY_LABELS: Record<string, string> = {
@@ -366,6 +402,7 @@ const SECTION_BUILDERS: ((config: PrivacyPolicyConfig) => DocumentSection | null
 	buildConsentWithdrawal,
 	buildAutomatedDecisionMaking,
 	buildDataRetention,
+	buildProvisionRequirement,
 	buildCookies,
 	buildThirdParties,
 	buildUserRights,

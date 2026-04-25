@@ -16,6 +16,12 @@ const input: PolicyInput = {
 		purposes: { "Account Information": "To authenticate users" },
 		lawfulBasis: { "Account Information": "contract" as const },
 		retention: { "Account Information": "Until deletion" },
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite" as const,
+				consequences: "We cannot create or operate your account.",
+			},
+		},
 	},
 	cookies: {
 		used: { essential: true, analytics: false, marketing: false },

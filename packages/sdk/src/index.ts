@@ -1,4 +1,4 @@
-import type { LegalBasis, OpenPolicyConfig } from "@openpolicy/core";
+import type { LegalBasis, OpenPolicyConfig, ProvisionRequirement } from "@openpolicy/core";
 import type { ScannedCollectionKeys, ScannedCookieKeys } from "./auto-collected";
 
 export type {
@@ -19,6 +19,9 @@ export type {
 	LegalBasisMap,
 	OpenPolicyConfig,
 	PolicyCategory,
+	ProvisionBasis,
+	ProvisionRequirement,
+	ProvisionRequirementMap,
 	Purposes,
 	Retention as RetentionMap,
 	ThirdParty,
@@ -54,6 +57,7 @@ type OpenPolicyConfigWithGenerics<
 		purposes: { [P in DataKey<Collected>]: string };
 		lawfulBasis: { [P in DataKey<Collected>]: LegalBasis };
 		retention: { [P in DataKey<Collected>]: string };
+		provisionRequirement: { [P in DataKey<Collected>]: ProvisionRequirement };
 	};
 	cookies?: {
 		used: CookieUsed;

@@ -42,6 +42,9 @@ export type {
 	PolicyCategory,
 	PolicyInput,
 	PrivacyPolicyConfig,
+	ProvisionBasis,
+	ProvisionRequirement,
+	ProvisionRequirementMap,
 	Purposes,
 	Retention,
 	ThirdParty,
@@ -79,7 +82,13 @@ export function shouldEmit(category: PolicyCategory, config: OpenPolicyConfig): 
 	return category === "privacy" ? hasAnyPrivacyField(config) : hasCookieField(config);
 }
 
-const EMPTY_DATA: DataConfig = { collected: {}, purposes: {}, lawfulBasis: {}, retention: {} };
+const EMPTY_DATA: DataConfig = {
+	collected: {},
+	purposes: {},
+	lawfulBasis: {},
+	retention: {},
+	provisionRequirement: {},
+};
 const EMPTY_COOKIES: CookiePolicyCookies = { used: { essential: true }, lawfulBasis: {} };
 
 export function expandOpenPolicyConfig(config: OpenPolicyConfig): PolicyInput[] {

@@ -81,11 +81,28 @@ export type Purposes = Record<string, string>;
 
 export type Retention = Record<string, string>;
 
+// GDPR Art. 13(2)(e) — for each collected category, disclose whether
+// provision of the data is required, and the consequences of failing to
+// provide it. Keys mirror `DataConfig.collected`.
+export type ProvisionBasis =
+	| "statutory" //              Required by law (e.g. tax record-keeping)
+	| "contractual" //            Required under an existing contract
+	| "contract-prerequisite" //  Necessary to enter into a contract
+	| "voluntary"; //             Optional — provision is not required
+
+export type ProvisionRequirement = {
+	basis: ProvisionBasis;
+	consequences: string;
+};
+
+export type ProvisionRequirementMap = Record<string, ProvisionRequirement>;
+
 export type DataConfig = {
 	collected: DataCollection;
 	purposes: Purposes;
 	lawfulBasis: LegalBasisMap;
 	retention: Retention;
+	provisionRequirement: ProvisionRequirementMap;
 };
 
 export type ThirdParty = { name: string; purpose: string; policyUrl?: string };

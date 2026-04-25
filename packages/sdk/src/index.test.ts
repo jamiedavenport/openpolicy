@@ -16,6 +16,12 @@ const fixture: OpenPolicyConfig = {
 		purposes: { "Account Information": "To authenticate users" },
 		lawfulBasis: { "Account Information": "contract" },
 		retention: { "Account Information": "Until deletion" },
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+		},
 	},
 	cookies: {
 		used: { essential: true, analytics: false, marketing: false },
@@ -39,6 +45,12 @@ test("defineConfig rejects data without lawfulBasis for every collected category
 			// @ts-expect-error — missing "Account Information" in lawfulBasis
 			lawfulBasis: {},
 			retention: { "Account Information": "Until deletion" },
+			provisionRequirement: {
+				"Account Information": {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
+			},
 		},
 	});
 	expect(true).toBe(true);
@@ -55,6 +67,29 @@ test("defineConfig rejects data without retention for every collected category",
 			lawfulBasis: { "Account Information": "contract" },
 			// @ts-expect-error — missing "Account Information" in retention
 			retention: {},
+			provisionRequirement: {
+				"Account Information": {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
+			},
+		},
+	});
+	expect(true).toBe(true);
+});
+
+test("defineConfig rejects data without provisionRequirement for every collected category", () => {
+	defineConfig({
+		company: fixture.company,
+		effectiveDate: "2026-01-01",
+		jurisdictions: ["eu"],
+		data: {
+			collected: { "Account Information": ["Email"] },
+			purposes: { "Account Information": "Auth" },
+			lawfulBasis: { "Account Information": "contract" },
+			retention: { "Account Information": "Until deletion" },
+			// @ts-expect-error — missing "Account Information" in provisionRequirement
+			provisionRequirement: {},
 		},
 	});
 	expect(true).toBe(true);

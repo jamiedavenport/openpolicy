@@ -27,6 +27,16 @@ export default defineConfig({
 			"Account Information": "Until account deletion",
 			"Session Data": "Until session expiry",
 		},
+		provisionRequirement: {
+			"Account Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or operate your account.",
+			},
+			"Session Data": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot secure the service or your session.",
+			},
+		},
 	},
 	cookies: {
 		used: {

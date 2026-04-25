@@ -22,6 +22,12 @@ export default defineConfig({
 		retention: {
 			"Personal Information": "As long as necessary for the purposes described in this policy",
 		},
+		provisionRequirement: {
+			"Personal Information": {
+				basis: "contract-prerequisite",
+				consequences: "We cannot create or manage your account.",
+			},
+		},
 	},
 	cookies: {
 		used: {
