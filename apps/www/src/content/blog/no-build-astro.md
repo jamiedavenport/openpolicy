@@ -51,24 +51,18 @@ export default defineConfig({
 	// Privacy policy fields — auto-detected from field presence
 	data: {
 		collected: {
-			/* ... */
+			/* category → field labels */
 		},
-		purposes: {
-			/* ... */
-		},
-		lawfulBasis: {
-			/* ... */
-		},
-		retention: {
-			/* ... */
+		context: {
+			/* category → { purpose, lawfulBasis, retention, provision } */
 		},
 	},
 	// ...
 	// Cookie policy fields — auto-detected from field presence
 	cookies: {
 		used: { essential: true /* ... */ },
-		lawfulBasis: {
-			/* ... */
+		context: {
+			/* category → { lawfulBasis } */
 		},
 	},
 	// ...

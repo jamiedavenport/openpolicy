@@ -20,7 +20,14 @@ Minimal config with privacy policy:
 
 ```ts
 // openpolicy.ts
-import { cookies, dataCollected, defineConfig, LegalBases, thirdParties } from "@openpolicy/sdk";
+import {
+	ContractPrerequisite,
+	cookies,
+	dataCollected,
+	defineConfig,
+	LegalBases,
+	thirdParties,
+} from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -33,20 +40,25 @@ export default defineConfig({
 	jurisdictions: ["us-ca"],
 	data: {
 		collected: { ...dataCollected },
-		purposes: { "Account Information": "To create and manage user accounts" },
-		lawfulBasis: { "Account Information": LegalBases.Contract },
-		retention: { "Account Information": "Until account deletion" },
+		context: {
+			"Account Information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+		},
 	},
 	thirdParties: [...thirdParties],
 	cookies: {
 		used: cookies,
-		lawfulBasis: { essential: LegalBases.LegalObligation },
+		context: { essential: { lawfulBasis: LegalBases.LegalObligation } },
 	},
 	automatedDecisionMaking: [],
 });
 ```
 
-The `data` block holds privacy fields together: `collected`, `purposes`, `lawfulBasis`, and `retention` all share the same set of category keys (TS-enforced via `defineConfig`). The `cookies` block mirrors that pattern with `used` (categories) and `lawfulBasis` (Article 6 basis per category). OpenPolicy auto-detects which policies to generate from the fields you provide: a `data` block produces a privacy policy; a `cookies` block produces a cookie policy. `effectiveDate` and `jurisdictions` are shared across both.
+The `data` block keeps privacy fields together: `collected` lists field labels per category, and `context` carries the per-category metadata (`purpose`, `lawfulBasis`, `retention`, `provision`). Every key in `collected` must have a matching `context` entry — TS-enforced via `defineConfig`. The `cookies` block mirrors that pattern with `used` (categories) and `context` (Article 6 basis per category). OpenPolicy auto-detects which policies to generate from the fields you provide: a `data` block produces a privacy policy; a `cookies` block produces a cookie policy. `effectiveDate` and `jurisdictions` are shared across both.
 
 User rights (access, erasure, portability, etc.) are **derived automatically** from `jurisdictions` — declare `eu` (GDPR) or `uk` (UK-GDPR) for the six GDPR-style rights, `us-ca` for the four CCPA rights, or any combination for the union. There is no `userRights` field on the public config. See [Supported jurisdictions](https://docs.openpolicy.sh/references/jurisdictions) for the full list of codes.
 
@@ -54,10 +66,11 @@ User rights (access, erasure, portability, etc.) are **derived automatically** f
 
 ### 1. Privacy config with GDPR
 
-Use `Compliance.GDPR` to spread the required `jurisdictions` (rights are derived automatically). Pair each collected category with its purpose, lawful basis, and retention:
+Use `Compliance.GDPR` to spread the required `jurisdictions` (rights are derived automatically). Pair each collected category with a single context object holding its purpose, lawful basis, retention, and provision requirement:
 
 ```ts
 import {
+	ContractPrerequisite,
 	cookies,
 	Compliance,
 	DataCategories,
@@ -67,6 +80,7 @@ import {
 	Providers,
 	Retention,
 	thirdParties,
+	Voluntary,
 } from "@openpolicy/sdk";
 
 export default defineConfig({
@@ -84,34 +98,36 @@ export default defineConfig({
 			...DataCategories.AccountInfo,
 			...DataCategories.UsageData,
 		},
-		purposes: {
-			"Account Information": "To authenticate users and send service notifications",
-			"Usage Data": "To understand product usage and improve the service",
-		},
-		lawfulBasis: {
-			"Account Information": LegalBases.Contract,
-			"Usage Data": LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Account Information": Retention.UntilAccountDeletion,
-			"Usage Data": Retention.NinetyDays,
+		context: {
+			"Account Information": {
+				purpose: "To authenticate users and send service notifications",
+				lawfulBasis: LegalBases.Contract,
+				retention: Retention.UntilAccountDeletion,
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+			"Usage Data": {
+				purpose: "To understand product usage and improve the service",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: Retention.NinetyDays,
+				provision: Voluntary("None — your service is unaffected."),
+			},
 		},
 	},
 	thirdParties: [...thirdParties, Providers.Stripe, Providers.PostHog],
 	children: { underAge: 13 },
 	cookies: {
 		used: cookies,
-		lawfulBasis: {
-			essential: LegalBases.LegalObligation,
-			analytics: LegalBases.Consent,
-			marketing: LegalBases.Consent,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 	automatedDecisionMaking: [],
 });
 ```
 
-`Compliance.GDPR` expands to `{ jurisdictions: ["eu"] }`. The six GDPR user rights are derived automatically from `jurisdictions: ["eu"]`. `defineConfig` infers the category set from `data.collected` and requires every category to appear in `purposes`, `lawfulBasis`, and `retention` — omitting any is a TS error.
+`Compliance.GDPR` expands to `{ jurisdictions: ["eu"] }`. The six GDPR user rights are derived automatically from `jurisdictions: ["eu"]`. `defineConfig` infers the category set from `data.collected` and requires every category to appear in `context` — omitting any is a TS error.
 
 ### 2. Using Compliance presets
 
@@ -134,7 +150,7 @@ defineConfig({
 });
 ```
 
-Each preset provides only `jurisdictions`. The Article 6 basis per data category lives in `data.lawfulBasis` (you choose), not the preset.
+Each preset provides only `jurisdictions`. The Article 6 basis per data category lives in `data.context[category].lawfulBasis` (you choose), not the preset.
 
 Available preset groups from `@openpolicy/sdk`:
 
@@ -155,10 +171,10 @@ export default defineConfig({
   jurisdictions: ["eu", "us-ca"],
   cookies: {
     used: { essential: true, analytics: true, marketing: false },
-    lawfulBasis: {
-      essential: LegalBases.LegalObligation,
-      analytics: LegalBases.Consent,
-      marketing: LegalBases.Consent,
+    context: {
+      essential: { lawfulBasis: LegalBases.LegalObligation },
+      analytics: { lawfulBasis: LegalBases.Consent },
+      marketing: { lawfulBasis: LegalBases.Consent },
     },
   },
   consentMechanism: {
@@ -171,24 +187,28 @@ export default defineConfig({
 });
 ```
 
-`cookies.used` requires `essential: true` — all other keys are `boolean` and are treated as additional cookie categories. Every enabled category in `cookies.used` must have a matching entry in `cookies.lawfulBasis` (TS-enforced via the `ScannedCookieKeys` interface). Presence of `cookies`, `consentMechanism`, or `trackingTechnologies` auto-detects a cookie policy.
+`cookies.used` requires `essential: true` — all other keys are `boolean` and are treated as additional cookie categories. Every enabled category in `cookies.used` must have a matching entry in `cookies.context` (TS-enforced via the `ScannedCookieKeys` interface). Presence of `cookies`, `consentMechanism`, or `trackingTechnologies` auto-detects a cookie policy.
 
 ## Common Mistakes
 
-### HIGH — Using free-form purpose names in lawfulBasis
+### HIGH — Using free-form keys in `data.context`
 
 Wrong:
 
 ```ts
-// WRONG: lawfulBasis keys must match data.collected keys (TS will reject this)
+// WRONG: data.context keys must match data.collected keys (TS will reject this)
 defineConfig({
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
-		purposes: { "Account Information": "Account creation" },
-		lawfulBasis: {
-			"Providing the service": LegalBases.Contract, // ← unrelated string
+		context: {
+			"Providing the service": {
+				// ← unrelated string
+				purpose: "Account creation",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create your account."),
+			},
 		},
-		retention: { "Account Information": "Until account deletion" },
 	},
 });
 ```
@@ -199,14 +219,19 @@ Correct:
 defineConfig({
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
-		purposes: { "Account Information": "Account creation" },
-		lawfulBasis: { "Account Information": LegalBases.Contract },
-		retention: { "Account Information": "Until account deletion" },
+		context: {
+			"Account Information": {
+				purpose: "Account creation",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create your account."),
+			},
+		},
 	},
 });
 ```
 
-`data.purposes`, `data.lawfulBasis`, and `data.retention` are all keyed by the same set of strings as `data.collected`. The renderer joins them into the GDPR Art. 13(1)(c) chain: `**Account Information** — used for Account creation — Performance of a contract (Article 6(1)(b))`.
+`data.context` is keyed by the same set of strings as `data.collected`. The renderer joins each context entry into the GDPR Art. 13(1)(c) chain: `**Account Information** — used for Account creation — Performance of a contract (Article 6(1)(b))`.
 
 Source: `packages/core/src/types.ts`, `packages/core/src/documents/privacy.ts`
 
@@ -223,7 +248,7 @@ defineConfig({
 	company: {
 		/* ... */
 	},
-	data: { collected: {}, purposes: {}, lawfulBasis: {}, retention: {} },
+	data: { collected: {}, context: {} },
 	// jurisdictions omitted
 });
 ```
@@ -237,9 +262,14 @@ defineConfig({
 	},
 	data: {
 		collected: { "Account Information": ["Name"] },
-		purposes: { "Account Information": "Account creation" },
-		lawfulBasis: { "Account Information": LegalBases.Contract },
-		retention: { "Account Information": "Until account deletion" },
+		context: {
+			"Account Information": {
+				purpose: "Account creation",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create your account."),
+			},
+		},
 	},
 	jurisdictions: ["eu", "us-ca"],
 });

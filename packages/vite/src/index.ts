@@ -75,8 +75,8 @@ async function findConfigDir(root: string): Promise<string> {
  * per scanned `collecting()` category and one per scanned cookie category.
  * The SDK's `ScannedCollectionKeys` and `ScannedCookieKeys` interfaces are
  * augmented by this file so `defineConfig` requires every scanned category to
- * have matching entries in `data.purposes` / `data.lawfulBasis` /
- * `data.retention` and `cookies.lawfulBasis`. Commit the file — that keeps
+ * have matching entries in `data.context` (with `purpose`, `lawfulBasis`,
+ * `retention`, and `provision`) and `cookies.context`. Commit the file — that keeps
  * the type-level constraints live in CI without needing to run the Vite
  * plugin first.
  */

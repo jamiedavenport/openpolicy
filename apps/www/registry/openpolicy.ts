@@ -1,4 +1,4 @@
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -14,26 +14,18 @@ export default defineConfig({
 			"Personal Information": ["Full name", "Email address"],
 			"Usage Data": ["Pages visited", "Time spent on site"],
 		},
-		purposes: {
-			"Personal Information": "To create and manage user accounts",
-			"Usage Data": "To understand product usage and improve the service",
-		},
-		lawfulBasis: {
-			"Personal Information": LegalBases.Contract,
-			"Usage Data": LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Personal Information": "As long as your account is active",
-			"Usage Data": "90 days",
-		},
-		provisionRequirement: {
+		context: {
 			"Personal Information": {
-				basis: "contract-prerequisite",
-				consequences: "We cannot create or manage your account.",
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "As long as your account is active",
+				provision: ContractPrerequisite("We cannot create or manage your account."),
 			},
 			"Usage Data": {
-				basis: "voluntary",
-				consequences: "None — your service is unaffected.",
+				purpose: "To understand product usage and improve the service",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "90 days",
+				provision: Voluntary("None — your service is unaffected."),
 			},
 		},
 	},
@@ -43,10 +35,10 @@ export default defineConfig({
 			analytics: false,
 			marketing: false,
 		},
-		lawfulBasis: {
-			essential: LegalBases.LegalObligation,
-			analytics: LegalBases.Consent,
-			marketing: LegalBases.Consent,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 	thirdParties: [],

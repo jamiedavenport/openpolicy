@@ -13,19 +13,25 @@ const minimalPrivacyConfig: PrivacyPolicyConfig = {
 	},
 	data: {
 		collected: { "Account Information": ["Name", "Email address"] },
-		purposes: { "Account Information": "To authenticate users and send service notifications" },
-		lawfulBasis: { "Account Information": "contract" },
-		retention: { "Account Information": "Until account deletion" },
-		provisionRequirement: {
+		context: {
 			"Account Information": {
-				basis: "contract-prerequisite",
-				consequences: "We cannot create or operate your account.",
+				purpose: "To authenticate users and send service notifications",
+				lawfulBasis: "contract",
+				retention: "Until account deletion",
+				provision: {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
 			},
 		},
 	},
 	cookies: {
 		used: { essential: true, analytics: false, marketing: false },
-		lawfulBasis: { essential: "legal_obligation", analytics: "consent", marketing: "consent" },
+		context: {
+			essential: { lawfulBasis: "legal_obligation" },
+			analytics: { lawfulBasis: "consent" },
+			marketing: { lawfulBasis: "consent" },
+		},
 	},
 	thirdParties: [],
 	userRights: ["access"],
@@ -147,10 +153,7 @@ test("compile throws when data.collected is empty", () => {
 			...minimalPrivacyConfig,
 			data: {
 				collected: {},
-				purposes: {},
-				lawfulBasis: {},
-				retention: {},
-				provisionRequirement: {},
+				context: {},
 			},
 		}),
 	).toThrow(/no data collected/i);
@@ -172,26 +175,24 @@ test("data-collected section includes purpose paragraph for each category", () =
 				"Account Information": ["Name", "Email"],
 				"Session Data": ["IP address"],
 			},
-			purposes: {
-				"Account Information": "To authenticate users",
-				"Session Data": "To secure sessions",
-			},
-			lawfulBasis: {
-				"Account Information": "contract",
-				"Session Data": "legitimate_interests",
-			},
-			retention: {
-				"Account Information": "Until account deletion",
-				"Session Data": "30 days",
-			},
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot create or operate your account.",
+					purpose: "To authenticate users",
+					lawfulBasis: "contract",
+					retention: "Until account deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot create or operate your account.",
+					},
 				},
 				"Session Data": {
-					basis: "voluntary",
-					consequences: "None — your service is unaffected.",
+					purpose: "To secure sessions",
+					lawfulBasis: "legitimate_interests",
+					retention: "30 days",
+					provision: {
+						basis: "voluntary",
+						consequences: "None — your service is unaffected.",
+					},
 				},
 			},
 		},
@@ -302,26 +303,24 @@ test("legal-basis section renders one block per data category with Article 6 sub
 				"Personal Information": ["Name", "Email"],
 				"Marketing Data": ["Mailing list signup"],
 			},
-			purposes: {
-				"Personal Information": "Providing the service",
-				"Marketing Data": "Marketing communications",
-			},
-			lawfulBasis: {
-				"Personal Information": "contract",
-				"Marketing Data": "consent",
-			},
-			retention: {
-				"Personal Information": "Until account deletion",
-				"Marketing Data": "Until consent is withdrawn",
-			},
-			provisionRequirement: {
+			context: {
 				"Personal Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot provide the service.",
+					purpose: "Providing the service",
+					lawfulBasis: "contract",
+					retention: "Until account deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot provide the service.",
+					},
 				},
 				"Marketing Data": {
-					basis: "voluntary",
-					consequences: "None — your service is unaffected.",
+					purpose: "Marketing communications",
+					lawfulBasis: "consent",
+					retention: "Until consent is withdrawn",
+					provision: {
+						basis: "voluntary",
+						consequences: "None — your service is unaffected.",
+					},
 				},
 			},
 		},
@@ -344,26 +343,24 @@ test("consent-withdrawal section is rendered when any data category uses consent
 				"Personal Information": ["Name"],
 				"Marketing Data": ["Mailing list signup"],
 			},
-			purposes: {
-				"Personal Information": "Providing the service",
-				"Marketing Data": "Marketing communications",
-			},
-			lawfulBasis: {
-				"Personal Information": "contract",
-				"Marketing Data": "consent",
-			},
-			retention: {
-				"Personal Information": "Until account deletion",
-				"Marketing Data": "Until consent is withdrawn",
-			},
-			provisionRequirement: {
+			context: {
 				"Personal Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot provide the service.",
+					purpose: "Providing the service",
+					lawfulBasis: "contract",
+					retention: "Until account deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot provide the service.",
+					},
 				},
 				"Marketing Data": {
-					basis: "voluntary",
-					consequences: "None — your service is unaffected.",
+					purpose: "Marketing communications",
+					lawfulBasis: "consent",
+					retention: "Until consent is withdrawn",
+					provision: {
+						basis: "voluntary",
+						consequences: "None — your service is unaffected.",
+					},
 				},
 			},
 		},
@@ -384,7 +381,10 @@ test("consent-withdrawal section is rendered when only cookies use consent (EU)"
 		jurisdictions: ["eu"],
 		cookies: {
 			used: { essential: true, analytics: true },
-			lawfulBasis: { essential: "legal_obligation", analytics: "consent" },
+			context: {
+				essential: { lawfulBasis: "legal_obligation" },
+				analytics: { lawfulBasis: "consent" },
+			},
 		},
 	});
 	const cw = doc.sections.find((s) => s.id === "consent-withdrawal")!;
@@ -403,32 +403,30 @@ test("consent-withdrawal section is omitted when no data or cookie basis is cons
 				"Personal Information": ["Name"],
 				"Service Data": ["Logs"],
 			},
-			purposes: {
-				"Personal Information": "Providing the service",
-				"Service Data": "Service communications",
-			},
-			lawfulBasis: {
-				"Personal Information": "contract",
-				"Service Data": "legitimate_interests",
-			},
-			retention: {
-				"Personal Information": "Until account deletion",
-				"Service Data": "30 days",
-			},
-			provisionRequirement: {
+			context: {
 				"Personal Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot provide the service.",
+					purpose: "Providing the service",
+					lawfulBasis: "contract",
+					retention: "Until account deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot provide the service.",
+					},
 				},
 				"Service Data": {
-					basis: "voluntary",
-					consequences: "None — your service is unaffected.",
+					purpose: "Service communications",
+					lawfulBasis: "legitimate_interests",
+					retention: "30 days",
+					provision: {
+						basis: "voluntary",
+						consequences: "None — your service is unaffected.",
+					},
 				},
 			},
 		},
 		cookies: {
 			used: { essential: true },
-			lawfulBasis: { essential: "legal_obligation" },
+			context: { essential: { lawfulBasis: "legal_obligation" } },
 		},
 	});
 	expect(doc.sections.find((s) => s.id === "consent-withdrawal")).toBeUndefined();
@@ -441,7 +439,10 @@ test("consent-withdrawal section is omitted under non-EU/UK jurisdictions even w
 		jurisdictions: ["us-ca"],
 		cookies: {
 			used: { essential: true, analytics: true },
-			lawfulBasis: { essential: "legal_obligation", analytics: "consent" },
+			context: {
+				essential: { lawfulBasis: "legal_obligation" },
+				analytics: { lawfulBasis: "consent" },
+			},
 		},
 	});
 	expect(doc.sections.find((s) => s.id === "consent-withdrawal")).toBeUndefined();
@@ -454,13 +455,15 @@ test("legal-basis section no longer carries the consent-withdrawal paragraph (it
 		jurisdictions: ["eu"],
 		data: {
 			collected: { "Marketing Data": ["Email"] },
-			purposes: { "Marketing Data": "Marketing communications" },
-			lawfulBasis: { "Marketing Data": "consent" },
-			retention: { "Marketing Data": "Until consent is withdrawn" },
-			provisionRequirement: {
+			context: {
 				"Marketing Data": {
-					basis: "voluntary",
-					consequences: "None — your service is unaffected.",
+					purpose: "Marketing communications",
+					lawfulBasis: "consent",
+					retention: "Until consent is withdrawn",
+					provision: {
+						basis: "voluntary",
+						consequences: "None — your service is unaffected.",
+					},
 				},
 			},
 		},
@@ -603,40 +606,42 @@ test("provision-requirement section renders one paragraph per category covering 
 				"Marketing Preferences": ["Newsletter opt-in"],
 				"Cover Letter": ["Free-text"],
 			},
-			purposes: {
-				"Account Information": "To authenticate users",
-				"Billing Address": "To issue invoices",
-				"Marketing Preferences": "To send marketing emails",
-				"Cover Letter": "To enter into an employment contract",
-			},
-			lawfulBasis: {
-				"Account Information": "contract",
-				"Billing Address": "legal_obligation",
-				"Marketing Preferences": "consent",
-				"Cover Letter": "contract",
-			},
-			retention: {
-				"Account Information": "Until account deletion",
-				"Billing Address": "7 years",
-				"Marketing Preferences": "Until consent is withdrawn",
-				"Cover Letter": "12 months",
-			},
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contractual",
-					consequences: "We cannot operate your account.",
+					purpose: "To authenticate users",
+					lawfulBasis: "contract",
+					retention: "Until account deletion",
+					provision: {
+						basis: "contractual",
+						consequences: "We cannot operate your account.",
+					},
 				},
 				"Billing Address": {
-					basis: "statutory",
-					consequences: "We cannot lawfully invoice you.",
+					purpose: "To issue invoices",
+					lawfulBasis: "legal_obligation",
+					retention: "7 years",
+					provision: {
+						basis: "statutory",
+						consequences: "We cannot lawfully invoice you.",
+					},
 				},
 				"Marketing Preferences": {
-					basis: "voluntary",
-					consequences: "None — you may decline without affecting your service.",
+					purpose: "To send marketing emails",
+					lawfulBasis: "consent",
+					retention: "Until consent is withdrawn",
+					provision: {
+						basis: "voluntary",
+						consequences: "None — you may decline without affecting your service.",
+					},
 				},
 				"Cover Letter": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot consider your application.",
+					purpose: "To enter into an employment contract",
+					lawfulBasis: "contract",
+					retention: "12 months",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot consider your application.",
+					},
 				},
 			},
 		},

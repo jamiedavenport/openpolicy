@@ -42,6 +42,6 @@ That's the whole flow. The CLI is meant for one-time setup — once it's done, u
 
 ## Why a prompt instead of a wizard?
 
-A coding agent reading your actual codebase can fill in `data.collected`, `data.purposes`, `data.lawfulBasis`, `data.retention`, `thirdParties`, `jurisdictions`, and cookie usage more accurately than a series of prompts ever could — it infers from your ORM schemas, imports, environment variables, and existing legal copy. The CLI gives you the scaffolding, the agent supplies the content.
+A coding agent reading your actual codebase can fill in `data.collected`, `data.context`, `thirdParties`, `jurisdictions`, and cookie usage more accurately than a series of prompts ever could — it infers from your ORM schemas, imports, environment variables, and existing legal copy. The CLI gives you the scaffolding, the agent supplies the content.
 
 See [Configuration](/configuration) for the shape of `openpolicy.ts` and [Auto-collect](/policies/auto-collect) for declaring data collection inline in your source.

@@ -34,7 +34,7 @@ export function validatePrivacyPolicy(config: PrivacyPolicyConfig): ValidationIs
 			level: "error",
 			message: "company.contact is required",
 		});
-	const { collected, purposes } = config.data;
+	const { collected, context } = config.data;
 	if (Object.keys(collected).length === 0)
 		issues.push({
 			code: "data-collected-required",
@@ -42,53 +42,50 @@ export function validatePrivacyPolicy(config: PrivacyPolicyConfig): ValidationIs
 			message: "data.collected must have at least one entry",
 		});
 	for (const category of Object.keys(collected)) {
-		const purpose = purposes[category];
-		if (purpose === undefined) {
+		const entry = context[category];
+		if (entry === undefined) {
 			issues.push({
-				code: "data-purpose-missing",
+				code: "data-context-missing",
 				level: "error",
-				message: `data.purposes["${category}"] is missing — every collected category requires a processing purpose (GDPR Art. 13(1)(c))`,
+				message: `data.context["${category}"] is missing — every collected category requires a context entry (purpose, lawful basis, retention, provision).`,
 			});
 			continue;
 		}
-		if (purpose.trim().length === 0) {
+		if (entry.purpose === undefined) {
+			issues.push({
+				code: "data-purpose-missing",
+				level: "error",
+				message: `data.context["${category}"].purpose is missing — every collected category requires a processing purpose (GDPR Art. 13(1)(c))`,
+			});
+		} else if (entry.purpose.trim().length === 0) {
 			issues.push({
 				code: "data-purpose-empty",
 				level: "error",
-				message: `data.purposes["${category}"] must be a non-empty string`,
+				message: `data.context["${category}"].purpose must be a non-empty string`,
 			});
 		}
 	}
-	for (const category of Object.keys(purposes)) {
+	for (const category of Object.keys(context)) {
 		if (!(category in collected)) {
 			issues.push({
-				code: "data-purpose-orphan",
+				code: "data-context-orphan",
 				level: "error",
-				message: `data.purposes["${category}"] has no matching entry in data.collected — remove it or declare the collected fields`,
+				message: `data.context["${category}"] has no matching entry in data.collected — remove it or declare the collected fields`,
 			});
 		}
 	}
 
 	// GDPR / UK-GDPR Art. 13(1)(c): lawful basis must be stated for each
-	// distinct processing purpose. Keys in data.lawfulBasis mirror
-	// data.collected, so every collected category needs a basis.
+	// distinct processing purpose. Every collected category needs a basis
+	// in its context entry.
 	if (config.jurisdictions.includes("eu") || config.jurisdictions.includes("uk")) {
 		for (const category of Object.keys(collected)) {
-			const basis = config.data.lawfulBasis[category];
+			const basis = context[category]?.lawfulBasis;
 			if (!basis) {
 				issues.push({
 					code: "lawful-basis-incomplete",
 					level: "error",
-					message: `GDPR Article 13(1)(c): data.lawfulBasis["${category}"] is missing — every collected category requires an Article 6 lawful basis.`,
-				});
-			}
-		}
-		for (const category of Object.keys(config.data.lawfulBasis)) {
-			if (!(category in collected)) {
-				issues.push({
-					code: "lawful-basis-orphan",
-					level: "error",
-					message: `data.lawfulBasis["${category}"] has no matching entry in data.collected — remove it or declare the collected fields`,
+					message: `GDPR Article 13(1)(c): data.context["${category}"].lawfulBasis is missing — every collected category requires an Article 6 lawful basis.`,
 				});
 			}
 		}
@@ -97,18 +94,18 @@ export function validatePrivacyPolicy(config: PrivacyPolicyConfig): ValidationIs
 		// whether provision is statutory, contractual, a contract-prerequisite,
 		// or voluntary, and the consequences of failure to provide it.
 		for (const category of Object.keys(collected)) {
-			const pr = config.data.provisionRequirement?.[category];
+			const pr = context[category]?.provision;
 			if (!pr || !pr.basis) {
 				issues.push({
 					code: "statutory-contractual-obligation",
 					level: "error",
-					message: `GDPR Article 13(2)(e): data.provisionRequirement["${category}"] is missing — disclose whether provision is statutory, contractual, a contract-prerequisite, or voluntary, and the consequences of failure to provide it.`,
+					message: `GDPR Article 13(2)(e): data.context["${category}"].provision is missing — disclose whether provision is statutory, contractual, a contract-prerequisite, or voluntary, and the consequences of failure to provide it.`,
 				});
 			} else if (typeof pr.consequences !== "string" || pr.consequences.trim().length === 0) {
 				issues.push({
 					code: "statutory-contractual-obligation",
 					level: "error",
-					message: `GDPR Article 13(2)(e): data.provisionRequirement["${category}"].consequences is empty — state the consequences of failure to provide this data.`,
+					message: `GDPR Article 13(2)(e): data.context["${category}"].provision.consequences is empty — state the consequences of failure to provide this data.`,
 				});
 			}
 		}
@@ -116,12 +113,12 @@ export function validatePrivacyPolicy(config: PrivacyPolicyConfig): ValidationIs
 
 	// Retention must be declared for every collected category.
 	for (const category of Object.keys(collected)) {
-		const period = config.data.retention[category];
+		const period = context[category]?.retention;
 		if (period === undefined || period.trim().length === 0) {
 			issues.push({
 				code: "retention-incomplete",
 				level: "error",
-				message: `data.retention["${category}"] is missing — declare a retention period for every collected category.`,
+				message: `data.context["${category}"].retention is missing — declare a retention period for every collected category.`,
 			});
 		}
 	}

@@ -1,4 +1,4 @@
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -14,27 +14,18 @@ export default defineConfig({
 			"Account Information": ["Name", "Email address"],
 			"Session Data": ["IP address", "User agent"],
 		},
-		purposes: {
-			"Account Information":
-				"To authenticate users, send service notifications, and provide customer support",
-			"Session Data": "To secure sessions, detect abuse, and diagnose service issues",
-		},
-		lawfulBasis: {
-			"Account Information": LegalBases.Contract,
-			"Session Data": LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Account Information": "Until account deletion",
-			"Session Data": "Until session expiry",
-		},
-		provisionRequirement: {
+		context: {
 			"Account Information": {
-				basis: "contract-prerequisite",
-				consequences: "We cannot create or operate your account.",
+				purpose: "To authenticate users, send service notifications, and provide customer support",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
 			},
 			"Session Data": {
-				basis: "contract-prerequisite",
-				consequences: "We cannot secure the service or your session.",
+				purpose: "To secure sessions, detect abuse, and diagnose service issues",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "Until session expiry",
+				provision: ContractPrerequisite("We cannot secure the service or your session."),
 			},
 		},
 	},
@@ -44,10 +35,10 @@ export default defineConfig({
 			analytics: false,
 			marketing: false,
 		},
-		lawfulBasis: {
-			essential: LegalBases.LegalObligation,
-			analytics: LegalBases.Consent,
-			marketing: LegalBases.Consent,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 	thirdParties: [],

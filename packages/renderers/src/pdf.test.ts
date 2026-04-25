@@ -13,22 +13,24 @@ const input: PolicyInput = {
 	},
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
-		purposes: { "Account Information": "To authenticate users" },
-		lawfulBasis: { "Account Information": "contract" as const },
-		retention: { "Account Information": "Until deletion" },
-		provisionRequirement: {
+		context: {
 			"Account Information": {
-				basis: "contract-prerequisite" as const,
-				consequences: "We cannot create or operate your account.",
+				purpose: "To authenticate users",
+				lawfulBasis: "contract" as const,
+				retention: "Until deletion",
+				provision: {
+					basis: "contract-prerequisite" as const,
+					consequences: "We cannot create or operate your account.",
+				},
 			},
 		},
 	},
 	cookies: {
 		used: { essential: true, analytics: false, marketing: false },
-		lawfulBasis: {
-			essential: "legal_obligation" as const,
-			analytics: "consent" as const,
-			marketing: "consent" as const,
+		context: {
+			essential: { lawfulBasis: "legal_obligation" as const },
+			analytics: { lawfulBasis: "consent" as const },
+			marketing: { lawfulBasis: "consent" as const },
 		},
 	},
 	thirdParties: [],

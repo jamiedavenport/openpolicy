@@ -26,17 +26,20 @@ export type {
 	CompanyConfig,
 	CompileOptions,
 	ConsentMechanism,
+	CookieContext,
+	CookieContextEntry,
 	CookiePolicyConfig,
 	CookiePolicyCookies,
 	CookieUsage,
 	DataCollection,
 	DataConfig,
+	DataContext,
+	DataContextEntry,
 	Dpo,
 	EffectiveDate,
 	EuRepresentative,
 	Jurisdiction,
 	LegalBasis,
-	LegalBasisMap,
 	OpenPolicyConfig,
 	OutputFormat,
 	PolicyCategory,
@@ -44,15 +47,13 @@ export type {
 	PrivacyPolicyConfig,
 	ProvisionBasis,
 	ProvisionRequirement,
-	ProvisionRequirementMap,
-	Purposes,
-	Retention,
 	ThirdParty,
 	TrackingTechnology,
 	UserRight,
 	ValidationIssue,
 } from "./types";
 export { isOpenPolicyConfig } from "./types";
+export { Contractual, ContractPrerequisite, Statutory, Voluntary } from "./provision";
 export { deriveUserRights } from "./user-rights";
 export { validatePrivacyPolicy } from "./validate";
 export { validateOpenPolicyConfig } from "./validate-config";
@@ -84,12 +85,9 @@ export function shouldEmit(category: PolicyCategory, config: OpenPolicyConfig): 
 
 const EMPTY_DATA: DataConfig = {
 	collected: {},
-	purposes: {},
-	lawfulBasis: {},
-	retention: {},
-	provisionRequirement: {},
+	context: {},
 };
-const EMPTY_COOKIES: CookiePolicyCookies = { used: { essential: true }, lawfulBasis: {} };
+const EMPTY_COOKIES: CookiePolicyCookies = { used: { essential: true }, context: {} };
 
 export function expandOpenPolicyConfig(config: OpenPolicyConfig): PolicyInput[] {
 	const inputs: PolicyInput[] = [];

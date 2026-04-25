@@ -17,11 +17,11 @@ const validConfig: CookiePolicyConfig = {
 			functional: false,
 			marketing: false,
 		},
-		lawfulBasis: {
-			essential: "legal_obligation",
-			analytics: "consent",
-			functional: "consent",
-			marketing: "consent",
+		context: {
+			essential: { lawfulBasis: "legal_obligation" },
+			analytics: { lawfulBasis: "consent" },
+			functional: { lawfulBasis: "consent" },
+			marketing: { lawfulBasis: "consent" },
 		},
 	},
 	thirdParties: [],
@@ -88,11 +88,11 @@ test("all cookies disabled is an error", () => {
 				functional: false,
 				marketing: false,
 			},
-			lawfulBasis: {
-				essential: "legal_obligation",
-				analytics: "consent",
-				functional: "consent",
-				marketing: "consent",
+			context: {
+				essential: { lawfulBasis: "legal_obligation" },
+				analytics: { lawfulBasis: "consent" },
+				functional: { lawfulBasis: "consent" },
+				marketing: { lawfulBasis: "consent" },
 			},
 		},
 	});

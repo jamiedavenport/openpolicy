@@ -1,4 +1,4 @@
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -13,19 +13,12 @@ export default defineConfig({
 		collected: {
 			"Personal Information": ["Full name", "Email address"],
 		},
-		purposes: {
-			"Personal Information": "To create and manage user accounts and provide customer support",
-		},
-		lawfulBasis: {
-			"Personal Information": LegalBases.Contract,
-		},
-		retention: {
-			"Personal Information": "As long as necessary for the purposes described in this policy",
-		},
-		provisionRequirement: {
+		context: {
 			"Personal Information": {
-				basis: "contract-prerequisite",
-				consequences: "We cannot create or manage your account.",
+				purpose: "To create and manage user accounts and provide customer support",
+				lawfulBasis: LegalBases.Contract,
+				retention: "As long as necessary for the purposes described in this policy",
+				provision: ContractPrerequisite("We cannot create or manage your account."),
 			},
 		},
 	},
@@ -36,11 +29,11 @@ export default defineConfig({
 			functional: false,
 			marketing: false,
 		},
-		lawfulBasis: {
-			essential: LegalBases.LegalObligation,
-			analytics: LegalBases.Consent,
-			functional: LegalBases.Consent,
-			marketing: LegalBases.Consent,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			functional: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 	thirdParties: [

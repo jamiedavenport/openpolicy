@@ -25,7 +25,7 @@ With OpenPolicy, you define your policy as a TypeScript object and render it dir
 
 ```ts
 // openpolicy.ts
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -40,17 +40,19 @@ export default defineConfig({
 			"Account Information": ["Full name", "Email address"],
 			"Usage Data": ["Pages visited", "Feature usage"],
 		},
-		purposes: {
-			"Account Information": "To create and manage user accounts",
-			"Usage Data": "To understand product usage and improve the service",
-		},
-		lawfulBasis: {
-			"Account Information": LegalBases.Contract,
-			"Usage Data": LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Account Information": "Until account deletion",
-			"Usage Data": "90 days",
+		context: {
+			"Account Information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+			"Usage Data": {
+				purpose: "To understand product usage and improve the service",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "90 days",
+				provision: Voluntary("None — your service is unaffected."),
+			},
 		},
 	},
 });

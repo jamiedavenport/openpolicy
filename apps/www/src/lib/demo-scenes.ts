@@ -20,13 +20,15 @@ export default defineConfig({
   jurisdictions: ["us-ca"],
   data: {
     collected: { Account: ["Email"] },
-    purposes: { Account: "Sign you in" },
-    lawfulBasis: { Account: "contract" },
-    retention: { Account: "While account is active" },
-    provisionRequirement: {
+    context: {
       Account: {
-        basis: "contract-prerequisite",
-        consequences: "Account creation fails",
+        purpose: "Sign you in",
+        lawfulBasis: "contract",
+        retention: "While account is active",
+        provision: {
+          basis: "contract-prerequisite",
+          consequences: "Account creation fails",
+        },
       },
     },
   },
@@ -46,13 +48,15 @@ export default defineConfig({
   jurisdictions: ["us-ca", "eu"],
   data: {
     collected: { Account: ["Email"] },
-    purposes: { Account: "Sign you in" },
-    lawfulBasis: { Account: "contract" },
-    retention: { Account: "While account is active" },
-    provisionRequirement: {
+    context: {
       Account: {
-        basis: "contract-prerequisite",
-        consequences: "Account creation fails",
+        purpose: "Sign you in",
+        lawfulBasis: "contract",
+        retention: "While account is active",
+        provision: {
+          basis: "contract-prerequisite",
+          consequences: "Account creation fails",
+        },
       },
     },
   },
@@ -75,26 +79,24 @@ export default defineConfig({
       Account: ["Email"],
       Analytics: ["IP address", "User agent"],
     },
-    purposes: {
-      Account: "Sign you in",
-      Analytics: "Understand product usage",
-    },
-    lawfulBasis: {
-      Account: "contract",
-      Analytics: "legitimate_interests",
-    },
-    retention: {
-      Account: "While account is active",
-      Analytics: "13 months",
-    },
-    provisionRequirement: {
+    context: {
       Account: {
-        basis: "contract-prerequisite",
-        consequences: "Account creation fails",
+        purpose: "Sign you in",
+        lawfulBasis: "contract",
+        retention: "While account is active",
+        provision: {
+          basis: "contract-prerequisite",
+          consequences: "Account creation fails",
+        },
       },
       Analytics: {
-        basis: "voluntary",
-        consequences: "Limited product insights",
+        purpose: "Understand product usage",
+        lawfulBasis: "legitimate_interests",
+        retention: "13 months",
+        provision: {
+          basis: "voluntary",
+          consequences: "Limited product insights",
+        },
       },
     },
   },
@@ -114,11 +116,13 @@ const SCENE_0_CONFIG: OpenPolicyConfig = {
 	jurisdictions: ["us-ca"],
 	data: {
 		collected: { Account: ["Email"] },
-		purposes: { Account: "Sign you in" },
-		lawfulBasis: { Account: "contract" },
-		retention: { Account: "While account is active" },
-		provisionRequirement: {
-			Account: { basis: "contract-prerequisite", consequences: "Account creation fails" },
+		context: {
+			Account: {
+				purpose: "Sign you in",
+				lawfulBasis: "contract",
+				retention: "While account is active",
+				provision: { basis: "contract-prerequisite", consequences: "Account creation fails" },
+			},
 		},
 	},
 };
@@ -135,26 +139,24 @@ const SCENE_2_CONFIG: OpenPolicyConfig = {
 			Account: ["Email"],
 			Analytics: ["IP address", "User agent"],
 		},
-		purposes: {
-			Account: "Sign you in",
-			Analytics: "Understand product usage",
-		},
-		lawfulBasis: {
-			Account: "contract",
-			Analytics: "legitimate_interests",
-		},
-		retention: {
-			Account: "While account is active",
-			Analytics: "13 months",
-		},
-		provisionRequirement: {
+		context: {
 			Account: {
-				basis: "contract-prerequisite",
-				consequences: "Account creation fails",
+				purpose: "Sign you in",
+				lawfulBasis: "contract",
+				retention: "While account is active",
+				provision: {
+					basis: "contract-prerequisite",
+					consequences: "Account creation fails",
+				},
 			},
 			Analytics: {
-				basis: "voluntary",
-				consequences: "Limited product insights",
+				purpose: "Understand product usage",
+				lawfulBasis: "legitimate_interests",
+				retention: "13 months",
+				provision: {
+					basis: "voluntary",
+					consequences: "Limited product insights",
+				},
 			},
 		},
 	},
@@ -169,6 +171,6 @@ export const scenes: DemoScene[] = [
 		label: "+ analytics",
 		code: SCENE_2_CODE,
 		config: SCENE_2_CONFIG,
-		addedLines: [14, 18, 22, 26, 33, 34, 35, 36],
+		addedLines: [14, 26, 27, 28, 29, 30, 31, 32, 33, 34],
 	},
 ];

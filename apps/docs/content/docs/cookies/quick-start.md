@@ -52,11 +52,11 @@ cookies: {
     functional: false,
     marketing: false,
   },
-  lawfulBasis: {
-    essential: LegalBases.LegalObligation,
-    analytics: LegalBases.Consent,
-    functional: LegalBases.Consent,
-    marketing: LegalBases.Consent,
+  context: {
+    essential: { lawfulBasis: LegalBases.LegalObligation },
+    analytics: { lawfulBasis: LegalBases.Consent },
+    functional: { lawfulBasis: LegalBases.Consent },
+    marketing: { lawfulBasis: LegalBases.Consent },
   },
 },
 consentMechanism: {

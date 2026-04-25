@@ -34,12 +34,6 @@ export type LegalBasis =
 	| "public_task"
 	| "legitimate_interests";
 
-// GDPR Art. 13(1)(c) requires the lawful basis to be stated for each
-// distinct processing purpose. Keys mirror `DataConfig.collected` so every
-// declared data category carries its Article 6 basis; the renderer joins
-// the matching `purposes[category]` entry into the rendered chain.
-export type LegalBasisMap = Record<string, LegalBasis>;
-
 // GDPR Art. 13(2)(f) requires disclosing each automated-decision-making
 // or profiling activity (Art. 22) — the existence, the logic involved,
 // and the significance and envisaged consequences for the data subject.
@@ -77,13 +71,9 @@ export type EffectiveDate = `${number}-${number}-${number}`;
 
 export type DataCollection = Record<string, string[]>;
 
-export type Purposes = Record<string, string>;
-
-export type Retention = Record<string, string>;
-
 // GDPR Art. 13(2)(e) — for each collected category, disclose whether
 // provision of the data is required, and the consequences of failing to
-// provide it. Keys mirror `DataConfig.collected`.
+// provide it.
 export type ProvisionBasis =
 	| "statutory" //              Required by law (e.g. tax record-keeping)
 	| "contractual" //            Required under an existing contract
@@ -95,14 +85,21 @@ export type ProvisionRequirement = {
 	consequences: string;
 };
 
-export type ProvisionRequirementMap = Record<string, ProvisionRequirement>;
+// One row of per-category metadata. Every key in `data.collected` carries
+// a matching `data.context[category]` entry so the renderers can pull
+// purpose, lawful basis, retention, and provision disclosure together.
+export type DataContextEntry = {
+	purpose: string;
+	lawfulBasis: LegalBasis;
+	retention: string;
+	provision: ProvisionRequirement;
+};
+
+export type DataContext = Record<string, DataContextEntry>;
 
 export type DataConfig = {
 	collected: DataCollection;
-	purposes: Purposes;
-	lawfulBasis: LegalBasisMap;
-	retention: Retention;
-	provisionRequirement: ProvisionRequirementMap;
+	context: DataContext;
 };
 
 export type ThirdParty = { name: string; purpose: string; policyUrl?: string };
@@ -117,9 +114,15 @@ export type CookieUsage = {
 	[key: string]: boolean;
 };
 
+export type CookieContextEntry = {
+	lawfulBasis: LegalBasis;
+};
+
+export type CookieContext = Record<string, CookieContextEntry>;
+
 export type CookiePolicyCookies = {
 	used: CookieUsage;
-	lawfulBasis: LegalBasisMap;
+	context: CookieContext;
 };
 
 export type TrackingTechnology = string;

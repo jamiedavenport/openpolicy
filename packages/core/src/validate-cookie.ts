@@ -48,11 +48,11 @@ export function validateCookiePolicy(config: CookiePolicyConfig): ValidationIssu
 		});
 	}
 	for (const key of enabledKeys) {
-		if (!config.cookies.lawfulBasis?.[key]) {
+		if (!config.cookies.context?.[key]?.lawfulBasis) {
 			issues.push({
 				code: "cookie-lawful-basis-missing",
 				level: "error",
-				message: `cookies.lawfulBasis["${key}"] is missing — every enabled cookie category requires an Article 6 lawful basis.`,
+				message: `cookies.context["${key}"].lawfulBasis is missing — every enabled cookie category requires an Article 6 lawful basis.`,
 			});
 		}
 	}

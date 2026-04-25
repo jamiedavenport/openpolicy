@@ -1,4 +1,11 @@
-import { cookies, dataCollected, defineConfig, LegalBases, thirdParties } from "@openpolicy/sdk";
+import {
+	ContractPrerequisite,
+	cookies,
+	dataCollected,
+	defineConfig,
+	LegalBases,
+	thirdParties,
+} from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -14,35 +21,27 @@ export default defineConfig({
 			...dataCollected,
 			"Usage Data": ["Pages visited", "Browser type", "IP address"],
 		},
-		purposes: {
-			"Account Information": "To authenticate users and send service notifications",
-			"Usage Data": "To understand product usage and improve the service",
-		},
-		lawfulBasis: {
-			"Account Information": LegalBases.Contract,
-			"Usage Data": LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Account Information": "Until account deletion",
-			"Usage Data": "90 days",
-		},
-		provisionRequirement: {
+		context: {
 			"Account Information": {
-				basis: "contract-prerequisite",
-				consequences: "We cannot create or operate your account.",
+				purpose: "To authenticate users and send service notifications",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
 			},
 			"Usage Data": {
-				basis: "contract-prerequisite",
-				consequences: "We cannot deliver or secure the service.",
+				purpose: "To understand product usage and improve the service",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "90 days",
+				provision: ContractPrerequisite("We cannot deliver or secure the service."),
 			},
 		},
 	},
 	cookies: {
 		used: cookies,
-		lawfulBasis: {
-			essential: LegalBases.LegalObligation,
-			analytics: LegalBases.Consent,
-			marketing: LegalBases.Consent,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 	thirdParties,

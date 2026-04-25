@@ -18,7 +18,7 @@ OpenPolicy treats policies like code: they live in your repo, they're reviewed i
 
 ```ts
 // openpolicy.ts
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -34,25 +34,27 @@ export default defineConfig({
 			"Account Information": ["Email", "Name"],
 			"Usage Data": ["IP address", "Browser", "Pages visited"],
 		},
-		purposes: {
-			"Account Information": "To create and manage user accounts",
-			"Usage Data": "To understand product usage and improve the service",
-		},
-		lawfulBasis: {
-			"Account Information": LegalBases.Contract,
-			"Usage Data": LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Account Information": "3 years after account closure",
-			"Usage Data": "90 days",
+		context: {
+			"Account Information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "3 years after account closure",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+			"Usage Data": {
+				purpose: "To understand product usage and improve the service",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "90 days",
+				provision: Voluntary("None — your service is unaffected."),
+			},
 		},
 	},
 	cookies: {
 		used: { essential: true, analytics: true, marketing: false },
-		lawfulBasis: {
-			essential: LegalBases.LegalObligation,
-			analytics: LegalBases.Consent,
-			marketing: LegalBases.Consent,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 	thirdParties: [
@@ -115,7 +117,7 @@ Read this codebase carefully, then generate a policy.ts using the OpenPolicy SDK
 SDK reference: https://openpolicy.sh/llms.txt
 
 Your output should capture:
-- Every category of data collected, why (data.purposes), the Article 6 basis (data.lawfulBasis), and how long it's kept (data.retention)
+- Every category of data collected, plus a `data.context` entry for each carrying its purpose, Article 6 basis, retention period, and provision requirement
 - All third-party services integrated and their purpose
 - The applicable jurisdiction (US, EU, UK, etc.)
 - Cookie categories and the lawful basis for each

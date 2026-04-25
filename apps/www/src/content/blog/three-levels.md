@@ -25,7 +25,7 @@ The config is a plain TypeScript object:
 
 ```ts
 // openpolicy.ts
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -41,26 +41,28 @@ export default defineConfig({
 			"Account Information": ["Name", "Email address"],
 			"Usage Data": ["Pages visited", "Features used"],
 		},
-		purposes: {
-			"Account Information": "To create and manage user accounts",
-			"Usage Data": "To understand product usage and improve the service",
-		},
-		lawfulBasis: {
-			"Account Information": LegalBases.Contract,
-			"Usage Data": LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Account Information": "Until account deletion",
-			"Usage Data": "90 days",
+		context: {
+			"Account Information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+			"Usage Data": {
+				purpose: "To understand product usage and improve the service",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "90 days",
+				provision: Voluntary("None — your service is unaffected."),
+			},
 		},
 	},
 	thirdParties: [],
 	cookies: {
 		used: { essential: true, analytics: true, marketing: false },
-		lawfulBasis: {
-			essential: LegalBases.LegalObligation,
-			analytics: LegalBases.Consent,
-			marketing: LegalBases.Consent,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 	automatedDecisionMaking: [],

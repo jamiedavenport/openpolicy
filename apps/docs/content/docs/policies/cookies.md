@@ -20,11 +20,11 @@ cookies: {
     functional: false,
     marketing: false,
   },
-  lawfulBasis: {
-    essential: LegalBases.LegalObligation,
-    analytics: LegalBases.Consent,
-    functional: LegalBases.Consent,
-    marketing: LegalBases.Consent,
+  context: {
+    essential: { lawfulBasis: LegalBases.LegalObligation },
+    analytics: { lawfulBasis: LegalBases.Consent },
+    functional: { lawfulBasis: LegalBases.Consent },
+    marketing: { lawfulBasis: LegalBases.Consent },
   },
 },
 thirdParties: [
@@ -41,7 +41,7 @@ consentMechanism: {
 },
 ```
 
-`cookies.used` always requires `essential: true`; other keys are `boolean` and act as additional categories. Every key in `cookies.used` must have a matching Article 6 basis in `cookies.lawfulBasis` — `defineConfig` enforces this at type-check time, and the rendered "Cookies and Tracking" section appends the basis to each enabled category.
+`cookies.used` always requires `essential: true`; other keys are `boolean` and act as additional categories. Every key in `cookies.used` must have a matching Article 6 basis in `cookies.context[key].lawfulBasis` — `defineConfig` enforces this at type-check time, and the rendered "Cookies and Tracking" section appends the basis to each enabled category.
 
 Then render it:
 
