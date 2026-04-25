@@ -1,13 +1,13 @@
 ---
 import { Icon } from "astro-icon/components";
-import BaseLayout from "../layouts/BaseLayout.astro";
+import AnimatedDemo from "../components/animated-demo.astro";
 import CodeBlock from "../components/code-block.astro";
 import CompareCell from "../components/compare-cell.astro";
+import InstrumentSnippet from "../components/instrument-snippet.astro";
 import { homepageRows } from "../data/comparisons";
+import BaseLayout from "../layouts/BaseLayout.astro";
 
 import installCmd from "../snippets/install.sh?raw";
-import policyTs from "../snippets/openpolicy.ts?raw";
-import instrumentTs from "../snippets/instrument.ts?raw";
 import viteCfg from "../snippets/vite.config.ts?raw";
 import privacyRoute from "../snippets/privacy-policy.tsx?raw";
 import llmPrompt from "../snippets/prompt.txt?raw";
@@ -75,9 +75,9 @@ const frameworks = [
       ))}
     </div>
     <p class="text-sm text-gray-500 mb-2">
-      Define everything in one <code>openpolicy.ts</code> config.
+      Define everything in one <code>openpolicy.ts</code> config — your policy adapts in lockstep.
     </p>
-    <CodeBlock code={policyTs} lang="ts" filename="openpolicy.ts" />
+    <AnimatedDemo />
   </section>
 
   <section>
@@ -113,7 +113,10 @@ const frameworks = [
     <p class="mb-4">
       Wrap data at the point you store it. <code>collecting()</code> is a pass-through at runtime, but the Vite plugin scans for these calls at build time and populates your policy's data inventory automatically. <code>thirdParty()</code> does the same for integrations.
     </p>
-    <CodeBlock code={instrumentTs} lang="ts" filename="src/actions/create-user.ts" />
+    <InstrumentSnippet />
+    <p class="text-sm text-gray-500 mt-4 mb-6">
+      Every collected field has to be labelled or explicitly <code>Ignore</code>d — forget one and TypeScript fails the build. Compliance gaps surface in your editor, not in production.
+    </p>
     <p class="text-sm text-gray-500 mt-6 mb-2">
       Wire <code>openPolicy()</code> into your Vite config so the scan runs on every build.
     </p>

@@ -45,18 +45,18 @@
 
   ```ts
   defineConfig({
-    // ... existing fields ...
-    automatedDecisionMaking: [], // explicit "we don't"
-    // or:
-    automatedDecisionMaking: [
-      {
-        name: "Fraud scoring",
-        logic:
-          "Transactions are scored by a rules engine combining device fingerprint and historical patterns.",
-        significance:
-          "A high score may delay or decline a transaction; you can request human review.",
-      },
-    ],
+  	// ... existing fields ...
+  	automatedDecisionMaking: [], // explicit "we don't"
+  	// or:
+  	automatedDecisionMaking: [
+  		{
+  			name: "Fraud scoring",
+  			logic:
+  				"Transactions are scored by a rules engine combining device fingerprint and historical patterns.",
+  			significance:
+  				"A high score may delay or decline a transaction; you can request human review.",
+  		},
+  	],
   });
   ```
 
@@ -69,18 +69,17 @@
   ```ts
   // before
   defineConfig({
-    dataCollected: { "Account Information": ["Name", "Email"] },
+  	dataCollected: { "Account Information": ["Name", "Email"] },
   });
 
   // after
   defineConfig({
-    data: {
-      collected: { "Account Information": ["Name", "Email"] },
-      purposes: {
-        "Account Information":
-          "To authenticate users and send service notifications",
-      },
-    },
+  	data: {
+  		collected: { "Account Information": ["Name", "Email"] },
+  		purposes: {
+  			"Account Information": "To authenticate users and send service notifications",
+  		},
+  	},
   });
   ```
 
@@ -95,15 +94,15 @@
   ```ts
   // before
   defineConfig({
-    legalBasis: ["legitimate_interests", "consent"],
+  	legalBasis: ["legitimate_interests", "consent"],
   });
 
   // after
   defineConfig({
-    legalBasis: {
-      "Providing the service": "legitimate_interests",
-      "Marketing communications": "consent",
-    },
+  	legalBasis: {
+  		"Providing the service": "legitimate_interests",
+  		"Marketing communications": "consent",
+  	},
   });
   ```
 
@@ -149,7 +148,6 @@
 
   Old union: `"us" | "eu" | "ca" | "au" | "nz" | "other"`
   New union: `"eu" | "uk" | "us-ca" | "us-va" | "us-co" | "br" | "ca" | "au" | "jp" | "sg"`
-
   - `"us"` is **removed** — there is no federal US privacy regime shipping content. List specific state codes (e.g. `"us-ca"`) for the states you cover.
   - `"ca"` **semantics flipped** from California → Canada. Consumers using `"ca"` for CCPA must migrate to `"us-ca"`. `"ca"` is now a reserved code for Canada and produces no gated content yet.
   - `"nz"` and `"other"` are removed.
@@ -167,14 +165,12 @@
 - 8e219fe: Flatten `defineConfig()` — all policy fields now live at the top level. The nested `privacy: { ... }` and `cookie: { ... }` blocks are gone, and `effectiveDate` / `jurisdictions` are single top-level fields (previously duplicated in each block).
 
   Which policy types are generated is now auto-detected from field presence:
-
   - **Privacy policy** is emitted if any of `dataCollected`, `legalBasis`, `retention`, `userRights`, or `children` is set.
   - **Cookie policy** is emitted if `cookies` is set.
 
   You can override auto-detection with `policies: ["privacy"]` or `policies: ["cookie"]`.
 
   **Breaking changes:**
-
   - `OpenPolicyConfig` is a single flat object. The `privacy` and `cookie` wrapper keys are removed.
   - `EffectiveDate` is now the template literal type `` `${number}-${number}-${number}` ``.
   - `LegalBasis` is narrowed to a union of GDPR Art. 6 lawful bases: `"consent" | "contract" | "legal_obligation" | "vital_interests" | "public_task" | "legitimate_interests"`. Free-form strings are no longer accepted.
@@ -185,28 +181,28 @@
 
   ```ts
   export default defineConfig({
-    company: {
-      /* … */
-    },
-    privacy: {
-      effectiveDate: "2026-01-01",
-      jurisdictions: ["us"],
-      dataCollected: {
-        /* … */
-      },
-      legalBasis: "legitimate_interests",
-      retention: {
-        /* … */
-      },
-      cookies: { essential: true, analytics: false, marketing: false },
-      thirdParties: [],
-      userRights: ["access"],
-    },
-    cookie: {
-      effectiveDate: "2026-01-01",
-      jurisdictions: ["us"],
-      cookies: { essential: true, analytics: true },
-    },
+  	company: {
+  		/* … */
+  	},
+  	privacy: {
+  		effectiveDate: "2026-01-01",
+  		jurisdictions: ["us"],
+  		dataCollected: {
+  			/* … */
+  		},
+  		legalBasis: "legitimate_interests",
+  		retention: {
+  			/* … */
+  		},
+  		cookies: { essential: true, analytics: false, marketing: false },
+  		thirdParties: [],
+  		userRights: ["access"],
+  	},
+  	cookie: {
+  		effectiveDate: "2026-01-01",
+  		jurisdictions: ["us"],
+  		cookies: { essential: true, analytics: true },
+  	},
   });
   ```
 
@@ -214,28 +210,27 @@
 
   ```ts
   export default defineConfig({
-    company: {
-      /* … */
-    },
-    effectiveDate: "2026-01-01",
-    jurisdictions: ["us"],
-    dataCollected: {
-      /* … */
-    },
-    legalBasis: "legitimate_interests",
-    retention: {
-      /* … */
-    },
-    userRights: ["access"],
-    thirdParties: [],
-    cookies: { essential: true, analytics: true },
+  	company: {
+  		/* … */
+  	},
+  	effectiveDate: "2026-01-01",
+  	jurisdictions: ["us"],
+  	dataCollected: {
+  		/* … */
+  	},
+  	legalBasis: "legitimate_interests",
+  	retention: {
+  		/* … */
+  	},
+  	userRights: ["access"],
+  	thirdParties: [],
+  	cookies: { essential: true, analytics: true },
   });
   ```
 
 - 8e219fe: Remove Terms of Service support. OpenPolicy now focuses exclusively on privacy and cookie policies — domains that are globally regulated and have consistent compliance requirements.
 
   **Breaking changes:**
-
   - `PolicyInput` is now a discriminated union of `privacy | cookie` only (the `terms` branch has been removed)
   - `TermsOfServiceConfig` and `DisputeResolutionMethod` types have been removed from `@openpolicy/sdk` and `@openpolicy/core`
   - `validateTermsOfService` has been removed from `@openpolicy/core`
@@ -246,7 +241,6 @@
   **Migration:** remove the `terms: { ... }` block from your `openpolicy.ts` config and stop importing `<TermsOfService />`. If you need terms of service content, source it from a dedicated legal tool.
 
 - 8e219fe: **Breaking change:** `userRights` has been removed from `OpenPolicyConfig`. The data-subject rights listed in your privacy policy are now derived automatically from `jurisdictions`:
-
   - `jurisdictions: ["eu"]` → access, rectification, erasure, portability, restriction, objection (GDPR)
   - `jurisdictions: ["ca"]` → access, erasure, opt_out_sale, non_discrimination (CCPA)
   - Both → the union, in a fixed canonical order
@@ -270,7 +264,6 @@
   The rendered privacy policy may list **more** rights than before if your previous `userRights` value was shorter than the baseline required by your declared `jurisdictions` — this is intentional; the refactor closes a footgun where the field under-declared legal obligations.
 
   Related SDK surface changes:
-
   - `Rights` constant removed from `@openpolicy/sdk` (superseded by derivation).
   - `UserRight` type re-export removed from `@openpolicy/sdk`.
   - `Compliance.GDPR` and `Compliance.CCPA` no longer include a `userRights` field — they still provide `jurisdictions` (and `legalBasis` for GDPR), which is enough to drive the correct rights list.
