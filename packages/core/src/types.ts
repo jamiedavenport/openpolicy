@@ -34,6 +34,11 @@ export type LegalBasis =
 	| "public_task"
 	| "legitimate_interests";
 
+// GDPR Art. 13(1)(c) requires the lawful basis to be stated for each
+// distinct processing purpose — keys are human-readable purpose names,
+// values are the Article 6 basis that applies to that purpose.
+export type LegalBasisMap = Record<string, LegalBasis>;
+
 export type Dpo =
 	| { email: string; name?: string; phone?: string; address?: string }
 	| { required: false; reason?: string };
@@ -85,7 +90,7 @@ export type PrivacyPolicyConfig = {
 	effectiveDate: EffectiveDate;
 	company: CompanyConfig;
 	data: DataConfig;
-	legalBasis: LegalBasis | LegalBasis[];
+	legalBasis: LegalBasisMap;
 	retention: Retention;
 	cookies: CookiePolicyCookies;
 	thirdParties: ThirdParty[];
@@ -118,7 +123,7 @@ export type OpenPolicyConfig = {
 
 	// Data handling — feeds the privacy policy.
 	data?: DataConfig;
-	legalBasis?: LegalBasis | LegalBasis[];
+	legalBasis?: LegalBasisMap;
 	retention?: Retention;
 	children?: ChildrenConfig;
 	thirdParties?: ThirdParty[];
@@ -139,6 +144,7 @@ export function isOpenPolicyConfig(value: unknown): value is OpenPolicyConfig {
 }
 
 export type ValidationIssue = {
+	code: string;
 	level: "error" | "warning";
 	message: string;
 };

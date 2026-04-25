@@ -14,7 +14,7 @@ const baseConfig: PrivacyPolicyConfig = {
 		collected: { "Account Information": ["Name", "Email"] },
 		purposes: { "Account Information": "To authenticate users" },
 	},
-	legalBasis: ["legitimate_interests"],
+	legalBasis: { "Providing the service": "legitimate_interests" },
 	retention: { "Account data": "Until deletion" },
 	cookies: { essential: true },
 	thirdParties: [],
@@ -89,4 +89,59 @@ test("validatePrivacyPolicy: errors when a purpose key has no matching collected
 				i.message.includes('data.purposes["Orphan Category"] has no matching entry'),
 		),
 	).toBe(true);
+});
+
+test("validatePrivacyPolicy: emits lawful-basis-per-purpose when EU jurisdiction has empty legalBasis map", () => {
+	const issues = validatePrivacyPolicy({
+		...baseConfig,
+		jurisdictions: ["eu"],
+		legalBasis: {},
+	});
+	expect(issues.some((i) => i.code === "lawful-basis-per-purpose" && i.level === "error")).toBe(
+		true,
+	);
+});
+
+test("validatePrivacyPolicy: emits lawful-basis-per-purpose when UK jurisdiction has empty legalBasis map", () => {
+	const issues = validatePrivacyPolicy({
+		...baseConfig,
+		jurisdictions: ["uk"],
+		legalBasis: {},
+	});
+	expect(issues.some((i) => i.code === "lawful-basis-per-purpose" && i.level === "error")).toBe(
+		true,
+	);
+});
+
+test("validatePrivacyPolicy: emits lawful-basis-per-purpose when a purpose has empty basis", () => {
+	const issues = validatePrivacyPolicy({
+		...baseConfig,
+		jurisdictions: ["eu"],
+		legalBasis: { "Providing the service": "" as never },
+	});
+	const hit = issues.find(
+		(i) => i.code === "lawful-basis-per-purpose" && i.message.includes("Providing the service"),
+	);
+	expect(hit).toBeDefined();
+});
+
+test("validatePrivacyPolicy: does NOT emit lawful-basis-per-purpose for non-GDPR jurisdictions", () => {
+	const issues = validatePrivacyPolicy({
+		...baseConfig,
+		jurisdictions: ["us-ca"],
+		legalBasis: {},
+	});
+	expect(issues.some((i) => i.code === "lawful-basis-per-purpose")).toBe(false);
+});
+
+test("validatePrivacyPolicy: well-formed per-purpose legalBasis under GDPR has no lawful-basis errors", () => {
+	const issues = validatePrivacyPolicy({
+		...baseConfig,
+		jurisdictions: ["eu"],
+		legalBasis: {
+			"Providing the service": "contract",
+			"Marketing communications": "consent",
+		},
+	});
+	expect(issues.some((i) => i.code === "lawful-basis-per-purpose")).toBe(false);
 });

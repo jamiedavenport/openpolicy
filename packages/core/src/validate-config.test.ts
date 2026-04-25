@@ -16,7 +16,7 @@ const baseConfig: OpenPolicyConfig = {
 		collected: { "Account Information": ["Name", "Email"] },
 		purposes: { "Account Information": "To authenticate users" },
 	},
-	legalBasis: "legitimate_interests",
+	legalBasis: { "Providing the service": "legitimate_interests" },
 	retention: { "Account data": "Until deletion" },
 };
 

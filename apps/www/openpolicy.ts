@@ -20,7 +20,10 @@ export default defineConfig({
 			"Session Data": "To secure sessions, detect abuse, and diagnose service issues",
 		},
 	},
-	legalBasis: ["legitimate_interests", "consent"],
+	legalBasis: {
+		"Providing the service": "legitimate_interests",
+		"Marketing communications": "consent",
+	},
 	retention: {
 		"Account information": "Until account deletion",
 		"Session data": "Until session expiry",

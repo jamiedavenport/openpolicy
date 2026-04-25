@@ -15,7 +15,10 @@ const minimalPrivacyConfig: PrivacyPolicyConfig = {
 		collected: { "Account Information": ["Name", "Email address"] },
 		purposes: { "Account Information": "To authenticate users and send service notifications" },
 	},
-	legalBasis: ["legitimate_interests", "consent"],
+	legalBasis: {
+		"Providing the service": "legitimate_interests",
+		"Marketing communications": "consent",
+	},
 	retention: { "Account data": "Until account deletion" },
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
@@ -257,4 +260,64 @@ test("introduction section has ParagraphNode children", () => {
 	const firstPara = intro.content[1] as ParagraphNode;
 	expect(firstPara.children.length).toBeGreaterThan(0);
 	expect(firstPara.children[0]?.type).toBe("text");
+});
+
+test("legal-basis section renders one block per processing purpose with Article 6 sub-clause", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		legalBasis: {
+			"Providing the service": "contract",
+			"Marketing communications": "consent",
+		},
+	});
+	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
+	const blob = JSON.stringify(legalBasis);
+	expect(blob).toContain("Providing the service");
+	expect(blob).toContain("Performance of a contract (Article 6(1)(b))");
+	expect(blob).toContain("Marketing communications");
+	expect(blob).toContain("Consent (Article 6(1)(a))");
+});
+
+test("legal-basis section appends consent-withdrawal paragraph when any purpose uses consent", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		legalBasis: {
+			"Providing the service": "contract",
+			"Marketing communications": "consent",
+		},
+	});
+	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
+	const blob = JSON.stringify(legalBasis);
+	expect(blob).toContain("Right to withdraw consent");
+	expect(blob).toContain(minimalPrivacyConfig.company.contact);
+	expect(blob).toContain("does not affect the lawfulness");
+});
+
+test("legal-basis section omits consent-withdrawal paragraph when no purpose uses consent", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		legalBasis: {
+			"Providing the service": "contract",
+			"Service communications": "legitimate_interests",
+		},
+	});
+	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
+	const blob = JSON.stringify(legalBasis);
+	expect(blob).not.toContain("Right to withdraw consent");
+});
+
+test("legal-basis section is omitted entirely when legalBasis map is empty (non-GDPR)", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["ca"],
+		legalBasis: {},
+	});
+	expect(doc.sections.find((s) => s.id === "legal-basis")).toBeUndefined();
 });

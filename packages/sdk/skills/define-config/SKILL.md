@@ -32,7 +32,7 @@ export default defineConfig({
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["us-ca"],
 	dataCollected: { ...dataCollected },
-	legalBasis: "legitimate_interests",
+	legalBasis: { "Providing the service": "legitimate_interests" },
 	retention: { "Account Information": "Until account deletion" },
 	thirdParties: [...thirdParties],
 	cookies: { essential: true, analytics: false, marketing: false },
@@ -84,7 +84,7 @@ export default defineConfig({
 });
 ```
 
-`Compliance.GDPR` expands to `{ jurisdictions: ["eu"], legalBasis: ["legitimate_interests"] }`. The six GDPR user rights are derived automatically from `jurisdictions: ["eu"]`.
+`Compliance.GDPR` expands to `{ jurisdictions: ["eu"], legalBasis: { "Providing the service": "legitimate_interests" } }`. The six GDPR user rights are derived automatically from `jurisdictions: ["eu"]`.
 
 ### 2. Using Compliance presets
 
@@ -154,7 +154,7 @@ const config: PrivacyPolicyConfig = {
 	company: { name: "Acme", legalName: "Acme, Inc.", address: "...", contact: "..." },
 	effectiveDate: "2026-01-01",
 	dataCollected: {},
-	legalBasis: "consent",
+	legalBasis: { "Marketing communications": "consent" },
 	retention: {},
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
@@ -176,7 +176,7 @@ export default defineConfig({
 	effectiveDate: "2026-01-01",
 	jurisdictions: [],
 	dataCollected: {},
-	legalBasis: "consent",
+	legalBasis: { "Marketing communications": "consent" },
 	retention: {},
 	thirdParties: [],
 	cookies: { essential: true, analytics: false, marketing: false },
@@ -200,7 +200,7 @@ defineConfig({
 	company: {
 		/* ... */
 	},
-	legalBasis: "legitimate_interests",
+	legalBasis: { "Providing the service": "legitimate_interests" },
 	// jurisdictions omitted
 });
 ```
@@ -212,7 +212,7 @@ defineConfig({
 	company: {
 		/* ... */
 	},
-	legalBasis: "legitimate_interests",
+	legalBasis: { "Providing the service": "legitimate_interests" },
 	jurisdictions: ["eu", "us-ca"],
 });
 ```

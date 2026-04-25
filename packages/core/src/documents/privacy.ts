@@ -71,14 +71,27 @@ function buildDataCollected(config: PrivacyPolicyConfig): DocumentSection {
 
 function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
 	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
-	const bases = Array.isArray(config.legalBasis) ? config.legalBasis : [config.legalBasis];
-	const labelled = bases.map((b) => LEGAL_BASIS_LABELS[b] ?? b);
-	return section("legal-basis", [
+	const entries = Object.entries(config.legalBasis);
+	if (entries.length === 0) return null;
+	const content: ContentNode[] = [
 		heading("Legal Basis for Processing", {
-			reason: "Required by GDPR and UK-GDPR Article 13",
+			reason: "Required by GDPR and UK-GDPR Article 13(1)(c)",
 		}),
-		p([labelled.join(" and ")]),
-	]);
+		p(["Under GDPR Article 6, we rely on the following lawful bases for each processing purpose:"]),
+	];
+	for (const [purpose, basis] of entries) {
+		const label = LEGAL_BASIS_LABELS[basis] ?? basis;
+		content.push(p([bold(purpose), " — ", label]));
+	}
+	if (entries.some(([, basis]) => basis === "consent")) {
+		content.push(
+			p([
+				bold("Right to withdraw consent."),
+				` Where we rely on your consent, you may withdraw it at any time by contacting us at ${config.company.contact}. Withdrawing consent does not affect the lawfulness of any processing we carried out before you withdrew it.`,
+			]),
+		);
+	}
+	return section("legal-basis", content);
 }
 
 function buildDataRetention(config: PrivacyPolicyConfig): DocumentSection {

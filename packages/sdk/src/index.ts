@@ -12,6 +12,7 @@ export type {
 	EffectiveDate,
 	Jurisdiction,
 	LegalBasis,
+	LegalBasisMap,
 	OpenPolicyConfig,
 	PolicyCategory,
 	Purposes,

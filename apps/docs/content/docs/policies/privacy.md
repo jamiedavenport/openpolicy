@@ -21,7 +21,10 @@ data: {
     "Usage Data": "To understand product usage and improve the service",
   },
 },
-legalBasis: ["legitimate_interests", "consent"],
+legalBasis: {
+  "Providing the service": "legitimate_interests",
+  "Marketing communications": "consent",
+},
 retention: {
   "Account data": "Until account deletion",
   "Usage logs": "90 days",

@@ -19,7 +19,10 @@ export default defineConfig({
 			"Usage Data": "To understand product usage and improve the service",
 		},
 	},
-	legalBasis: "legitimate_interests",
+	legalBasis: {
+		"Providing the service": "contract",
+		"Marketing emails": "consent",
+	},
 	retention: {
 		"Account data": "Until account deletion",
 		"Usage logs": "90 days",

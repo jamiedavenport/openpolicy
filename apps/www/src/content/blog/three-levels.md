@@ -40,7 +40,10 @@ export default defineConfig({
 		"Account Information": ["Name", "Email address"],
 		"Usage Data": ["Pages visited", "Features used"],
 	},
-	legalBasis: ["legitimate_interests", "consent"],
+	legalBasis: {
+		"Providing the service": "legitimate_interests",
+		"Marketing communications": "consent",
+	},
 	retention: { "Account Information": "Until account deletion" },
 	thirdParties: [],
 	cookies: { essential: true, analytics: true, marketing: false },

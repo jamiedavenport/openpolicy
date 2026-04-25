@@ -18,7 +18,7 @@ const privacyConfig: PrivacyPolicyConfig = {
 		collected: { account: ["email", "name"] },
 		purposes: { account: "To authenticate users" },
 	},
-	legalBasis: "consent",
+	legalBasis: { "Marketing communications": "consent" },
 	retention: { account: "2 years" },
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],

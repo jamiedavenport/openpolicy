@@ -44,7 +44,10 @@ export default defineConfig({
 			"Usage Data": "To understand product usage and improve the service",
 		},
 	},
-	legalBasis: ["legitimate_interests", "consent"],
+	legalBasis: {
+		"Providing the service": "legitimate_interests",
+		"Marketing communications": "consent",
+	},
 	retention: { "Account data": "Until account deletion" },
 	thirdParties: [],
 	cookies: { essential: true, analytics: false, marketing: false },

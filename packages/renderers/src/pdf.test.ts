@@ -15,7 +15,7 @@ const input: PolicyInput = {
 		collected: { "Account Information": ["Name", "Email"] },
 		purposes: { "Account Information": "To authenticate users" },
 	},
-	legalBasis: "legitimate_interests" as const,
+	legalBasis: { "Providing the service": "legitimate_interests" as const },
 	retention: { "Account data": "Until deletion" },
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],

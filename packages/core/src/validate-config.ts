@@ -5,16 +5,39 @@ import type { OpenPolicyConfig, PolicyCategory, ValidationIssue } from "./types"
 export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIssue[] {
 	const issues: ValidationIssue[] = [];
 
-	if (!config.effectiveDate) issues.push({ level: "error", message: "effectiveDate is required" });
-	if (!config.company?.name) issues.push({ level: "error", message: "company.name is required" });
+	if (!config.effectiveDate)
+		issues.push({
+			code: "effective-date-required",
+			level: "error",
+			message: "effectiveDate is required",
+		});
+	if (!config.company?.name)
+		issues.push({
+			code: "company-name-required",
+			level: "error",
+			message: "company.name is required",
+		});
 	if (!config.company?.legalName)
-		issues.push({ level: "error", message: "company.legalName is required" });
+		issues.push({
+			code: "company-legal-name-required",
+			level: "error",
+			message: "company.legalName is required",
+		});
 	if (!config.company?.address)
-		issues.push({ level: "error", message: "company.address is required" });
+		issues.push({
+			code: "company-address-required",
+			level: "error",
+			message: "company.address is required",
+		});
 	if (!config.company?.contact)
-		issues.push({ level: "error", message: "company.contact is required" });
+		issues.push({
+			code: "company-contact-required",
+			level: "error",
+			message: "company.contact is required",
+		});
 	if (!config.jurisdictions || config.jurisdictions.length === 0) {
 		issues.push({
+			code: "jurisdictions-required",
 			level: "error",
 			message: "jurisdictions must have at least one entry",
 		});
@@ -22,6 +45,7 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 		for (const code of config.jurisdictions) {
 			if (!isJurisdiction(code)) {
 				issues.push({
+					code: "jurisdiction-unknown",
 					level: "error",
 					message: `Unknown jurisdiction "${code}" — valid codes: ${JURISDICTIONS.join(", ")}`,
 				});
@@ -34,6 +58,7 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 
 	if (!wantPrivacy && !wantCookie) {
 		issues.push({
+			code: "policy-empty",
 			level: "error",
 			message:
 				"Config must produce at least one policy — provide data-handling fields (data, legalBasis, retention, children) or cookies",
@@ -44,6 +69,7 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 		for (const category of config.policies) {
 			if (category === "privacy" && !hasAnyPrivacyField(config)) {
 				issues.push({
+					code: "policy-privacy-empty",
 					level: "error",
 					message:
 						'policies includes "privacy" but no data-handling fields are set — add data, legalBasis, retention, or children',
@@ -51,6 +77,7 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 			}
 			if (category === "cookie" && !config.cookies) {
 				issues.push({
+					code: "policy-cookie-empty",
 					level: "error",
 					message: 'policies includes "cookie" but cookies is not set',
 				});
@@ -60,6 +87,7 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 
 	if (wantPrivacy && !config.data) {
 		issues.push({
+			code: "data-missing",
 			level: "warning",
 			message: "data is not set — the privacy policy will render a placeholder section",
 		});
@@ -68,6 +96,7 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 	const gdprScope = config.jurisdictions?.includes("eu") || config.jurisdictions?.includes("uk");
 	if (wantPrivacy && gdprScope && config.company?.dpo === undefined) {
 		issues.push({
+			code: "company-dpo-undeclared",
 			level: "warning",
 			message:
 				"company.dpo is not set — GDPR Article 13(1)(b) requires Data Protection Officer contact details if one is appointed. Set company.dpo, or set company.dpo = { required: false } to declare that none is needed.",

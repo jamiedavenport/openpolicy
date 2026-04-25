@@ -68,7 +68,7 @@ test("buildUserRights: privacy policy omits 'Your Rights' section when derivatio
 			collected: { "Account Information": ["Name", "Email"] },
 			purposes: { "Account Information": "To authenticate users" },
 		},
-		legalBasis: "legitimate_interests",
+		legalBasis: { "Providing the service": "legitimate_interests" },
 		retention: { "Account data": "Until deletion" },
 		cookies: { essential: true, analytics: false, marketing: false },
 		thirdParties: [],
@@ -94,7 +94,7 @@ test("validateOpenPolicyConfig: emits no userRights-related issues", () => {
 			collected: { "Account Information": ["Name", "Email"] },
 			purposes: { "Account Information": "To authenticate users" },
 		},
-		legalBasis: "legitimate_interests",
+		legalBasis: { "Providing the service": "legitimate_interests" },
 		retention: { "Account data": "Until deletion" },
 	};
 	const issues = validateOpenPolicyConfig(config);
