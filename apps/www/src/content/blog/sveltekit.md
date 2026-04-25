@@ -37,7 +37,10 @@ export default defineConfig({
 		"Account information": ["Email address", "Display name"],
 		"Usage data": ["Pages visited", "Session duration"],
 	},
-	legalBasis: ["legitimate_interests", "consent"],
+	legalBasis: {
+		"Providing the service": "legitimate_interests",
+		"Marketing communications": "consent",
+	},
 	retention: {
 		"Account data": "Until account deletion",
 		"Analytics data": "13 months",
@@ -61,6 +64,7 @@ export default defineConfig({
 		hasPreferencePanel: false,
 		canWithdraw: true,
 	},
+	automatedDecisionMaking: [],
 });
 ```
 

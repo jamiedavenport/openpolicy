@@ -11,8 +11,11 @@ const input: PolicyInput = {
 		address: "123 Main St, Springfield, USA",
 		contact: "privacy@acme.com",
 	},
-	dataCollected: { "Account Information": ["Name", "Email"] },
-	legalBasis: "legitimate_interests",
+	data: {
+		collected: { "Account Information": ["Name", "Email"] },
+		purposes: { "Account Information": "To authenticate users" },
+	},
+	legalBasis: { "Providing the service": "legitimate_interests" },
 	retention: { "Account data": "Until deletion" },
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
@@ -31,8 +34,11 @@ const fullConfig: OpenPolicyConfig = {
 	company,
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["ca"],
-	dataCollected: { "Account Information": ["Name", "Email"] },
-	legalBasis: "legitimate_interests",
+	data: {
+		collected: { "Account Information": ["Name", "Email"] },
+		purposes: { "Account Information": "To authenticate users" },
+	},
+	legalBasis: { "Providing the service": "legitimate_interests" },
 	retention: { "Account data": "Until deletion" },
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
@@ -98,6 +104,35 @@ test("expandOpenPolicyConfig returns empty array when nothing to emit", () => {
 		jurisdictions: ["ca"],
 	});
 	expect(inputs).toHaveLength(0);
+});
+
+test("expandOpenPolicyConfig passes automatedDecisionMaking through unchanged when set", () => {
+	const inputs = expandOpenPolicyConfig({
+		...fullConfig,
+		automatedDecisionMaking: [
+			{ name: "Fraud scoring", logic: "Rules engine", significance: "May decline" },
+		],
+	});
+	const privacy = inputs.find((i) => i.type === "privacy");
+	expect(privacy?.type).toBe("privacy");
+	if (privacy?.type !== "privacy") throw new Error("expected privacy input");
+	expect(privacy.automatedDecisionMaking).toEqual([
+		{ name: "Fraud scoring", logic: "Rules engine", significance: "May decline" },
+	]);
+});
+
+test("expandOpenPolicyConfig preserves undefined automatedDecisionMaking (no default)", () => {
+	const inputs = expandOpenPolicyConfig(fullConfig);
+	const privacy = inputs.find((i) => i.type === "privacy");
+	if (privacy?.type !== "privacy") throw new Error("expected privacy input");
+	expect(privacy.automatedDecisionMaking).toBeUndefined();
+});
+
+test("expandOpenPolicyConfig preserves explicit empty automatedDecisionMaking array", () => {
+	const inputs = expandOpenPolicyConfig({ ...fullConfig, automatedDecisionMaking: [] });
+	const privacy = inputs.find((i) => i.type === "privacy");
+	if (privacy?.type !== "privacy") throw new Error("expected privacy input");
+	expect(privacy.automatedDecisionMaking).toEqual([]);
 });
 
 test("shouldEmit honours explicit policies override", () => {

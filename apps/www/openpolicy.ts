@@ -9,11 +9,21 @@ export default defineConfig({
 	},
 	effectiveDate: "2026-03-03",
 	jurisdictions: ["eu", "uk", "us-ca"],
-	dataCollected: {
-		"Account Information": ["Name", "Email address"],
-		"Session Data": ["IP address", "User agent"],
+	data: {
+		collected: {
+			"Account Information": ["Name", "Email address"],
+			"Session Data": ["IP address", "User agent"],
+		},
+		purposes: {
+			"Account Information":
+				"To authenticate users, send service notifications, and provide customer support",
+			"Session Data": "To secure sessions, detect abuse, and diagnose service issues",
+		},
 	},
-	legalBasis: ["legitimate_interests", "consent"],
+	legalBasis: {
+		"Providing the service": "legitimate_interests",
+		"Marketing communications": "consent",
+	},
 	retention: {
 		"Account information": "Until account deletion",
 		"Session data": "Until session expiry",
@@ -24,4 +34,5 @@ export default defineConfig({
 		marketing: false,
 	},
 	thirdParties: [],
+	automatedDecisionMaking: [],
 });

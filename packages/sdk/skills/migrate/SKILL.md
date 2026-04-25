@@ -136,20 +136,25 @@ Scan the existing policy for jurisdiction signals:
 | "Australian Privacy Act"                             | `jurisdictions: ["au"]`                                                                                                                                                        |
 | No specific regulation cited                         | Pick the specific region(s) where the business operates — there is no federal `"us"` code. See [Supported jurisdictions](https://docs.openpolicy.sh/references/jurisdictions). |
 
-For legal basis (GDPR policies only), map the stated basis:
+For legal basis (GDPR policies only), the value is `Record<PurposeName, LegalBasis>` — each named processing purpose maps to its Article 6 basis. GDPR Art. 13(1)(c) requires the lawful basis to be stated for each distinct processing purpose. Map prose phrases to basis values:
 
-| Prose                                              | `legalBasis` value       |
+| Prose                                              | basis value              |
 | -------------------------------------------------- | ------------------------ |
 | "legitimate interests"                             | `"legitimate_interests"` |
 | "your consent" / "you have agreed"                 | `"consent"`              |
 | "to perform a contract" / "to provide the service" | `"contract"`             |
 | "legal obligation" / "required by law"             | `"legal_obligation"`     |
 
-When the policy states more than one basis, use an array:
+Build the map by naming each purpose the existing policy describes:
 
 ```ts
-legalBasis: ["legitimate_interests", "consent"],
+legalBasis: {
+  "Providing the service": "legitimate_interests",
+  "Marketing communications": "consent",
+},
 ```
+
+When any value is `"consent"`, the rendered policy automatically appends a GDPR Art. 13(2)(c) right-to-withdraw paragraph — no extra config needed.
 
 Use `Compliance.GDPR` or `Compliance.CCPA` as a starting point when the existing policy explicitly targets those regulations. Merge the array fields when both apply:
 

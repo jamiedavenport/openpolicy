@@ -34,16 +34,44 @@ export type LegalBasis =
 	| "public_task"
 	| "legitimate_interests";
 
+// GDPR Art. 13(1)(c) requires the lawful basis to be stated for each
+// distinct processing purpose — keys are human-readable purpose names,
+// values are the Article 6 basis that applies to that purpose.
+export type LegalBasisMap = Record<string, LegalBasis>;
+
+// GDPR Art. 13(2)(f) requires disclosing each automated-decision-making
+// or profiling activity (Art. 22) — the existence, the logic involved,
+// and the significance and envisaged consequences for the data subject.
+export type AutomatedDecision = {
+	name: string;
+	logic: string;
+	significance: string;
+};
+
+export type AutomatedDecisionMaking = AutomatedDecision[];
+
+export type Dpo =
+	| { email: string; name?: string; phone?: string; address?: string }
+	| { required: false; reason?: string };
+
 export type CompanyConfig = {
 	name: string;
 	legalName: string;
 	address: string;
 	contact: string;
+	dpo?: Dpo;
 };
 
 export type EffectiveDate = `${number}-${number}-${number}`;
 
 export type DataCollection = Record<string, string[]>;
+
+export type Purposes = Record<string, string>;
+
+export type DataConfig = {
+	collected: DataCollection;
+	purposes: Purposes;
+};
 
 export type Retention = Record<string, string>;
 
@@ -72,14 +100,15 @@ export type ConsentMechanism = {
 export type PrivacyPolicyConfig = {
 	effectiveDate: EffectiveDate;
 	company: CompanyConfig;
-	dataCollected: DataCollection;
-	legalBasis: LegalBasis | LegalBasis[];
+	data: DataConfig;
+	legalBasis: LegalBasisMap;
 	retention: Retention;
 	cookies: CookiePolicyCookies;
 	thirdParties: ThirdParty[];
 	userRights: UserRight[];
 	jurisdictions: Jurisdiction[];
 	children?: ChildrenConfig;
+	automatedDecisionMaking?: AutomatedDecisionMaking;
 };
 
 // Internal type consumed by section builders via PolicyInput.
@@ -105,11 +134,12 @@ export type OpenPolicyConfig = {
 	jurisdictions: Jurisdiction[];
 
 	// Data handling — feeds the privacy policy.
-	dataCollected?: DataCollection;
-	legalBasis?: LegalBasis | LegalBasis[];
+	data?: DataConfig;
+	legalBasis?: LegalBasisMap;
 	retention?: Retention;
 	children?: ChildrenConfig;
 	thirdParties?: ThirdParty[];
+	automatedDecisionMaking?: AutomatedDecisionMaking;
 
 	// Cookie posture — feeds the cookie policy and the privacy cookie-overview section.
 	cookies?: CookiePolicyCookies;
@@ -127,6 +157,7 @@ export function isOpenPolicyConfig(value: unknown): value is OpenPolicyConfig {
 }
 
 export type ValidationIssue = {
+	code: string;
 	level: "error" | "warning";
 	message: string;
 };

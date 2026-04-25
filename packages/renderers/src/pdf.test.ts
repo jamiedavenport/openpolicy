@@ -11,8 +11,11 @@ const input: PolicyInput = {
 		address: "123 Main St",
 		contact: "privacy@acme.com",
 	},
-	dataCollected: { "Account Information": ["Name", "Email"] },
-	legalBasis: "legitimate_interests" as const,
+	data: {
+		collected: { "Account Information": ["Name", "Email"] },
+		purposes: { "Account Information": "To authenticate users" },
+	},
+	legalBasis: { "Providing the service": "legitimate_interests" as const },
 	retention: { "Account data": "Until deletion" },
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],

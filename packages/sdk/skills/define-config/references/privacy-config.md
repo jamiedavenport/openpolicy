@@ -4,16 +4,17 @@ All fields below live at the top level of `OpenPolicyConfig` (the object passed 
 
 ## PrivacyPolicyConfig
 
-| Field           | Type                                                             | Required   | Notes                                                                                                                                                             |
-| --------------- | ---------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `effectiveDate` | `string`                                                         | Yes        | ISO date string (e.g. `"2026-01-01"`). Validation fails if empty.                                                                                                 |
-| `dataCollected` | `Record<string, string[]>`                                       | Yes        | At least one entry required. Keys are category labels; values are arrays of data point labels. Use `DataCategories.*` presets or spread `dataCollected` sentinel. |
-| `legalBasis`    | `LegalBasis \| LegalBasis[]`                                     | Yes (GDPR) | Required when `"eu"` is in `jurisdictions`. Accepts a single value or array.                                                                                      |
-| `retention`     | `Record<string, string>`                                         | Yes        | Keys should match `dataCollected` categories. Use `Retention.*` preset strings.                                                                                   |
-| `cookies`       | `{ essential: boolean; analytics: boolean; marketing: boolean }` | Yes        | All three booleans required. Drives cookie policy sections.                                                                                                       |
-| `thirdParties`  | `{ name: string; purpose: string; policyUrl?: string }[]`        | Yes        | Can be empty array. Use `Providers.*` presets or spread `thirdParties` sentinel.                                                                                  |
-| `jurisdictions` | `Jurisdiction[]`                                                 | Yes        | Controls which jurisdiction-specific sections appear and drives the auto-derived user rights list. See values below.                                              |
-| `children`      | `{ underAge: number; noticeUrl?: string }`                       | No         | Include when service is directed at children. `underAge` must be a positive integer.                                                                              |
+| Field                     | Type                                                             | Required               | Notes                                                                                                                                                                                                                                                                                                            |
+| ------------------------- | ---------------------------------------------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `effectiveDate`           | `string`                                                         | Yes                    | ISO date string (e.g. `"2026-01-01"`). Validation fails if empty.                                                                                                                                                                                                                                                |
+| `dataCollected`           | `Record<string, string[]>`                                       | Yes                    | At least one entry required. Keys are category labels; values are arrays of data point labels. Use `DataCategories.*` presets or spread `dataCollected` sentinel.                                                                                                                                                |
+| `legalBasis`              | `Record<PurposeName, LegalBasis>` (`LegalBasisMap`)              | Yes (GDPR)             | Required when `"eu"` or `"uk"` is in `jurisdictions`. Keys are human-readable processing-purpose names; values are the Article 6 basis for that purpose. GDPR Art. 13(1)(c) requires the lawful basis to be stated for each distinct processing purpose.                                                         |
+| `retention`               | `Record<string, string>`                                         | Yes                    | Keys should match `dataCollected` categories. Use `Retention.*` preset strings.                                                                                                                                                                                                                                  |
+| `cookies`                 | `{ essential: boolean; analytics: boolean; marketing: boolean }` | Yes                    | All three booleans required. Drives cookie policy sections.                                                                                                                                                                                                                                                      |
+| `thirdParties`            | `{ name: string; purpose: string; policyUrl?: string }[]`        | Yes                    | Can be empty array. Use `Providers.*` presets or spread `thirdParties` sentinel.                                                                                                                                                                                                                                 |
+| `jurisdictions`           | `Jurisdiction[]`                                                 | Yes                    | Controls which jurisdiction-specific sections appear and drives the auto-derived user rights list. See values below.                                                                                                                                                                                             |
+| `children`                | `{ underAge: number; noticeUrl?: string }`                       | No                     | Include when service is directed at children. `underAge` must be a positive integer.                                                                                                                                                                                                                             |
+| `automatedDecisionMaking` | `AutomatedDecision[]` (alias `AutomatedDecisionMaking`)          | No (warns under EU/UK) | GDPR Art. 13(2)(f) / Art. 22 disclosure. Set to `[]` to declare no automated decision-making is used. Each entry declares one activity with `name`, `logic`, and `significance`. Omitting under EU/UK emits a warning; populating triggers an Art. 22(3) right-to-human-review paragraph in the rendered policy. |
 
 ### LegalBasis values
 
@@ -100,18 +101,21 @@ Each entry is a `{ name: string; purpose: string; policyUrl: string }` safe to u
 
 ### Compliance presets
 
-| Preset               | Expands to                                                        |
-| -------------------- | ----------------------------------------------------------------- |
-| `Compliance.GDPR`    | `{ jurisdictions: ["eu"], legalBasis: ["legitimate_interests"] }` |
-| `Compliance.UK_GDPR` | `{ jurisdictions: ["uk"], legalBasis: ["legitimate_interests"] }` |
-| `Compliance.CCPA`    | `{ jurisdictions: ["us-ca"] }`                                    |
+| Preset               | Expands to                                                                                   |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| `Compliance.GDPR`    | `{ jurisdictions: ["eu"], legalBasis: { "Providing the service": "legitimate_interests" } }` |
+| `Compliance.UK_GDPR` | `{ jurisdictions: ["uk"], legalBasis: { "Providing the service": "legitimate_interests" } }` |
+| `Compliance.CCPA`    | `{ jurisdictions: ["us-ca"] }`                                                               |
 
 ### Validation behavior
 
 - `effectiveDate` empty → fatal error
 - `company.*` fields empty → fatal error per field
 - `dataCollected` has zero keys → fatal error
-- `"eu"` or `"uk"` in jurisdictions + no `legalBasis` → fatal error
+- `"eu"` or `"uk"` in jurisdictions + empty `legalBasis` map → fatal `lawful-basis-per-purpose` error
+- `"eu"` or `"uk"` in jurisdictions + any purpose with empty basis → fatal `lawful-basis-per-purpose` error
+- When any purpose's basis is `"consent"`, the rendered policy automatically appends an Art. 13(2)(c) right-to-withdraw paragraph
+- `"eu"` or `"uk"` in jurisdictions + `automatedDecisionMaking` omitted → `automated-decision-making` warning (set to `[]` to declare none, or populate)
 - Any unknown jurisdiction code → fatal error (lists valid codes in message)
 - `children.underAge` ≤ 0 → fatal error
 

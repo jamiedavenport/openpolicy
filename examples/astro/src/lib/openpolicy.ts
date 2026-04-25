@@ -9,11 +9,20 @@ export default defineConfig({
 	},
 	effectiveDate: "2026-03-03",
 	jurisdictions: ["eu", "us-ca"],
-	dataCollected: {
-		"Account Information": ["Name", "Email address"],
-		"Usage Data": ["Pages visited", "Browser type", "IP address"],
+	data: {
+		collected: {
+			"Account Information": ["Name", "Email address"],
+			"Usage Data": ["Pages visited", "Browser type", "IP address"],
+		},
+		purposes: {
+			"Account Information": "To authenticate users and send service notifications",
+			"Usage Data": "To understand product usage and improve the service",
+		},
 	},
-	legalBasis: ["legitimate_interests", "consent"],
+	legalBasis: {
+		"Providing the service": "legitimate_interests",
+		"Marketing communications": "consent",
+	},
 	retention: {
 		"Account data": "Until account deletion",
 		"Usage logs": "90 days",
@@ -38,4 +47,5 @@ export default defineConfig({
 		canWithdraw: true,
 	},
 	children: { underAge: 16, noticeUrl: "https://acme.com/parental-notice" },
+	automatedDecisionMaking: [],
 });

@@ -148,11 +148,12 @@ export default defineConfig({
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "us-ca"],
-	legalBasis: "legitimate_interests",
+	legalBasis: { "Providing the service": "legitimate_interests" },
 	dataCollected: {
 		...dataCollected, // auto-collected at build time
 		Analytics: ["Page views", "Click events"], // manually declared
 	},
+	automatedDecisionMaking: [],
 });
 ```
 

@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import type { ParagraphNode } from "./documents";
+import type { ListNode, ParagraphNode } from "./documents";
 import { compile } from "./documents";
 import type { PrivacyPolicyConfig } from "./types";
 
@@ -11,8 +11,14 @@ const minimalPrivacyConfig: PrivacyPolicyConfig = {
 		address: "123 Main St, Springfield, USA",
 		contact: "privacy@acme.com",
 	},
-	dataCollected: { "Account Information": ["Name", "Email address"] },
-	legalBasis: ["legitimate_interests", "consent"],
+	data: {
+		collected: { "Account Information": ["Name", "Email address"] },
+		purposes: { "Account Information": "To authenticate users and send service notifications" },
+	},
+	legalBasis: {
+		"Providing the service": "legitimate_interests",
+		"Marketing communications": "consent",
+	},
 	retention: { "Account data": "Until account deletion" },
 	cookies: { essential: true, analytics: false, marketing: false },
 	thirdParties: [],
@@ -128,6 +134,123 @@ test("children-privacy has noticeUrl link when provided", () => {
 	expect(linkNode).toBeDefined();
 });
 
+test("compile throws when data.collected is empty", () => {
+	expect(() =>
+		compile({
+			type: "privacy",
+			...minimalPrivacyConfig,
+			data: { collected: {}, purposes: {} },
+		}),
+	).toThrow(/no data collected/i);
+});
+
+test("data-collected section lists at least one category", () => {
+	const doc = compile({ type: "privacy", ...minimalPrivacyConfig });
+	const s = doc.sections.find((x) => x.id === "data-collected")!;
+	const list = s.content.find((n) => n.type === "list") as ListNode;
+	expect(list.items.length).toBeGreaterThan(0);
+});
+
+test("data-collected section includes purpose paragraph for each category", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		data: {
+			collected: {
+				"Account Information": ["Name", "Email"],
+				"Session Data": ["IP address"],
+			},
+			purposes: {
+				"Account Information": "To authenticate users",
+				"Session Data": "To secure sessions",
+			},
+		},
+	});
+	const s = doc.sections.find((x) => x.id === "data-collected")!;
+	const blob = JSON.stringify(s);
+	expect(blob).toContain("To authenticate users");
+	expect(blob).toContain("To secure sessions");
+	expect(blob).toContain("Purpose:");
+});
+
+test("gdpr-supplement mentions DPO when one is configured", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		company: {
+			...minimalPrivacyConfig.company,
+			dpo: { email: "dpo@acme.com", name: "Jane Doe", phone: "+1 555 010 2030" },
+		},
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).toContain("Data Protection Officer");
+	expect(blob).toContain("dpo@acme.com");
+	expect(blob).toContain("Jane Doe");
+	expect(blob).toContain("+1 555 010 2030");
+});
+
+test("gdpr-supplement states no DPO when company.dpo.required === false", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		company: {
+			...minimalPrivacyConfig.company,
+			dpo: { required: false, reason: "Small-scale processing only." },
+		},
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).toContain("have not appointed a Data Protection Officer");
+	expect(blob).toContain("Article 37(1)");
+	expect(blob).toContain("Small-scale processing only.");
+});
+
+test("gdpr-supplement falls back to no-DPO disclosure when unset", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).toContain("Data Protection Officer");
+	expect(blob).toContain("Article 37(1)");
+});
+
+test("uk-gdpr-supplement includes DPO contact when configured", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["uk"],
+		company: {
+			...minimalPrivacyConfig.company,
+			dpo: { email: "dpo@acme.co.uk" },
+		},
+	});
+	const uk = doc.sections.find((s) => s.id === "uk-gdpr-supplement")!;
+	const blob = JSON.stringify(uk);
+	expect(blob).toContain("Data Protection Officer");
+	expect(blob).toContain("dpo@acme.co.uk");
+});
+
+test("contact section lists DPO when configured", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		company: {
+			...minimalPrivacyConfig.company,
+			dpo: { email: "dpo@acme.com", name: "Jane Doe" },
+		},
+	});
+	const contact = doc.sections.find((s) => s.id === "contact")!;
+	const blob = JSON.stringify(contact);
+	expect(blob).toContain("Data Protection Officer");
+	expect(blob).toContain("dpo@acme.com");
+});
+
 test("introduction section has ParagraphNode children", () => {
 	const doc = compile({ type: "privacy", ...minimalPrivacyConfig });
 	const intro = doc.sections.find((s) => s.id === "introduction")!;
@@ -137,4 +260,123 @@ test("introduction section has ParagraphNode children", () => {
 	const firstPara = intro.content[1] as ParagraphNode;
 	expect(firstPara.children.length).toBeGreaterThan(0);
 	expect(firstPara.children[0]?.type).toBe("text");
+});
+
+test("legal-basis section renders one block per processing purpose with Article 6 sub-clause", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		legalBasis: {
+			"Providing the service": "contract",
+			"Marketing communications": "consent",
+		},
+	});
+	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
+	const blob = JSON.stringify(legalBasis);
+	expect(blob).toContain("Providing the service");
+	expect(blob).toContain("Performance of a contract (Article 6(1)(b))");
+	expect(blob).toContain("Marketing communications");
+	expect(blob).toContain("Consent (Article 6(1)(a))");
+});
+
+test("legal-basis section appends consent-withdrawal paragraph when any purpose uses consent", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		legalBasis: {
+			"Providing the service": "contract",
+			"Marketing communications": "consent",
+		},
+	});
+	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
+	const blob = JSON.stringify(legalBasis);
+	expect(blob).toContain("Right to withdraw consent");
+	expect(blob).toContain(minimalPrivacyConfig.company.contact);
+	expect(blob).toContain("does not affect the lawfulness");
+});
+
+test("legal-basis section omits consent-withdrawal paragraph when no purpose uses consent", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		legalBasis: {
+			"Providing the service": "contract",
+			"Service communications": "legitimate_interests",
+		},
+	});
+	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
+	const blob = JSON.stringify(legalBasis);
+	expect(blob).not.toContain("Right to withdraw consent");
+});
+
+test("legal-basis section is omitted entirely when legalBasis map is empty (non-GDPR)", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["ca"],
+		legalBasis: {},
+	});
+	expect(doc.sections.find((s) => s.id === "legal-basis")).toBeUndefined();
+});
+
+test("automated-decision-making section is omitted under non-EU/UK jurisdictions even when set", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["us-ca"],
+		automatedDecisionMaking: [],
+	});
+	expect(doc.sections.find((s) => s.id === "automated-decision-making")).toBeUndefined();
+});
+
+test("automated-decision-making section is omitted when field is undefined under EU", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+	});
+	expect(doc.sections.find((s) => s.id === "automated-decision-making")).toBeUndefined();
+});
+
+test("automated-decision-making section emits explicit-none paragraph when [] under EU", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		automatedDecisionMaking: [],
+	});
+	const adm = doc.sections.find((s) => s.id === "automated-decision-making")!;
+	expect(adm).toBeDefined();
+	const blob = JSON.stringify(adm);
+	expect(blob).toContain("We do not engage in automated decision-making");
+	expect(blob).toContain("Article 22");
+	expect(blob).not.toContain("Right to human review");
+});
+
+test("automated-decision-making section enumerates each activity and appends Art. 22 right-to-human-review", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+		automatedDecisionMaking: [
+			{
+				name: "Fraud scoring",
+				logic:
+					"Transactions are scored by a rules engine combining device fingerprint and transaction history.",
+				significance:
+					"A high score may delay or decline a transaction; you can request human review.",
+			},
+		],
+	});
+	const adm = doc.sections.find((s) => s.id === "automated-decision-making")!;
+	expect(adm).toBeDefined();
+	const blob = JSON.stringify(adm);
+	expect(blob).toContain("Fraud scoring");
+	expect(blob).toContain("rules engine");
+	expect(blob).toContain("Significance");
+	expect(blob).toContain("Right to human review");
+	expect(blob).toContain(minimalPrivacyConfig.company.contact);
 });
