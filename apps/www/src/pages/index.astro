@@ -10,6 +10,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import installCmd from "../snippets/install.sh?raw";
 import viteCfg from "../snippets/vite.config.ts?raw";
 import privacyRoute from "../snippets/privacy-policy.tsx?raw";
+import consentSnippet from "../snippets/consent.tsx?raw";
 import llmPrompt from "../snippets/prompt.txt?raw";
 
 const shadcnCmd = "bunx shadcn@latest add @openpolicy/privacy-policy";
@@ -131,6 +132,45 @@ const frameworks = [
       Render the compiled policy anywhere with <code>&lt;PrivacyPolicy&gt;</code> or <code>&lt;CookiePolicy&gt;</code>. Control consent-gated code paths with <code>useCookies()</code> and <code>&lt;ConsentGate&gt;</code>. <code>&lt;CookieBanner&gt;</code> handles display, persistence, and <code>data-consent-*</code> attributes on <code>&lt;body&gt;</code>.
     </p>
     <CodeBlock code={privacyRoute} lang="tsx" filename="src/routes/privacy.tsx" />
+  </section>
+
+  <section>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
+      04-CONSENT.md
+    </h2>
+    <p class="mb-4">
+      Drop <code>&lt;CookieBanner /&gt;</code> in once, gate analytics with <code>&lt;ConsentGate&gt;</code>, and read state via <code>useCookies()</code>. Categories are typed against your <code>openpolicy.ts</code>.
+    </p>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-px bg-gray-200 border border-gray-200">
+      <div class="bg-gray-50 p-6 flex flex-col">
+        <p class="font-mono font-medium text-xs text-gray-500 mb-4">PREVIEW</p>
+        <div class="flex-1 flex items-end">
+          <div class="w-full bg-white border border-gray-200 shadow-sm p-4">
+            <div class="flex items-center gap-1.5 mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-700 shrink-0" aria-hidden="true">
+                <path d="M21.598 11.064a1.006 1.006 0 0 0-.854-.172A2.94 2.94 0 0 1 20 11c-1.654 0-3-1.346-3.003-2.937.005-.034.016-.136.017-.17a.998.998 0 0 0-1.254-1.006A2.97 2.97 0 0 1 15 7c-1.654 0-3-1.346-3-3 0-.217.031-.444.099-.716a1 1 0 0 0-1.067-1.236A10.014 10.014 0 0 0 2 12c0 5.514 4.486 10 10 10s10-4.486 10-10c0-.049-.003-.097-.007-.16a1.004 1.004 0 0 0-.395-.776"/>
+                <circle cx="12.5" cy="11.5" r="1.5"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <circle cx="7.5" cy="14.5" r="1.5"/>
+                <circle cx="15.5" cy="15.5" r="1.5"/>
+              </svg>
+              <p class="font-medium text-sm">Cookies</p>
+            </div>
+            <p class="text-xs text-gray-500 mb-4 leading-relaxed">
+              We use cookies to make this site work and, with your consent, to measure usage. <a href="#" class="underline">Privacy policy</a>.
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" class="px-3 py-1.5 bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors">Accept all</button>
+              <button type="button" class="px-3 py-1.5 bg-white border border-gray-300 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">Reject</button>
+              <button type="button" class="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors">Customize</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white">
+        <CodeBlock code={consentSnippet} lang="tsx" filename="src/root.tsx" />
+      </div>
+    </div>
   </section>
 
   <section>
