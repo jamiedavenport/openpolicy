@@ -270,7 +270,14 @@ function buildGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | nul
 			".",
 		]),
 		p([
-			"If we transfer your personal data outside the EEA, we ensure adequate safeguards are in place in accordance with GDPR requirements.",
+			"Where we transfer your personal data outside the EEA, we rely on one or more of the safeguards permitted under Chapter V of the GDPR: (a) transfers to countries the European Commission has determined provide an adequate level of data protection (the current list is published at ",
+			link(
+				"https://commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en",
+				"commission.europa.eu/.../adequacy-decisions_en",
+			),
+			"); (b) Standard Contractual Clauses (SCCs) adopted by the European Commission under Article 46(2)(c); and (c) Binding Corporate Rules approved under Article 47 where applicable. You may request further information about the specific safeguards applied to a particular transfer by contacting us at ",
+			config.company.contact,
+			".",
 		]),
 	];
 	const rep = euRepresentativeParagraph(config);

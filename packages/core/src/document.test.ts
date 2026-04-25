@@ -452,6 +452,25 @@ test("gdpr-supplement renders Article 27 representative paragraph when configure
 	expect(blob).toContain("eu-rep@acme.com");
 });
 
+test("gdpr-supplement names specific Article 46 transfer safeguards and links the adequacy registry", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["eu"],
+	});
+	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
+	const blob = JSON.stringify(gdpr);
+	expect(blob).toContain("Chapter V");
+	expect(blob).toContain("Standard Contractual Clauses");
+	expect(blob).toContain("Binding Corporate Rules");
+	expect(blob).toContain("adequate level of data protection");
+	expect(blob).toContain(
+		"commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en",
+	);
+	expect(blob).toContain(minimalPrivacyConfig.company.contact);
+	expect(blob).not.toContain("we ensure adequate safeguards are in place");
+});
+
 test("uk-gdpr-supplement still names the ICO with its complaint URL", () => {
 	const doc = compile({
 		type: "privacy",
