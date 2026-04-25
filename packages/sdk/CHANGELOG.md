@@ -1,5 +1,102 @@
 # @openpolicy/sdk
 
+## 0.0.27
+
+### Patch Changes
+
+- 261bae3: Adds `automatedDecisionMaking` to fix the GDPR Art. 13(2)(f) / Art. 22 validator error (`automated-decision-making`). Each entry declares one activity with `name`, `logic`, and `significance` fields; an empty array `[]` explicitly declares that no automated decision-making is used.
+
+  Under EU/UK jurisdictions, the rendered privacy policy now includes an "Automated Decision-Making and Profiling" section, and validation emits a warning if the field is omitted entirely (controllers must make an explicit declaration either way). When at least one activity is listed, the section automatically appends the Art. 22(3) right-to-human-review paragraph referencing `company.contact`.
+
+  Example:
+
+  ```ts
+  defineConfig({
+    // ... existing fields ...
+    automatedDecisionMaking: [], // explicit "we don't"
+    // or:
+    automatedDecisionMaking: [
+      {
+        name: "Fraud scoring",
+        logic:
+          "Transactions are scored by a rules engine combining device fingerprint and historical patterns.",
+        significance:
+          "A high score may delay or decline a transaction; you can request human review.",
+      },
+    ],
+  });
+  ```
+
+- 261bae3: **Breaking:** top-level `dataCollected` moves to `data.collected`, and a sibling `data.purposes` is newly required — one prose string per collected category, disclosing _why_ you process it. Satisfies GDPR Article 13(1)(c), which was previously unaddressed.
+
+  `defineConfig` now enforces purpose coverage at type-check time: every key in `data.collected` must have a matching entry in `data.purposes`. The `openPolicy()` Vite plugin emits `openpolicy.gen.ts` next to your `openpolicy.ts`, augmenting a `ScannedCollectionKeys` interface so the same constraint applies to scanned `collecting()` categories. Commit `openpolicy.gen.ts` — that keeps the type-level constraint live in CI without needing to run the Vite plugin first.
+
+  Migration: nest `dataCollected` under `data.collected`, then add a `data.purposes` map keyed by the same category names.
+
+  ```ts
+  // before
+  defineConfig({
+    dataCollected: { "Account Information": ["Name", "Email"] },
+  });
+
+  // after
+  defineConfig({
+    data: {
+      collected: { "Account Information": ["Name", "Email"] },
+      purposes: {
+        "Account Information":
+          "To authenticate users and send service notifications",
+      },
+    },
+  });
+  ```
+
+- 261bae3: Add optional `company.dpo` for Data Protection Officer contact details, required under GDPR Article 13(1)(b) when a DPO has been appointed.
+
+  `Dpo` is a discriminated union: provide `{ email, name?, phone?, address? }` to disclose the appointed officer, or `{ required: false, reason? }` to declare explicitly that no DPO is required. The GDPR and UK-GDPR supplements now render a paragraph covering both cases, and the contact section includes the DPO details when present.
+
+  `validateOpenPolicyConfig` emits a warning when `jurisdictions` includes `eu` or `uk` and `company.dpo` is unset — previously the generated policy was silent on DPO, which external GDPR linters flag as a `dpo-contact` violation.
+
+  ```ts
+  company: {
+    name: "Acme Inc.",
+    legalName: "Acme Corporation",
+    address: "123 Main St, Springfield, USA",
+    contact: "privacy@acme.com",
+    dpo: { email: "dpo@acme.com", name: "Jane Doe" },
+  },
+  ```
+
+- 261bae3: **Breaking:** `legalBasis` is now `Record<PurposeName, LegalBasis>` (alias `LegalBasisMap`) instead of `LegalBasis | LegalBasis[]`. Each named processing purpose maps to its Article 6 lawful basis, fixing the `lawful-basis-per-purpose` validator error (GDPR Art. 13(1)(c) requires the lawful basis to be stated for each distinct processing purpose).
+
+  When any purpose's basis is `"consent"`, the rendered policy now automatically appends a GDPR Art. 13(2)(c) right-to-withdraw paragraph — disclosing the right to withdraw consent at any time without affecting the lawfulness of pre-withdrawal processing. No new config field is required; the disclosure references `company.contact`.
+
+  Validation issues now carry a stable `code` field (in addition to `level` and `message`) so consumers can assert on `code` instead of message substrings. The new code `lawful-basis-per-purpose` fires when an EU/UK policy has an empty `legalBasis` map or any purpose with an empty basis. `Compliance.GDPR` and `Compliance.UK_GDPR` presets now expose `legalBasis` as a single-purpose map by default.
+
+  Migration:
+
+  ```ts
+  // before
+  defineConfig({
+    legalBasis: ["legitimate_interests", "consent"],
+  });
+
+  // after
+  defineConfig({
+    legalBasis: {
+      "Providing the service": "legitimate_interests",
+      "Marketing communications": "consent",
+    },
+  });
+  ```
+
+- 261bae3: **Breaking:** `compile()` now throws when `dataCollected` is empty. Previously, an
+  empty `dataCollected` produced an "Information We Collect" section with the
+  intro sentence "We collect the following categories of information:" followed
+  by an empty list, which fails GDPR's categories-of-data disclosure
+  requirement. To fix, populate `dataCollected` in your config, or instrument
+  `collecting()` calls and use `autoCollect()` from `@openpolicy/vite-auto-collect`.
+
 ## 0.0.26
 
 ### Patch Changes
@@ -17,6 +114,7 @@
 ### Patch Changes
 
 - 94b16b7: Add cookie auto-detection (OP-283).
+
   - `@openpolicy/sdk` exports a new `cookies` sentinel (spread into `defineConfig({ cookies })`) and a `defineCookie("category")` helper for declaring consent categories manually at call sites.
   - `@openpolicy/vite`'s `openPolicy()` now scans source for `defineCookie()` calls, `<ConsentGate requires="…" />` JSX usage, and `useCookies().has(…)` lookups (including nested `{ and, or, not }` expressions) from `@openpolicy/react`. Detected categories populate the `cookies` sentinel alongside `dataCollected` and `thirdParties`.
   - New plugin option `cookies: { usePackageJson: true }` opts into inferring cookie categories from the project's `package.json` via a known-packages table (e.g. `posthog-js` → `analytics`, `@stripe/stripe-js` → `essential`).
@@ -27,6 +125,7 @@
 
   Old union: `"us" | "eu" | "ca" | "au" | "nz" | "other"`
   New union: `"eu" | "uk" | "us-ca" | "us-va" | "us-co" | "br" | "ca" | "au" | "jp" | "sg"`
+
   - `"us"` is **removed** — there is no federal US privacy regime shipping content. List specific state codes (e.g. `"us-ca"`) for the states you cover.
   - `"ca"` **semantics flipped** from California → Canada. Consumers using `"ca"` for CCPA must migrate to `"us-ca"`. `"ca"` is now a reserved code for Canada and produces no gated content yet.
   - `"nz"` and `"other"` are removed.
@@ -44,12 +143,14 @@
 - 8e219fe: Flatten `defineConfig()` — all policy fields now live at the top level. The nested `privacy: { ... }` and `cookie: { ... }` blocks are gone, and `effectiveDate` / `jurisdictions` are single top-level fields (previously duplicated in each block).
 
   Which policy types are generated is now auto-detected from field presence:
+
   - **Privacy policy** is emitted if any of `dataCollected`, `legalBasis`, `retention`, `userRights`, or `children` is set.
   - **Cookie policy** is emitted if `cookies` is set.
 
   You can override auto-detection with `policies: ["privacy"]` or `policies: ["cookie"]`.
 
   **Breaking changes:**
+
   - `OpenPolicyConfig` is a single flat object. The `privacy` and `cookie` wrapper keys are removed.
   - `EffectiveDate` is now the template literal type `` `${number}-${number}-${number}` ``.
   - `LegalBasis` is narrowed to a union of GDPR Art. 6 lawful bases: `"consent" | "contract" | "legal_obligation" | "vital_interests" | "public_task" | "legitimate_interests"`. Free-form strings are no longer accepted.
@@ -60,28 +161,28 @@
 
   ```ts
   export default defineConfig({
-  	company: {
-  		/* … */
-  	},
-  	privacy: {
-  		effectiveDate: "2026-01-01",
-  		jurisdictions: ["us"],
-  		dataCollected: {
-  			/* … */
-  		},
-  		legalBasis: "legitimate_interests",
-  		retention: {
-  			/* … */
-  		},
-  		cookies: { essential: true, analytics: false, marketing: false },
-  		thirdParties: [],
-  		userRights: ["access"],
-  	},
-  	cookie: {
-  		effectiveDate: "2026-01-01",
-  		jurisdictions: ["us"],
-  		cookies: { essential: true, analytics: true },
-  	},
+    company: {
+      /* … */
+    },
+    privacy: {
+      effectiveDate: "2026-01-01",
+      jurisdictions: ["us"],
+      dataCollected: {
+        /* … */
+      },
+      legalBasis: "legitimate_interests",
+      retention: {
+        /* … */
+      },
+      cookies: { essential: true, analytics: false, marketing: false },
+      thirdParties: [],
+      userRights: ["access"],
+    },
+    cookie: {
+      effectiveDate: "2026-01-01",
+      jurisdictions: ["us"],
+      cookies: { essential: true, analytics: true },
+    },
   });
   ```
 
@@ -89,27 +190,28 @@
 
   ```ts
   export default defineConfig({
-  	company: {
-  		/* … */
-  	},
-  	effectiveDate: "2026-01-01",
-  	jurisdictions: ["us"],
-  	dataCollected: {
-  		/* … */
-  	},
-  	legalBasis: "legitimate_interests",
-  	retention: {
-  		/* … */
-  	},
-  	userRights: ["access"],
-  	thirdParties: [],
-  	cookies: { essential: true, analytics: true },
+    company: {
+      /* … */
+    },
+    effectiveDate: "2026-01-01",
+    jurisdictions: ["us"],
+    dataCollected: {
+      /* … */
+    },
+    legalBasis: "legitimate_interests",
+    retention: {
+      /* … */
+    },
+    userRights: ["access"],
+    thirdParties: [],
+    cookies: { essential: true, analytics: true },
   });
   ```
 
 - 8e219fe: Remove Terms of Service support. OpenPolicy now focuses exclusively on privacy and cookie policies — domains that are globally regulated and have consistent compliance requirements.
 
   **Breaking changes:**
+
   - `PolicyInput` is now a discriminated union of `privacy | cookie` only (the `terms` branch has been removed)
   - `TermsOfServiceConfig` and `DisputeResolutionMethod` types have been removed from `@openpolicy/sdk` and `@openpolicy/core`
   - `validateTermsOfService` has been removed from `@openpolicy/core`
@@ -120,6 +222,7 @@
   **Migration:** remove the `terms: { ... }` block from your `openpolicy.ts` config and stop importing `<TermsOfService />`. If you need terms of service content, source it from a dedicated legal tool.
 
 - 8e219fe: **Breaking change:** `userRights` has been removed from `OpenPolicyConfig`. The data-subject rights listed in your privacy policy are now derived automatically from `jurisdictions`:
+
   - `jurisdictions: ["eu"]` → access, rectification, erasure, portability, restriction, objection (GDPR)
   - `jurisdictions: ["ca"]` → access, erasure, opt_out_sale, non_discrimination (CCPA)
   - Both → the union, in a fixed canonical order
@@ -143,6 +246,7 @@
   The rendered privacy policy may list **more** rights than before if your previous `userRights` value was shorter than the baseline required by your declared `jurisdictions` — this is intentional; the refactor closes a footgun where the field under-declared legal obligations.
 
   Related SDK surface changes:
+
   - `Rights` constant removed from `@openpolicy/sdk` (superseded by derivation).
   - `UserRight` type re-export removed from `@openpolicy/sdk`.
   - `Compliance.GDPR` and `Compliance.CCPA` no longer include a `userRights` field — they still provide `jurisdictions` (and `legalBasis` for GDPR), which is enough to drive the correct rights list.
