@@ -162,12 +162,12 @@ const frameworks = [
             <div class="flex flex-wrap gap-2">
               <button type="button" class="px-3 py-1.5 bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors">Accept all</button>
               <button type="button" class="px-3 py-1.5 bg-white border border-gray-300 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">Reject</button>
-              <button type="button" class="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors">Customize</button>
+              <button type="button" class="ml-auto px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors">Customize</button>
             </div>
           </div>
         </div>
       </div>
-      <div class="bg-white">
+      <div class="bg-white [&>div]:border-0">
         <CodeBlock code={consentSnippet} lang="tsx" filename="src/root.tsx" />
       </div>
     </div>
@@ -217,21 +217,212 @@ const frameworks = [
     <h2 class="font-mono font-medium text-xs text-gray-500 mb-4">
       PLUS.md
     </h2>
-    <div class="border border-gray-200 bg-gray-50 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-      <div class="flex-1">
-        <p class="font-mono font-medium text-xs text-gray-500 mb-2">OPTIONAL CLOUD TIER</p>
-        <p class="font-medium text-sm mb-1">OpenPolicy Plus — privacy infrastructure at scale</p>
-        <p class="text-sm text-gray-500">
-          Server-side consent capture, compliance checks on every pull request, and hands-on onboarding. The core framework stays Apache-2.0 and free forever.
-        </p>
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-px bg-gray-200 border border-gray-200">
+      <div class="bg-gray-50 p-6 flex flex-col gap-8 justify-between lg:col-span-2">
+        <dl class="grid gap-4">
+          <div class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-gray-700 shrink-0 mt-0.5" aria-hidden="true">
+              <circle cx="18" cy="18" r="3"/>
+              <circle cx="6" cy="6" r="3"/>
+              <path d="M13 6h3a2 2 0 0 1 2 2v7"/>
+              <line x1="6" y1="9" x2="6" y2="21"/>
+            </svg>
+            <div>
+              <dt class="text-sm font-medium text-gray-900">Automated PR checks</dt>
+              <dd class="text-xs text-gray-500 mt-1">Every change is scanned against your enforcement profile and blocked if it would break compliance.</dd>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-gray-700 shrink-0 mt-0.5" aria-hidden="true">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            <div>
+              <dt class="text-sm font-medium text-gray-900">Live SDK monitoring</dt>
+              <dd class="text-xs text-gray-500 mt-1">Production scans catch third-party scripts that slip in between deploys.</dd>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-gray-700 shrink-0 mt-0.5" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M2 12h20"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            <div>
+              <dt class="text-sm font-medium text-gray-900">Geo-routed banners &amp; policies</dt>
+              <dd class="text-xs text-gray-500 mt-1">Visitors see the cookie banner and policy version that match their region.</dd>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-gray-700 shrink-0 mt-0.5" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+            <div>
+              <dt class="text-sm font-medium text-gray-900">Immutable consent ledger</dt>
+              <dd class="text-xs text-gray-500 mt-1">Every accept and reject is hashed and timestamped, ready when a DPA asks.</dd>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-gray-700 shrink-0 mt-0.5" aria-hidden="true">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+            </svg>
+            <div>
+              <dt class="text-sm font-medium text-gray-900">Policy change notifications</dt>
+              <dd class="text-xs text-gray-500 mt-1">Email and in-app banners notify users when your policy changes, with re-consent flows where required.</dd>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-gray-700 shrink-0 mt-0.5" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <line x1="10" y1="9" x2="8" y2="9"/>
+            </svg>
+            <div>
+              <dt class="text-sm font-medium text-gray-900">Auditor-ready exports</dt>
+              <dd class="text-xs text-gray-500 mt-1">Policy history, third-party register, and consent receipts in one signed bundle.</dd>
+            </div>
+          </div>
+        </dl>
+        <div>
+          <p class="font-mono font-medium text-xs text-gray-500 mb-3">OPENPOLICY PLUS</p>
+          <p class="font-medium text-base mb-2">Global compliance, on autopilot</p>
+          <p class="text-sm text-gray-500 mb-5">
+            The same checks an auditor would run — on every PR, against the jurisdictions where your users actually are.
+          </p>
+          <a
+            href="https://plus.openpolicy.sh"
+            target="_blank"
+            class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors duration-200"
+          >
+            Learn more →
+          </a>
+        </div>
       </div>
-      <a
-        href="https://plus.openpolicy.sh"
-        target="_blank"
-        class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors duration-200 shrink-0"
-      >
-        Learn more →
-      </a>
+      <div class="bg-white lg:col-span-3 p-5">
+        <div class="border border-gray-200 rounded-md overflow-hidden">
+          <div class="flex items-center bg-gray-50 border-b border-gray-200 px-4 py-2 gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 shrink-0" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <span class="font-mono text-xs text-gray-700 truncate flex-1 min-w-0">src/components/analytics.tsx</span>
+            <span class="font-mono text-[10px] text-gray-400 shrink-0">+2 -0</span>
+          </div>
+          <div class="font-mono text-xs leading-5 [&_pre]:m-0 [&_pre]:p-0">
+            <div class="px-4 py-1 bg-blue-50/60 text-blue-900/70 border-b border-gray-100">@@ -1,5 +1,7 @@</div>
+            <div class="grid grid-cols-[2.5rem_1fr]">
+              <span class="text-right pr-2 text-gray-400 select-none border-r border-gray-100">1</span>
+              <span class="pl-3 pr-2 text-gray-700 whitespace-pre">export function Analytics() &#123;</span>
+              <span class="text-right pr-2 text-gray-400 select-none border-r border-gray-100">2</span>
+              <span class="pl-3 pr-2 text-gray-700 whitespace-pre">  return (</span>
+              <span class="text-right pr-2 text-gray-400 select-none border-r border-gray-100">3</span>
+              <span class="pl-3 pr-2 text-gray-700 whitespace-pre">    &lt;&gt;</span>
+              <span class="text-right pr-2 bg-emerald-50 text-emerald-700 select-none border-r border-emerald-100">+</span>
+              <span class="pl-3 pr-2 bg-emerald-50 text-emerald-900 whitespace-pre">      &lt;script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXX" /&gt;</span>
+              <span class="text-right pr-2 bg-emerald-50 text-emerald-700 select-none border-r border-emerald-100">+</span>
+              <span class="pl-3 pr-2 bg-emerald-50 text-emerald-900 whitespace-pre">      &lt;script dangerouslySetInnerHTML=&#123;&#123; __html: `gtag('config', 'G-XXXXXX');` &#125;&#125; /&gt;</span>
+              <span class="text-right pr-2 text-gray-400 select-none border-r border-gray-100">4</span>
+              <span class="pl-3 pr-2 text-gray-700 whitespace-pre">    &lt;/&gt;</span>
+            </div>
+          </div>
+          <div class="border-t border-gray-200 bg-gray-50/40">
+            <div class="p-4 flex gap-3">
+              <div class="size-8 rounded-full bg-white border border-gray-200 flex items-center justify-center shrink-0 overflow-hidden">
+                <img src="/favicon.svg" alt="" width="20" height="20" class="size-5" />
+              </div>
+              <div class="flex-1 min-w-0 border border-gray-200 rounded-md bg-white overflow-hidden">
+                <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs">
+                  <span class="font-semibold text-gray-900">openpolicy-bot</span>
+                  <span class="text-gray-500">requested changes 3 minutes ago</span>
+                  <span class="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 bg-red-50 border border-red-200 text-red-700 rounded-full font-mono text-[10px] font-medium uppercase tracking-wider">
+                    <span class="size-1.5 rounded-full bg-red-500"></span>
+                    Blocking
+                  </span>
+                </div>
+                <div class="border-l-4 border-red-500 bg-red-50/70 px-3 py-2.5 flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="text-red-600 shrink-0 mt-0.5" aria-hidden="true">
+                    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold text-red-900 mb-0.5">Compliance check failed — merge blocked</p>
+                    <p class="text-xs text-red-800/90">EU visitors (<span class="font-mono">~38.2k / month</span>) would receive GA cookies before consent — a <span class="font-mono">GDPR Art. 6</span> violation.</p>
+                  </div>
+                </div>
+                <div class="px-3 py-3">
+                  <p class="text-sm text-gray-700 mb-2.5">
+                    This change loads <code>gtag.js</code>, which sets the <code>_ga</code> (2 yr), <code>_gid</code> (24 hr), and <code>_gat</code> cookies and forwards IP + page data to Google <em>on first paint</em> — before the visitor has a chance to accept or reject.
+                  </p>
+                  <p class="text-sm text-gray-700 mb-3">
+                    Plus checked this against your enforcement profile: <span class="font-mono text-xs">strict</span>. <span class="font-mono text-xs">61%</span> of last month's sessions originated in regions where prior consent is required for non-essential cookies.
+                  </p>
+                  <div class="grid grid-cols-2 gap-2 mb-3 text-xs">
+                    <div class="border border-gray-200 rounded-md bg-gray-50 px-3 py-2">
+                      <p class="font-mono text-[10px] text-gray-500 uppercase tracking-wider mb-1">Detected at</p>
+                      <p class="font-mono text-gray-800 truncate">analytics.tsx<span class="text-gray-400">:4</span></p>
+                      <p class="font-mono text-gray-800 truncate">analytics.tsx<span class="text-gray-400">:5</span></p>
+                    </div>
+                    <div class="border border-gray-200 rounded-md bg-gray-50 px-3 py-2">
+                      <p class="font-mono text-[10px] text-gray-500 uppercase tracking-wider mb-1">Affected jurisdictions</p>
+                      <p class="font-mono text-gray-800">eu <span class="text-gray-400">· GDPR + ePrivacy</span></p>
+                      <p class="font-mono text-gray-800">uk <span class="text-gray-400">· UK GDPR</span></p>
+                    </div>
+                  </div>
+                  <div class="border border-gray-200 rounded-md overflow-hidden mb-3">
+                    <div class="flex items-center bg-gray-50 border-b border-gray-200 px-3 py-1.5 gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 shrink-0" aria-hidden="true">
+                        <path d="m9 11-6 6v3h9l3-3"/>
+                        <path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/>
+                      </svg>
+                      <span class="font-mono text-[10px] text-gray-500 uppercase tracking-wider">Suggested fix · wrap in a consent gate</span>
+                    </div>
+                    <div class="bg-white font-mono text-xs leading-5">
+                      <div class="grid grid-cols-[2.5rem_1fr]">
+                        <span class="text-right pr-2 bg-emerald-50 text-emerald-700 select-none border-r border-emerald-100">+</span>
+                        <span class="pl-3 pr-2 bg-emerald-50 text-emerald-900 whitespace-pre">    &lt;ConsentGate category="analytics"&gt;</span>
+                        <span class="text-right pr-2 text-gray-400 select-none border-r border-gray-100"> </span>
+                        <span class="pl-3 pr-2 text-gray-700 whitespace-pre">      &lt;script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXX" /&gt;</span>
+                        <span class="text-right pr-2 text-gray-400 select-none border-r border-gray-100"> </span>
+                        <span class="pl-3 pr-2 text-gray-700 whitespace-pre">      &lt;script dangerouslySetInnerHTML=&#123;&#123; __html: `gtag('config', 'G-XXXXXX');` &#125;&#125; /&gt;</span>
+                        <span class="text-right pr-2 bg-emerald-50 text-emerald-700 select-none border-r border-emerald-100">+</span>
+                        <span class="pl-3 pr-2 bg-emerald-50 text-emerald-900 whitespace-pre">    &lt;/ConsentGate&gt;</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="font-mono text-[10px] text-gray-500 uppercase tracking-wider mb-2">Other checks · 3 passed</p>
+                  <ul role="list" class="space-y-1.5 text-xs text-gray-600">
+                    <li class="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600 shrink-0" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      <span>CCPA opt-out link present</span>
+                      <span class="font-mono text-[10px] text-gray-400 ml-auto">us-ca</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600 shrink-0" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      <span>GDPR lawful basis declared for all categories</span>
+                      <span class="font-mono text-[10px] text-gray-400 ml-auto">eu</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600 shrink-0" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      <span>Policy hash matches deployed <span class="font-mono">v0.0.29</span></span>
+                      <span class="font-mono text-[10px] text-gray-400 ml-auto">global</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
