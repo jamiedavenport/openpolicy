@@ -30,16 +30,52 @@ async function touch(rel: string, content: string): Promise<void> {
 }
 
 /**
+ * Captures `error` / `warn` calls from the Rollup PluginContext so build-mode
+ * validation paths can be asserted. `error` matches Rollup's contract by
+ * throwing — the plugin uses `this.error` to abort the build.
+ */
+type PluginContextStub = {
+	errors: string[];
+	warnings: string[];
+	error(msg: string): never;
+	warn(msg: string): void;
+};
+
+function createPluginContext(): PluginContextStub {
+	const ctx: PluginContextStub = {
+		errors: [],
+		warnings: [],
+		error(msg: string): never {
+			ctx.errors.push(msg);
+			throw new Error(msg);
+		},
+		warn(msg: string): void {
+			ctx.warnings.push(msg);
+		},
+	};
+	return ctx;
+}
+
+/**
  * Invokes `configResolved` and `buildStart` in the order Vite would, so the
  * plugin's internal `scanned` state is populated.
  */
-async function runPluginBuildStart(plugin: PluginInstance, root: string): Promise<void> {
+async function runPluginBuildStart(
+	plugin: PluginInstance,
+	root: string,
+	options: { command?: "build" | "serve"; ctx?: PluginContextStub } = {},
+): Promise<PluginContextStub> {
+	const command = options.command ?? "build";
 	const configResolved = plugin.configResolved as
-		| ((config: { root: string }) => void | Promise<void>)
+		| ((config: { root: string; command: "build" | "serve" }) => void | Promise<void>)
 		| undefined;
-	if (configResolved) await configResolved({ root });
-	const buildStart = plugin.buildStart as (() => void | Promise<void>) | undefined;
-	if (buildStart) await buildStart.call({});
+	if (configResolved) await configResolved({ root, command });
+	const buildStart = plugin.buildStart as
+		| ((this: PluginContextStub) => void | Promise<void>)
+		| undefined;
+	const ctx = options.ctx ?? createPluginContext();
+	if (buildStart) await buildStart.call(ctx);
+	return ctx;
 }
 
 type ScannedResult = {
@@ -90,6 +126,7 @@ type StubServer = {
 	invalidatedIds: string[];
 	sentMessages: Array<{ type: string }>;
 	loggedErrors: string[];
+	loggedWarnings: string[];
 	runHandler: (event: WatcherEvent, file: string) => Promise<void>;
 	// biome-ignore lint/suspicious/noExplicitAny: ad-hoc ViteDevServer stub.
 	server: any;
@@ -112,6 +149,7 @@ function createStubServer(): StubServer {
 	const invalidatedIds: string[] = [];
 	const sentMessages: Array<{ type: string }> = [];
 	const loggedErrors: string[] = [];
+	const loggedWarnings: string[] = [];
 
 	// biome-ignore lint/suspicious/noExplicitAny: see StubServer.
 	const server: any = {
@@ -141,6 +179,9 @@ function createStubServer(): StubServer {
 				error(msg: string): void {
 					loggedErrors.push(msg);
 				},
+				warn(msg: string): void {
+					loggedWarnings.push(msg);
+				},
 			},
 		},
 	};
@@ -156,6 +197,7 @@ function createStubServer(): StubServer {
 		invalidatedIds,
 		sentMessages,
 		loggedErrors,
+		loggedWarnings,
 		runHandler,
 		server,
 	};
@@ -869,7 +911,7 @@ test("buildStart emits openpolicy.gen.ts next to openpolicy.ts inside src/", asy
 		`import { collecting } from "@openpolicy/sdk";\n` +
 			`collecting("Account Information", v, { email: "Email" });\n`,
 	);
-	const plugin = openPolicy();
+	const plugin = openPolicy({ validate: false });
 	await runPluginBuildStart(plugin, tmp);
 	const dts = await readFile(join(tmp, "src/openpolicy.gen.ts"), "utf8");
 	expect(dts).toContain('"Account Information": true');
@@ -882,8 +924,41 @@ test("buildStart emits openpolicy.gen.ts next to openpolicy.ts inside src/lib/",
 		`import { collecting } from "@openpolicy/sdk";\n` +
 			`collecting("Account Information", v, { email: "Email" });\n`,
 	);
-	const plugin = openPolicy();
+	const plugin = openPolicy({ validate: false });
 	await runPluginBuildStart(plugin, tmp);
 	const dts = await readFile(join(tmp, "src/lib/openpolicy.gen.ts"), "utf8");
 	expect(dts).toContain('"Account Information": true');
+});
+
+test("validate:false skips config load entirely (stub config does not crash buildStart)", async () => {
+	// A `{}` config would fail every required-field check; with validate
+	// disabled, buildStart must not even load the file.
+	await touch("src/openpolicy.ts", "export default {} as const;\n");
+	const plugin = openPolicy({ validate: false });
+	const ctx = await runPluginBuildStart(plugin, tmp);
+	expect(ctx.errors).toEqual([]);
+	expect(ctx.warnings).toEqual([]);
+});
+
+test("vite dev (command: 'serve') does not abort via this.error even if config has issues", async () => {
+	// Validation in `vite dev` flows through the dev-server logger inside
+	// `configureServer`, never through PluginContext.error. A stub config
+	// with multiple errors must not throw out of buildStart in serve mode.
+	await touch("src/openpolicy.ts", "export default {} as const;\n");
+	const plugin = openPolicy();
+	const ctx = await runPluginBuildStart(plugin, tmp, { command: "serve" });
+	expect(ctx.errors).toEqual([]);
+});
+
+test("validate:false leaves load hook working so scanned data still flows through", async () => {
+	await touch(
+		"src/lib/db.ts",
+		`import { collecting } from "@openpolicy/sdk";
+		collecting("Account Information", v, { name: "Name" });`,
+	);
+	const plugin = openPolicy({ validate: false });
+	await runPluginBuildStart(plugin, tmp);
+	expect(loadScanned(plugin).dataCollected).toEqual({
+		"Account Information": ["Name"],
+	});
 });

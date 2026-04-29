@@ -65,19 +65,9 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/css-vars'
-    | '/onboarding-wizard'
-    | '/shadcn'
-    | '/tailwind'
+  fullPaths: '/' | '/css-vars' | '/onboarding-wizard' | '/shadcn' | '/tailwind'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/css-vars'
-    | '/onboarding-wizard'
-    | '/shadcn'
-    | '/tailwind'
+  to: '/' | '/css-vars' | '/onboarding-wizard' | '/shadcn' | '/tailwind'
   id:
     | '__root__'
     | '/'

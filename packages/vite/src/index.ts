@@ -4,6 +4,14 @@ import type { Plugin, ViteDevServer } from "vite";
 import { extractFromFile, type ThirdPartyEntry } from "./analyse";
 import { KNOWN_COOKIE_PACKAGES, KNOWN_PACKAGES } from "./known-packages";
 import { walkSources } from "./scan";
+import {
+	AUTO_COLLECTED_SPECIFIER,
+	type CookieMap,
+	renderAutoCollectedSource,
+	type Scanned,
+	SDK_PATH_PATTERN,
+} from "./scanned";
+import { formatIssue, loadAndValidateConfig, type ValidatedConfig } from "./validate";
 
 export type OpenPolicyOptions = {
 	/**
@@ -29,14 +37,15 @@ export type OpenPolicyOptions = {
 	cookies?: {
 		usePackageJson?: boolean;
 	};
-};
 
-type CookieMap = { essential: boolean; [key: string]: boolean };
-
-type Scanned = {
-	dataCollected: Record<string, string[]>;
-	thirdParties: ThirdPartyEntry[];
-	cookies: CookieMap;
+	/**
+	 * Run `validateOpenPolicyConfig` (and the per-policy validators) against
+	 * the resolved `openpolicy.ts` after each scan. Errors fail `vite build`
+	 * (`PluginContext.error`); warnings are reported (`PluginContext.warn`)
+	 * but never block. In dev, both error and warning issues are logged
+	 * through the dev-server logger and never crash HMR. Defaults to `true`.
+	 */
+	validate?: boolean;
 };
 
 /**
@@ -59,15 +68,15 @@ const CONFIG_CANDIDATES = [
 	"lib/openpolicy.ts",
 ];
 
-async function findConfigDir(root: string): Promise<string> {
+async function findConfig(root: string): Promise<{ dir: string; file: string | null }> {
 	for (const candidate of CONFIG_CANDIDATES) {
 		const path = resolve(root, candidate);
 		try {
 			await access(path);
-			return dirname(path);
+			return { dir: dirname(path), file: path };
 		} catch {}
 	}
-	return root;
+	return { dir: root, file: null };
 }
 
 /**
@@ -108,24 +117,6 @@ async function writeAutoCollectedDts(
 }
 
 /**
- * Matches any path that lives inside the `@openpolicy/sdk` package, whether
- * it's resolved via a workspace symlink (`.../packages/sdk/...`) or a
- * published `node_modules` install (`.../@openpolicy/sdk/...`). Used to scope
- * the `./auto-collected` relative-import interception to the SDK itself.
- */
-const SDK_PATH_PATTERN = /[\\/](?:@openpolicy[\\/]sdk|packages[\\/]sdk)[\\/]/;
-
-/**
- * Matches the relative specifier the SDK uses for its own internal
- * `./auto-collected` import. Both the source form (`./auto-collected`) and
- * the published dist form (`./auto-collected.js`) need to be intercepted:
- * the former applies when consumers resolve the SDK via its workspace
- * source, the latter when resolving against `dist/` with the separate
- * `auto-collected.js` chunk.
- */
-const AUTO_COLLECTED_SPECIFIER = /^\.\/auto-collected(?:\.js)?$/;
-
-/**
  * Vite plugin that scans source files for `@openpolicy/sdk` `collecting()`,
  * `thirdParty()`, and `defineCookie()` calls at the start of each build and
  * inlines the discovered data into the SDK's `dataCollected` / `thirdParties`
@@ -144,9 +135,12 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 	const ignore = options.ignore ?? [];
 	const usePackageJsonOpt = options.thirdParties?.usePackageJson ?? false;
 	const useCookiesPackageJsonOpt = options.cookies?.usePackageJson ?? false;
+	const validateOpt = options.validate ?? true;
 	let resolvedRoot: string;
 	let resolvedSrcDir: string;
 	let resolvedConfigDir: string;
+	let resolvedConfigFile: string | null = null;
+	let resolvedCommand: "build" | "serve" = "build";
 	let scanned: Scanned = {
 		dataCollected: {},
 		thirdParties: [],
@@ -275,16 +269,47 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 	 */
 	async function rescanAndRefresh(server: ViteDevServer): Promise<void> {
 		const next = await scanAndMerge();
-		if (JSON.stringify(next) === JSON.stringify(scanned)) return;
-		scanned = next;
-		await writeAutoCollectedDts(
-			resolvedConfigDir,
-			scanned.dataCollected,
-			Object.keys(scanned.cookies),
-		);
-		const mod = server.moduleGraph.getModuleById(RESOLVED_VIRTUAL_ID);
-		if (mod) server.moduleGraph.invalidateModule(mod);
-		server.ws.send({ type: "full-reload" });
+		const changed = JSON.stringify(next) !== JSON.stringify(scanned);
+		if (changed) {
+			scanned = next;
+			await writeAutoCollectedDts(
+				resolvedConfigDir,
+				scanned.dataCollected,
+				Object.keys(scanned.cookies),
+			);
+			const mod = server.moduleGraph.getModuleById(RESOLVED_VIRTUAL_ID);
+			if (mod) server.moduleGraph.invalidateModule(mod);
+			server.ws.send({ type: "full-reload" });
+		}
+		await runValidationDev(server);
+	}
+
+	async function runValidationDev(server: ViteDevServer): Promise<void> {
+		if (!validateOpt || !resolvedConfigFile) return;
+		let result: ValidatedConfig;
+		try {
+			result = await loadAndValidateConfig({
+				configFile: resolvedConfigFile,
+				scanned,
+			});
+		} catch (err) {
+			server.config.logger.error(`[openpolicy] validation crashed: ${err}`);
+			return;
+		}
+		if (result.loadError) {
+			// Don't double-report TS/import errors — the user's own pipeline
+			// already shows them. Surface only the message at warn level so
+			// it's discoverable without spamming.
+			server.config.logger.warn(
+				`[openpolicy] could not load config for validation: ${result.loadError.message}`,
+			);
+			return;
+		}
+		for (const issue of result.issues) {
+			const line = formatIssue(issue);
+			if (issue.level === "error") server.config.logger.error(line);
+			else server.config.logger.warn(line);
+		}
 	}
 
 	return {
@@ -327,15 +352,43 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 		configResolved(config) {
 			resolvedRoot = config.root;
 			resolvedSrcDir = resolve(config.root, srcDirOpt);
+			resolvedCommand = config.command;
 		},
 		async buildStart() {
-			resolvedConfigDir = await findConfigDir(resolvedRoot);
+			const found = await findConfig(resolvedRoot);
+			resolvedConfigDir = found.dir;
+			resolvedConfigFile = found.file;
 			scanned = await scanAndMerge();
 			await writeAutoCollectedDts(
 				resolvedConfigDir,
 				scanned.dataCollected,
 				Object.keys(scanned.cookies),
 			);
+			// Only validate via Rollup's PluginContext in `vite build` —
+			// `this.error` aborts the build, which is the desired CI signal.
+			// In `vite dev` we let `configureServer` handle validation
+			// through the dev-server logger so HMR isn't crashed.
+			if (validateOpt && resolvedConfigFile && resolvedCommand === "build") {
+				const result = await loadAndValidateConfig({
+					configFile: resolvedConfigFile,
+					scanned,
+				});
+				if (result.loadError) {
+					this.warn(
+						`[openpolicy] could not load config for validation: ${result.loadError.message}`,
+					);
+				} else {
+					const errors = result.issues.filter((i) => i.level === "error");
+					const warnings = result.issues.filter((i) => i.level === "warning");
+					for (const issue of warnings) this.warn(formatIssue(issue));
+					if (errors.length > 0) {
+						const lines = errors.map(formatIssue).join("\n");
+						this.error(
+							`OpenPolicy validation found ${errors.length} error${errors.length === 1 ? "" : "s"}:\n${lines}`,
+						);
+					}
+				}
+			}
 		},
 		configureServer(server) {
 			// Make sure chokidar watches the whole src tree, not just files
@@ -344,8 +397,14 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			// event — the very case we most need to re-scan on.
 			server.watcher.add(resolvedSrcDir);
 
+			// Watch the config file too so edits to `openpolicy.ts` re-run
+			// validation even when no scanned source has changed.
+			if (resolvedConfigFile) server.watcher.add(resolvedConfigFile);
+
 			const handler = async (file: string): Promise<void> => {
-				if (!isTrackedSource(file)) return;
+				const tracked = isTrackedSource(file);
+				const isConfig = resolvedConfigFile !== null && file === resolvedConfigFile;
+				if (!tracked && !isConfig) return;
 				// Surface errors via the logger but don't rethrow — an
 				// unhandled rejection would crash the watcher process.
 				try {
@@ -358,6 +417,13 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			server.watcher.on("change", handler);
 			server.watcher.on("add", handler);
 			server.watcher.on("unlink", handler);
+
+			// Replay validation through the dev-server logger. `buildStart`
+			// already validated in build mode via `this.error`/`this.warn`,
+			// but Vite's dev pipeline doesn't expose that PluginContext to
+			// the terminal in the same way — so we re-emit through the
+			// server logger for visibility on `vite dev` startup.
+			void runValidationDev(server);
 		},
 		async resolveId(source, importer, resolveOptions) {
 			if (!importer || !AUTO_COLLECTED_SPECIFIER.test(source)) return null;
@@ -373,11 +439,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 		},
 		load(id) {
 			if (id !== RESOLVED_VIRTUAL_ID) return null;
-			return (
-				`export const dataCollected = ${JSON.stringify(scanned.dataCollected)};\n` +
-				`export const thirdParties = ${JSON.stringify(scanned.thirdParties)};\n` +
-				`export const cookies = ${JSON.stringify(scanned.cookies)};\n`
-			);
+			return renderAutoCollectedSource(scanned);
 		},
 	};
 }
