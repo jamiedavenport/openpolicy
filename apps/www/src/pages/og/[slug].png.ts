@@ -7,14 +7,16 @@ import type { ReactNode } from "react";
 import satori from "satori";
 
 export async function getStaticPaths() {
-	const posts = await getCollection("blog");
+	const now = Date.now();
+	const posts = (await getCollection("blog")).filter((post) => post.data.pubDate.valueOf() <= now);
 	return posts.map((post) => ({ params: { slug: post.slug } }));
 }
 
 const fontData = fs.readFileSync(path.join(process.cwd(), "src/fonts/GeistMono-Bold.woff"));
 
 export const GET: APIRoute = async ({ params }) => {
-	const posts = await getCollection("blog");
+	const now = Date.now();
+	const posts = (await getCollection("blog")).filter((p) => p.data.pubDate.valueOf() <= now);
 	const post = posts.find((p) => p.slug === params.slug);
 	if (!post) return new Response("Not found", { status: 404 });
 
