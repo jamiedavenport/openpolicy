@@ -5,7 +5,7 @@ export default defineConfig({
 		name: "Your Company",
 		legalName: "Your Company, Inc.",
 		address: "123 Main St, City, State, ZIP",
-		contact: "privacy@yourcompany.com",
+		contact: { email: "privacy@yourcompany.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "us-ca"],

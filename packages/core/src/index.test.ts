@@ -9,7 +9,7 @@ const input: PolicyInput = {
 		name: "Acme Inc.",
 		legalName: "Acme Corporation",
 		address: "123 Main St, Springfield, USA",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
@@ -42,7 +42,7 @@ const company = {
 	name: "Acme Inc.",
 	legalName: "Acme Corporation",
 	address: "123 Main St, Springfield, USA",
-	contact: "privacy@acme.com",
+	contact: { email: "privacy@acme.com" },
 };
 
 const fullConfig: OpenPolicyConfig = {

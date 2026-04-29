@@ -21,7 +21,12 @@ const results = await compilePolicy(
 	{
 		type: "privacy",
 		effectiveDate: "2026-01-01",
-		company: { name: "Acme", legalName: "Acme, Inc.", address: "...", contact: "privacy@acme.com" },
+		company: {
+			name: "Acme",
+			legalName: "Acme, Inc.",
+			address: "...",
+			contact: { email: "privacy@acme.com" },
+		},
 		// ... rest of config
 	},
 	{ formats: ["markdown", "html", "pdf"] },

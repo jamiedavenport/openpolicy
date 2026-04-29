@@ -8,7 +8,7 @@ const baseConfig: OpenPolicyConfig = {
 		name: "Acme Inc.",
 		legalName: "Acme Corporation",
 		address: "123 Main St, Springfield, USA",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu"],
@@ -179,4 +179,29 @@ test("validateOpenPolicyConfig does NOT emit statutory-contractual-obligation fo
 		},
 	});
 	expect(issues.some((i) => i.code === "statutory-contractual-obligation")).toBe(false);
+});
+
+test("validateOpenPolicyConfig warns when us-ca jurisdiction lacks company.contact.phone", () => {
+	const issues = validateOpenPolicyConfig({ ...baseConfig, jurisdictions: ["us-ca"] });
+	const hit = issues.find((i) => i.code === "company-contact-phone-recommended");
+	expect(hit).toBeDefined();
+	expect(hit?.level).toBe("warning");
+	expect(hit?.message).toContain("CCPA");
+});
+
+test("validateOpenPolicyConfig does not warn about contact phone when phone is set", () => {
+	const issues = validateOpenPolicyConfig({
+		...baseConfig,
+		jurisdictions: ["us-ca"],
+		company: {
+			...baseConfig.company,
+			contact: { email: "privacy@acme.com", phone: "+1-800-555-0100" },
+		},
+	});
+	expect(issues.some((i) => i.code === "company-contact-phone-recommended")).toBe(false);
+});
+
+test("validateOpenPolicyConfig does not warn about contact phone for non-CCPA jurisdictions", () => {
+	const issues = validateOpenPolicyConfig({ ...baseConfig, jurisdictions: ["eu"] });
+	expect(issues.some((i) => i.code === "company-contact-phone-recommended")).toBe(false);
 });

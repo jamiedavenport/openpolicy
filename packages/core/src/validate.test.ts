@@ -8,7 +8,7 @@ const baseConfig: PrivacyPolicyConfig = {
 		name: "Acme Inc.",
 		legalName: "Acme Corporation",
 		address: "123 Main St, Springfield, USA",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },

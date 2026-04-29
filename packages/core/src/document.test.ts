@@ -9,7 +9,7 @@ const minimalPrivacyConfig: PrivacyPolicyConfig = {
 		name: "Acme Inc.",
 		legalName: "Acme Corporation",
 		address: "123 Main St, Springfield, USA",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	data: {
 		collected: { "Account Information": ["Name", "Email address"] },
@@ -370,7 +370,7 @@ test("consent-withdrawal section is rendered when any data category uses consent
 	const blob = JSON.stringify(cw);
 	expect(blob).toContain("Right to Withdraw Consent");
 	expect(blob).toContain("Article 7(3)");
-	expect(blob).toContain(minimalPrivacyConfig.company.contact);
+	expect(blob).toContain(minimalPrivacyConfig.company.contact.email);
 	expect(blob).toContain("does not affect the lawfulness");
 });
 
@@ -578,7 +578,7 @@ test("gdpr-supplement names specific Article 46 transfer safeguards and links th
 	expect(blob).toContain(
 		"commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en",
 	);
-	expect(blob).toContain(minimalPrivacyConfig.company.contact);
+	expect(blob).toContain(minimalPrivacyConfig.company.contact.email);
 	expect(blob).not.toContain("we ensure adequate safeguards are in place");
 });
 
@@ -700,5 +700,63 @@ test("automated-decision-making section enumerates each activity and appends Art
 	expect(blob).toContain("rules engine");
 	expect(blob).toContain("Significance");
 	expect(blob).toContain("Right to human review");
-	expect(blob).toContain(minimalPrivacyConfig.company.contact);
+	expect(blob).toContain(minimalPrivacyConfig.company.contact.email);
+});
+
+test("Contact section renders phone when company.contact.phone is set", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		company: {
+			...minimalPrivacyConfig.company,
+			contact: { email: "privacy@acme.com", phone: "+1-800-555-0100" },
+		},
+	});
+	const contact = doc.sections.find((s) => s.id === "contact")!;
+	expect(contact).toBeDefined();
+	const blob = JSON.stringify(contact);
+	expect(blob).toContain("Phone:");
+	expect(blob).toContain("+1-800-555-0100");
+});
+
+test("Contact section omits phone when company.contact.phone is unset", () => {
+	const doc = compile({ type: "privacy", ...minimalPrivacyConfig });
+	const contact = doc.sections.find((s) => s.id === "contact")!;
+	const blob = JSON.stringify(contact);
+	expect(blob).not.toContain("Phone:");
+});
+
+test("CCPA supplement renders Submitting Requests with email and phone when us-ca", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["us-ca"],
+		company: {
+			...minimalPrivacyConfig.company,
+			contact: { email: "privacy@acme.com", phone: "+1-800-555-0100" },
+		},
+	});
+	const ccpa = doc.sections.find((s) => s.id === "ccpa-supplement")!;
+	expect(ccpa).toBeDefined();
+	const blob = JSON.stringify(ccpa);
+	expect(blob).toContain("Submitting requests");
+	expect(blob).toContain("privacy@acme.com");
+	expect(blob).toContain("+1-800-555-0100");
+});
+
+test("CCPA supplement Submitting Requests lists email even when phone is unset", () => {
+	const doc = compile({
+		type: "privacy",
+		...minimalPrivacyConfig,
+		jurisdictions: ["us-ca"],
+	});
+	const ccpa = doc.sections.find((s) => s.id === "ccpa-supplement")!;
+	const blob = JSON.stringify(ccpa);
+	expect(blob).toContain("Submitting requests");
+	expect(blob).toContain("privacy@acme.com");
+});
+
+test("CCPA supplement is omitted when us-ca is not in jurisdictions", () => {
+	const doc = compile({ type: "privacy", ...minimalPrivacyConfig });
+	expect(doc.sections.find((s) => s.id === "ccpa-supplement")).toBeUndefined();
 });

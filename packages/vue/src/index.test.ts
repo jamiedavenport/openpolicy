@@ -8,7 +8,7 @@ const company = {
 	name: "Acme",
 	legalName: "Acme Inc.",
 	address: "123 Main St",
-	contact: "privacy@acme.com",
+	contact: { email: "privacy@acme.com" },
 };
 
 const privacyConfig: PrivacyPolicyConfig = {

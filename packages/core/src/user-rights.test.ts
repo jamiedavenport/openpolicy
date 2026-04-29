@@ -62,7 +62,7 @@ test("buildUserRights: privacy policy omits 'Your Rights' section when derivatio
 			name: "Acme Inc.",
 			legalName: "Acme Corporation",
 			address: "123 Main St, Springfield, USA",
-			contact: "privacy@acme.com",
+			contact: { email: "privacy@acme.com" },
 		},
 		data: {
 			collected: { "Account Information": ["Name", "Email"] },
@@ -101,7 +101,7 @@ test("validateOpenPolicyConfig: emits no userRights-related issues", () => {
 			name: "Acme Inc.",
 			legalName: "Acme Corporation",
 			address: "123 Main St, Springfield, USA",
-			contact: "privacy@acme.com",
+			contact: { email: "privacy@acme.com" },
 		},
 		effectiveDate: "2026-01-01",
 		jurisdictions: ["us-ca"],

@@ -28,11 +28,11 @@ export function validateCookiePolicy(config: CookiePolicyConfig): ValidationIssu
 			level: "error",
 			message: "company.address is required",
 		});
-	if (!config.company.contact)
+	if (!config.company.contact?.email)
 		issues.push({
 			code: "company-contact-required",
 			level: "error",
-			message: "company.contact is required",
+			message: "company.contact.email is required",
 		});
 
 	const used = config.cookies.used;

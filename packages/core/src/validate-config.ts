@@ -29,11 +29,11 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 			level: "error",
 			message: "company.address is required",
 		});
-	if (!config.company?.contact)
+	if (!config.company?.contact?.email)
 		issues.push({
 			code: "company-contact-required",
 			level: "error",
-			message: "company.contact is required",
+			message: "company.contact.email is required",
 		});
 	if (!config.jurisdictions || config.jurisdictions.length === 0) {
 		issues.push({
@@ -154,6 +154,15 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 			level: "warning",
 			message:
 				"company.dpo is not set — GDPR Article 13(1)(b) requires Data Protection Officer contact details if one is appointed. Set company.dpo, or set company.dpo = { required: false } to declare that none is needed.",
+		});
+	}
+
+	if (wantPrivacy && config.jurisdictions?.includes("us-ca") && !config.company?.contact?.phone) {
+		issues.push({
+			code: "company-contact-phone-recommended",
+			level: "warning",
+			message:
+				"company.contact.phone is not set — CCPA §1798.130(a)(1) requires businesses to provide two or more designated methods for consumers to submit requests, and (unless you operate exclusively online) one must be a toll-free phone number.",
 		});
 	}
 

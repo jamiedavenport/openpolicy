@@ -5,7 +5,10 @@ export default defineConfig({
 		name: "Your Company",
 		legalName: "Your Company, Inc.",
 		address: "123 Main St, City, State, ZIP",
-		contact: "privacy@yourcompany.com",
+		contact: {
+			email: "privacy@yourcompany.com",
+			phone: "+1-800-555-0100",
+		},
 	},
 	effectiveDate: "2026-03-09",
 	jurisdictions: ["us-ca"],

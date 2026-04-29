@@ -8,7 +8,7 @@ const validConfig: CookiePolicyConfig = {
 		name: "Acme",
 		legalName: "Acme Inc.",
 		address: "123 Main St",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	cookies: {
 		used: {
@@ -73,7 +73,7 @@ test("missing company.address is an error", () => {
 test("missing company.contact is an error", () => {
 	const issues = validateCookiePolicy({
 		...validConfig,
-		company: { ...validConfig.company, contact: "" },
+		company: { ...validConfig.company, contact: { email: "" } },
 	});
 	expect(issues.some((i) => i.message.includes("company.contact"))).toBe(true);
 });

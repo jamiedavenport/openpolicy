@@ -77,7 +77,7 @@ export default defineConfig({
 		name: "Acme",
 		legalName: "Acme, Inc.",
 		address: "123 Main St, San Francisco, CA 94105",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: [...Compliance.GDPR.jurisdictions, ...Compliance.CCPA.jurisdictions],

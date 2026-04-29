@@ -7,6 +7,7 @@ export type {
 	ChildrenConfig,
 	CompanyConfig,
 	ConsentMechanism,
+	Contact,
 	CookieContext,
 	CookieContextEntry,
 	CookiePolicyCookies,

@@ -58,11 +58,16 @@ export type EuRepresentative = {
 	email: string;
 };
 
+export type Contact = {
+	email: string;
+	phone?: string;
+};
+
 export type CompanyConfig = {
 	name: string;
 	legalName: string;
 	address: string;
-	contact: string;
+	contact: Contact;
 	dpo?: Dpo;
 	euRepresentative?: EuRepresentative;
 };

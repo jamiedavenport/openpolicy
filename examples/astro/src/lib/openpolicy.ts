@@ -5,7 +5,7 @@ export default defineConfig({
 		name: "Acme Inc.",
 		legalName: "Acme Corporation",
 		address: "123 Main St, Springfield, USA",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-03-03",
 	jurisdictions: ["eu", "us-ca"],

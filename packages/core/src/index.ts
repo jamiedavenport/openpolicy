@@ -24,6 +24,7 @@ export type {
 	CompanyConfig,
 	CompileOptions,
 	ConsentMechanism,
+	Contact,
 	CookieContext,
 	CookieContextEntry,
 	CookiePolicyConfig,

@@ -129,11 +129,11 @@ Build the privacy page. Build the cookie banner. Then keep going — onboarding,
 
 ## Where the primitives live
 
-| Primitive        | What it gives you                                   | Where it comes from                                     |
-| ---------------- | --------------------------------------------------- | ------------------------------------------------------- |
-| `data.collected` | `Record<string, string[]>` of categories and fields | `collecting()` calls + manual entries                   |
-| `thirdParties`   | `{ name, purpose, policyUrl? }[]`                   | `thirdParty()` calls + `usePackageJson` detection       |
-| `cookies.used`   | `{ essential: true, [category]: boolean }`          | `defineCookie()` calls + manual entries                 |
+| Primitive        | What it gives you                                   | Where it comes from                               |
+| ---------------- | --------------------------------------------------- | ------------------------------------------------- |
+| `data.collected` | `Record<string, string[]>` of categories and fields | `collecting()` calls + manual entries             |
+| `thirdParties`   | `{ name, purpose, policyUrl? }[]`                   | `thirdParty()` calls + `usePackageJson` detection |
+| `cookies.used`   | `{ essential: true, [category]: boolean }`          | `defineCookie()` calls + manual entries           |
 
 All of them read from the same `openpolicy.ts`. All of them update together when you change it.
 

@@ -31,7 +31,7 @@ export default defineConfig({
 	company: {
 		name: "Acme",
 		legalName: "Acme, Inc.",
-		contact: "legal@acme.com",
+		contact: { email: "legal@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "us-ca"],

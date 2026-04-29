@@ -14,7 +14,7 @@ export default defineConfig({
     name: "Acme",
     legalName: "Acme Inc.",
     address: "123 Market St",
-    contact: "privacy@acme.com",
+    contact: { email: "privacy@acme.com" },
   },
   effectiveDate: "2026-01-01",
   jurisdictions: ["us-ca"],
@@ -42,7 +42,7 @@ export default defineConfig({
     name: "Acme",
     legalName: "Acme Inc.",
     address: "123 Market St",
-    contact: "privacy@acme.com",
+    contact: { email: "privacy@acme.com" },
   },
   effectiveDate: "2026-01-01",
   jurisdictions: ["us-ca", "eu"],
@@ -70,7 +70,7 @@ export default defineConfig({
     name: "Acme",
     legalName: "Acme Inc.",
     address: "123 Market St",
-    contact: "privacy@acme.com",
+    contact: { email: "privacy@acme.com" },
   },
   effectiveDate: "2026-01-01",
   jurisdictions: ["us-ca", "eu"],
@@ -107,7 +107,7 @@ const COMPANY = {
 	name: "Acme",
 	legalName: "Acme Inc.",
 	address: "123 Market St",
-	contact: "privacy@acme.com",
+	contact: { email: "privacy@acme.com" },
 } as const;
 
 const SCENE_0_CONFIG: OpenPolicyConfig = {

@@ -30,7 +30,7 @@ export default defineConfig({
 		name: "Acme Inc.",
 		legalName: "Acme Corporation",
 		address: "123 Main St, Springfield, USA",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "us-ca"],
@@ -69,6 +69,22 @@ export default defineConfig({
 
 The `company` block is required and shared across all policy types. All other fields live at the top level: `effectiveDate` and `jurisdictions` are shared, and OpenPolicy auto-detects which policies to generate from the fields you provide — include the `data` block for a privacy policy, and the `cookies` block (or `consentMechanism` / `trackingTechnologies`) for a cookie policy.
 
+### Contact methods
+
+`company.contact` is an object: `email` is required, and `phone` is optional. The phone number is rendered alongside the email in the privacy and cookie policy contact sections.
+
+```ts
+company: {
+  // ...
+  contact: {
+    email: "privacy@acme.com",
+    phone: "+1-800-555-0100", // optional
+  },
+},
+```
+
+Setting `phone` is recommended when `jurisdictions` includes `us-ca`. CCPA §1798.130(a)(1) requires businesses to provide two or more designated methods for consumers to submit privacy requests, and (unless you operate exclusively online) one of those methods must be a toll-free number. When `phone` is set, the rendered CCPA supplement appends a "Submitting requests" block listing both methods. Omitting it under `us-ca` emits a validation warning.
+
 The `data` block has two sibling maps: `collected` (category → field labels) and `context` (category → metadata about that category). `defineConfig`'s generic enforces that every key in `collected` has a matching `context` entry with `purpose`, `lawfulBasis`, `retention`, and `provision`. The `cookies` block mirrors the same shape: `cookies.used` lists the categories you enable (with `essential: true` always required), and `cookies.context` declares the Article 6 basis for each enabled category.
 
 ### Data Protection Officer
@@ -80,7 +96,7 @@ company: {
   name: "Acme Inc.",
   legalName: "Acme Corporation",
   address: "123 Main St, Springfield, USA",
-  contact: "privacy@acme.com",
+  contact: { email: "privacy@acme.com" },
   dpo: {
     email: "dpo@acme.com",
     name: "Jane Doe",           // optional

@@ -35,7 +35,9 @@ function buildIntroduction(config: PrivacyPolicyConfig): DocumentSection {
 		p([
 			`This Privacy Policy describes how ${config.company.name} ("we", "us", or "our") collects, uses, and shares information about you when you use our services. Effective Date: ${config.effectiveDate}.`,
 		]),
-		p([`If you have questions about this policy, please contact us at ${config.company.contact}.`]),
+		p([
+			`If you have questions about this policy, please contact us at ${config.company.contact.email}.`,
+		]),
 	]);
 }
 
@@ -110,7 +112,7 @@ function buildConsentWithdrawal(config: PrivacyPolicyConfig): DocumentSection | 
 			reason: "Required by GDPR Article 7(3) and Article 13(2)(c)",
 		}),
 		p([
-			`Where we rely on your consent for any processing of your personal data, you have the right to withdraw that consent at any time by contacting us at ${config.company.contact}. Withdrawing your consent does not affect the lawfulness of any processing we carried out before you withdrew it. Where consent is required to provide a particular feature or service, withdrawing it may mean we are no longer able to offer that feature or service.`,
+			`Where we rely on your consent for any processing of your personal data, you have the right to withdraw that consent at any time by contacting us at ${config.company.contact.email}. Withdrawing your consent does not affect the lawfulness of any processing we carried out before you withdrew it. Where consent is required to provide a particular feature or service, withdrawing it may mean we are no longer able to offer that feature or service.`,
 		]),
 	]);
 }
@@ -148,7 +150,7 @@ function buildAutomatedDecisionMaking(config: PrivacyPolicyConfig): DocumentSect
 	content.push(
 		p([
 			bold("Right to human review."),
-			` You have the right not to be subject to a decision based solely on automated processing, including profiling. To request human intervention, express your point of view, or contest a decision, contact us at ${config.company.contact}.`,
+			` You have the right not to be subject to a decision based solely on automated processing, including profiling. To request human intervention, express your point of view, or contest a decision, contact us at ${config.company.contact.email}.`,
 		]),
 	);
 	return section("automated-decision-making", content);
@@ -323,7 +325,7 @@ function buildGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | nul
 				"commission.europa.eu/.../adequacy-decisions_en",
 			),
 			"); (b) Standard Contractual Clauses (SCCs) adopted by the European Commission under Article 46(2)(c); and (c) Binding Corporate Rules approved under Article 47 where applicable. You may request further information about the specific safeguards applied to a particular transfer by contacting us at ",
-			config.company.contact,
+			config.company.contact.email,
 			".",
 		]),
 	];
@@ -358,6 +360,9 @@ function buildUkGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | n
 
 function buildCcpaSupplement(config: PrivacyPolicyConfig): DocumentSection | null {
 	if (!config.jurisdictions.includes("us-ca")) return null;
+	const { email, phone } = config.company.contact;
+	const submissionMethods: ListItemNode[] = [li([bold("Email:"), " ", email])];
+	if (phone) submissionMethods.push(li([bold("Phone:"), " ", phone]));
 	return section("ccpa-supplement", [
 		heading("California Privacy Rights (CCPA)", { reason: "Required by CCPA" }),
 		p(["If you are a California resident, you have the following additional rights:"]),
@@ -373,6 +378,11 @@ function buildCcpaSupplement(config: PrivacyPolicyConfig): DocumentSection | nul
 				"Right to Non-Discrimination — We will not discriminate against you for exercising your CCPA rights.",
 			]),
 		]),
+		p([
+			bold("Submitting requests."),
+			" To exercise any of these rights, contact us using one of the methods below. We will respond within the timeframes required by CCPA §1798.130.",
+		]),
+		ul(submissionMethods),
 	]);
 }
 
@@ -380,8 +390,11 @@ function buildContact(config: PrivacyPolicyConfig): DocumentSection {
 	const items = [
 		li([bold("Legal Name:"), " ", config.company.legalName]),
 		li([bold("Address:"), " ", config.company.address]),
-		li([bold("Email:"), " ", config.company.contact]),
+		li([bold("Email:"), " ", config.company.contact.email]),
 	];
+	if (config.company.contact.phone) {
+		items.push(li([bold("Phone:"), " ", config.company.contact.phone]));
+	}
 	const { dpo } = config.company;
 	if (dpo && "email" in dpo) {
 		const dpoParts: (string | InlineNode)[] = [bold("Data Protection Officer:"), " "];
