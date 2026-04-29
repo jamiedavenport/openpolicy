@@ -131,7 +131,7 @@ export async function createUser(name: string, email: string) {
 
 `collecting()` returns its argument unchanged — no runtime cost, no wrapping type to thread through. At build time the plugin walks every file, finds these calls, and populates `dataCollected` before your config is evaluated.
 
-For cookie categories the plugin can't infer from `package.json`, declare them at the call site too — either with `defineCookie()` where the category is first established, or implicitly via `<ConsentGate requires="marketing">` and `useCookies().has("functional")` calls, which the plugin also reads.
+For cookie categories the plugin can't infer from `package.json`, declare them at the call site too with `defineCookie()` where the category is first established.
 
 You're still at the same surface area as Level 1 — one config file, the same components, the same output. The difference is that the parts most likely to go stale are now derived from code. The policy, the cookie banner, and the third-party list follow the product instead of trailing it.
 

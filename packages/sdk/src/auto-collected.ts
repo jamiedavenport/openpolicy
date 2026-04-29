@@ -68,10 +68,10 @@ export const thirdParties: {
 /**
  * Placeholder populated by `@openpolicy/vite` during a Vite build. The plugin
  * intercepts this module's resolution and replaces it with the cookie
- * categories discovered via `defineCookie()` calls, `<ConsentGate>` usage,
- * `useCookies().has()` lookups, and optionally the project's `package.json`.
- * The literal default below is only used as a fallback when no plugin is
- * active — `essential` is always true; other categories default to false.
+ * categories discovered via `defineCookie()` calls and optionally the
+ * project's `package.json`. The literal default below is only used as a
+ * fallback when no plugin is active — `essential` is always true; other
+ * categories default to false.
  *
  * Spread into `cookies.used` and pair with `cookies.context` (whose
  * required keys are derived from this sentinel via `ScannedCookieKeys`).

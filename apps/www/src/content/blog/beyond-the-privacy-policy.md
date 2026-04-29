@@ -19,7 +19,7 @@ import openpolicy from "@/lib/openpolicy";
 const { data, thirdParties, cookies } = openpolicy;
 ```
 
-Those three fields are the same ones that feed `<PrivacyPolicy />`. They're also already populated by auto-collect: every `collecting()` call in your codebase contributes to `data.collected`, every `thirdParty()` call (or matched `package.json` entry) contributes to `thirdParties`, and every `<ConsentGate>` or `useCookies().has()` lookup contributes to `cookies.used`.
+Those three fields are the same ones that feed `<PrivacyPolicy />`. They're also already populated by auto-collect: every `collecting()` call in your codebase contributes to `data.collected`, every `thirdParty()` call (or matched `package.json` entry) contributes to `thirdParties`, and every `defineCookie()` call contributes to `cookies.used`.
 
 That means any UI you build on top of them inherits the same guarantee: change your product, and the UI updates on the next build. No second source of truth, no separate content CMS, no drift.
 
@@ -98,10 +98,10 @@ Because the labels came from your `collecting()` call, the disclosure and the st
 
 ### 4. Per-feature consent gates
 
-`<ConsentGate>` is usually presented as the thing that wraps your analytics script. It's also perfect for user-facing features that depend on specific cookie categories — live chat widgets, personalised recommendations, embedded video.
+The same `cookies` config drives [OpenCookies](https://github.com/jamiedavenport/opencookies), our sibling project for the consent UI. Its `<ConsentGate>` is perfect for user-facing features that depend on specific cookie categories — live chat widgets, personalised recommendations, embedded video.
 
 ```tsx
-import { ConsentGate } from "@openpolicy/react";
+import { ConsentGate } from "@opencookies/react";
 
 <ConsentGate requires="functional">
   <LiveChatWidget />
@@ -133,9 +133,7 @@ Build the privacy page. Build the cookie banner. Then keep going — onboarding,
 | ---------------- | --------------------------------------------------- | ------------------------------------------------------- |
 | `data.collected` | `Record<string, string[]>` of categories and fields | `collecting()` calls + manual entries                   |
 | `thirdParties`   | `{ name, purpose, policyUrl? }[]`                   | `thirdParty()` calls + `usePackageJson` detection       |
-| `cookies.used`   | `{ essential: true, [category]: boolean }`          | `<ConsentGate>` + `useCookies().has()` + manual entries |
-| `useCookies()`   | React hook: consent state, toggles, route           | `<OpenPolicy>` provider                                 |
-| `<ConsentGate>`  | Conditional render by consent expression            | `<OpenPolicy>` provider                                 |
+| `cookies.used`   | `{ essential: true, [category]: boolean }`          | `defineCookie()` calls + manual entries                 |
 
 All of them read from the same `openpolicy.ts`. All of them update together when you change it.
 

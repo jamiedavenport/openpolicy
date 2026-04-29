@@ -9,12 +9,8 @@
 		"policies/privacy",
 		"policies/auto-collect",
 		"policies/cookies",
-		"---Cookies---",
+		"---Cookie banner---",
 		"cookies/overview",
-		"cookies/quick-start",
-		"cookies/hooks",
-		"cookies/banner",
-		"cookies/preferences",
 		"---References---",
 		"references/examples",
 		"references/jurisdictions"

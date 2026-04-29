@@ -39,14 +39,6 @@ const demos = [
 		badge: "Advanced",
 	},
 	{
-		to: "/cookie-banner" as const,
-		label: "Cookie Banner",
-		description:
-			"Composable cookie consent UI — banner, preference panel, and accept/reject flow — built with shadcn/ui and wired to the consent store.",
-		code: "<CookieBanner.CustomizeButton onClick={() => setShowPreferences(true)} />",
-		badge: "New",
-	},
-	{
 		to: "/onboarding-wizard" as const,
 		label: "Onboarding Wizard",
 		description:

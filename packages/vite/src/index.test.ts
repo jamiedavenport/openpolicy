@@ -703,47 +703,6 @@ test("cookies: defineCookie() adds the category", async () => {
 	});
 });
 
-test("cookies: ConsentGate usage adds the category", async () => {
-	await touch(
-		"src/Widget.tsx",
-		`
-		import { ConsentGate } from "@openpolicy/react";
-		export function Widget() {
-			return <ConsentGate requires="analytics">hi</ConsentGate>;
-		}
-		`,
-	);
-
-	const plugin = openPolicy();
-	await runPluginBuildStart(plugin, tmp);
-
-	expect(loadScanned(plugin).cookies).toEqual({
-		essential: true,
-		analytics: true,
-	});
-});
-
-test("cookies: useCookies().has() adds the category (including nested expr)", async () => {
-	await touch(
-		"src/hook.ts",
-		`
-		import { useCookies } from "@openpolicy/react";
-		export function X() {
-			return useCookies().has({ or: ["analytics", "marketing"] });
-		}
-		`,
-	);
-
-	const plugin = openPolicy();
-	await runPluginBuildStart(plugin, tmp);
-
-	expect(loadScanned(plugin).cookies).toEqual({
-		essential: true,
-		analytics: true,
-		marketing: true,
-	});
-});
-
 test("cookies: usePackageJson disabled by default — posthog-js alone does not add analytics", async () => {
 	await touch("package.json", JSON.stringify({ dependencies: { "posthog-js": "^1.0.0" } }));
 

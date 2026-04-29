@@ -127,10 +127,9 @@ const AUTO_COLLECTED_SPECIFIER = /^\.\/auto-collected(?:\.js)?$/;
 
 /**
  * Vite plugin that scans source files for `@openpolicy/sdk` `collecting()`,
- * `thirdParty()`, and `defineCookie()` calls (plus `<ConsentGate>` and
- * `useCookies().has()` usage from `@openpolicy/react`) at the start of each
- * build and inlines the discovered data into the SDK's `dataCollected` /
- * `thirdParties` / `cookies` sentinels.
+ * `thirdParty()`, and `defineCookie()` calls at the start of each build and
+ * inlines the discovered data into the SDK's `dataCollected` / `thirdParties`
+ * / `cookies` sentinels.
  *
  * Internally the plugin intercepts `@openpolicy/sdk`'s own relative import of
  * `./auto-collected` and redirects it to a virtual module whose body is a
