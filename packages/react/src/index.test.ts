@@ -8,7 +8,7 @@ const company = {
 	name: "Acme",
 	legalName: "Acme Inc.",
 	address: "123 Main St",
-	contact: "privacy@acme.com",
+	contact: { email: "privacy@acme.com" },
 };
 
 const privacyConfig: PrivacyPolicyConfig = {
@@ -16,19 +16,25 @@ const privacyConfig: PrivacyPolicyConfig = {
 	company,
 	data: {
 		collected: { account: ["email", "name"] },
-		purposes: { account: "To authenticate users" },
-		lawfulBasis: { account: "contract" },
-		retention: { account: "2 years" },
-		provisionRequirement: {
+		context: {
 			account: {
-				basis: "contract-prerequisite",
-				consequences: "We cannot create or operate your account.",
+				purpose: "To authenticate users",
+				lawfulBasis: "contract",
+				retention: "2 years",
+				provision: {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
 			},
 		},
 	},
 	cookies: {
 		used: { essential: true, analytics: false, marketing: false },
-		lawfulBasis: { essential: "legal_obligation", analytics: "consent", marketing: "consent" },
+		context: {
+			essential: { lawfulBasis: "legal_obligation" },
+			analytics: { lawfulBasis: "consent" },
+			marketing: { lawfulBasis: "consent" },
+		},
 	},
 	thirdParties: [],
 	userRights: ["access", "erasure"],

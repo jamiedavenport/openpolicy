@@ -1,19 +1,22 @@
 ---
-title: Overview
-description: Consent-aware cookie banner for React apps
+title: Cookie banner
+description: The cookie banner and consent runtime now live in the OpenCookies project.
 ---
 
-`@openpolicy/cookie-banner` is a shadcn registry component that adds a consent banner and preferences panel to your React app. It reads your cookie config from `openpolicy.ts` and stores consent decisions in `localStorage`.
+The cookie banner, preferences panel, and consent runtime previously shipped as part of OpenPolicy have moved to a sibling project: **OpenCookies**.
 
-See the [Quick Start](/cookies/quick-start) to get up and running.
+> [github.com/jamiedavenport/opencookies](https://github.com/jamiedavenport/opencookies)
 
-## What's included
+OpenCookies and OpenPolicy are designed to work together: the same `cookies` config in your `openpolicy.ts` drives both the cookie _policy_ (the legal document) and the cookie _banner_ (the consent UI).
 
-| Component               | Description                                   |
-| ----------------------- | --------------------------------------------- |
-| `<CookieBanner />`      | Initial consent prompt shown to new visitors  |
-| `<CookiePreferences />` | Modal panel for updating consent per category |
+## What stayed in OpenPolicy
 
-Both components are driven by the `<OpenPolicy>` provider — no props required.
+OpenPolicy still generates the **cookie policy** — the legal document describing the cookies your application uses. See [Policies → Cookie policy](/policies/cookies) for how to render it via `<CookiePolicy />`.
 
-The `useCookies()` hook exposes the full consent state for building custom UIs or gating content programmatically.
+## What moved to OpenCookies
+
+- The `<CookieBanner />` and `<CookiePreferences />` components.
+- The `useCookies()` hook and `<ConsentGate>` component.
+- Consent storage, cross-tab sync, and the `data-consent-*` body attributes.
+
+For installation and usage, follow the OpenCookies repository.

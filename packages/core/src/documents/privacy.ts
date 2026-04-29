@@ -35,7 +35,9 @@ function buildIntroduction(config: PrivacyPolicyConfig): DocumentSection {
 		p([
 			`This Privacy Policy describes how ${config.company.name} ("we", "us", or "our") collects, uses, and shares information about you when you use our services. Effective Date: ${config.effectiveDate}.`,
 		]),
-		p([`If you have questions about this policy, please contact us at ${config.company.contact}.`]),
+		p([
+			`If you have questions about this policy, please contact us at ${config.company.contact.email}.`,
+		]),
 	]);
 }
 
@@ -54,7 +56,7 @@ function buildChildrenPrivacy(config: PrivacyPolicyConfig): DocumentSection | nu
 }
 
 function buildDataCollected(config: PrivacyPolicyConfig): DocumentSection {
-	const { collected, purposes } = config.data;
+	const { collected, context } = config.data;
 	const content: ContentNode[] = [
 		heading("Information We Collect", {
 			reason: "Required by GDPR Article 13(1)(c)",
@@ -62,15 +64,15 @@ function buildDataCollected(config: PrivacyPolicyConfig): DocumentSection {
 		p(["We collect the following categories of personal data for the purposes described below:"]),
 	];
 	for (const [category, fields] of Object.entries(collected)) {
-		const purpose = purposes[category];
-		if (!purpose) {
+		const entry = context[category];
+		if (!entry?.purpose) {
 			throw new Error(
-				`OpenPolicy: data.collected["${category}"] has no matching entry in data.purposes. ` +
+				`OpenPolicy: data.collected["${category}"] has no matching entry in data.context. ` +
 					"Every collected category must declare its processing purpose (GDPR Art. 13(1)(c)).",
 			);
 		}
 		content.push(heading(category, 3));
-		content.push(p([bold("Purpose:"), " ", purpose]));
+		content.push(p([bold("Purpose:"), " ", entry.purpose]));
 		content.push(ul(fields.map((f) => li([f]))));
 	}
 	return section("data-collected", content);
@@ -78,7 +80,7 @@ function buildDataCollected(config: PrivacyPolicyConfig): DocumentSection {
 
 function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
 	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
-	const entries = Object.entries(config.data.lawfulBasis);
+	const entries = Object.entries(config.data.context);
 	if (entries.length === 0) return null;
 	const content: ContentNode[] = [
 		heading("Legal Basis for Processing", {
@@ -86,11 +88,10 @@ function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
 		}),
 		p(["Under GDPR Article 6, we rely on the following lawful bases for each processing purpose:"]),
 	];
-	for (const [category, basis] of entries) {
-		const label = LEGAL_BASIS_LABELS[basis] ?? basis;
-		const purpose = config.data.purposes[category];
+	for (const [category, entry] of entries) {
+		const label = LEGAL_BASIS_LABELS[entry.lawfulBasis] ?? entry.lawfulBasis;
 		const line: (string | InlineNode)[] = [bold(category)];
-		if (purpose) line.push(" — used for ", purpose);
+		if (entry.purpose) line.push(" — used for ", entry.purpose);
 		line.push(" — ", label);
 		content.push(p(line));
 	}
@@ -98,8 +99,8 @@ function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
 }
 
 function usesConsent(config: PrivacyPolicyConfig): boolean {
-	if (Object.values(config.data.lawfulBasis).some((b) => b === "consent")) return true;
-	if (Object.values(config.cookies.lawfulBasis).some((b) => b === "consent")) return true;
+	if (Object.values(config.data.context).some((e) => e.lawfulBasis === "consent")) return true;
+	if (Object.values(config.cookies.context).some((e) => e.lawfulBasis === "consent")) return true;
 	return false;
 }
 
@@ -111,7 +112,7 @@ function buildConsentWithdrawal(config: PrivacyPolicyConfig): DocumentSection | 
 			reason: "Required by GDPR Article 7(3) and Article 13(2)(c)",
 		}),
 		p([
-			`Where we rely on your consent for any processing of your personal data, you have the right to withdraw that consent at any time by contacting us at ${config.company.contact}. Withdrawing your consent does not affect the lawfulness of any processing we carried out before you withdrew it. Where consent is required to provide a particular feature or service, withdrawing it may mean we are no longer able to offer that feature or service.`,
+			`Where we rely on your consent for any processing of your personal data, you have the right to withdraw that consent at any time by contacting us at ${config.company.contact.email}. Withdrawing your consent does not affect the lawfulness of any processing we carried out before you withdrew it. Where consent is required to provide a particular feature or service, withdrawing it may mean we are no longer able to offer that feature or service.`,
 		]),
 	]);
 }
@@ -149,15 +150,15 @@ function buildAutomatedDecisionMaking(config: PrivacyPolicyConfig): DocumentSect
 	content.push(
 		p([
 			bold("Right to human review."),
-			` You have the right not to be subject to a decision based solely on automated processing, including profiling. To request human intervention, express your point of view, or contest a decision, contact us at ${config.company.contact}.`,
+			` You have the right not to be subject to a decision based solely on automated processing, including profiling. To request human intervention, express your point of view, or contest a decision, contact us at ${config.company.contact.email}.`,
 		]),
 	);
 	return section("automated-decision-making", content);
 }
 
 function buildDataRetention(config: PrivacyPolicyConfig): DocumentSection {
-	const items = Object.entries(config.data.retention).map(([category, period]) =>
-		li([bold(category), ": ", period]),
+	const items = Object.entries(config.data.context).map(([category, entry]) =>
+		li([bold(category), ": ", entry.retention]),
 	);
 	return section("data-retention", [
 		heading("Data Retention"),
@@ -168,7 +169,7 @@ function buildDataRetention(config: PrivacyPolicyConfig): DocumentSection {
 
 function buildProvisionRequirement(config: PrivacyPolicyConfig): DocumentSection | null {
 	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
-	const entries = Object.entries(config.data.provisionRequirement);
+	const entries = Object.entries(config.data.context);
 	if (entries.length === 0) return null;
 	const content: ContentNode[] = [
 		heading("Whether You Are Required to Provide This Data", {
@@ -178,7 +179,8 @@ function buildProvisionRequirement(config: PrivacyPolicyConfig): DocumentSection
 			"For each category of personal data we collect, we set out below whether you are required to provide it — by law, under our contract with you, or as a precondition to entering into a contract — or whether provision is voluntary, together with the consequences of failing to provide it.",
 		]),
 	];
-	for (const [category, requirement] of entries) {
+	for (const [category, entry] of entries) {
+		const requirement = entry.provision;
 		const label = PROVISION_BASIS_LABELS[requirement.basis] ?? requirement.basis;
 		content.push(
 			p([
@@ -211,7 +213,7 @@ function buildCookies(config: PrivacyPolicyConfig): DocumentSection {
 	for (const [key, enabled] of Object.entries(config.cookies.used)) {
 		if (!enabled) continue;
 		const label = cookieCategoryLabel(key);
-		const basis = config.cookies.lawfulBasis[key];
+		const basis = config.cookies.context[key]?.lawfulBasis;
 		const inline: (string | InlineNode)[] = [label];
 		if (basis) inline.push(" — ", LEGAL_BASIS_LABELS[basis] ?? basis);
 		items.push(li(inline));
@@ -323,7 +325,7 @@ function buildGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | nul
 				"commission.europa.eu/.../adequacy-decisions_en",
 			),
 			"); (b) Standard Contractual Clauses (SCCs) adopted by the European Commission under Article 46(2)(c); and (c) Binding Corporate Rules approved under Article 47 where applicable. You may request further information about the specific safeguards applied to a particular transfer by contacting us at ",
-			config.company.contact,
+			config.company.contact.email,
 			".",
 		]),
 	];
@@ -358,6 +360,9 @@ function buildUkGdprSupplement(config: PrivacyPolicyConfig): DocumentSection | n
 
 function buildCcpaSupplement(config: PrivacyPolicyConfig): DocumentSection | null {
 	if (!config.jurisdictions.includes("us-ca")) return null;
+	const { email, phone } = config.company.contact;
+	const submissionMethods: ListItemNode[] = [li([bold("Email:"), " ", email])];
+	if (phone) submissionMethods.push(li([bold("Phone:"), " ", phone]));
 	return section("ccpa-supplement", [
 		heading("California Privacy Rights (CCPA)", { reason: "Required by CCPA" }),
 		p(["If you are a California resident, you have the following additional rights:"]),
@@ -373,6 +378,11 @@ function buildCcpaSupplement(config: PrivacyPolicyConfig): DocumentSection | nul
 				"Right to Non-Discrimination — We will not discriminate against you for exercising your CCPA rights.",
 			]),
 		]),
+		p([
+			bold("Submitting requests."),
+			" To exercise any of these rights, contact us using one of the methods below. We will respond within the timeframes required by CCPA §1798.130.",
+		]),
+		ul(submissionMethods),
 	]);
 }
 
@@ -380,8 +390,11 @@ function buildContact(config: PrivacyPolicyConfig): DocumentSection {
 	const items = [
 		li([bold("Legal Name:"), " ", config.company.legalName]),
 		li([bold("Address:"), " ", config.company.address]),
-		li([bold("Email:"), " ", config.company.contact]),
+		li([bold("Email:"), " ", config.company.contact.email]),
 	];
+	if (config.company.contact.phone) {
+		items.push(li([bold("Phone:"), " ", config.company.contact.phone]));
+	}
 	const { dpo } = config.company;
 	if (dpo && "email" in dpo) {
 		const dpoParts: (string | InlineNode)[] = [bold("Data Protection Officer:"), " "];

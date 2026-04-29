@@ -62,23 +62,29 @@ test("buildUserRights: privacy policy omits 'Your Rights' section when derivatio
 			name: "Acme Inc.",
 			legalName: "Acme Corporation",
 			address: "123 Main St, Springfield, USA",
-			contact: "privacy@acme.com",
+			contact: { email: "privacy@acme.com" },
 		},
 		data: {
 			collected: { "Account Information": ["Name", "Email"] },
-			purposes: { "Account Information": "To authenticate users" },
-			lawfulBasis: { "Account Information": "contract" },
-			retention: { "Account Information": "Until deletion" },
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot create or operate your account.",
+					purpose: "To authenticate users",
+					lawfulBasis: "contract",
+					retention: "Until deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot create or operate your account.",
+					},
 				},
 			},
 		},
 		cookies: {
 			used: { essential: true, analytics: false, marketing: false },
-			lawfulBasis: { essential: "legal_obligation", analytics: "consent", marketing: "consent" },
+			context: {
+				essential: { lawfulBasis: "legal_obligation" },
+				analytics: { lawfulBasis: "consent" },
+				marketing: { lawfulBasis: "consent" },
+			},
 		},
 		thirdParties: [],
 		userRights: [],
@@ -95,19 +101,21 @@ test("validateOpenPolicyConfig: emits no userRights-related issues", () => {
 			name: "Acme Inc.",
 			legalName: "Acme Corporation",
 			address: "123 Main St, Springfield, USA",
-			contact: "privacy@acme.com",
+			contact: { email: "privacy@acme.com" },
 		},
 		effectiveDate: "2026-01-01",
 		jurisdictions: ["us-ca"],
 		data: {
 			collected: { "Account Information": ["Name", "Email"] },
-			purposes: { "Account Information": "To authenticate users" },
-			lawfulBasis: { "Account Information": "contract" },
-			retention: { "Account Information": "Until deletion" },
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot create or operate your account.",
+					purpose: "To authenticate users",
+					lawfulBasis: "contract",
+					retention: "Until deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot create or operate your account.",
+					},
 				},
 			},
 		},

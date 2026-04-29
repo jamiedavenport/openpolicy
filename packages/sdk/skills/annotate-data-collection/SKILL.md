@@ -22,7 +22,7 @@ This skill builds on openpolicy/vite-setup. Read it first.
 
 `collecting(category, value, labels)` is a **pass-through at runtime** — it returns `value` unchanged. Its purpose is to serve as a static marker. During a Vite build, `openPolicy()` scans your source files using oxc-parser, finds every `collecting()` call, and merges the extracted category/label data into the `dataCollected` virtual module exported from `@openpolicy/sdk`.
 
-The scanned data only reaches your policy config if you import the `dataCollected` sentinel and spread it into `data.collected`. Without the spread, all collected annotations are silently discarded. Every scanned category must also appear in `data.purposes`, `data.lawfulBasis`, and `data.retention` — `defineConfig`'s generic enforces this against the augmented `ScannedCollectionKeys` interface emitted into `openpolicy.gen.ts`.
+The scanned data only reaches your policy config if you import the `dataCollected` sentinel and spread it into `data.collected`. Without the spread, all collected annotations are silently discarded. Every scanned category must also appear in `data.context` (with `purpose`, `lawfulBasis`, `retention`, and `provision`) — `defineConfig`'s generic enforces this against the augmented `ScannedCollectionKeys` interface emitted into `openpolicy.gen.ts`.
 
 **Critical constraint: every argument that the plugin reads must be a string literal.** The AST scanner does not evaluate expressions. Variables, template literals, and computed values are silently skipped with no warning.
 
@@ -51,22 +51,27 @@ export async function createUser(name: string, email: string) {
 
 ```ts
 // openpolicy.ts
-import { dataCollected, defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, dataCollected, defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
 		name: "Acme",
 		legalName: "Acme, Inc.",
 		address: "123 Main St, San Francisco, CA 94105",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu"],
 	data: {
 		collected: { ...dataCollected }, // populated by openPolicy() at build time
-		purposes: { "Account Information": "To create and manage user accounts" },
-		lawfulBasis: { "Account Information": LegalBases.Contract },
-		retention: { "Account Information": "Until account deletion" },
+		context: {
+			"Account Information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+		},
 	},
 });
 ```
@@ -140,10 +145,16 @@ Note: `DataCategories` values are objects for spreading into `dataCollected` man
 
 ### 3. Spreading the sentinel into config
 
-The sentinel must be spread with `...dataCollected` inside `data.collected` — not assigned directly. You can add manually-tracked categories alongside the auto-collected ones, but every category (auto or manual) must appear in the three sibling maps too.
+The sentinel must be spread with `...dataCollected` inside `data.collected` — not assigned directly. You can add manually-tracked categories alongside the auto-collected ones, but every category (auto or manual) must appear in `data.context` too.
 
 ```ts
-import { dataCollected, defineConfig, LegalBases } from "@openpolicy/sdk";
+import {
+	ContractPrerequisite,
+	dataCollected,
+	defineConfig,
+	LegalBases,
+	Voluntary,
+} from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
@@ -156,17 +167,19 @@ export default defineConfig({
 			...dataCollected, // auto-collected at build time
 			Analytics: ["Page views", "Click events"], // manually declared
 		},
-		purposes: {
-			"Account Information": "To create and manage user accounts",
-			Analytics: "To understand product usage",
-		},
-		lawfulBasis: {
-			"Account Information": LegalBases.Contract,
-			Analytics: LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Account Information": "Until account deletion",
-			Analytics: "90 days",
+		context: {
+			"Account Information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+			Analytics: {
+				purpose: "To understand product usage",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "90 days",
+				provision: Voluntary("None — your service is unaffected."),
+			},
 		},
 	},
 	automatedDecisionMaking: [],
@@ -215,7 +228,7 @@ export default defineConfig({
 
 ```ts
 // CORRECT: sentinel imported and spread
-import { dataCollected, defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, dataCollected, defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	data: {
@@ -223,9 +236,14 @@ export default defineConfig({
 			...dataCollected, // auto-collected entries merged here
 			"Account Information": ["Email"], // any manual additions
 		},
-		purposes: { "Account Information": "Account creation" },
-		lawfulBasis: { "Account Information": LegalBases.Contract },
-		retention: { "Account Information": "Until account deletion" },
+		context: {
+			"Account Information": {
+				purpose: "Account creation",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create your account."),
+			},
+		},
 	},
 });
 ```

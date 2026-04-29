@@ -21,7 +21,7 @@ export default defineConfig({
 		name: "",
 		legalName: "",
 		address: "",
-		contact: "",
+		contact: { email: "" },
 	},
 	effectiveDate: "${today}",
 	jurisdictions: [],

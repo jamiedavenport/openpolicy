@@ -1,13 +1,10 @@
 import { parseSync } from "oxc-parser";
 
 const SDK_SPECIFIER = "@openpolicy/sdk";
-const REACT_SPECIFIER = "@openpolicy/react";
 const COLLECTING_NAME = "collecting";
 const THIRD_PARTY_NAME = "thirdParty";
 const IGNORE_NAME = "Ignore";
 const DEFINE_COOKIE_NAME = "defineCookie";
-const USE_COOKIES_NAME = "useCookies";
-const CONSENT_GATE_NAME = "ConsentGate";
 
 type AnyNode = { type: string; [key: string]: unknown };
 
@@ -24,7 +21,7 @@ export type ExtractResult = {
 };
 
 /**
- * Extract `collecting()`, `thirdParty()`, and cookie-related call metadata
+ * Extract `collecting()`, `thirdParty()`, and `defineCookie()` call metadata
  * from a single source file.
  *
  * Returns an `ExtractResult` with `dataCollected` (category → labels),
@@ -34,11 +31,10 @@ export type ExtractResult = {
  *
  * The analyser runs in two phases:
  * 1. Collect local names bound to `collecting` / `thirdParty` / `defineCookie`
- *    imported from `@openpolicy/sdk`, and `useCookies` / `ConsentGate`
- *    imported from `@openpolicy/react` (handles renamed imports, skips
+ *    imported from `@openpolicy/sdk` (handles renamed imports, skips
  *    type-only imports, ignores look-alikes from other modules).
- * 2. Walk the program body and inspect `CallExpression` / `JSXOpeningElement`
- *    nodes whose target is one of those tracked local names.
+ * 2. Walk the program body and inspect `CallExpression` nodes whose target
+ *    is one of those tracked local names.
  */
 export function extractFromFile(filename: string, code: string): ExtractResult {
 	const empty: ExtractResult = {
@@ -69,15 +65,7 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 	const thirdPartyNames = collectBindings(program, SDK_SPECIFIER, THIRD_PARTY_NAME);
 	const ignoreNames = collectBindings(program, SDK_SPECIFIER, IGNORE_NAME);
 	const defineCookieNames = collectBindings(program, SDK_SPECIFIER, DEFINE_COOKIE_NAME);
-	const useCookiesNames = collectBindings(program, REACT_SPECIFIER, USE_COOKIES_NAME);
-	const consentGateNames = collectBindings(program, REACT_SPECIFIER, CONSENT_GATE_NAME);
-	if (
-		collectingNames.size === 0 &&
-		thirdPartyNames.size === 0 &&
-		defineCookieNames.size === 0 &&
-		useCookiesNames.size === 0 &&
-		consentGateNames.size === 0
-	)
+	if (collectingNames.size === 0 && thirdPartyNames.size === 0 && defineCookieNames.size === 0)
 		return empty;
 
 	const dataCollected: Record<string, string[]> = {};
@@ -86,98 +74,50 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 	const cookieSet = new Set<string>();
 
 	walk(program, (node) => {
-		if (node.type === "CallExpression") {
-			const callee = node.callee as AnyNode | undefined;
-			const args = node.arguments as AnyNode[] | undefined;
+		if (node.type !== "CallExpression") return;
+		const callee = node.callee as AnyNode | undefined;
+		const args = node.arguments as AnyNode[] | undefined;
 
-			if (callee && callee.type === "Identifier") {
-				const calleeName = callee.name as string;
+		if (!callee || callee.type !== "Identifier") return;
+		const calleeName = callee.name as string;
 
-				if (collectingNames.has(calleeName)) {
-					if (!args || args.length < 3) return;
-					const category = extractStringLiteral(args[0]);
-					if (category === null) return;
-					const labels = extractLabelKeys(args[2], ignoreNames);
-					if (labels === null) return;
-					const existing = dataCollected[category] ?? [];
-					const seen = new Set(existing);
-					for (const label of labels) {
-						if (!seen.has(label)) {
-							existing.push(label);
-							seen.add(label);
-						}
-					}
-					dataCollected[category] = existing;
-					return;
-				}
-
-				if (thirdPartyNames.has(calleeName)) {
-					if (!args || args.length < 3) return;
-					const name = extractStringLiteral(args[0]);
-					if (name === null) return;
-					const purpose = extractStringLiteral(args[1]);
-					if (purpose === null) return;
-					const policyUrl = extractStringLiteral(args[2]);
-					if (policyUrl === null) return;
-					if (seenThirdParties.has(name)) return;
-					seenThirdParties.add(name);
-					thirdParties.push({ name, purpose, policyUrl });
-					return;
-				}
-
-				if (defineCookieNames.has(calleeName)) {
-					if (!args || args.length < 1) return;
-					const category = extractStringLiteral(args[0]);
-					if (category === null) return;
-					cookieSet.add(category);
-					return;
+		if (collectingNames.has(calleeName)) {
+			if (!args || args.length < 3) return;
+			const category = extractStringLiteral(args[0]);
+			if (category === null) return;
+			const labels = extractLabelKeys(args[2], ignoreNames);
+			if (labels === null) return;
+			const existing = dataCollected[category] ?? [];
+			const seen = new Set(existing);
+			for (const label of labels) {
+				if (!seen.has(label)) {
+					existing.push(label);
+					seen.add(label);
 				}
 			}
-
-			// `useCookies().has("analytics")` — a MemberExpression callee on a
-			// CallExpression whose own callee is useCookies.
-			if (callee && callee.type === "MemberExpression") {
-				const property = callee.property as AnyNode | undefined;
-				const object = callee.object as AnyNode | undefined;
-				if (
-					property?.type === "Identifier" &&
-					property.name === "has" &&
-					object?.type === "CallExpression"
-				) {
-					const inner = object.callee as AnyNode | undefined;
-					if (
-						inner?.type === "Identifier" &&
-						useCookiesNames.has(inner.name as string) &&
-						args &&
-						args[0]
-					) {
-						extractHasExpression(args[0], cookieSet);
-					}
-				}
-			}
+			dataCollected[category] = existing;
 			return;
 		}
 
-		if (node.type === "JSXOpeningElement") {
-			const name = node.name as AnyNode | undefined;
-			if (!name || name.type !== "JSXIdentifier") return;
-			if (!consentGateNames.has(name.name as string)) return;
-			const attrs = node.attributes as AnyNode[] | undefined;
-			if (!attrs) return;
-			for (const attr of attrs) {
-				if (attr.type !== "JSXAttribute") continue;
-				const attrName = attr.name as AnyNode | undefined;
-				if (!attrName || attrName.type !== "JSXIdentifier" || attrName.name !== "requires")
-					continue;
-				const value = attr.value as AnyNode | undefined;
-				if (!value) continue;
-				if (value.type === "Literal" && typeof value.value === "string") {
-					cookieSet.add(value.value);
-				} else if (value.type === "JSXExpressionContainer") {
-					const expr = value.expression as AnyNode | undefined;
-					if (expr) extractHasExpression(expr, cookieSet);
-				}
-			}
+		if (thirdPartyNames.has(calleeName)) {
+			if (!args || args.length < 3) return;
+			const name = extractStringLiteral(args[0]);
+			if (name === null) return;
+			const purpose = extractStringLiteral(args[1]);
+			if (purpose === null) return;
+			const policyUrl = extractStringLiteral(args[2]);
+			if (policyUrl === null) return;
+			if (seenThirdParties.has(name)) return;
+			seenThirdParties.add(name);
+			thirdParties.push({ name, purpose, policyUrl });
+			return;
+		}
+
+		if (defineCookieNames.has(calleeName)) {
+			if (!args || args.length < 1) return;
+			const category = extractStringLiteral(args[0]);
+			if (category === null) return;
+			cookieSet.add(category);
 		}
 	});
 
@@ -231,44 +171,6 @@ function extractStringLiteral(node: AnyNode | undefined): string | null {
 	if (node.type !== "Literal") return null;
 	if (typeof node.value !== "string") return null;
 	return node.value;
-}
-
-/**
- * Walks a `has()` / `requires=` expression (string literal or
- * `{ and|or|not }` object) and adds every string leaf to `out`. Conservative:
- * unknown shapes are silently ignored.
- */
-function extractHasExpression(node: AnyNode, out: Set<string>): void {
-	if (node.type === "Literal" && typeof node.value === "string") {
-		out.add(node.value);
-		return;
-	}
-	if (node.type === "ObjectExpression") {
-		const properties = node.properties as AnyNode[] | undefined;
-		if (!properties) return;
-		for (const prop of properties) {
-			if (prop.type !== "Property") continue;
-			const key = prop.key as AnyNode | undefined;
-			const keyName =
-				key?.type === "Identifier"
-					? (key.name as string)
-					: key?.type === "Literal" && typeof key.value === "string"
-						? key.value
-						: null;
-			if (keyName !== "and" && keyName !== "or" && keyName !== "not") continue;
-			const value = prop.value as AnyNode | undefined;
-			if (!value) continue;
-			if (value.type === "ArrayExpression") {
-				const elements = value.elements as AnyNode[] | undefined;
-				if (!elements) continue;
-				for (const el of elements) {
-					if (el) extractHasExpression(el, out);
-				}
-			} else {
-				extractHasExpression(value, out);
-			}
-		}
-	}
 }
 
 /**

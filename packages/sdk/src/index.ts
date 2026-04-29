@@ -1,4 +1,4 @@
-import type { LegalBasis, OpenPolicyConfig, ProvisionRequirement } from "@openpolicy/core";
+import type { CookieContextEntry, DataContextEntry, OpenPolicyConfig } from "@openpolicy/core";
 import type { ScannedCollectionKeys, ScannedCookieKeys } from "./auto-collected";
 
 export type {
@@ -7,26 +7,29 @@ export type {
 	ChildrenConfig,
 	CompanyConfig,
 	ConsentMechanism,
+	Contact,
+	CookieContext,
+	CookieContextEntry,
 	CookiePolicyCookies,
 	CookieUsage,
 	DataCollection,
 	DataConfig,
+	DataContext,
+	DataContextEntry,
 	Dpo,
 	EffectiveDate,
 	EuRepresentative,
 	Jurisdiction,
 	LegalBasis,
-	LegalBasisMap,
 	OpenPolicyConfig,
 	PolicyCategory,
 	ProvisionBasis,
 	ProvisionRequirement,
-	ProvisionRequirementMap,
-	Purposes,
-	Retention as RetentionMap,
 	ThirdParty,
 	TrackingTechnology,
 } from "@openpolicy/core";
+
+export { Contractual, ContractPrerequisite, Statutory, Voluntary } from "@openpolicy/core";
 
 export {
 	cookies,
@@ -54,14 +57,11 @@ type OpenPolicyConfigWithGenerics<
 > = Omit<OpenPolicyConfig, "data" | "cookies"> & {
 	data?: {
 		collected: Collected;
-		purposes: { [P in DataKey<Collected>]: string };
-		lawfulBasis: { [P in DataKey<Collected>]: LegalBasis };
-		retention: { [P in DataKey<Collected>]: string };
-		provisionRequirement: { [P in DataKey<Collected>]: ProvisionRequirement };
+		context: { [P in DataKey<Collected>]: DataContextEntry };
 	};
 	cookies?: {
 		used: CookieUsed;
-		lawfulBasis: { [P in CookieKey<CookieUsed>]: LegalBasis };
+		context: { [P in CookieKey<CookieUsed>]: CookieContextEntry };
 	};
 };
 

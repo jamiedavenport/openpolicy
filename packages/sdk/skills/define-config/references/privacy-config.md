@@ -7,8 +7,8 @@ All fields below live at the top level of `OpenPolicyConfig` (the object passed 
 | Field                     | Type                                                      | Required                | Notes                                                                                                                                                                                                                                                                                                            |
 | ------------------------- | --------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `effectiveDate`           | `string`                                                  | Yes                     | ISO date string (e.g. `"2026-01-01"`). Validation fails if empty.                                                                                                                                                                                                                                                |
-| `data`                    | `DataConfig`                                              | Yes (for privacy)       | `{ collected, purposes, lawfulBasis, retention }`. All four sub-maps are keyed by the same set of category names — `defineConfig` infers the set from `data.collected` and TS-enforces the others.                                                                                                               |
-| `cookies`                 | `CookiePolicyCookies`                                     | Yes (for cookie policy) | `{ used, lawfulBasis }`. `used` requires `essential: true`; `lawfulBasis` requires one entry per used category.                                                                                                                                                                                                  |
+| `data`                    | `DataConfig`                                              | Yes (for privacy)       | `{ collected, context }`. Both sub-maps are keyed by the same set of category names — `defineConfig` infers the set from `data.collected` and TS-enforces that every key has a matching `context` entry.                                                                                                         |
+| `cookies`                 | `CookiePolicyCookies`                                     | Yes (for cookie policy) | `{ used, context }`. `used` requires `essential: true`; `context` requires one entry per used category.                                                                                                                                                                                                          |
 | `thirdParties`            | `{ name: string; purpose: string; policyUrl?: string }[]` | No                      | Can be empty. Use `Providers.*` presets or spread `thirdParties` sentinel.                                                                                                                                                                                                                                       |
 | `jurisdictions`           | `Jurisdiction[]`                                          | Yes                     | Controls which jurisdiction-specific sections appear and drives the auto-derived user rights list. See values below.                                                                                                                                                                                             |
 | `children`                | `{ underAge: number; noticeUrl?: string }`                | No                      | Include when service is directed at children. `underAge` must be a positive integer.                                                                                                                                                                                                                             |
@@ -19,15 +19,20 @@ All fields below live at the top level of `OpenPolicyConfig` (the object passed 
 ```ts
 type DataConfig = {
 	collected: Record<string, string[]>; // category → field labels
-	purposes: Record<string, string>; // category → human-readable purpose
-	lawfulBasis: Record<string, LegalBasis>; // category → Article 6 basis
-	retention: Record<string, string>; // category → retention period
+	context: Record<string, DataContext>; // category → metadata row
+};
+
+type DataContext = {
+	purpose: string; // human-readable purpose
+	lawfulBasis: LegalBasis; // Article 6 basis
+	retention: string; // retention period
+	provision: ProvisionRequirement; // why we need this data + consequences if not provided
 };
 ```
 
-All four sub-maps share the same key set. The generic on `defineConfig` requires `purposes`, `lawfulBasis`, and `retention` to cover every key present in `collected` (plus every key the Vite plugin scans into `ScannedCollectionKeys`).
+Both sub-maps share the same key set. The generic on `defineConfig` requires `context` to cover every key present in `collected` (plus every key the Vite plugin scans into `ScannedCollectionKeys`).
 
-The renderer joins all three sibling maps in the GDPR Art. 13(1)(c) "Legal Basis for Processing" section: `**[category]** — used for [purpose] — [Article 6 basis]`.
+The renderer joins each context entry into the GDPR Art. 13(1)(c) "Legal Basis for Processing" section: `**[category]** — used for [purpose] — [Article 6 basis]`.
 
 ### LegalBasis values
 
@@ -39,6 +44,17 @@ The renderer joins all three sibling maps in the GDPR Art. 13(1)(c) "Legal Basis
 | `LegalBases.VitalInterests`      | `"vital_interests"`      |
 | `LegalBases.PublicTask`          | `"public_task"`          |
 | `LegalBases.LegitimateInterests` | `"legitimate_interests"` |
+
+### ProvisionRequirement helpers
+
+Each helper returns a `{ basis, consequences }` object safe to use under `data.context[category].provision`:
+
+| Helper                               | Basis                     | Use when…                                                                         |
+| ------------------------------------ | ------------------------- | --------------------------------------------------------------------------------- |
+| `Statutory(consequences)`            | `"statutory"`             | A law requires the data (e.g. tax records).                                       |
+| `Contractual(consequences)`          | `"contractual"`           | A contract you've already entered into requires it.                               |
+| `ContractPrerequisite(consequences)` | `"contract-prerequisite"` | The user must provide it to enter a contract (e.g. account creation, payment).    |
+| `Voluntary(consequences)`            | `"voluntary"`             | The data is optional — describe what (if anything) the user loses by withholding. |
 
 ### Jurisdiction values
 
@@ -86,7 +102,7 @@ Each entry is a `Record<string, string[]>` safe to spread into `data.collected`:
 
 ### Retention presets
 
-Each value is a string safe to use under `data.retention[category]`.
+Each value is a string safe to use under `data.context[category].retention`.
 
 | Constant                         | String value                      |
 | -------------------------------- | --------------------------------- |
@@ -122,17 +138,17 @@ Each entry is a `{ name: string; purpose: string; policyUrl: string }` safe to u
 | `Compliance.UK_GDPR` | `{ jurisdictions: ["uk"] }`    |
 | `Compliance.CCPA`    | `{ jurisdictions: ["us-ca"] }` |
 
-The Article 6 lawful basis per data category lives in `data.lawfulBasis` (you choose), not the preset.
+The Article 6 lawful basis per data category lives in `data.context[category].lawfulBasis` (you choose), not the preset.
 
 ### Validation behavior
 
 - `effectiveDate` empty → fatal error
 - `company.*` fields empty → fatal error per field
 - `data.collected` has zero keys → fatal error
-- For each `data.collected` category: missing `data.lawfulBasis[category]` under EU/UK jurisdictions → fatal `lawful-basis-incomplete` error
-- For each `data.collected` category: missing `data.retention[category]` → fatal `retention-incomplete` error
-- For each enabled cookie in `cookies.used`: missing `cookies.lawfulBasis[key]` → fatal `cookie-lawful-basis-missing` error
-- When any `data.lawfulBasis` value is `"consent"`, the rendered policy automatically appends an Art. 13(2)(c) right-to-withdraw paragraph
+- For each `data.collected` category: missing `data.context[category]` → fatal `data-context-missing` error
+- For each `data.context` key not in `data.collected` → fatal `data-context-orphan` error
+- For each enabled cookie in `cookies.used`: missing `cookies.context[key]` → fatal `cookie-lawful-basis-missing` error
+- When any `data.context[category].lawfulBasis` is `"consent"`, the rendered policy automatically appends an Art. 13(2)(c) right-to-withdraw paragraph
 - `"eu"` or `"uk"` in jurisdictions + `automatedDecisionMaking` omitted → `automated-decision-making` warning (set to `[]` to declare none, or populate)
 - Any unknown jurisdiction code → fatal error (lists valid codes in message)
 - `children.underAge` ≤ 0 → fatal error
@@ -148,7 +164,7 @@ Source: `packages/core/src/validate.ts`, `packages/core/src/validate-config.ts`,
 ```ts
 type CookiePolicyCookies = {
 	used: { essential: true; [key: string]: boolean }; // categories enabled
-	lawfulBasis: Record<string, LegalBasis>; // Article 6 basis per category
+	context: Record<string, { lawfulBasis: LegalBasis }>; // Article 6 basis per category
 };
 ```
 
@@ -168,21 +184,21 @@ defineConfig({
 			marketing: false,
 			preferences: true,
 		},
-		lawfulBasis: {
-			essential: LegalBases.LegalObligation,
-			analytics: LegalBases.Consent,
-			marketing: LegalBases.Consent,
-			preferences: LegalBases.Consent,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
+			preferences: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 });
 ```
 
-The Vite plugin auto-emits the discovered cookie categories into `ScannedCookieKeys`, so `defineConfig` requires `cookies.lawfulBasis` to cover every scanned category as well.
+The Vite plugin auto-emits the discovered cookie categories into `ScannedCookieKeys`, so `defineConfig` requires `cookies.context` to cover every scanned category as well.
 
 | Field                  | Type                                                                        | Required | Notes                                                                                                      |
 | ---------------------- | --------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
 | `cookies.used`         | `{ essential: true; [k: string]: boolean }`                                 | Yes      | `essential` is required and must be `true`; other keys are `boolean` and treated as additional categories. |
-| `cookies.lawfulBasis`  | `Record<keyof used, LegalBasis>`                                            | Yes      | One Article 6 basis per category.                                                                          |
+| `cookies.context`      | `Record<keyof used, { lawfulBasis: LegalBasis }>`                           | Yes      | One Article 6 basis per category, keyed by the same set as `cookies.used`.                                 |
 | `trackingTechnologies` | `string[]`                                                                  | No       | e.g. `["cookies", "localStorage", "sessionStorage", "pixel"]`                                              |
 | `consentMechanism`     | `{ hasBanner: boolean; hasPreferencePanel: boolean; canWithdraw: boolean }` | No       | Required when `"eu"` or `"uk"` is in jurisdictions (GDPR / UK-GDPR + PECR compliance).                     |

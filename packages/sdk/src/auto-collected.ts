@@ -2,18 +2,23 @@
  * Populated by `@openpolicy/vite` during a Vite build from `collecting()` calls
  * across the project. The plugin also emits `openpolicy.gen.ts` (alongside
  * your `openpolicy.ts`, meant to be committed) which augments
- * `ScannedCollectionKeys` so `defineConfig` requires `data.purposes` to cover
+ * `ScannedCollectionKeys` so `defineConfig` requires `data.context` to cover
  * every scanned key.
  *
  * @example
  * ```ts
- * import { dataCollected, defineConfig } from "@openpolicy/sdk";
+ * import { ContractPrerequisite, dataCollected, defineConfig, LegalBases } from "@openpolicy/sdk";
  *
  * export default defineConfig({
  *   data: {
  *     collected: dataCollected,
- *     purposes: {
- *       "Account Information": "To authenticate users",
+ *     context: {
+ *       "Account Information": {
+ *         purpose: "To authenticate users",
+ *         lawfulBasis: LegalBases.Contract,
+ *         retention: "Until account deletion",
+ *         provision: ContractPrerequisite("We cannot operate your account."),
+ *       },
  *     },
  *   },
  * });
@@ -27,7 +32,7 @@ export const dataCollected: Record<keyof ScannedCollectionKeys & string, string[
 /**
  * Augmented by `openpolicy.gen.ts` (emitted by `@openpolicy/vite` alongside
  * your config, meant to be committed) with one key per scanned `collecting()`
- * category. `defineConfig` reads this interface to require a `data.purposes`
+ * category. `defineConfig` reads this interface to require a `data.context`
  * entry for every scanned key.
  */
 // biome-ignore lint/suspicious/noEmptyInterface: augmented by codegen
@@ -63,12 +68,12 @@ export const thirdParties: {
 /**
  * Placeholder populated by `@openpolicy/vite` during a Vite build. The plugin
  * intercepts this module's resolution and replaces it with the cookie
- * categories discovered via `defineCookie()` calls, `<ConsentGate>` usage,
- * `useCookies().has()` lookups, and optionally the project's `package.json`.
- * The literal default below is only used as a fallback when no plugin is
- * active — `essential` is always true; other categories default to false.
+ * categories discovered via `defineCookie()` calls and optionally the
+ * project's `package.json`. The literal default below is only used as a
+ * fallback when no plugin is active — `essential` is always true; other
+ * categories default to false.
  *
- * Spread into `cookies.used` and pair with `cookies.lawfulBasis` (whose
+ * Spread into `cookies.used` and pair with `cookies.context` (whose
  * required keys are derived from this sentinel via `ScannedCookieKeys`).
  *
  * @example
@@ -81,9 +86,9 @@ export const thirdParties: {
  *   jurisdictions: ["eu", "us-ca"],
  *   cookies: {
  *     used: cookies,
- *     lawfulBasis: {
- *       essential: LegalBases.LegalObligation,
- *       analytics: LegalBases.Consent,
+ *     context: {
+ *       essential: { lawfulBasis: LegalBases.LegalObligation },
+ *       analytics: { lawfulBasis: LegalBases.Consent },
  *     },
  *   },
  * });
@@ -97,7 +102,7 @@ export const cookies: { essential: true; [key: string]: boolean } = {
  * Augmented by `openpolicy.gen.ts` (emitted by `@openpolicy/vite` alongside
  * your config, meant to be committed) with one key per scanned cookie
  * category. `defineConfig` reads this interface to require a
- * `cookies.lawfulBasis` entry for every scanned cookie category.
+ * `cookies.context` entry for every scanned cookie category.
  */
 // biome-ignore lint/suspicious/noEmptyInterface: augmented by codegen
 export interface ScannedCookieKeys {}

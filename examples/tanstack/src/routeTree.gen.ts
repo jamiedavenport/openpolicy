@@ -13,7 +13,6 @@ import { Route as TailwindRouteImport } from './routes/tailwind'
 import { Route as ShadcnRouteImport } from './routes/shadcn'
 import { Route as OnboardingWizardRouteImport } from './routes/onboarding-wizard'
 import { Route as CssVarsRouteImport } from './routes/css-vars'
-import { Route as CookieBannerRouteImport } from './routes/cookie-banner'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TailwindRoute = TailwindRouteImport.update({
@@ -36,11 +35,6 @@ const CssVarsRoute = CssVarsRouteImport.update({
   path: '/css-vars',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CookieBannerRoute = CookieBannerRouteImport.update({
-  id: '/cookie-banner',
-  path: '/cookie-banner',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -49,7 +43,6 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/cookie-banner': typeof CookieBannerRoute
   '/css-vars': typeof CssVarsRoute
   '/onboarding-wizard': typeof OnboardingWizardRoute
   '/shadcn': typeof ShadcnRoute
@@ -57,7 +50,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/cookie-banner': typeof CookieBannerRoute
   '/css-vars': typeof CssVarsRoute
   '/onboarding-wizard': typeof OnboardingWizardRoute
   '/shadcn': typeof ShadcnRoute
@@ -66,7 +58,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/cookie-banner': typeof CookieBannerRoute
   '/css-vars': typeof CssVarsRoute
   '/onboarding-wizard': typeof OnboardingWizardRoute
   '/shadcn': typeof ShadcnRoute
@@ -74,25 +65,12 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/cookie-banner'
-    | '/css-vars'
-    | '/onboarding-wizard'
-    | '/shadcn'
-    | '/tailwind'
+  fullPaths: '/' | '/css-vars' | '/onboarding-wizard' | '/shadcn' | '/tailwind'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/cookie-banner'
-    | '/css-vars'
-    | '/onboarding-wizard'
-    | '/shadcn'
-    | '/tailwind'
+  to: '/' | '/css-vars' | '/onboarding-wizard' | '/shadcn' | '/tailwind'
   id:
     | '__root__'
     | '/'
-    | '/cookie-banner'
     | '/css-vars'
     | '/onboarding-wizard'
     | '/shadcn'
@@ -101,7 +79,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CookieBannerRoute: typeof CookieBannerRoute
   CssVarsRoute: typeof CssVarsRoute
   OnboardingWizardRoute: typeof OnboardingWizardRoute
   ShadcnRoute: typeof ShadcnRoute
@@ -138,13 +115,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CssVarsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cookie-banner': {
-      id: '/cookie-banner'
-      path: '/cookie-banner'
-      fullPath: '/cookie-banner'
-      preLoaderRoute: typeof CookieBannerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -157,7 +127,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CookieBannerRoute: CookieBannerRoute,
   CssVarsRoute: CssVarsRoute,
   OnboardingWizardRoute: OnboardingWizardRoute,
   ShadcnRoute: ShadcnRoute,

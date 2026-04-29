@@ -19,14 +19,14 @@ bun add @openpolicy/sdk
 
 ```ts
 // openpolicy.ts
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
 		name: "Acme",
 		legalName: "Acme, Inc.",
 		address: "123 Main St, San Francisco, CA 94105",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "us-ca"],
@@ -35,17 +35,19 @@ export default defineConfig({
 			"Account information": ["Email address", "Display name"],
 			"Usage data": ["Pages visited", "Session duration"],
 		},
-		purposes: {
-			"Account information": "To create and manage user accounts",
-			"Usage data": "To understand product usage and improve the service",
-		},
-		lawfulBasis: {
-			"Account information": LegalBases.Contract,
-			"Usage data": LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Account information": "Until account deletion",
-			"Usage data": "13 months",
+		context: {
+			"Account information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+			"Usage data": {
+				purpose: "To understand product usage and improve the service",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "13 months",
+				provision: Voluntary("None — your service is unaffected."),
+			},
 		},
 	},
 	thirdParties: [
@@ -66,16 +68,16 @@ export default defineConfig({
 		name: "Acme",
 		legalName: "Acme, Inc.",
 		address: "123 Main St, San Francisco, CA 94105",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "us-ca"],
 	cookies: {
 		used: { essential: true, analytics: true, marketing: false },
-		lawfulBasis: {
-			essential: LegalBases.LegalObligation,
-			analytics: LegalBases.Consent,
-			marketing: LegalBases.Consent,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 });

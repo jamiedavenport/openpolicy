@@ -57,15 +57,19 @@ Contact: privacy@acme.com | Acme, Inc., 123 Main St, San Francisco, CA 94105
 ```ts
 // openpolicy.ts
 import {
-	cookies,
 	Compliance,
+	ContractPrerequisite,
+	cookies,
 	DataCategories,
 	dataCollected,
 	defineConfig,
 	LegalBases,
+	LegitimateInterests,
 	Providers,
 	Retention,
+	Statutory,
 	thirdParties,
+	Voluntary,
 } from "@openpolicy/sdk";
 
 export default defineConfig({
@@ -73,7 +77,7 @@ export default defineConfig({
 		name: "Acme",
 		legalName: "Acme, Inc.",
 		address: "123 Main St, San Francisco, CA 94105",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: [...Compliance.GDPR.jurisdictions, ...Compliance.CCPA.jurisdictions],
@@ -85,32 +89,40 @@ export default defineConfig({
 			...DataCategories.UsageData,
 			...DataCategories.DeviceInfo,
 		},
-		purposes: {
-			"Account Information": "To create and manage user accounts",
-			"Payment Information": "To process payments and prevent fraud",
-			"Usage Data": "To understand product usage and improve the service",
-			"Device Information": "To diagnose issues and tailor the experience to your device",
-		},
-		lawfulBasis: {
-			"Account Information": LegalBases.Contract,
-			"Payment Information": LegalBases.Contract,
-			"Usage Data": LegalBases.LegitimateInterests,
-			"Device Information": LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Account Information": Retention.UntilAccountDeletion,
-			"Payment Information": Retention.ThreeYears,
-			"Usage Data": Retention.NinetyDays,
-			"Device Information": Retention.NinetyDays,
+		context: {
+			"Account Information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: Retention.UntilAccountDeletion,
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+			"Payment Information": {
+				purpose: "To process payments and prevent fraud",
+				lawfulBasis: LegalBases.Contract,
+				retention: Retention.ThreeYears,
+				provision: Statutory("We cannot lawfully complete the transaction."),
+			},
+			"Usage Data": {
+				purpose: "To understand product usage and improve the service",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: Retention.NinetyDays,
+				provision: Voluntary("None — your service is unaffected."),
+			},
+			"Device Information": {
+				purpose: "To diagnose issues and tailor the experience to your device",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: Retention.NinetyDays,
+				provision: Voluntary("None — your service is unaffected."),
+			},
 		},
 	},
 	thirdParties: [...thirdParties, Providers.GoogleAnalytics, Providers.Stripe],
 	cookies: {
 		used: { ...cookies, analytics: true, marketing: false },
-		lawfulBasis: {
-			essential: LegalBases.LegalObligation,
-			analytics: LegalBases.Consent,
-			marketing: LegalBases.Consent,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 	automatedDecisionMaking: [],
@@ -144,13 +156,14 @@ data: {
     ...DataCategories.AccountInfo,
     "Health Data": ["Blood glucose readings", "Heart rate"],
   },
-  purposes: { /* ... */ },
-  lawfulBasis: { /* ... */ },
-  retention: { /* ... */ },
+  context: {
+    "Account Information": { /* purpose, lawfulBasis, retention, provision */ },
+    "Health Data": { /* purpose, lawfulBasis, retention, provision */ },
+  },
 },
 ```
 
-Always spread `dataCollected` first so the `openPolicy()` Vite plugin's output is included alongside the explicit entries. Every key you add to `data.collected` must appear in the three sibling maps too — `defineConfig` enforces this at type-check time.
+Always spread `dataCollected` first so the `openPolicy()` Vite plugin's output is included alongside the explicit entries. Every key you add to `data.collected` must have a matching `data.context` entry — `defineConfig` enforces this at type-check time.
 
 ### 2. Mapping jurisdiction and legal basis from GDPR/CCPA language
 
@@ -164,7 +177,7 @@ Scan the existing policy for jurisdiction signals:
 | "Australian Privacy Act"                             | `jurisdictions: ["au"]`                                                                                                                                                        |
 | No specific regulation cited                         | Pick the specific region(s) where the business operates — there is no federal `"us"` code. See [Supported jurisdictions](https://docs.openpolicy.sh/references/jurisdictions). |
 
-For lawful basis (GDPR policies only), `data.lawfulBasis` is keyed by the same category names as `data.collected` — each data category maps to its Article 6 basis. GDPR Art. 13(1)(c) requires the lawful basis to be stated per category, and the renderer joins category + purpose + basis into a single line. Map prose phrases to `LegalBases` constants:
+For lawful basis (GDPR policies only), `data.context[category].lawfulBasis` carries each category's Article 6 basis. GDPR Art. 13(1)(c) requires the lawful basis to be stated per category, and the renderer joins category + purpose + basis into a single line. Map prose phrases to `LegalBases` constants:
 
 | Prose                                              | LegalBases constant              |
 | -------------------------------------------------- | -------------------------------- |
@@ -173,18 +186,29 @@ For lawful basis (GDPR policies only), `data.lawfulBasis` is keyed by the same c
 | "to perform a contract" / "to provide the service" | `LegalBases.Contract`            |
 | "legal obligation" / "required by law"             | `LegalBases.LegalObligation`     |
 
-Build the map using the same keys as `data.collected`:
+Build the context map using the same keys as `data.collected`:
 
 ```ts
 data: {
   collected: { "Account Information": ["Name", "Email"], "Usage Data": [...] },
-  purposes:    { "Account Information": "Account creation", "Usage Data": "Analytics" },
-  lawfulBasis: { "Account Information": LegalBases.Contract, "Usage Data": LegalBases.LegitimateInterests },
-  retention:   { "Account Information": Retention.UntilAccountDeletion, "Usage Data": Retention.NinetyDays },
+  context: {
+    "Account Information": {
+      purpose: "Account creation",
+      lawfulBasis: LegalBases.Contract,
+      retention: Retention.UntilAccountDeletion,
+      provision: ContractPrerequisite("We cannot create or operate your account."),
+    },
+    "Usage Data": {
+      purpose: "Analytics",
+      lawfulBasis: LegalBases.LegitimateInterests,
+      retention: Retention.NinetyDays,
+      provision: Voluntary("None — your service is unaffected."),
+    },
+  },
 },
 ```
 
-When any value in `data.lawfulBasis` is `LegalBases.Consent`, the rendered policy automatically appends a GDPR Art. 13(2)(c) right-to-withdraw paragraph — no extra config needed.
+When any `data.context[category].lawfulBasis` is `LegalBases.Consent`, the rendered policy automatically appends a GDPR Art. 13(2)(c) right-to-withdraw paragraph — no extra config needed.
 
 Use `Compliance.GDPR` or `Compliance.CCPA` as a starting point when the existing policy explicitly targets those regulations. Each preset only sets `jurisdictions`; merge them when both apply:
 
@@ -192,7 +216,7 @@ Use `Compliance.GDPR` or `Compliance.CCPA` as a starting point when the existing
 jurisdictions: [...Compliance.GDPR.jurisdictions, ...Compliance.CCPA.jurisdictions],
 ```
 
-The user-rights list is derived from the resulting `jurisdictions` array — no need to merge a separate array. The Article 6 basis per data category lives in `data.lawfulBasis` (you choose), not the preset.
+The user-rights list is derived from the resulting `jurisdictions` array — no need to merge a separate array. The Article 6 basis per data category lives in `data.context[category].lawfulBasis` (you choose), not the preset.
 
 ### 3. Using presets to standardize values
 
@@ -210,12 +234,17 @@ Prefer preset constants over raw strings wherever the meaning matches exactly. T
 | "3 years"                       | `Retention.ThreeYears`           |
 | "as required by law"            | `Retention.AsRequiredByLaw`      |
 
-For a period not in the preset list, use a plain string. `data.retention` is keyed by `data.collected` category names:
+For a period not in the preset list, pass a plain string to `data.context[category].retention`:
 
 ```ts
 data: {
-  retention: {
-    "Audit Logs": "7 years",
+  context: {
+    "Audit Logs": {
+      purpose: "Security and compliance auditing",
+      lawfulBasis: LegalBases.LegalObligation,
+      retention: "7 years",
+      provision: Statutory("We cannot meet our retention obligations."),
+    },
   },
 },
 ```
@@ -253,9 +282,14 @@ defineConfig({
 				"We collect information you provide when you register for an account, including your name and email address.",
 			],
 		},
-		purposes: { Data: "Account creation" },
-		lawfulBasis: { Data: LegalBases.Contract },
-		retention: { Data: "Until account deletion" },
+		context: {
+			Data: {
+				purpose: "Account creation",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create your account."),
+			},
+		},
 	},
 });
 ```
@@ -269,9 +303,14 @@ defineConfig({
 	},
 	data: {
 		collected: { "Account Information": ["Name", "Email address"] },
-		purposes: { "Account Information": "To create and manage user accounts" },
-		lawfulBasis: { "Account Information": LegalBases.Contract },
-		retention: { "Account Information": "Until account deletion" },
+		context: {
+			"Account Information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+		},
 	},
 });
 ```

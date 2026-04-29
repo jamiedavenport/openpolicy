@@ -28,11 +28,11 @@ export function validateCookiePolicy(config: CookiePolicyConfig): ValidationIssu
 			level: "error",
 			message: "company.address is required",
 		});
-	if (!config.company.contact)
+	if (!config.company.contact?.email)
 		issues.push({
 			code: "company-contact-required",
 			level: "error",
-			message: "company.contact is required",
+			message: "company.contact.email is required",
 		});
 
 	const used = config.cookies.used;
@@ -48,11 +48,11 @@ export function validateCookiePolicy(config: CookiePolicyConfig): ValidationIssu
 		});
 	}
 	for (const key of enabledKeys) {
-		if (!config.cookies.lawfulBasis?.[key]) {
+		if (!config.cookies.context?.[key]?.lawfulBasis) {
 			issues.push({
 				code: "cookie-lawful-basis-missing",
 				level: "error",
-				message: `cookies.lawfulBasis["${key}"] is missing — every enabled cookie category requires an Article 6 lawful basis.`,
+				message: `cookies.context["${key}"].lawfulBasis is missing — every enabled cookie category requires an Article 6 lawful basis.`,
 			});
 		}
 	}

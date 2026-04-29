@@ -21,21 +21,26 @@ OpenPolicy starts with a typed configuration object. You declare facts about you
 
 ```ts
 // openpolicy.ts
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
 		name: "Your Company",
 		legalName: "Your Company, Inc.",
-		contact: "privacy@yourcompany.com",
+		contact: { email: "privacy@yourcompany.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["us-ca"],
 	data: {
 		collected: { "Personal Information": ["Full name", "Email address"] },
-		purposes: { "Personal Information": "To create and manage user accounts" },
-		lawfulBasis: { "Personal Information": LegalBases.Contract },
-		retention: { "Personal Information": "Until account deletion" },
+		context: {
+			"Personal Information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+		},
 	},
 });
 ```

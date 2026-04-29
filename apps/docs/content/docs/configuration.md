@@ -23,14 +23,14 @@ bun add @openpolicy/sdk
 
 ```ts
 // openpolicy.ts
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
 		name: "Acme Inc.",
 		legalName: "Acme Corporation",
 		address: "123 Main St, Springfield, USA",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "us-ca"],
@@ -39,36 +39,28 @@ export default defineConfig({
 			"Account Information": ["Name", "Email address"],
 			"Usage Data": ["Pages visited", "IP address"],
 		},
-		purposes: {
-			"Account Information": "To authenticate users and send service notifications",
-			"Usage Data": "To understand product usage and improve the service",
-		},
-		lawfulBasis: {
-			"Account Information": LegalBases.Contract,
-			"Usage Data": LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Account Information": "Until account deletion",
-			"Usage Data": "90 days",
-		},
-		provisionRequirement: {
+		context: {
 			"Account Information": {
-				basis: "contract-prerequisite",
-				consequences: "We cannot create or operate your account.",
+				purpose: "To authenticate users and send service notifications",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
 			},
 			"Usage Data": {
-				basis: "voluntary",
-				consequences: "None — your service is unaffected.",
+				purpose: "To understand product usage and improve the service",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "90 days",
+				provision: Voluntary("None — your service is unaffected."),
 			},
 		},
 	},
 	thirdParties: [],
 	cookies: {
 		used: { essential: true, analytics: false, marketing: false },
-		lawfulBasis: {
-			essential: LegalBases.LegalObligation,
-			analytics: LegalBases.Consent,
-			marketing: LegalBases.Consent,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 	automatedDecisionMaking: [],
@@ -77,7 +69,23 @@ export default defineConfig({
 
 The `company` block is required and shared across all policy types. All other fields live at the top level: `effectiveDate` and `jurisdictions` are shared, and OpenPolicy auto-detects which policies to generate from the fields you provide — include the `data` block for a privacy policy, and the `cookies` block (or `consentMechanism` / `trackingTechnologies`) for a cookie policy.
 
-The `data` block keeps the five sibling maps together — `collected`, `purposes`, `lawfulBasis`, `retention`, and `provisionRequirement` all share the same set of category keys, and `defineConfig`'s generic enforces that you fill all five for every category. The `cookies` block mirrors the same shape: `cookies.used` lists the categories you enable (with `essential: true` always required), and `cookies.lawfulBasis` declares the Article 6 basis for each one.
+### Contact methods
+
+`company.contact` is an object: `email` is required, and `phone` is optional. The phone number is rendered alongside the email in the privacy and cookie policy contact sections.
+
+```ts
+company: {
+  // ...
+  contact: {
+    email: "privacy@acme.com",
+    phone: "+1-800-555-0100", // optional
+  },
+},
+```
+
+Setting `phone` is recommended when `jurisdictions` includes `us-ca`. CCPA §1798.130(a)(1) requires businesses to provide two or more designated methods for consumers to submit privacy requests, and (unless you operate exclusively online) one of those methods must be a toll-free number. When `phone` is set, the rendered CCPA supplement appends a "Submitting requests" block listing both methods. Omitting it under `us-ca` emits a validation warning.
+
+The `data` block has two sibling maps: `collected` (category → field labels) and `context` (category → metadata about that category). `defineConfig`'s generic enforces that every key in `collected` has a matching `context` entry with `purpose`, `lawfulBasis`, `retention`, and `provision`. The `cookies` block mirrors the same shape: `cookies.used` lists the categories you enable (with `essential: true` always required), and `cookies.context` declares the Article 6 basis for each enabled category.
 
 ### Data Protection Officer
 
@@ -88,7 +96,7 @@ company: {
   name: "Acme Inc.",
   legalName: "Acme Corporation",
   address: "123 Main St, Springfield, USA",
-  contact: "privacy@acme.com",
+  contact: { email: "privacy@acme.com" },
   dpo: {
     email: "dpo@acme.com",
     name: "Jane Doe",           // optional
@@ -125,9 +133,24 @@ automatedDecisionMaking: [
 
 Omitting the field entirely emits a validation warning under EU/UK jurisdictions. When at least one activity is listed, the rendered policy automatically appends the Article 22(3) right-to-human-review paragraph referencing `company.contact`.
 
-`data.collected` is a map of category label → fields; `data.purposes` is a map of the same category label → prose describing _why_ you process it (GDPR Article 13(1)(c)); `data.lawfulBasis` declares the Article 6 basis per category; `data.retention` declares how long you keep each one; `data.provisionRequirement` declares whether providing each category is statutory, contractual, a contract-prerequisite, or voluntary, plus the consequences of failing to provide it (GDPR Article 13(2)(e)). Every key in `data.collected` must appear in all four sibling maps; `defineConfig` enforces this at type-check time, and the `openPolicy()` Vite plugin re-validates it at build time. When auto-collect is enabled, the plugin also emits `openpolicy.gen.ts` alongside your config (check it in) so the same constraint applies to scanned `collecting()` categories even without running Vite first.
+`data.collected` is a map of category label → fields. `data.context[category]` carries the per-category metadata: `purpose` (prose describing _why_ you process it — GDPR Article 13(1)(c)), `lawfulBasis` (the Article 6 basis), `retention` (how long you keep it), and `provision` (whether providing it is statutory, contractual, a contract-prerequisite, or voluntary, plus the consequences of failing to provide it — GDPR Article 13(2)(e)). The provision helpers `Statutory()`, `Contractual()`, `ContractPrerequisite()`, and `Voluntary()` from `@openpolicy/sdk` build the right shape from a consequences string. Every key in `data.collected` must appear in `data.context`; `defineConfig` enforces this at type-check time, and the `openPolicy()` Vite plugin re-validates it at build time (see [Build-time validation](#build-time-validation)). When auto-collect is enabled, the plugin also emits `openpolicy.gen.ts` alongside your config (check it in) so the same constraint applies to scanned `collecting()` categories even without running Vite first.
 
 The user rights you're legally required to disclose (access, erasure, portability, etc.) are derived automatically from `jurisdictions` — declare `eu` or `uk` and you get the six GDPR rights, declare `us-ca` and you get the four CCPA rights, declare any combination and you get the union. There's no `userRights` field to set. See [Supported jurisdictions](/references/jurisdictions) for the full list of codes.
+
+### Build-time validation
+
+The `openPolicy()` Vite plugin loads your resolved `openpolicy.ts` and runs every validator in `@openpolicy/core` against it on each build. It catches issues that TypeScript can't — missing GDPR lawful bases, retention periods, CCPA contact methods, DPO disclosures, and similar requirements that depend on `jurisdictions` rather than on the static shape of the config.
+
+In `vite build`, validation **errors** abort the build with a non-zero exit code and a list of `[openpolicy] code: message` lines. Warnings are surfaced via Rollup's warning channel and do not block. In `vite dev`, both errors and warnings stream to the dev-server logger and never crash HMR — fix them as you go and the next save replays validation.
+
+Validation runs against the _resolved_ config, with auto-collected data shimmed in first — so a scanned `collecting()` category without a matching `data.context` entry will fail validation just as a hand-written one would.
+
+To opt out (for instance when you want only the type-level guarantees and the auto-collect virtual module):
+
+```ts
+// vite.config.ts
+openPolicy({ validate: false });
+```
 
 ## Using AI
 

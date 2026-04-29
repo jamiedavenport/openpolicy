@@ -25,14 +25,14 @@ The config is a plain TypeScript object:
 
 ```ts
 // openpolicy.ts
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
 		name: "Acme",
 		legalName: "Acme, Inc.",
 		address: "123 Main St, San Francisco, CA 94105",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu", "uk", "us-ca"],
@@ -41,26 +41,28 @@ export default defineConfig({
 			"Account Information": ["Name", "Email address"],
 			"Usage Data": ["Pages visited", "Features used"],
 		},
-		purposes: {
-			"Account Information": "To create and manage user accounts",
-			"Usage Data": "To understand product usage and improve the service",
-		},
-		lawfulBasis: {
-			"Account Information": LegalBases.Contract,
-			"Usage Data": LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Account Information": "Until account deletion",
-			"Usage Data": "90 days",
+		context: {
+			"Account Information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+			"Usage Data": {
+				purpose: "To understand product usage and improve the service",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "90 days",
+				provision: Voluntary("None — your service is unaffected."),
+			},
 		},
 	},
 	thirdParties: [],
 	cookies: {
 		used: { essential: true, analytics: true, marketing: false },
-		lawfulBasis: {
-			essential: LegalBases.LegalObligation,
-			analytics: LegalBases.Consent,
-			marketing: LegalBases.Consent,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 	automatedDecisionMaking: [],
@@ -129,7 +131,7 @@ export async function createUser(name: string, email: string) {
 
 `collecting()` returns its argument unchanged — no runtime cost, no wrapping type to thread through. At build time the plugin walks every file, finds these calls, and populates `dataCollected` before your config is evaluated.
 
-For cookie categories the plugin can't infer from `package.json`, declare them at the call site too — either with `defineCookie()` where the category is first established, or implicitly via `<ConsentGate requires="marketing">` and `useCookies().has("functional")` calls, which the plugin also reads.
+For cookie categories the plugin can't infer from `package.json`, declare them at the call site too with `defineCookie()` where the category is first established.
 
 You're still at the same surface area as Level 1 — one config file, the same components, the same output. The difference is that the parts most likely to go stale are now derived from code. The policy, the cookie banner, and the third-party list follow the product instead of trailing it.
 

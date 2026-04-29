@@ -24,14 +24,20 @@ bun add @openpolicy/sdk @openpolicy/react @openpolicy/vite
 Create `openpolicy.ts` at the project root:
 
 ```ts
-import { dataCollected, defineConfig, LegalBases, thirdParties } from "@openpolicy/sdk";
+import {
+	ContractPrerequisite,
+	dataCollected,
+	defineConfig,
+	LegalBases,
+	thirdParties,
+} from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
 		name: "Acme",
 		legalName: "Acme, Inc.",
 		address: "123 Main St, San Francisco, CA 94105",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu"],
@@ -40,9 +46,14 @@ export default defineConfig({
 			...dataCollected,
 			"Account Information": ["Email address", "Display name"],
 		},
-		purposes: { "Account Information": "To create and manage user accounts" },
-		lawfulBasis: { "Account Information": LegalBases.Contract },
-		retention: { "Account Information": "Until account deletion" },
+		context: {
+			"Account Information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+		},
 	},
 	thirdParties: [...thirdParties],
 });
@@ -118,14 +129,21 @@ The `openPolicy({ thirdParties: { usePackageJson: true } })` option also auto-de
 ### Spread both sentinels in `openpolicy.ts`
 
 ```ts
-import { dataCollected, defineConfig, LegalBases, thirdParties } from "@openpolicy/sdk";
+import {
+	ContractPrerequisite,
+	dataCollected,
+	defineConfig,
+	LegalBases,
+	thirdParties,
+	Voluntary,
+} from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
 		name: "Acme",
 		legalName: "Acme, Inc.",
 		address: "123 Main St, San Francisco, CA 94105",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu"],
@@ -134,24 +152,26 @@ export default defineConfig({
 			...dataCollected, // populated by openPolicy() at build time
 			"Manual Category": ["Manually added field"], // additional hand-declared entries
 		},
-		purposes: {
-			"Account Information": "To create and manage user accounts",
-			"Manual Category": "To enable a specific feature",
-		},
-		lawfulBasis: {
-			"Account Information": LegalBases.Contract,
-			"Manual Category": LegalBases.LegitimateInterests,
-		},
-		retention: {
-			"Account Information": "Until account deletion",
-			"Manual Category": "30 days",
+		context: {
+			"Account Information": {
+				purpose: "To create and manage user accounts",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+			"Manual Category": {
+				purpose: "To enable a specific feature",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "30 days",
+				provision: Voluntary("None — your service is unaffected."),
+			},
 		},
 	},
 	thirdParties: [...thirdParties], // populated by openPolicy() at build time
 });
 ```
 
-`dataCollected` and `thirdParties` are placeholder objects in `@openpolicy/sdk`; `openPolicy()` replaces them via virtual module injection during the Vite build. Every category in `data.collected` (auto or manual) must appear in the three sibling maps too — `defineConfig`'s generic enforces this.
+`dataCollected` and `thirdParties` are placeholder objects in `@openpolicy/sdk`; `openPolicy()` replaces them via virtual module injection during the Vite build. Every category in `data.collected` (auto or manual) must have a matching entry in `data.context` — `defineConfig`'s generic enforces this.
 
 ## Common Mistakes
 
@@ -199,21 +219,26 @@ Wrong:
 
 ```ts
 // openpolicy.ts
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases } from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
 		name: "Acme",
 		legalName: "Acme, Inc.",
 		address: "123 Main St, San Francisco, CA 94105",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	data: {
 		collected: { "Account Information": ["Email address"] },
-		purposes: { "Account Information": "Account creation" },
-		lawfulBasis: { "Account Information": LegalBases.Contract },
-		retention: { "Account Information": "Until account deletion" },
+		context: {
+			"Account Information": {
+				purpose: "Account creation",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+		},
 	},
 	thirdParties: [],
 });
@@ -223,21 +248,32 @@ Correct:
 
 ```ts
 // openpolicy.ts
-import { dataCollected, defineConfig, LegalBases, thirdParties } from "@openpolicy/sdk";
+import {
+	ContractPrerequisite,
+	dataCollected,
+	defineConfig,
+	LegalBases,
+	thirdParties,
+} from "@openpolicy/sdk";
 
 export default defineConfig({
 	company: {
 		name: "Acme",
 		legalName: "Acme, Inc.",
 		address: "123 Main St, San Francisco, CA 94105",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	data: {
 		collected: { ...dataCollected, "Account Information": ["Email address"] },
-		purposes: { "Account Information": "Account creation" },
-		lawfulBasis: { "Account Information": LegalBases.Contract },
-		retention: { "Account Information": "Until account deletion" },
+		context: {
+			"Account Information": {
+				purpose: "Account creation",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+		},
 	},
 	thirdParties: [...thirdParties],
 });

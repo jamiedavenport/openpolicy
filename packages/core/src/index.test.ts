@@ -9,23 +9,29 @@ const input: PolicyInput = {
 		name: "Acme Inc.",
 		legalName: "Acme Corporation",
 		address: "123 Main St, Springfield, USA",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
-		purposes: { "Account Information": "To authenticate users" },
-		lawfulBasis: { "Account Information": "contract" },
-		retention: { "Account Information": "Until deletion" },
-		provisionRequirement: {
+		context: {
 			"Account Information": {
-				basis: "contract-prerequisite",
-				consequences: "We cannot create or operate your account.",
+				purpose: "To authenticate users",
+				lawfulBasis: "contract",
+				retention: "Until deletion",
+				provision: {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
 			},
 		},
 	},
 	cookies: {
 		used: { essential: true, analytics: false, marketing: false },
-		lawfulBasis: { essential: "legal_obligation", analytics: "consent", marketing: "consent" },
+		context: {
+			essential: { lawfulBasis: "legal_obligation" },
+			analytics: { lawfulBasis: "consent" },
+			marketing: { lawfulBasis: "consent" },
+		},
 	},
 	thirdParties: [],
 	userRights: ["access"],
@@ -36,7 +42,7 @@ const company = {
 	name: "Acme Inc.",
 	legalName: "Acme Corporation",
 	address: "123 Main St, Springfield, USA",
-	contact: "privacy@acme.com",
+	contact: { email: "privacy@acme.com" },
 };
 
 const fullConfig: OpenPolicyConfig = {
@@ -45,19 +51,25 @@ const fullConfig: OpenPolicyConfig = {
 	jurisdictions: ["ca"],
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
-		purposes: { "Account Information": "To authenticate users" },
-		lawfulBasis: { "Account Information": "contract" },
-		retention: { "Account Information": "Until deletion" },
-		provisionRequirement: {
+		context: {
 			"Account Information": {
-				basis: "contract-prerequisite",
-				consequences: "We cannot create or operate your account.",
+				purpose: "To authenticate users",
+				lawfulBasis: "contract",
+				retention: "Until deletion",
+				provision: {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
 			},
 		},
 	},
 	cookies: {
 		used: { essential: true, analytics: false, marketing: false },
-		lawfulBasis: { essential: "legal_obligation", analytics: "consent", marketing: "consent" },
+		context: {
+			essential: { lawfulBasis: "legal_obligation" },
+			analytics: { lawfulBasis: "consent" },
+			marketing: { lawfulBasis: "consent" },
+		},
 	},
 	thirdParties: [],
 };
@@ -111,7 +123,7 @@ test("expandOpenPolicyConfig auto-detects cookie-only when no privacy fields", (
 		jurisdictions: ["ca"],
 		cookies: {
 			used: { essential: true },
-			lawfulBasis: { essential: "legal_obligation" },
+			context: { essential: { lawfulBasis: "legal_obligation" } },
 		},
 	});
 	expect(inputs).toHaveLength(1);

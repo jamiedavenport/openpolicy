@@ -5,7 +5,6 @@ declare module "@openpolicy/sdk" {
 		"Usage Data": true;
 	}
 	interface ScannedCookieKeys {
-		"analytics": true;
 		"essential": true;
 	}
 }

@@ -29,11 +29,11 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 			level: "error",
 			message: "company.address is required",
 		});
-	if (!config.company?.contact)
+	if (!config.company?.contact?.email)
 		issues.push({
 			code: "company-contact-required",
 			level: "error",
-			message: "company.contact is required",
+			message: "company.contact.email is required",
 		});
 	if (!config.jurisdictions || config.jurisdictions.length === 0) {
 		issues.push({
@@ -61,7 +61,7 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 			code: "policy-empty",
 			level: "error",
 			message:
-				"Config must produce at least one policy — provide data-handling fields (data, legalBasis, retention, children) or cookies",
+				"Config must produce at least one policy — provide data-handling fields (data, children) or cookies",
 		});
 	}
 
@@ -98,36 +98,36 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 		const gdprScope = config.jurisdictions?.includes("eu") || config.jurisdictions?.includes("uk");
 		if (gdprScope) {
 			for (const category of collectedKeys) {
-				if (!config.data.lawfulBasis?.[category]) {
+				if (!config.data.context?.[category]?.lawfulBasis) {
 					issues.push({
 						code: "lawful-basis-incomplete",
 						level: "error",
-						message: `data.lawfulBasis["${category}"] is missing — every collected category requires an Article 6 lawful basis (GDPR Art. 13(1)(c)).`,
+						message: `data.context["${category}"].lawfulBasis is missing — every collected category requires an Article 6 lawful basis (GDPR Art. 13(1)(c)).`,
 					});
 				}
-				const pr = config.data.provisionRequirement?.[category];
+				const pr = config.data.context?.[category]?.provision;
 				if (!pr || !pr.basis) {
 					issues.push({
 						code: "statutory-contractual-obligation",
 						level: "error",
-						message: `data.provisionRequirement["${category}"] is missing — GDPR Art. 13(2)(e) requires disclosure of whether provision is statutory, contractual, a contract-prerequisite, or voluntary, and the consequences of failure to provide it.`,
+						message: `data.context["${category}"].provision is missing — GDPR Art. 13(2)(e) requires disclosure of whether provision is statutory, contractual, a contract-prerequisite, or voluntary, and the consequences of failure to provide it.`,
 					});
 				} else if (typeof pr.consequences !== "string" || pr.consequences.trim().length === 0) {
 					issues.push({
 						code: "statutory-contractual-obligation",
 						level: "error",
-						message: `data.provisionRequirement["${category}"].consequences is empty — GDPR Art. 13(2)(e) requires the consequences of failure to provide this data.`,
+						message: `data.context["${category}"].provision.consequences is empty — GDPR Art. 13(2)(e) requires the consequences of failure to provide this data.`,
 					});
 				}
 			}
 		}
 		for (const category of collectedKeys) {
-			const period = config.data.retention?.[category];
+			const period = config.data.context?.[category]?.retention;
 			if (period === undefined || period.trim().length === 0) {
 				issues.push({
 					code: "retention-incomplete",
 					level: "error",
-					message: `data.retention["${category}"] is missing — declare a retention period for every collected category.`,
+					message: `data.context["${category}"].retention is missing — declare a retention period for every collected category.`,
 				});
 			}
 		}
@@ -137,11 +137,11 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 		const used = config.cookies.used ?? {};
 		for (const [key, enabled] of Object.entries(used)) {
 			if (!enabled) continue;
-			if (!config.cookies.lawfulBasis?.[key]) {
+			if (!config.cookies.context?.[key]?.lawfulBasis) {
 				issues.push({
 					code: "cookie-lawful-basis-missing",
 					level: "error",
-					message: `cookies.lawfulBasis["${key}"] is missing — every enabled cookie category requires an Article 6 lawful basis.`,
+					message: `cookies.context["${key}"].lawfulBasis is missing — every enabled cookie category requires an Article 6 lawful basis.`,
 				});
 			}
 		}
@@ -154,6 +154,15 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 			level: "warning",
 			message:
 				"company.dpo is not set — GDPR Article 13(1)(b) requires Data Protection Officer contact details if one is appointed. Set company.dpo, or set company.dpo = { required: false } to declare that none is needed.",
+		});
+	}
+
+	if (wantPrivacy && config.jurisdictions?.includes("us-ca") && !config.company?.contact?.phone) {
+		issues.push({
+			code: "company-contact-phone-recommended",
+			level: "warning",
+			message:
+				"company.contact.phone is not set — CCPA §1798.130(a)(1) requires businesses to provide two or more designated methods for consumers to submit requests, and (unless you operate exclusively online) one must be a toll-free phone number.",
 		});
 	}
 

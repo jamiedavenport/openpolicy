@@ -8,23 +8,25 @@ const baseConfig: PrivacyPolicyConfig = {
 		name: "Acme Inc.",
 		legalName: "Acme Corporation",
 		address: "123 Main St, Springfield, USA",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
-		purposes: { "Account Information": "To authenticate users" },
-		lawfulBasis: { "Account Information": "contract" },
-		retention: { "Account Information": "Until deletion" },
-		provisionRequirement: {
+		context: {
 			"Account Information": {
-				basis: "contract-prerequisite",
-				consequences: "We cannot create or operate your account.",
+				purpose: "To authenticate users",
+				lawfulBasis: "contract",
+				retention: "Until deletion",
+				provision: {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
 			},
 		},
 	},
 	cookies: {
 		used: { essential: true },
-		lawfulBasis: { essential: "legal_obligation" },
+		context: { essential: { lawfulBasis: "legal_obligation" } },
 	},
 	thirdParties: [],
 	userRights: [],
@@ -40,10 +42,7 @@ test("validatePrivacyPolicy: errors when data.collected is empty", () => {
 		...baseConfig,
 		data: {
 			collected: {},
-			purposes: {},
-			lawfulBasis: {},
-			retention: {},
-			provisionRequirement: {},
+			context: {},
 		},
 	});
 	expect(issues.some((i) => i.message === "data.collected must have at least one entry")).toBe(
@@ -51,7 +50,7 @@ test("validatePrivacyPolicy: errors when data.collected is empty", () => {
 	);
 });
 
-test("validatePrivacyPolicy: errors when a collected category has no purpose", () => {
+test("validatePrivacyPolicy: errors when a collected category has no context entry", () => {
 	const issues = validatePrivacyPolicy({
 		...baseConfig,
 		data: {
@@ -59,27 +58,22 @@ test("validatePrivacyPolicy: errors when a collected category has no purpose", (
 				"Account Information": ["Name"],
 				"Session Data": ["IP"],
 			},
-			purposes: { "Account Information": "To authenticate users" },
-			lawfulBasis: {
-				"Account Information": "contract",
-				"Session Data": "legitimate_interests",
-			},
-			retention: { "Account Information": "Until deletion", "Session Data": "30 days" },
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot create or operate your account.",
-				},
-				"Session Data": {
-					basis: "voluntary",
-					consequences: "None — your service is unaffected.",
+					purpose: "To authenticate users",
+					lawfulBasis: "contract",
+					retention: "Until deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot create or operate your account.",
+					},
 				},
 			},
 		},
 	});
 	expect(
 		issues.some(
-			(i) => i.level === "error" && i.message.includes('data.purposes["Session Data"] is missing'),
+			(i) => i.level === "error" && i.message.includes('data.context["Session Data"] is missing'),
 		),
 	).toBe(true);
 });
@@ -89,13 +83,15 @@ test("validatePrivacyPolicy: errors when a purpose is an empty string", () => {
 		...baseConfig,
 		data: {
 			collected: { "Account Information": ["Name"] },
-			purposes: { "Account Information": "   " },
-			lawfulBasis: { "Account Information": "contract" },
-			retention: { "Account Information": "Until deletion" },
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot create or operate your account.",
+					purpose: "   ",
+					lawfulBasis: "contract",
+					retention: "Until deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot create or operate your account.",
+					},
 				},
 			},
 		},
@@ -104,26 +100,36 @@ test("validatePrivacyPolicy: errors when a purpose is an empty string", () => {
 		issues.some(
 			(i) =>
 				i.level === "error" &&
-				i.message.includes('data.purposes["Account Information"] must be a non-empty string'),
+				i.message.includes(
+					'data.context["Account Information"].purpose must be a non-empty string',
+				),
 		),
 	).toBe(true);
 });
 
-test("validatePrivacyPolicy: errors when a purpose key has no matching collected category", () => {
+test("validatePrivacyPolicy: errors when a context key has no matching collected category", () => {
 	const issues = validatePrivacyPolicy({
 		...baseConfig,
 		data: {
 			collected: { "Account Information": ["Name"] },
-			purposes: {
-				"Account Information": "To authenticate users",
-				"Orphan Category": "Not attached to anything",
-			},
-			lawfulBasis: { "Account Information": "contract" },
-			retention: { "Account Information": "Until deletion" },
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot create or operate your account.",
+					purpose: "To authenticate users",
+					lawfulBasis: "contract",
+					retention: "Until deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot create or operate your account.",
+					},
+				},
+				"Orphan Category": {
+					purpose: "Not attached to anything",
+					lawfulBasis: "contract",
+					retention: "Until deletion",
+					provision: {
+						basis: "voluntary",
+						consequences: "None",
+					},
 				},
 			},
 		},
@@ -132,7 +138,7 @@ test("validatePrivacyPolicy: errors when a purpose key has no matching collected
 		issues.some(
 			(i) =>
 				i.level === "error" &&
-				i.message.includes('data.purposes["Orphan Category"] has no matching entry'),
+				i.message.includes('data.context["Orphan Category"] has no matching entry'),
 		),
 	).toBe(true);
 });
@@ -143,13 +149,15 @@ test("validatePrivacyPolicy: emits lawful-basis-incomplete when EU jurisdiction 
 		jurisdictions: ["eu"],
 		data: {
 			collected: { "Account Information": ["Name"] },
-			purposes: { "Account Information": "To authenticate users" },
-			lawfulBasis: {},
-			retention: { "Account Information": "Until deletion" },
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot create or operate your account.",
+					purpose: "To authenticate users",
+					lawfulBasis: undefined as never,
+					retention: "Until deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot create or operate your account.",
+					},
 				},
 			},
 		},
@@ -165,13 +173,15 @@ test("validatePrivacyPolicy: emits lawful-basis-incomplete when UK jurisdiction 
 		jurisdictions: ["uk"],
 		data: {
 			collected: { "Account Information": ["Name"] },
-			purposes: { "Account Information": "To authenticate users" },
-			lawfulBasis: {},
-			retention: { "Account Information": "Until deletion" },
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot create or operate your account.",
+					purpose: "To authenticate users",
+					lawfulBasis: undefined as never,
+					retention: "Until deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot create or operate your account.",
+					},
 				},
 			},
 		},
@@ -187,13 +197,15 @@ test("validatePrivacyPolicy: emits lawful-basis-incomplete when a category has e
 		jurisdictions: ["eu"],
 		data: {
 			collected: { "Account Information": ["Name"] },
-			purposes: { "Account Information": "To authenticate users" },
-			lawfulBasis: { "Account Information": "" as never },
-			retention: { "Account Information": "Until deletion" },
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot create or operate your account.",
+					purpose: "To authenticate users",
+					lawfulBasis: "" as never,
+					retention: "Until deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot create or operate your account.",
+					},
 				},
 			},
 		},
@@ -210,13 +222,15 @@ test("validatePrivacyPolicy: does NOT emit lawful-basis-incomplete for non-GDPR 
 		jurisdictions: ["us-ca"],
 		data: {
 			collected: { "Account Information": ["Name"] },
-			purposes: { "Account Information": "To authenticate users" },
-			lawfulBasis: {},
-			retention: { "Account Information": "Until deletion" },
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot create or operate your account.",
+					purpose: "To authenticate users",
+					lawfulBasis: undefined as never,
+					retention: "Until deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot create or operate your account.",
+					},
 				},
 			},
 		},
@@ -230,26 +244,24 @@ test("validatePrivacyPolicy: well-formed lawfulBasis under GDPR has no lawful-ba
 		jurisdictions: ["eu"],
 		data: {
 			collected: { "Account Information": ["Name"], "Marketing Data": ["Mailing list"] },
-			purposes: {
-				"Account Information": "Providing the service",
-				"Marketing Data": "Marketing communications",
-			},
-			lawfulBasis: {
-				"Account Information": "contract",
-				"Marketing Data": "consent",
-			},
-			retention: {
-				"Account Information": "Until deletion",
-				"Marketing Data": "Until withdrawal",
-			},
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot create or operate your account.",
+					purpose: "Providing the service",
+					lawfulBasis: "contract",
+					retention: "Until deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot create or operate your account.",
+					},
 				},
 				"Marketing Data": {
-					basis: "voluntary",
-					consequences: "None — your service is unaffected.",
+					purpose: "Marketing communications",
+					lawfulBasis: "consent",
+					retention: "Until withdrawal",
+					provision: {
+						basis: "voluntary",
+						consequences: "None — your service is unaffected.",
+					},
 				},
 			},
 		},
@@ -262,13 +274,15 @@ test("validatePrivacyPolicy: emits retention-incomplete when a category lacks re
 		...baseConfig,
 		data: {
 			collected: { "Account Information": ["Name"] },
-			purposes: { "Account Information": "To authenticate users" },
-			lawfulBasis: { "Account Information": "contract" },
-			retention: {},
-			provisionRequirement: {
+			context: {
 				"Account Information": {
-					basis: "contract-prerequisite",
-					consequences: "We cannot create or operate your account.",
+					purpose: "To authenticate users",
+					lawfulBasis: "contract",
+					retention: undefined as never,
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot create or operate your account.",
+					},
 				},
 			},
 		},
@@ -277,7 +291,7 @@ test("validatePrivacyPolicy: emits retention-incomplete when a category lacks re
 		issues.some(
 			(i) =>
 				i.code === "retention-incomplete" &&
-				i.message.includes('data.retention["Account Information"]'),
+				i.message.includes('data.context["Account Information"].retention'),
 		),
 	).toBe(true);
 });

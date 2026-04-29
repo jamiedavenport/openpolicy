@@ -157,14 +157,18 @@ function buildJurisdictionEuUk(config: CookiePolicyConfig): DocumentSection | nu
 }
 
 function buildContact(config: CookiePolicyConfig): DocumentSection {
+	const items = [
+		li([bold("Legal Name: "), config.company.legalName]),
+		li([bold("Address: "), config.company.address]),
+		li([bold("Email: "), config.company.contact.email]),
+	];
+	if (config.company.contact.phone) {
+		items.push(li([bold("Phone: "), config.company.contact.phone]));
+	}
 	return section("cookie-contact", [
 		heading("Contact Us"),
 		p(["If you have questions about this Cookie Policy, please contact us:"]),
-		ul([
-			li([bold("Legal Name: "), config.company.legalName]),
-			li([bold("Address: "), config.company.address]),
-			li([bold("Email: "), config.company.contact]),
-		]),
+		ul(items),
 	]);
 }
 

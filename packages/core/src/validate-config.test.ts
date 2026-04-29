@@ -8,19 +8,21 @@ const baseConfig: OpenPolicyConfig = {
 		name: "Acme Inc.",
 		legalName: "Acme Corporation",
 		address: "123 Main St, Springfield, USA",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eu"],
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
-		purposes: { "Account Information": "To authenticate users" },
-		lawfulBasis: { "Account Information": "contract" },
-		retention: { "Account Information": "Until deletion" },
-		provisionRequirement: {
+		context: {
 			"Account Information": {
-				basis: "contract-prerequisite",
-				consequences: "We cannot create or operate your account.",
+				purpose: "To authenticate users",
+				lawfulBasis: "contract",
+				retention: "Until deletion",
+				provision: {
+					basis: "contract-prerequisite",
+					consequences: "We cannot create or operate your account.",
+				},
 			},
 		},
 	},
@@ -113,22 +115,26 @@ test("validateOpenPolicyConfig does not warn about DPO for non-EU/UK jurisdictio
 	expect(issues.some((i) => i.message.includes("company.dpo"))).toBe(false);
 });
 
-test("validateOpenPolicyConfig emits statutory-contractual-obligation when provisionRequirement is missing under GDPR", () => {
+test("validateOpenPolicyConfig emits statutory-contractual-obligation when provision is missing under GDPR", () => {
 	const issues = validateOpenPolicyConfig({
 		...baseConfig,
 		data: {
 			collected: { "Account Information": ["Name", "Email"] },
-			purposes: { "Account Information": "To authenticate users" },
-			lawfulBasis: { "Account Information": "contract" },
-			retention: { "Account Information": "Until deletion" },
-			provisionRequirement: {},
+			context: {
+				"Account Information": {
+					purpose: "To authenticate users",
+					lawfulBasis: "contract",
+					retention: "Until deletion",
+					provision: undefined as never,
+				},
+			},
 		},
 	});
 	const hit = issues.find(
 		(i) => i.code === "statutory-contractual-obligation" && i.level === "error",
 	);
 	expect(hit).toBeDefined();
-	expect(hit?.message).toContain('data.provisionRequirement["Account Information"]');
+	expect(hit?.message).toContain('data.context["Account Information"].provision');
 	expect(hit?.message).toContain("Art. 13(2)(e)");
 });
 
@@ -137,11 +143,13 @@ test("validateOpenPolicyConfig emits statutory-contractual-obligation when conse
 		...baseConfig,
 		data: {
 			collected: { "Account Information": ["Name", "Email"] },
-			purposes: { "Account Information": "To authenticate users" },
-			lawfulBasis: { "Account Information": "contract" },
-			retention: { "Account Information": "Until deletion" },
-			provisionRequirement: {
-				"Account Information": { basis: "contractual", consequences: "   " },
+			context: {
+				"Account Information": {
+					purpose: "To authenticate users",
+					lawfulBasis: "contract",
+					retention: "Until deletion",
+					provision: { basis: "contractual", consequences: "   " },
+				},
 			},
 		},
 	});
@@ -160,11 +168,40 @@ test("validateOpenPolicyConfig does NOT emit statutory-contractual-obligation fo
 		jurisdictions: ["us-ca"],
 		data: {
 			collected: { "Account Information": ["Name", "Email"] },
-			purposes: { "Account Information": "To authenticate users" },
-			lawfulBasis: { "Account Information": "contract" },
-			retention: { "Account Information": "Until deletion" },
-			provisionRequirement: {},
+			context: {
+				"Account Information": {
+					purpose: "To authenticate users",
+					lawfulBasis: "contract",
+					retention: "Until deletion",
+					provision: undefined as never,
+				},
+			},
 		},
 	});
 	expect(issues.some((i) => i.code === "statutory-contractual-obligation")).toBe(false);
+});
+
+test("validateOpenPolicyConfig warns when us-ca jurisdiction lacks company.contact.phone", () => {
+	const issues = validateOpenPolicyConfig({ ...baseConfig, jurisdictions: ["us-ca"] });
+	const hit = issues.find((i) => i.code === "company-contact-phone-recommended");
+	expect(hit).toBeDefined();
+	expect(hit?.level).toBe("warning");
+	expect(hit?.message).toContain("CCPA");
+});
+
+test("validateOpenPolicyConfig does not warn about contact phone when phone is set", () => {
+	const issues = validateOpenPolicyConfig({
+		...baseConfig,
+		jurisdictions: ["us-ca"],
+		company: {
+			...baseConfig.company,
+			contact: { email: "privacy@acme.com", phone: "+1-800-555-0100" },
+		},
+	});
+	expect(issues.some((i) => i.code === "company-contact-phone-recommended")).toBe(false);
+});
+
+test("validateOpenPolicyConfig does not warn about contact phone for non-CCPA jurisdictions", () => {
+	const issues = validateOpenPolicyConfig({ ...baseConfig, jurisdictions: ["eu"] });
+	expect(issues.some((i) => i.code === "company-contact-phone-recommended")).toBe(false);
 });

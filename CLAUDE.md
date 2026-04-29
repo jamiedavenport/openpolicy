@@ -70,8 +70,8 @@ The plugin emits three sentinels into a virtual module that users spread into th
 
 It also writes `openpolicy.gen.ts` augmenting two interfaces in `@openpolicy/sdk` so `defineConfig`'s generic forces every scanned key to appear in the sibling sub-maps:
 
-- `ScannedCollectionKeys` — every scanned data category must appear in `data.purposes`, `data.lawfulBasis`, and `data.retention`
-- `ScannedCookieKeys` — every scanned cookie category must appear in `cookies.lawfulBasis`
+- `ScannedCollectionKeys` — every scanned data category must appear in `data.context` (with `purpose`, `lawfulBasis`, `retention`, and `provision`)
+- `ScannedCookieKeys` — every scanned cookie category must appear in `cookies.context`
 
 When changing the config shape:
 

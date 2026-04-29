@@ -32,11 +32,14 @@
 		"test": "vp test"
 	},
 	"dependencies": {
+		"@openpolicy/core": "workspace:*",
+		"bundle-require": "^5.1.0",
 		"oxc-parser": "^0.124.0"
 	},
 	"devDependencies": {
 		"@openpolicy/sdk": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
+		"esbuild": "^0.25.12",
 		"vite": "catalog:",
 		"vite-plus": "catalog:"
 	},

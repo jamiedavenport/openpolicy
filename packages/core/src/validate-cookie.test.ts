@@ -8,7 +8,7 @@ const validConfig: CookiePolicyConfig = {
 		name: "Acme",
 		legalName: "Acme Inc.",
 		address: "123 Main St",
-		contact: "privacy@acme.com",
+		contact: { email: "privacy@acme.com" },
 	},
 	cookies: {
 		used: {
@@ -17,11 +17,11 @@ const validConfig: CookiePolicyConfig = {
 			functional: false,
 			marketing: false,
 		},
-		lawfulBasis: {
-			essential: "legal_obligation",
-			analytics: "consent",
-			functional: "consent",
-			marketing: "consent",
+		context: {
+			essential: { lawfulBasis: "legal_obligation" },
+			analytics: { lawfulBasis: "consent" },
+			functional: { lawfulBasis: "consent" },
+			marketing: { lawfulBasis: "consent" },
 		},
 	},
 	thirdParties: [],
@@ -73,7 +73,7 @@ test("missing company.address is an error", () => {
 test("missing company.contact is an error", () => {
 	const issues = validateCookiePolicy({
 		...validConfig,
-		company: { ...validConfig.company, contact: "" },
+		company: { ...validConfig.company, contact: { email: "" } },
 	});
 	expect(issues.some((i) => i.message.includes("company.contact"))).toBe(true);
 });
@@ -88,11 +88,11 @@ test("all cookies disabled is an error", () => {
 				functional: false,
 				marketing: false,
 			},
-			lawfulBasis: {
-				essential: "legal_obligation",
-				analytics: "consent",
-				functional: "consent",
-				marketing: "consent",
+			context: {
+				essential: { lawfulBasis: "legal_obligation" },
+				analytics: { lawfulBasis: "consent" },
+				functional: { lawfulBasis: "consent" },
+				marketing: { lawfulBasis: "consent" },
 			},
 		},
 	});
