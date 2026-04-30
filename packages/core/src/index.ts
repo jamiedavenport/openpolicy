@@ -13,9 +13,27 @@ export type {
 	NodeContext,
 	ParagraphNode,
 	PolicyType,
+	TableCellNode,
+	TableNode,
+	TableRowNode,
 	TextNode,
 } from "./documents";
-export { bold, compile, heading, italic, li, link, ol, p, section, text, ul } from "./documents";
+export {
+	bold,
+	cell,
+	compile,
+	heading,
+	italic,
+	li,
+	link,
+	ol,
+	p,
+	row,
+	section,
+	table,
+	text,
+	ul,
+} from "./documents";
 export { isJurisdiction, JURISDICTIONS } from "./jurisdictions";
 export type {
 	AutomatedDecision,

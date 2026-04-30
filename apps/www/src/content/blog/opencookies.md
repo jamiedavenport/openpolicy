@@ -21,13 +21,13 @@ Trying to grow both inside one repo meant the parts of OpenCookies that needed t
 
 ## What moved, what stayed
 
-| Stays in OpenPolicy                                                  | Moved to OpenCookies (across React, Vue, Svelte, Solid)                          |
-| -------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `<PrivacyPolicy />` and `<CookiePolicy />`                           | `<CookieBanner />` and `<CookiePreferences />`                                   |
-| `defineConfig()` and the `@openpolicy/sdk` types                     | `useConsent()`, `useCategory(key)`, and the `createConsentStore()` core API      |
-| `collecting()`, `thirdParty()`, `defineCookie()`                     | `<ConsentGate>` for component gating, `defineScript` + `gateScript` for vendor scripts |
+| Stays in OpenPolicy                                                     | Moved to OpenCookies (across React, Vue, Svelte, Solid)                                                                     |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `<PrivacyPolicy />` and `<CookiePolicy />`                              | `<CookieBanner />` and `<CookiePreferences />`                                                                              |
+| `defineConfig()` and the `@openpolicy/sdk` types                        | `useConsent()`, `useCategory(key)`, and the `createConsentStore()` core API                                                 |
+| `collecting()`, `thirdParty()`, `defineCookie()`                        | `<ConsentGate>` for component gating, `defineScript` + `gateScript` for vendor scripts                                      |
 | `@openpolicy/vite` auto-collect for `data` / `cookies` / `thirdParties` | Pluggable storage (localStorage / cookie / SSR / custom), cross-tab sync, GPC, jurisdiction resolvers, versioned re-consent |
-| The compiled cookie *policy* (the legal document)                    | A Vite plugin that flags ungated cookie usage at build time                      |
+| The compiled cookie _policy_ (the legal document)                       | A Vite plugin that flags ungated cookie usage at build time                                                                 |
 
 The short version: OpenPolicy still owns the words on your `/privacy` and `/cookies` pages. OpenCookies owns the banner that decides what runs.
 
@@ -40,13 +40,11 @@ That's intentional for now. OpenCookies is finding its API, and we'd rather let 
 ```ts
 import openpolicy from "@/openpolicy";
 
-const cookieCategories = Object.entries(openpolicy.cookies.used).map(
-	([key]) => ({
-		key,
-		label: openpolicy.cookies.context[key]?.label ?? key,
-		locked: key === "essential",
-	}),
-);
+const cookieCategories = Object.entries(openpolicy.cookies.used).map(([key]) => ({
+	key,
+	label: openpolicy.cookies.context[key]?.label ?? key,
+	locked: key === "essential",
+}));
 ```
 
 Pass `cookieCategories` into `<OpenCookiesProvider>` and the banner picks up whatever your `openpolicy.ts` already declares. Add or remove a category there and both the policy document and the banner follow. Closing the loop so this happens automatically is on the roadmap; the manual bridge is short enough that it shouldn't get in the way.
@@ -56,11 +54,7 @@ Pass `cookieCategories` into `<OpenCookiesProvider>` and the banner picks up wha
 OpenCookies is headless — there are no styles, no DOM opinions, no markup you have to override. You wrap your app in a provider, read state with a hook, and render whatever you'd render anyway.
 
 ```tsx
-import {
-	ConsentGate,
-	OpenCookiesProvider,
-	useConsent,
-} from "@opencookies/react";
+import { ConsentGate, OpenCookiesProvider, useConsent } from "@opencookies/react";
 
 const config = {
 	categories: [

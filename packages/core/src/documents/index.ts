@@ -20,7 +20,21 @@ export function compile(input: PolicyInput): Document {
 	};
 }
 
-export { bold, heading, italic, li, link, ol, p, section, text, ul } from "./helpers";
+export {
+	bold,
+	cell,
+	heading,
+	italic,
+	li,
+	link,
+	ol,
+	p,
+	row,
+	section,
+	table,
+	text,
+	ul,
+} from "./helpers";
 export type {
 	BoldNode,
 	ContentNode,
@@ -36,5 +50,8 @@ export type {
 	NodeContext,
 	ParagraphNode,
 	PolicyType,
+	TableCellNode,
+	TableNode,
+	TableRowNode,
 	TextNode,
 } from "./types";

@@ -1,6 +1,6 @@
 import type { CookiePolicyConfig } from "../types";
-import { bold, heading, li, link, p, section, ul } from "./helpers";
-import type { DocumentSection } from "./types";
+import { bold, cell, heading, li, link, p, row, section, table, ul } from "./helpers";
+import type { DocumentSection, TableRowNode } from "./types";
 
 function buildIntroduction(config: CookiePolicyConfig): DocumentSection {
 	return section("cookie-introduction", [
@@ -62,9 +62,12 @@ function buildTypes(config: CookiePolicyConfig): DocumentSection {
 		]);
 	}
 
+	const rows: TableRowNode[] = types.map((t) =>
+		row([cell([bold(t.label)]), cell([t.description])]),
+	);
 	return section("cookie-types", [
 		heading("Types of Cookies We Use"),
-		ul(types.map((t) => li([bold(t.label), " \u2014 ", t.description]))),
+		table(["Type", "Description"], rows),
 	]);
 }
 
@@ -79,19 +82,17 @@ function buildTrackingTechnologies(config: CookiePolicyConfig): DocumentSection 
 
 function buildThirdParties(config: CookiePolicyConfig): DocumentSection | null {
 	if (!config.thirdParties || config.thirdParties.length === 0) return null;
+	const rows: TableRowNode[] = config.thirdParties.map((t) =>
+		row([
+			cell([bold(t.name)]),
+			cell([t.purpose]),
+			cell(t.policyUrl ? [link(t.policyUrl, "View")] : [""]),
+		]),
+	);
 	return section("cookie-third-parties", [
 		heading("Third-Party Cookies"),
 		p(["The following third parties may set cookies through our services:"]),
-		ul(
-			config.thirdParties.map((t) =>
-				li([
-					bold(t.name),
-					" \u2014 ",
-					t.purpose,
-					...(t.policyUrl ? [" (", link(t.policyUrl, "Privacy Policy"), ")"] : []),
-				]),
-			),
-		),
+		table(["Service", "Purpose", "Privacy policy"], rows),
 	]);
 }
 

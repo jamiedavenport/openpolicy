@@ -5,6 +5,9 @@ import type {
 	ItalicNode,
 	LinkNode,
 	Node,
+	TableCellNode,
+	TableNode,
+	TableRowNode,
 	TextNode,
 } from "@openpolicy/core";
 import type { ReactNode } from "react";
@@ -73,6 +76,52 @@ export function DefaultList({
 	return <Tag data-op-list>{children}</Tag>;
 }
 
+export function DefaultTable({ node: _node, children }: { node: TableNode; children: ReactNode }) {
+	return <table data-op-table>{children}</table>;
+}
+
+export function DefaultTableHeader({ children }: { children: ReactNode }) {
+	return <thead data-op-table-header>{children}</thead>;
+}
+
+export function DefaultTableBody({ children }: { children: ReactNode }) {
+	return <tbody data-op-table-body>{children}</tbody>;
+}
+
+export function DefaultTableRow({
+	node: _node,
+	children,
+}: {
+	node: TableRowNode;
+	children: ReactNode;
+}) {
+	return <tr data-op-table-row>{children}</tr>;
+}
+
+export function DefaultTableHead({
+	node: _node,
+	children,
+}: {
+	node: TableCellNode;
+	children: ReactNode;
+}) {
+	return (
+		<th data-op-table-cell scope="col">
+			{children}
+		</th>
+	);
+}
+
+export function DefaultTableCell({
+	node: _node,
+	children,
+}: {
+	node: TableCellNode;
+	children: ReactNode;
+}) {
+	return <td data-op-table-cell>{children}</td>;
+}
+
 export function renderNode(node: Node, components: PolicyComponents, key?: number): ReactNode {
 	switch (node.type) {
 		case "document":
@@ -129,6 +178,45 @@ export function renderNode(node: Node, components: PolicyComponents, key?: numbe
 					{node.children.map((n, i) => renderNode(n, components, i))}
 				</li>
 			);
+
+		case "table": {
+			const TableComp = components.Table ?? DefaultTable;
+			const TableHeaderComp = components.TableHeader ?? DefaultTableHeader;
+			const TableBodyComp = components.TableBody ?? DefaultTableBody;
+			const TableRowComp = components.TableRow ?? DefaultTableRow;
+			const TableHeadComp = components.TableHead ?? DefaultTableHead;
+			const TableCellComp = components.TableCell ?? DefaultTableCell;
+			const renderCell = (
+				cell: TableCellNode,
+				cellKey: number,
+				Comp: typeof TableHeadComp | typeof TableCellComp,
+			) => (
+				<Comp key={cellKey} node={cell}>
+					{cell.children.map((n, i) => renderNode(n, components, i))}
+				</Comp>
+			);
+			const renderRow = (
+				row: TableRowNode,
+				rowKey: number | undefined,
+				CellComp: typeof TableHeadComp | typeof TableCellComp,
+			) => (
+				<TableRowComp key={rowKey} node={row}>
+					{row.cells.map((c, ci) => renderCell(c, ci, CellComp))}
+				</TableRowComp>
+			);
+			const headerRow = renderRow(node.header, undefined, TableHeadComp);
+			const bodyRows = node.rows.map((row, ri) => renderRow(row, ri, TableCellComp));
+			return (
+				<TableComp key={key} node={node}>
+					<TableHeaderComp>{headerRow}</TableHeaderComp>
+					<TableBodyComp>{bodyRows}</TableBodyComp>
+				</TableComp>
+			);
+		}
+
+		case "tableRow":
+		case "tableCell":
+			return null;
 
 		case "text": {
 			const Comp = components.Text ?? DefaultText;

@@ -4,6 +4,8 @@ import type {
 	InlineNode,
 	ListItemNode,
 	ListNode,
+	TableNode,
+	TableRowNode,
 } from "@openpolicy/core";
 import PDFDocument from "pdfkit";
 
@@ -78,6 +80,36 @@ function renderListItem(
 	}
 }
 
+function inlineToText(nodes: InlineNode[]): string {
+	return nodes.map((n) => n.value).join("");
+}
+
+function renderTable(doc: InstanceType<typeof PDFDocument>, node: TableNode): void {
+	const headerCells = node.header.cells.map((c) => ({
+		text: inlineToText(c.children),
+		type: "TH" as const,
+		font: { src: FONT_BOLD },
+		backgroundColor: "#f3f4f6",
+		textColor: COLOR_HEADING,
+	}));
+	const bodyRows = node.rows.map((r: TableRowNode) =>
+		r.cells.map((c) => ({
+			text: inlineToText(c.children),
+			textColor: COLOR_BODY,
+		})),
+	);
+	doc.fontSize(SIZE_BODY).fillColor(COLOR_BODY);
+	doc.table({
+		data: [headerCells, ...bodyRows],
+		defaultStyle: {
+			border: { top: 0.5, bottom: 0.5, left: 0.5, right: 0.5 },
+			borderColor: "#e5e7eb",
+			padding: 6,
+		},
+	});
+	doc.moveDown(0.5);
+}
+
 function renderSection(
 	doc: InstanceType<typeof PDFDocument>,
 	section: DocumentSection,
@@ -115,6 +147,9 @@ function renderSection(
 					renderListItem(doc, node.items[i]!, 0, node.ordered ?? false, i);
 				}
 				doc.moveDown(0.3);
+				break;
+			case "table":
+				renderTable(doc, node);
 				break;
 		}
 	}

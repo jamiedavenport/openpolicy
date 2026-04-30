@@ -1,4 +1,11 @@
-import type { Document, InlineNode, ListItemNode, ListNode } from "@openpolicy/core";
+import type {
+	Document,
+	InlineNode,
+	ListItemNode,
+	ListNode,
+	TableNode,
+	TableRowNode,
+} from "@openpolicy/core";
 
 function escapeHtml(str: string): string {
 	return str
@@ -34,6 +41,18 @@ function renderList(node: ListNode): string {
 	return `<${tag}>${items}</${tag}>`;
 }
 
+function renderRowCells(row: TableRowNode, tag: "th" | "td"): string {
+	return row.cells.map((c) => `<${tag}>${c.children.map(renderInline).join("")}</${tag}>`).join("");
+}
+
+function renderTable(node: TableNode): string {
+	const head = `<thead><tr>${renderRowCells(node.header, "th")}</tr></thead>`;
+	const body = `<tbody>${node.rows
+		.map((r) => `<tr>${renderRowCells(r, "td")}</tr>`)
+		.join("")}</tbody>`;
+	return `<table>${head}${body}</table>`;
+}
+
 export function renderHTML(doc: Document): string {
 	return doc.sections
 		.map((section) => {
@@ -48,6 +67,8 @@ export function renderHTML(doc: Document): string {
 						return `<p>${node.children.map(renderInline).join("")}</p>`;
 					case "list":
 						return renderList(node);
+					case "table":
+						return renderTable(node);
 				}
 			});
 			return blocks.join("\n");
