@@ -41,7 +41,23 @@ export type ListNode = {
 	items: ListItemNode[];
 	context?: NodeContext;
 };
-export type ContentNode = HeadingNode | ParagraphNode | ListNode;
+export type TableCellNode = {
+	type: "tableCell";
+	children: InlineNode[];
+	context?: NodeContext;
+};
+export type TableRowNode = {
+	type: "tableRow";
+	cells: TableCellNode[];
+	context?: NodeContext;
+};
+export type TableNode = {
+	type: "table";
+	header: TableRowNode;
+	rows: TableRowNode[];
+	context?: NodeContext;
+};
+export type ContentNode = HeadingNode | ParagraphNode | ListNode | TableNode;
 
 // A single section of a document
 export type DocumentSection = {
@@ -62,4 +78,11 @@ export type Document = {
 };
 
 // Every node in the document tree
-export type Node = Document | DocumentSection | ContentNode | ListItemNode | InlineNode;
+export type Node =
+	| Document
+	| DocumentSection
+	| ContentNode
+	| ListItemNode
+	| TableRowNode
+	| TableCellNode
+	| InlineNode;

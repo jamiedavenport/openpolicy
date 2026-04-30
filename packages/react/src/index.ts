@@ -8,6 +8,12 @@ export {
 	DefaultList,
 	DefaultParagraph,
 	DefaultSection,
+	DefaultTable,
+	DefaultTableBody,
+	DefaultTableCell,
+	DefaultTableHead,
+	DefaultTableHeader,
+	DefaultTableRow,
 	DefaultText,
 	renderNode,
 } from "./components/defaults";

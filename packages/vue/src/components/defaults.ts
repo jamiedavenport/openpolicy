@@ -6,6 +6,9 @@ import type {
 	LinkNode,
 	ListNode,
 	Node,
+	TableCellNode,
+	TableNode,
+	TableRowNode,
 	TextNode,
 } from "@openpolicy/core";
 import { h, type VNodeChild } from "vue";
@@ -67,6 +70,54 @@ export function DefaultList({ node, children }: { node: ListNode; children?: VNo
 	return h(tag, { "data-op-list": "" }, children ?? undefined);
 }
 
+export function DefaultTable({
+	node: _node,
+	children,
+}: {
+	node: TableNode;
+	children?: VNodeChild;
+}) {
+	return h("table", { "data-op-table": "" }, children ?? undefined);
+}
+
+export function DefaultTableHeader({ children }: { children?: VNodeChild }) {
+	return h("thead", { "data-op-table-header": "" }, children ?? undefined);
+}
+
+export function DefaultTableBody({ children }: { children?: VNodeChild }) {
+	return h("tbody", { "data-op-table-body": "" }, children ?? undefined);
+}
+
+export function DefaultTableRow({
+	node: _node,
+	children,
+}: {
+	node: TableRowNode;
+	children?: VNodeChild;
+}) {
+	return h("tr", { "data-op-table-row": "" }, children ?? undefined);
+}
+
+export function DefaultTableHead({
+	node: _node,
+	children,
+}: {
+	node: TableCellNode;
+	children?: VNodeChild;
+}) {
+	return h("th", { "data-op-table-cell": "", scope: "col" }, children ?? undefined);
+}
+
+export function DefaultTableCell({
+	node: _node,
+	children,
+}: {
+	node: TableCellNode;
+	children?: VNodeChild;
+}) {
+	return h("td", { "data-op-table-cell": "" }, children ?? undefined);
+}
+
 export function renderNode(node: Node, components: PolicyComponents, key?: number): VNodeChild {
 	switch (node.type) {
 		case "document":
@@ -124,6 +175,49 @@ export function renderNode(node: Node, components: PolicyComponents, key?: numbe
 				{ key, "data-op-list-item": "" },
 				node.children.map((n, i) => renderNode(n, components, i)),
 			);
+
+		case "table": {
+			const TableComp = components.Table ?? DefaultTable;
+			const TableHeaderComp = components.TableHeader ?? DefaultTableHeader;
+			const TableBodyComp = components.TableBody ?? DefaultTableBody;
+			const TableRowComp = components.TableRow ?? DefaultTableRow;
+			const TableHeadComp = components.TableHead ?? DefaultTableHead;
+			const TableCellComp = components.TableCell ?? DefaultTableCell;
+			const renderCell = (
+				cell: TableCellNode,
+				cellKey: number,
+				Comp: typeof TableHeadComp | typeof TableCellComp,
+			) => {
+				const cellChildren = cell.children.map((n, i) => renderNode(n, components, i));
+				return h(
+					Comp,
+					{ key: cellKey, node: cell, children: cellChildren },
+					{ default: () => cellChildren },
+				);
+			};
+			const renderRow = (
+				row: TableRowNode,
+				rowKey: number | undefined,
+				CellComp: typeof TableHeadComp | typeof TableCellComp,
+			) => {
+				const rowChildren = row.cells.map((c, ci) => renderCell(c, ci, CellComp));
+				return h(
+					TableRowComp,
+					{ key: rowKey, node: row, children: rowChildren },
+					{ default: () => rowChildren },
+				);
+			};
+			const headerRow = renderRow(node.header, undefined, TableHeadComp);
+			const bodyRows = node.rows.map((row, ri) => renderRow(row, ri, TableCellComp));
+			const headerSlot = h(TableHeaderComp, { children: headerRow }, { default: () => headerRow });
+			const bodySlot = h(TableBodyComp, { children: bodyRows }, { default: () => bodyRows });
+			const inner = [headerSlot, bodySlot];
+			return h(TableComp, { key, node, children: inner }, { default: () => inner });
+		}
+
+		case "tableRow":
+		case "tableCell":
+			return null;
 
 		case "text": {
 			const Comp = components.Text ?? DefaultText;

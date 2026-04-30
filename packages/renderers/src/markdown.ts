@@ -1,4 +1,11 @@
-import type { Document, InlineNode, ListItemNode, ListNode } from "@openpolicy/core";
+import type {
+	Document,
+	InlineNode,
+	ListItemNode,
+	ListNode,
+	TableNode,
+	TableRowNode,
+} from "@openpolicy/core";
 
 function renderInline(node: InlineNode): string {
 	switch (node.type) {
@@ -34,6 +41,21 @@ function renderListItem(item: ListItemNode, indent = "", ordered = false, index 
 	return line;
 }
 
+function renderCellInline(children: InlineNode[]): string {
+	return children.map(renderInline).join("").replace(/\|/g, "\\|").replace(/\n/g, " ");
+}
+
+function renderTableRow(row: TableRowNode): string {
+	return `| ${row.cells.map((c) => renderCellInline(c.children)).join(" | ")} |`;
+}
+
+function renderTable(node: TableNode): string {
+	const headerLine = renderTableRow(node.header);
+	const separatorLine = `| ${node.header.cells.map(() => "---").join(" | ")} |`;
+	const bodyLines = node.rows.map(renderTableRow);
+	return [headerLine, separatorLine, ...bodyLines].join("\n");
+}
+
 export function renderMarkdown(doc: Document): string {
 	return doc.sections
 		.map((section) => {
@@ -50,6 +72,8 @@ export function renderMarkdown(doc: Document): string {
 						return node.items
 							.map((item, idx) => renderListItem(item, "", node.ordered, idx))
 							.join("\n");
+					case "table":
+						return renderTable(node);
 				}
 			});
 			return blocks.join("\n\n");

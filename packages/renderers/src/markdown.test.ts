@@ -210,6 +210,66 @@ test("renders italic inline node", () => {
 	expect(result).toBe("_emphasis_");
 });
 
+test("renders a table as GFM", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [
+					{
+						type: "table",
+						header: {
+							type: "tableRow",
+							cells: [
+								{ type: "tableCell", children: [{ type: "text", value: "Name" }] },
+								{ type: "tableCell", children: [{ type: "text", value: "Purpose" }] },
+							],
+						},
+						rows: [
+							{
+								type: "tableRow",
+								cells: [
+									{ type: "tableCell", children: [{ type: "bold", value: "Acme" }] },
+									{ type: "tableCell", children: [{ type: "text", value: "Auth" }] },
+								],
+							},
+						],
+					},
+				],
+			},
+		]),
+	);
+	expect(result).toBe("| Name | Purpose |\n| --- | --- |\n| **Acme** | Auth |");
+});
+
+test("escapes pipe characters in table cells", () => {
+	const result = renderMarkdown(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [
+					{
+						type: "table",
+						header: {
+							type: "tableRow",
+							cells: [{ type: "tableCell", children: [{ type: "text", value: "Field" }] }],
+						},
+						rows: [
+							{
+								type: "tableRow",
+								cells: [{ type: "tableCell", children: [{ type: "text", value: "a|b" }] }],
+							},
+						],
+					},
+				],
+			},
+		]),
+	);
+	expect(result).toContain("| a\\|b |");
+});
+
 test("joins multiple content nodes within a section with blank lines", () => {
 	const result = renderMarkdown(
 		doc([

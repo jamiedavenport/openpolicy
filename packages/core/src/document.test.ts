@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import type { ListNode, ParagraphNode } from "./documents";
+import type { ParagraphNode, TableNode } from "./documents";
 import { compile } from "./documents";
 import type { PrivacyPolicyConfig } from "./types";
 
@@ -65,28 +65,32 @@ test("Reserved-region config has expected section IDs (no EU/UK/CA-only sections
 	expect(ids).not.toContain("ccpa-supplement");
 });
 
-test("EU config includes legal-basis and gdpr-supplement", () => {
+test("EU config includes lawful-basis column in data-collected and gdpr-supplement", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
 		jurisdictions: ["eu"],
 	});
 	const ids = doc.sections.map((s) => s.id);
-	expect(ids).toContain("legal-basis");
 	expect(ids).toContain("gdpr-supplement");
 	expect(ids).not.toContain("uk-gdpr-supplement");
+	const dc = doc.sections.find((s) => s.id === "data-collected")!;
+	const tbl = dc.content.find((n) => n.type === "table") as TableNode;
+	expect(tbl.header.cells.length).toBe(4);
 });
 
-test("UK config includes legal-basis and uk-gdpr-supplement (not gdpr-supplement)", () => {
+test("UK config includes lawful-basis column in data-collected and uk-gdpr-supplement (not gdpr-supplement)", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
 		jurisdictions: ["uk"],
 	});
 	const ids = doc.sections.map((s) => s.id);
-	expect(ids).toContain("legal-basis");
 	expect(ids).toContain("uk-gdpr-supplement");
 	expect(ids).not.toContain("gdpr-supplement");
+	const dc = doc.sections.find((s) => s.id === "data-collected")!;
+	const tbl = dc.content.find((n) => n.type === "table") as TableNode;
+	expect(tbl.header.cells.length).toBe(4);
 	const ukSection = doc.sections.find((s) => s.id === "uk-gdpr-supplement")!;
 	const textBlob = JSON.stringify(ukSection);
 	expect(textBlob).toContain("Information Commissioner");
@@ -159,14 +163,15 @@ test("compile throws when data.collected is empty", () => {
 	).toThrow(/no data collected/i);
 });
 
-test("data-collected section lists at least one category", () => {
+test("data-collected section has a table with at least one row", () => {
 	const doc = compile({ type: "privacy", ...minimalPrivacyConfig });
 	const s = doc.sections.find((x) => x.id === "data-collected")!;
-	const list = s.content.find((n) => n.type === "list") as ListNode;
-	expect(list.items.length).toBeGreaterThan(0);
+	const tbl = s.content.find((n) => n.type === "table") as TableNode;
+	expect(tbl.rows.length).toBeGreaterThan(0);
+	expect(tbl.header.cells.length).toBe(3);
 });
 
-test("data-collected section includes purpose paragraph for each category", () => {
+test("data-collected table includes the purpose for each category", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
@@ -201,7 +206,7 @@ test("data-collected section includes purpose paragraph for each category", () =
 	const blob = JSON.stringify(s);
 	expect(blob).toContain("To authenticate users");
 	expect(blob).toContain("To secure sessions");
-	expect(blob).toContain("Purpose:");
+	expect(blob).toContain("Purpose");
 });
 
 test("gdpr-supplement mentions DPO when one is configured", () => {
@@ -293,7 +298,7 @@ test("introduction section has ParagraphNode children", () => {
 	expect(firstPara.children[0]?.type).toBe("text");
 });
 
-test("legal-basis section renders one block per data category with Article 6 sub-clause", () => {
+test("data-collected table includes lawful-basis labels with Article 6 sub-clause under EU jurisdiction", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
@@ -325,8 +330,8 @@ test("legal-basis section renders one block per data category with Article 6 sub
 			},
 		},
 	});
-	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
-	const blob = JSON.stringify(legalBasis);
+	const dc = doc.sections.find((s) => s.id === "data-collected")!;
+	const blob = JSON.stringify(dc);
 	expect(blob).toContain("Providing the service");
 	expect(blob).toContain("Performance of a contract (Article 6(1)(b))");
 	expect(blob).toContain("Marketing communications");
@@ -448,7 +453,7 @@ test("consent-withdrawal section is omitted under non-EU/UK jurisdictions even w
 	expect(doc.sections.find((s) => s.id === "consent-withdrawal")).toBeUndefined();
 });
 
-test("legal-basis section no longer carries the consent-withdrawal paragraph (it's its own section now)", () => {
+test("data-collected section does not carry the consent-withdrawal paragraph (it's its own section now)", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
@@ -468,18 +473,21 @@ test("legal-basis section no longer carries the consent-withdrawal paragraph (it
 			},
 		},
 	});
-	const legalBasis = doc.sections.find((s) => s.id === "legal-basis")!;
-	const blob = JSON.stringify(legalBasis);
+	const dc = doc.sections.find((s) => s.id === "data-collected")!;
+	const blob = JSON.stringify(dc);
 	expect(blob).not.toContain("Right to withdraw consent");
 });
 
-test("legal-basis section is omitted entirely under non-GDPR jurisdictions", () => {
+test("data-collected table omits the lawful-basis column under non-GDPR jurisdictions", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
 		jurisdictions: ["ca"],
 	});
-	expect(doc.sections.find((s) => s.id === "legal-basis")).toBeUndefined();
+	const dc = doc.sections.find((s) => s.id === "data-collected")!;
+	const tbl = dc.content.find((n) => n.type === "table") as TableNode;
+	expect(tbl.header.cells.length).toBe(3);
+	expect(JSON.stringify(dc)).not.toContain("Article 6");
 });
 
 test("automated-decision-making section is omitted under non-EU/UK jurisdictions even when set", () => {
