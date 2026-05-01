@@ -11,21 +11,21 @@ import type {
 	TableRowNode,
 	TextNode,
 } from "@openpolicy/core";
-import type { Component, VNodeChild } from "vue";
+import type { Component } from "vue";
 
-export interface PolicyComponents {
-	Section?: Component<{ section: DocumentSection; children?: VNodeChild }>;
+export type PolicyComponents = {
+	Section?: Component<{ section: DocumentSection }>;
 	Heading?: Component<{ node: HeadingNode }>;
-	Paragraph?: Component<{ node: ParagraphNode; children?: VNodeChild }>;
-	List?: Component<{ node: ListNode; children?: VNodeChild }>;
-	Table?: Component<{ node: TableNode; children?: VNodeChild }>;
-	TableHeader?: Component<{ children?: VNodeChild }>;
-	TableBody?: Component<{ children?: VNodeChild }>;
-	TableRow?: Component<{ node: TableRowNode; children?: VNodeChild }>;
-	TableHead?: Component<{ node: TableCellNode; children?: VNodeChild }>;
-	TableCell?: Component<{ node: TableCellNode; children?: VNodeChild }>;
+	Paragraph?: Component<{ node: ParagraphNode }>;
+	List?: Component<{ node: ListNode }>;
+	Table?: Component<{ node: TableNode }>;
+	TableHeader?: Component;
+	TableBody?: Component;
+	TableRow?: Component<{ node: TableRowNode }>;
+	TableHead?: Component<{ node: TableCellNode }>;
+	TableCell?: Component<{ node: TableCellNode }>;
 	Text?: Component<{ node: TextNode }>;
 	Bold?: Component<{ node: BoldNode }>;
 	Italic?: Component<{ node: ItalicNode }>;
 	Link?: Component<{ node: LinkNode }>;
-}
+};

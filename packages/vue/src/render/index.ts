@@ -1,7 +1,7 @@
 import type { Document } from "@openpolicy/core";
 import type { VNodeChild } from "vue";
-import { renderNode } from "./components/defaults";
-import type { PolicyComponents } from "./types";
+import type { PolicyComponents } from "../types";
+import { renderNode } from "./renderNode";
 
 export function renderDocument(doc: Document, components: PolicyComponents = {}): VNodeChild {
 	return renderNode(doc, components);

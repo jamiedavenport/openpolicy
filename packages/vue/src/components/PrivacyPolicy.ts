@@ -1,12 +1,6 @@
-import {
-	compile,
-	expandOpenPolicyConfig,
-	isOpenPolicyConfig,
-	type OpenPolicyConfig,
-	type PrivacyPolicyConfig,
-} from "@openpolicy/core";
-import { type CSSProperties, defineComponent, h, inject, type PropType } from "vue";
-import { OpenPolicyContextKey } from "../context";
+import type { OpenPolicyConfig, PrivacyPolicyConfig } from "@openpolicy/core";
+import { type CSSProperties, defineComponent, h, type PropType } from "vue";
+import { usePolicyDocument } from "../composables/usePolicyDocument";
 import { renderDocument } from "../render";
 import type { PolicyComponents } from "../types";
 
@@ -27,20 +21,13 @@ export const PrivacyPolicy = defineComponent({
 		},
 	},
 	setup(props) {
-		const context = inject(OpenPolicyContextKey, null);
-
+		const doc = usePolicyDocument("privacy", () => props.config);
 		return () => {
-			const config = props.config ?? context?.config.value ?? undefined;
-			if (!config) return null;
-			const input = isOpenPolicyConfig(config)
-				? expandOpenPolicyConfig(config).find((i) => i.type === "privacy")
-				: { type: "privacy" as const, ...config };
-			if (!input) return null;
-			const doc = compile(input);
+			if (!doc.value) return null;
 			return h(
 				"div",
 				{ "data-op-policy": "", style: props.style },
-				renderDocument(doc, props.components) ?? undefined,
+				renderDocument(doc.value, props.components) ?? undefined,
 			);
 		};
 	},
