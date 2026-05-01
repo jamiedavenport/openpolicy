@@ -1,5 +1,15 @@
 # @openpolicy/core
 
+## 0.0.30
+
+### Patch Changes
+
+- 1d0ca66: Render structured policy data (data collected, retention, provision requirements, cookies, third parties) as tables instead of nested headings + bullet lists. Adds a new `table` block node to the document AST plus helpers (`table`, `row`, `cell`) and table cases in the markdown (GFM), HTML (`<table>`), PDF (PDFKit native `doc.table()`), React, and Vue renderers.
+
+  The React and Vue renderers expose six override slots (`Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell`) so consumers can swap in shadcn-style table primitives independently. Defaults emit `data-op-table`, `data-op-table-header`, `data-op-table-body`, `data-op-table-row`, and `data-op-table-cell` attributes for descendant-selector styling.
+
+  Breaking: the `legal-basis` section is gone — its lawful-basis column merges into `data-collected` (now 4 columns under EU/UK, 3 elsewhere), and its Article 6 notice merges into the `data-collected` lead-in paragraph. The `data-collected`, `data-retention`, `provision-requirement`, `cookies`, `third-parties` (privacy) and `cookie-types`, `cookie-third-parties` (cookie) sections no longer emit `list`/sub-`heading` blocks; downstream consumers walking `DocumentSection.content` should add a `case "table":` branch.
+
 ## 0.0.29
 
 ### Patch Changes
@@ -17,6 +27,7 @@
   ```
 
   CCPA §1798.130(a)(1) requires businesses to provide two or more designated methods for consumers to submit privacy requests, and (unless you operate exclusively online) one must be a toll-free phone number. Setting `company.contact.phone` is now disclosed in:
+
   - The privacy policy **Contact** section (alongside email).
   - A new **Submitting requests** subsection inside the CCPA supplement that lists the available submission methods.
   - The cookie policy **Contact Us** section.
@@ -71,23 +82,27 @@
   OpenPolicy still generates the cookie _policy_ (the legal document) — `<CookiePolicy>`, `defineCookie()`, and the `cookies.used` / `cookies.context` config keys are unchanged. Only the consent UI/runtime has been extracted.
 
   Removed from `@openpolicy/react`:
+
   - `useCookies()` hook
   - `<ConsentGate>` component
   - `useShouldShowCookieBanner()` hook
   - The consent-tracking responsibilities of `<OpenPolicy>` — the provider is now a thin config-only context (mirrors `@openpolicy/vue`). Continue mounting `<OpenPolicy config={...}>` so `<PrivacyPolicy>` / `<CookiePolicy>` can read the config.
 
   Removed from `@openpolicy/core`:
+
   - `acceptAll()` / `rejectAll()` helpers
   - `CookieConsent` and `CookieConsentStatus` types
 
   The `ConsentMechanism` type and `consentMechanism` policy field are unchanged — they are informational policy content, not runtime.
 
   Removed from `@openpolicy/vite`:
+
   - The auto-collect scanner no longer recognises `<ConsentGate>` or `useCookies().has()` from `@openpolicy/react`. Declare cookie categories with `defineCookie()` instead. (When OpenCookies publishes its own Vite plugin, scanning targeted at its components can be reintroduced.)
 
   Migration: install OpenCookies for banner/preferences/consent, keep using OpenPolicy for the cookie policy document.
 
 - 9960678: The `openPolicy()` Vite plugin now runs the validators from `@openpolicy/core` against your resolved `openpolicy.ts` on every build. Errors that previously only fired when you called `validateOpenPolicyConfig()` manually (missing `effectiveDate`, GDPR lawful basis incomplete, retention missing, etc.) now surface inline:
+
   - `vite build` aborts with a non-zero exit code listing `[openpolicy] code: message` for each error. Warnings (CCPA phone, DPO disclosure, etc.) print via Rollup's warning channel without blocking.
   - `vite dev` streams both errors and warnings to the dev-server logger. HMR keeps working — fix the issues and the next save replays validation.
 
@@ -182,18 +197,18 @@
 
   ```ts
   defineConfig({
-  	// ... existing fields ...
-  	automatedDecisionMaking: [], // explicit "we don't"
-  	// or:
-  	automatedDecisionMaking: [
-  		{
-  			name: "Fraud scoring",
-  			logic:
-  				"Transactions are scored by a rules engine combining device fingerprint and historical patterns.",
-  			significance:
-  				"A high score may delay or decline a transaction; you can request human review.",
-  		},
-  	],
+    // ... existing fields ...
+    automatedDecisionMaking: [], // explicit "we don't"
+    // or:
+    automatedDecisionMaking: [
+      {
+        name: "Fraud scoring",
+        logic:
+          "Transactions are scored by a rules engine combining device fingerprint and historical patterns.",
+        significance:
+          "A high score may delay or decline a transaction; you can request human review.",
+      },
+    ],
   });
   ```
 
@@ -206,17 +221,18 @@
   ```ts
   // before
   defineConfig({
-  	dataCollected: { "Account Information": ["Name", "Email"] },
+    dataCollected: { "Account Information": ["Name", "Email"] },
   });
 
   // after
   defineConfig({
-  	data: {
-  		collected: { "Account Information": ["Name", "Email"] },
-  		purposes: {
-  			"Account Information": "To authenticate users and send service notifications",
-  		},
-  	},
+    data: {
+      collected: { "Account Information": ["Name", "Email"] },
+      purposes: {
+        "Account Information":
+          "To authenticate users and send service notifications",
+      },
+    },
   });
   ```
 
@@ -247,15 +263,15 @@
   ```ts
   // before
   defineConfig({
-  	legalBasis: ["legitimate_interests", "consent"],
+    legalBasis: ["legitimate_interests", "consent"],
   });
 
   // after
   defineConfig({
-  	legalBasis: {
-  		"Providing the service": "legitimate_interests",
-  		"Marketing communications": "consent",
-  	},
+    legalBasis: {
+      "Providing the service": "legitimate_interests",
+      "Marketing communications": "consent",
+    },
   });
   ```
 
@@ -288,6 +304,7 @@
 
   Old union: `"us" | "eu" | "ca" | "au" | "nz" | "other"`
   New union: `"eu" | "uk" | "us-ca" | "us-va" | "us-co" | "br" | "ca" | "au" | "jp" | "sg"`
+
   - `"us"` is **removed** — there is no federal US privacy regime shipping content. List specific state codes (e.g. `"us-ca"`) for the states you cover.
   - `"ca"` **semantics flipped** from California → Canada. Consumers using `"ca"` for CCPA must migrate to `"us-ca"`. `"ca"` is now a reserved code for Canada and produces no gated content yet.
   - `"nz"` and `"other"` are removed.
@@ -305,12 +322,14 @@
 - 8e219fe: Flatten `defineConfig()` — all policy fields now live at the top level. The nested `privacy: { ... }` and `cookie: { ... }` blocks are gone, and `effectiveDate` / `jurisdictions` are single top-level fields (previously duplicated in each block).
 
   Which policy types are generated is now auto-detected from field presence:
+
   - **Privacy policy** is emitted if any of `dataCollected`, `legalBasis`, `retention`, `userRights`, or `children` is set.
   - **Cookie policy** is emitted if `cookies` is set.
 
   You can override auto-detection with `policies: ["privacy"]` or `policies: ["cookie"]`.
 
   **Breaking changes:**
+
   - `OpenPolicyConfig` is a single flat object. The `privacy` and `cookie` wrapper keys are removed.
   - `EffectiveDate` is now the template literal type `` `${number}-${number}-${number}` ``.
   - `LegalBasis` is narrowed to a union of GDPR Art. 6 lawful bases: `"consent" | "contract" | "legal_obligation" | "vital_interests" | "public_task" | "legitimate_interests"`. Free-form strings are no longer accepted.
@@ -321,28 +340,28 @@
 
   ```ts
   export default defineConfig({
-  	company: {
-  		/* … */
-  	},
-  	privacy: {
-  		effectiveDate: "2026-01-01",
-  		jurisdictions: ["us"],
-  		dataCollected: {
-  			/* … */
-  		},
-  		legalBasis: "legitimate_interests",
-  		retention: {
-  			/* … */
-  		},
-  		cookies: { essential: true, analytics: false, marketing: false },
-  		thirdParties: [],
-  		userRights: ["access"],
-  	},
-  	cookie: {
-  		effectiveDate: "2026-01-01",
-  		jurisdictions: ["us"],
-  		cookies: { essential: true, analytics: true },
-  	},
+    company: {
+      /* … */
+    },
+    privacy: {
+      effectiveDate: "2026-01-01",
+      jurisdictions: ["us"],
+      dataCollected: {
+        /* … */
+      },
+      legalBasis: "legitimate_interests",
+      retention: {
+        /* … */
+      },
+      cookies: { essential: true, analytics: false, marketing: false },
+      thirdParties: [],
+      userRights: ["access"],
+    },
+    cookie: {
+      effectiveDate: "2026-01-01",
+      jurisdictions: ["us"],
+      cookies: { essential: true, analytics: true },
+    },
   });
   ```
 
@@ -350,27 +369,28 @@
 
   ```ts
   export default defineConfig({
-  	company: {
-  		/* … */
-  	},
-  	effectiveDate: "2026-01-01",
-  	jurisdictions: ["us"],
-  	dataCollected: {
-  		/* … */
-  	},
-  	legalBasis: "legitimate_interests",
-  	retention: {
-  		/* … */
-  	},
-  	userRights: ["access"],
-  	thirdParties: [],
-  	cookies: { essential: true, analytics: true },
+    company: {
+      /* … */
+    },
+    effectiveDate: "2026-01-01",
+    jurisdictions: ["us"],
+    dataCollected: {
+      /* … */
+    },
+    legalBasis: "legitimate_interests",
+    retention: {
+      /* … */
+    },
+    userRights: ["access"],
+    thirdParties: [],
+    cookies: { essential: true, analytics: true },
   });
   ```
 
 - 8e219fe: Remove Terms of Service support. OpenPolicy now focuses exclusively on privacy and cookie policies — domains that are globally regulated and have consistent compliance requirements.
 
   **Breaking changes:**
+
   - `PolicyInput` is now a discriminated union of `privacy | cookie` only (the `terms` branch has been removed)
   - `TermsOfServiceConfig` and `DisputeResolutionMethod` types have been removed from `@openpolicy/sdk` and `@openpolicy/core`
   - `validateTermsOfService` has been removed from `@openpolicy/core`
@@ -381,6 +401,7 @@
   **Migration:** remove the `terms: { ... }` block from your `openpolicy.ts` config and stop importing `<TermsOfService />`. If you need terms of service content, source it from a dedicated legal tool.
 
 - 8e219fe: **Breaking change:** `userRights` has been removed from `OpenPolicyConfig`. The data-subject rights listed in your privacy policy are now derived automatically from `jurisdictions`:
+
   - `jurisdictions: ["eu"]` → access, rectification, erasure, portability, restriction, objection (GDPR)
   - `jurisdictions: ["ca"]` → access, erasure, opt_out_sale, non_discrimination (CCPA)
   - Both → the union, in a fixed canonical order
@@ -404,6 +425,7 @@
   The rendered privacy policy may list **more** rights than before if your previous `userRights` value was shorter than the baseline required by your declared `jurisdictions` — this is intentional; the refactor closes a footgun where the field under-declared legal obligations.
 
   Related SDK surface changes:
+
   - `Rights` constant removed from `@openpolicy/sdk` (superseded by derivation).
   - `UserRight` type re-export removed from `@openpolicy/sdk`.
   - `Compliance.GDPR` and `Compliance.CCPA` no longer include a `userRights` field — they still provide `jurisdictions` (and `legalBasis` for GDPR), which is enough to drive the correct rights list.
