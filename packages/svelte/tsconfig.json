@@ -1,0 +1,8 @@
+{
+	"extends": "@openpolicy/tooling/base",
+	"compilerOptions": {
+		"outDir": "dist",
+		"types": ["svelte"]
+	},
+	"include": ["src/**/*.ts", "src/**/*.svelte", "src/**/*.svelte.ts"]
+}

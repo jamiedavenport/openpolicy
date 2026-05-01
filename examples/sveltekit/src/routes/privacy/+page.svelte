@@ -1,11 +1,14 @@
+<script lang="ts">
+import { OpenPolicy, PrivacyPolicy } from "@openpolicy/svelte";
+import config from "../../../openpolicy";
+</script>
+
 <svelte:head>
 	<title>Privacy Policy</title>
 </svelte:head>
 
-<script lang="ts">
-import policy from "$lib/policies/privacy-policy.html?raw";
-</script>
-
 <main>
-	{@html policy}
+	<OpenPolicy {config}>
+		<PrivacyPolicy />
+	</OpenPolicy>
 </main>

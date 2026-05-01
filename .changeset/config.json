@@ -10,6 +10,7 @@
 			"@openpolicy/cli",
 			"@openpolicy/react",
 			"@openpolicy/vue",
+			"@openpolicy/svelte",
 			"@openpolicy/renderers"
 		]
 	],

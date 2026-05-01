@@ -40,6 +40,12 @@ test("detects vue as a prod dep integration", () => {
 	expect(got).toEqual([{ trigger: "vue", pkg: "@openpolicy/vue", dev: false }]);
 });
 
+test("detects svelte as a prod dep integration", () => {
+	writePkg({ dependencies: { svelte: "^5.0.0" } });
+	const got = detectIntegrations(dir);
+	expect(got).toEqual([{ trigger: "svelte", pkg: "@openpolicy/svelte", dev: false }]);
+});
+
 test("detects multiple integrations (vite + react)", () => {
 	writePkg({
 		dependencies: { react: "^19.0.0" },

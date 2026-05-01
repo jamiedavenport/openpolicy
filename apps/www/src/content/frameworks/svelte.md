@@ -8,25 +8,12 @@ pubDate: 2026-03-23
 
 # OpenPolicy with Svelte
 
-Use the Vite plugin to compile your policy at build time and import it as a string into any Svelte component.
+Native Svelte components for displaying OpenPolicy-generated legal pages in any Svelte 5 or SvelteKit app.
 
 ## Install
 
 ```bash
-bun add @openpolicy/sdk @openpolicy/vite
-```
-
-## Configure the Vite plugin
-
-```ts
-// vite.config.ts
-import { sveltekit } from "@sveltejs/kit/vite";
-import { openPolicy } from "@openpolicy/vite";
-import { defineConfig } from "vite";
-
-export default defineConfig({
-	plugins: [sveltekit(), openPolicy({ configs: ["./src/openpolicy.ts"] })],
-});
+bun add @openpolicy/sdk @openpolicy/svelte
 ```
 
 ## Define your policy
@@ -45,23 +32,27 @@ export default definePrivacyPolicy({
 ## Render in a route
 
 ```svelte
-<!-- src/routes/privacy-policy/+page.svelte -->
+<!-- src/routes/privacy/+page.svelte -->
 <script lang="ts">
-  import policy from "../../privacy-policy.html?raw";
+import { OpenPolicy, PrivacyPolicy } from "@openpolicy/svelte";
+import config from "../../openpolicy";
 </script>
 
 <svelte:head>
-  <title>Privacy Policy — Acme</title>
+	<title>Privacy Policy</title>
 </svelte:head>
 
 <main>
-  {@html policy}
+	<OpenPolicy {config}>
+		<PrivacyPolicy />
+	</OpenPolicy>
 </main>
 ```
 
 ## Why OpenPolicy for Svelte
 
-- **Compiled at build time** — zero runtime overhead; the policy is plain HTML
-- **Works with SvelteKit SSR** — the HTML string renders server-side for instant first paint
-- **`?raw` import** — standard Vite feature, no extra loader needed
-- **Policy as code** — change your data-handling, update the config, rebuild — done
+- **Native Svelte 5 components** — runes-ready, no `?raw` HTML imports
+- **Slot-friendly overrides** — swap any heading, paragraph, or table renderer with a snippet
+- **Works with SvelteKit SSR** — renders cleanly server-side for instant first paint
+- **Version controlled** — policy text lives in your repo, not a third-party dashboard
+- **GDPR & CCPA built in** — flip compliance flags in your config, not in manual prose
