@@ -3,6 +3,7 @@ title: "Beyond the privacy policy"
 description: "Most teams adopt OpenPolicy for a policy page and a cookie banner. The more interesting thing is that your config is a typed, runtime data source — and you can use it to build onboarding tours, transparency dashboards, and just-in-time disclosures that stay in sync with the rest of your app."
 pubDate: 2026-04-24
 author: "OpenPolicy Team"
+tags: ["philosophy"]
 ---
 
 Most teams adopt OpenPolicy for two things: a privacy policy page that doesn't go stale, and a cookie banner that doesn't ship as a third-party script. Both are good reasons. Neither is the whole story.

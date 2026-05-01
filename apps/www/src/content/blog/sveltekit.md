@@ -3,6 +3,7 @@ title: "Policy Pages in SvelteKit That Actually Stay Up to Date"
 description: "Use the OpenPolicy Vite plugin to generate legally-structured privacy and cookie policy pages at build time — hot-reloaded in dev, committed with your code."
 pubDate: 2026-03-13
 author: "OpenPolicy Team"
+tags: ["framework"]
 ---
 
 SvelteKit apps need legal pages before launch. The usual approach: find a template, paste it into a `+page.svelte`, and hope nobody notices when it still references "Your Company Name" six months later.

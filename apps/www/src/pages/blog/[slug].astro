@@ -55,6 +55,21 @@ const readMinutes = Math.max(1, Math.round(wordCount / 220));
         <dt class="font-mono uppercase tracking-wide text-xs text-gray-400">Author</dt>
         <dd class="font-mono text-xs text-gray-700">{author}</dd>
       </div>
+      {post.data.tags.length > 0 && (
+        <div class="grid grid-cols-[8rem_1fr] py-3 items-center">
+          <dt class="font-mono uppercase tracking-wide text-xs text-gray-400">Tags</dt>
+          <dd class="flex flex-wrap gap-1.5">
+            {post.data.tags.map((t) => (
+              <a
+                href={`/blog/tags/${t}`}
+                class="font-mono text-[10px] uppercase tracking-wide text-gray-400 hover:text-gray-700 border border-gray-200 px-1.5 py-0.5 transition-colors"
+              >
+                {t}
+              </a>
+            ))}
+          </dd>
+        </div>
+      )}
       <div class="grid grid-cols-[8rem_1fr] py-3">
         <dt class="font-mono uppercase tracking-wide text-xs text-gray-400">Reading</dt>
         <dd class="font-mono text-xs text-gray-700 tabular-nums">{readMinutes} min · {wordCount.toLocaleString()} words</dd>

@@ -1,5 +1,8 @@
 ---
 import { getCollection } from "astro:content";
+import BlogList from "../components/blog-list.astro";
+import TagNav from "../components/tag-nav.astro";
+import { BLOG_TAGS, type BlogTag } from "../content.config";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const now = Date.now();
@@ -7,21 +10,10 @@ const posts = (await getCollection("blog"))
 	.filter((post) => post.data.pubDate.valueOf() <= now)
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-const monthYearLabel = (d: Date) =>
-	d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-
-// biome-ignore lint/correctness/noUnusedVariables: used in template below
-const groups = posts.reduce<Map<string, typeof posts>>((acc, p) => {
-	const key = monthYearLabel(p.data.pubDate);
-	const list = acc.get(key) ?? [];
-	list.push(p);
-	acc.set(key, list);
-	return acc;
-}, new Map());
-
-// biome-ignore lint/correctness/noUnusedVariables: used in template below
-const longDate = (d: Date) =>
-	d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+const counts = { all: posts.length } as Record<BlogTag | "all", number>;
+for (const t of BLOG_TAGS) {
+	counts[t] = posts.filter((p) => p.data.tags.includes(t)).length;
+}
 ---
 
 <BaseLayout
@@ -30,42 +22,10 @@ const longDate = (d: Date) =>
   ogUrl="https://openpolicy.sh/blog"
 >
   <section>
-    <h2 class="font-mono font-medium text-xs text-gray-500 mb-10">BLOG.md</h2>
+    <h2 class="font-mono font-medium text-xs text-gray-500 mb-6">BLOG.md</h2>
 
-    <div class="flex flex-col gap-12">
-      {[...groups.entries()].map(([label, group]) => (
-        <div class="grid grid-cols-1 sm:grid-cols-[10rem_1fr] gap-4 sm:gap-10">
-          <div class="sm:sticky sm:top-14 sm:self-start">
-            <p class="font-mono uppercase tracking-wide text-xs text-gray-400 mb-2">
-              {label}
-            </p>
-            <p class="font-mono text-xs text-gray-300 tabular-nums">
-              {group.length.toString().padStart(2, "0")} {group.length === 1 ? "post" : "posts"}
-            </p>
-          </div>
-          <ul role="list" class="flex flex-col border-l border-gray-200">
-            {group.map((post) => (
-              <li>
-                <a
-                  href={`/blog/${post.slug}`}
-                  class="group relative block pl-6 pr-4 py-5 hover:bg-gray-50 transition-colors"
-                >
-                  <span class="absolute left-0 top-7 -translate-x-1/2 size-1.5 bg-white border border-gray-300 group-hover:bg-gray-900 group-hover:border-gray-900 transition-colors"></span>
-                  <p class="font-mono text-xs text-gray-400 tabular-nums mb-1.5">
-                    {longDate(post.data.pubDate)}
-                  </p>
-                  <p class="font-medium text-gray-900 mb-1 text-pretty group-hover:text-gray-600 transition-colors">
-                    {post.data.title}
-                  </p>
-                  <p class="text-sm/6 text-gray-500 text-pretty max-w-[60ch]">
-                    {post.data.description}
-                  </p>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
+    <TagNav counts={counts} />
+
+    <BlogList posts={posts} />
   </section>
 </BaseLayout>

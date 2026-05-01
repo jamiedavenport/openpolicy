@@ -3,6 +3,7 @@ title: "Why we're betting on a code-first approach to privacy"
 description: "Most apps treat privacy policies as an afterthought. Here's why shipping them as code changes everything."
 pubDate: 2026-03-26
 author: "OpenPolicy Team"
+tags: ["philosophy"]
 ---
 
 Legal pages are always an afterthought. An embed script from a compliance tool pasted into your `<head>`, a PDF from a lawyer dropped into an S3 bucket, or a static HTML page copy-pasted from a template and never touched again. It works — until your product changes and nobody updates it.

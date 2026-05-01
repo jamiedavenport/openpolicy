@@ -3,6 +3,7 @@ title: "Ship a Privacy Policy with Your TanStack App"
 description: "Use the OpenPolicy Vite plugin to generate a legally-structured privacy policy at build time — no Google Docs, no copy-paste."
 pubDate: 2026-03-06
 author: "OpenPolicy Team"
+tags: ["framework"]
 ---
 
 Most TanStack Start apps need a privacy policy before they launch. The usual approach: grab a template from the internet, paste it into a static page, and forget about it until a lawyer asks why it still says "Company Name Here."

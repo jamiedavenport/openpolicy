@@ -3,6 +3,7 @@ title: "Build Privacy Policies Your Customers Actually Want to Read"
 description: "Render your privacy policy directly into your React, Next.js, or TanStack app as components you fully control — swap every heading, paragraph, and section for your own."
 pubDate: 2026-03-18
 author: "OpenPolicy Team"
+tags: ["framework"]
 ---
 
 Policy pages are always an afterthought. An unstyled wall of text, pasted from a Google Doc, completely disconnected from the rest of your product — your nav, your fonts, your brand. Every other page in your app got a design review. Your privacy policy got a Ctrl+V.

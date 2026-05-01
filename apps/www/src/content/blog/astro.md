@@ -3,6 +3,7 @@ title: "Ship a Privacy Policy with Your Astro Site"
 description: "Define your privacy policy as TypeScript and render it directly in an Astro page — no integration, no generated files."
 pubDate: 2026-03-05
 author: "OpenPolicy Team"
+tags: ["framework"]
 ---
 
 Most Astro sites need a privacy policy before they launch. The usual approach: grab a template from the internet, paste it into a static page, and forget about it until a lawyer asks why it still says "Company Name Here."

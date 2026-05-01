@@ -3,6 +3,7 @@ title: "Your privacy policy should know what your code does"
 description: "Annotate your data storage and third-party calls once. Auto-collect keeps your policy in sync automatically."
 pubDate: 2026-04-13
 author: "OpenPolicy Team"
+tags: ["engineering", "announcement"]
 ---
 
 The hardest part of a code-first policy isn't the initial setup. It's keeping it accurate.

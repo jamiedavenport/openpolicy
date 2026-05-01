@@ -3,6 +3,7 @@ title: "Legal pages as components, not scripts"
 description: "OpenPolicy is on the shadcn registry. Install privacy policy and cookie policy components with a single command — code you own, styled with Tailwind."
 pubDate: 2026-03-27
 author: "OpenPolicy Team"
+tags: ["engineering"]
 ---
 
 The old way: find a template, copy-paste the HTML, swap in your company name, commit it to a static route, and forget about it. Or paste an embed script from a compliance tool and depend on a third party's uptime forever. Either way, you own nothing.

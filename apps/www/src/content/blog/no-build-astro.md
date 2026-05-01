@@ -3,6 +3,7 @@ title: "Zero-build privacy policies with Astro"
 description: "Skip the Vite plugin — compile privacy and cookie policies directly in Astro page frontmatter using @openpolicy/core."
 pubDate: 2026-04-10
 author: "OpenPolicy Team"
+tags: ["framework", "engineering"]
 ---
 
 When we launched the OpenPolicy Astro integration in March, it worked by generating Markdown files at build time. You added the plugin to `astro.config.mjs`, pointed it at an output directory, and Astro imported the generated `.md` files as components.

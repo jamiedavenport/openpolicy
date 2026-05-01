@@ -3,6 +3,7 @@ title: "Automatic consent tracking with Better Auth"
 description: "A new Better Auth plugin records exactly which policy version each user accepted — tied to the same config that generates your privacy and cookie policies."
 pubDate: 2026-04-20
 author: "OpenPolicy Team"
+tags: ["integration"]
 ---
 
 Consent is easy to ship and hard to prove. You need a record of _who_ agreed to _which version_ of your policy, _when_, and from _where_ — and you need it to hold up months later when a user, auditor, or regulator asks what they signed up for.

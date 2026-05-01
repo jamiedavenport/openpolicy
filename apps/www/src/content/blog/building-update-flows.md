@@ -3,6 +3,7 @@ title: "How to notify users about privacy policy changes without spamming everyo
 description: "Privacy policies change. The hard part isn't updating the document — it's knowing which users need to know, what changed for them specifically, and how to tell them without crying wolf."
 pubDate: 2026-04-15
 author: "OpenPolicy Team"
+tags: ["operations"]
 ---
 
 Privacy policies change. That's fine — it means your product is evolving. But every update creates a problem: how do you tell your users without blasting every single one of them with a wall of legalese they'll immediately dismiss?

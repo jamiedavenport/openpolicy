@@ -3,6 +3,7 @@ title: "Building a Legal Chatbot with OpenPolicy and AI SDK"
 description: "Compile your privacy policy into a Claude system prompt and stream plain-English answers — no RAG, no vector DB, just a route handler and 100 lines of React."
 pubDate: 2026-03-23
 author: "OpenPolicy Team"
+tags: ["ai", "engineering"]
 ---
 
 Nobody reads privacy policies. They're long, dense, and written for lawyers — but the information in them matters. Users want to know if you sell their data, how to delete their account, what happens if you shut down. Right now they either wade through legalese or just don't bother.

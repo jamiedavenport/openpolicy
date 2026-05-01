@@ -3,6 +3,7 @@ title: "Announcing OpenCookies"
 description: "We've split the cookie banner, preferences panel, and consent runtime out of OpenPolicy into a sibling project: OpenCookies. Headless consent primitives, a much better fit for the problem, and still designed to compose with OpenPolicy."
 pubDate: 2026-04-29
 author: "OpenPolicy Team"
+tags: ["announcement"]
 ---
 
 If you've been using OpenPolicy's cookie banner, the components have moved. They now live in a sibling project: [OpenCookies](https://github.com/jamiedavenport/opencookies). The tagline is **"Consent logic, not consent UI."** — and that's the whole shape of the change.

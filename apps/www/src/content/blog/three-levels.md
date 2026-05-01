@@ -3,6 +3,7 @@ title: "The three levels of OpenPolicy"
 description: "Ship a policy on day one, keep it in sync as the product grows, and prove who consented to what once compliance risk gets real — without rewriting anything."
 pubDate: 2026-04-22
 author: "OpenPolicy Team"
+tags: ["philosophy"]
 ---
 
 Privacy work doesn't happen all at once. It starts when you launch and need a policy that isn't embarrassing, changes shape when the product starts moving faster than anyone can remember to update config, and changes shape _again_ when you have enough users that a regulator or auditor could credibly show up at the door.

@@ -3,6 +3,7 @@ title: "Stop Copy-Pasting Legal Pages Into Your Next.js App"
 description: "Use the OpenPolicy CLI to generate legally-structured policy documents at build time — no Google Docs, no copy-paste."
 pubDate: 2026-03-09
 author: "OpenPolicy Team"
+tags: ["framework"]
 ---
 
 Most Next.js apps need a privacy policy before they launch. The usual approach: grab a template from the internet, paste it into a static page, and forget about it until a lawyer asks why it still says "Company Name Here."
