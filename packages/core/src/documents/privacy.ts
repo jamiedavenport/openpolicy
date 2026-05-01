@@ -1,6 +1,6 @@
 import type { PrivacyPolicyConfig } from "../types";
-import { bold, heading, li, link, p, section, ul } from "./helpers";
-import type { ContentNode, DocumentSection, InlineNode, ListItemNode } from "./types";
+import { bold, cell, heading, li, link, p, row, section, table, ul } from "./helpers";
+import type { ContentNode, DocumentSection, InlineNode, ListItemNode, TableRowNode } from "./types";
 
 const LEGAL_BASIS_LABELS: Record<string, string> = {
 	consent: "Consent (Article 6(1)(a))",
@@ -57,13 +57,9 @@ function buildChildrenPrivacy(config: PrivacyPolicyConfig): DocumentSection | nu
 
 function buildDataCollected(config: PrivacyPolicyConfig): DocumentSection {
 	const { collected, context } = config.data;
-	const content: ContentNode[] = [
-		heading("Information We Collect", {
-			reason: "Required by GDPR Article 13(1)(c)",
-		}),
-		p(["We collect the following categories of personal data for the purposes described below:"]),
-	];
-	for (const [category, fields] of Object.entries(collected)) {
+	const includeLegalBasis =
+		config.jurisdictions.includes("eu") || config.jurisdictions.includes("uk");
+	const rows: TableRowNode[] = Object.entries(collected).map(([category, fields]) => {
 		const entry = context[category];
 		if (!entry?.purpose) {
 			throw new Error(
@@ -71,31 +67,27 @@ function buildDataCollected(config: PrivacyPolicyConfig): DocumentSection {
 					"Every collected category must declare its processing purpose (GDPR Art. 13(1)(c)).",
 			);
 		}
-		content.push(heading(category, 3));
-		content.push(p([bold("Purpose:"), " ", entry.purpose]));
-		content.push(ul(fields.map((f) => li([f]))));
-	}
-	return section("data-collected", content);
-}
-
-function buildLegalBasis(config: PrivacyPolicyConfig): DocumentSection | null {
-	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
-	const entries = Object.entries(config.data.context);
-	if (entries.length === 0) return null;
-	const content: ContentNode[] = [
-		heading("Legal Basis for Processing", {
-			reason: "Required by GDPR and UK-GDPR Article 13(1)(c)",
-		}),
-		p(["Under GDPR Article 6, we rely on the following lawful bases for each processing purpose:"]),
-	];
-	for (const [category, entry] of entries) {
-		const label = LEGAL_BASIS_LABELS[entry.lawfulBasis] ?? entry.lawfulBasis;
-		const line: (string | InlineNode)[] = [bold(category)];
-		if (entry.purpose) line.push(" — used for ", entry.purpose);
-		line.push(" — ", label);
-		content.push(p(line));
-	}
-	return section("legal-basis", content);
+		const cells = [cell([bold(category)]), cell([fields.join(", ")]), cell([entry.purpose])];
+		if (includeLegalBasis) {
+			const label = LEGAL_BASIS_LABELS[entry.lawfulBasis] ?? entry.lawfulBasis;
+			cells.push(cell([label]));
+		}
+		return row(cells);
+	});
+	const headerLabels = includeLegalBasis
+		? ["Category", "Fields collected", "Purpose", "Lawful basis"]
+		: ["Category", "Fields collected", "Purpose"];
+	const intro = includeLegalBasis
+		? "We collect the following categories of personal data for the purposes described below. Under GDPR Article 6, we rely on the lawful bases shown for each processing purpose:"
+		: "We collect the following categories of personal data for the purposes described below:";
+	const reason = includeLegalBasis
+		? "Required by GDPR Article 13(1)(c) and Article 6"
+		: "Required by GDPR Article 13(1)(c)";
+	return section("data-collected", [
+		heading("Information We Collect", { reason }),
+		p([intro]),
+		table(headerLabels, rows),
+	]);
 }
 
 function usesConsent(config: PrivacyPolicyConfig): boolean {
@@ -157,13 +149,13 @@ function buildAutomatedDecisionMaking(config: PrivacyPolicyConfig): DocumentSect
 }
 
 function buildDataRetention(config: PrivacyPolicyConfig): DocumentSection {
-	const items = Object.entries(config.data.context).map(([category, entry]) =>
-		li([bold(category), ": ", entry.retention]),
+	const rows: TableRowNode[] = Object.entries(config.data.context).map(([category, entry]) =>
+		row([cell([bold(category)]), cell([entry.retention])]),
 	);
 	return section("data-retention", [
 		heading("Data Retention"),
 		p(["We retain your data for the following periods:"]),
-		ul(items),
+		table(["Category", "Retention period"], rows),
 	]);
 }
 
@@ -171,30 +163,20 @@ function buildProvisionRequirement(config: PrivacyPolicyConfig): DocumentSection
 	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
 	const entries = Object.entries(config.data.context);
 	if (entries.length === 0) return null;
-	const content: ContentNode[] = [
+	const rows: TableRowNode[] = entries.map(([category, entry]) => {
+		const requirement = entry.provision;
+		const label = PROVISION_BASIS_LABELS[requirement.basis] ?? requirement.basis;
+		return row([cell([bold(category)]), cell([label]), cell([requirement.consequences])]);
+	});
+	return section("provision-requirement", [
 		heading("Whether You Are Required to Provide This Data", {
 			reason: "Required by GDPR and UK-GDPR Article 13(2)(e)",
 		}),
 		p([
 			"For each category of personal data we collect, we set out below whether you are required to provide it — by law, under our contract with you, or as a precondition to entering into a contract — or whether provision is voluntary, together with the consequences of failing to provide it.",
 		]),
-	];
-	for (const [category, entry] of entries) {
-		const requirement = entry.provision;
-		const label = PROVISION_BASIS_LABELS[requirement.basis] ?? requirement.basis;
-		content.push(
-			p([
-				bold(category),
-				" \u2014 ",
-				label,
-				" \u2014 ",
-				bold("Consequences:"),
-				" ",
-				requirement.consequences,
-			]),
-		);
-	}
-	return section("provision-requirement", content);
+		table(["Category", "Requirement", "Consequences"], rows),
+	]);
 }
 
 const COOKIE_CATEGORY_LABELS: Record<string, string> = {
@@ -209,17 +191,15 @@ function cookieCategoryLabel(key: string): string {
 }
 
 function buildCookies(config: PrivacyPolicyConfig): DocumentSection {
-	const items: ListItemNode[] = [];
+	const rows: TableRowNode[] = [];
 	for (const [key, enabled] of Object.entries(config.cookies.used)) {
 		if (!enabled) continue;
 		const label = cookieCategoryLabel(key);
 		const basis = config.cookies.context[key]?.lawfulBasis;
-		const inline: (string | InlineNode)[] = [label];
-		if (basis) inline.push(" — ", LEGAL_BASIS_LABELS[basis] ?? basis);
-		items.push(li(inline));
+		rows.push(row([cell([label]), cell([basis ? (LEGAL_BASIS_LABELS[basis] ?? basis) : ""])]));
 	}
 
-	if (items.length === 0) {
+	if (rows.length === 0) {
 		return section("cookies", [
 			heading("Cookies and Tracking"),
 			p(["We do not use cookies or similar tracking technologies."]),
@@ -228,7 +208,7 @@ function buildCookies(config: PrivacyPolicyConfig): DocumentSection {
 	return section("cookies", [
 		heading("Cookies and Tracking"),
 		p(["We use the following types of cookies and tracking technologies:"]),
-		ul(items),
+		table(["Category", "Lawful basis"], rows),
 	]);
 }
 
@@ -241,14 +221,17 @@ function buildThirdParties(config: PrivacyPolicyConfig): DocumentSection {
 			]),
 		]);
 	}
+	const rows: TableRowNode[] = config.thirdParties.map((t) =>
+		row([
+			cell([bold(t.name)]),
+			cell([t.purpose]),
+			cell(t.policyUrl ? [link(t.policyUrl, "View")] : [""]),
+		]),
+	);
 	return section("third-parties", [
 		heading("Third-Party Services"),
 		p(["We share data with the following third-party services:"]),
-		ul(
-			config.thirdParties.map((t) =>
-				li([t.policyUrl ? link(t.policyUrl, t.name) : bold(t.name), " \u2014 ", t.purpose]),
-			),
-		),
+		table(["Service", "Purpose", "Privacy policy"], rows),
 	]);
 }
 
@@ -411,7 +394,6 @@ const SECTION_BUILDERS: ((config: PrivacyPolicyConfig) => DocumentSection | null
 	buildIntroduction,
 	buildChildrenPrivacy,
 	buildDataCollected,
-	buildLegalBasis,
 	buildConsentWithdrawal,
 	buildAutomatedDecisionMaking,
 	buildDataRetention,

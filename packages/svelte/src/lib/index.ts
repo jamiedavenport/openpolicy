@@ -1,0 +1,18 @@
+export { default as CookiePolicy } from "./CookiePolicy.svelte";
+export { default as DefaultBold } from "./defaults/DefaultBold.svelte";
+export { default as DefaultHeading } from "./defaults/DefaultHeading.svelte";
+export { default as DefaultItalic } from "./defaults/DefaultItalic.svelte";
+export { default as DefaultLink } from "./defaults/DefaultLink.svelte";
+export { default as DefaultList } from "./defaults/DefaultList.svelte";
+export { default as DefaultParagraph } from "./defaults/DefaultParagraph.svelte";
+export { default as DefaultSection } from "./defaults/DefaultSection.svelte";
+export { default as DefaultTable } from "./defaults/DefaultTable.svelte";
+export { default as DefaultTableBody } from "./defaults/DefaultTableBody.svelte";
+export { default as DefaultTableCell } from "./defaults/DefaultTableCell.svelte";
+export { default as DefaultTableHead } from "./defaults/DefaultTableHead.svelte";
+export { default as DefaultTableHeader } from "./defaults/DefaultTableHeader.svelte";
+export { default as DefaultTableRow } from "./defaults/DefaultTableRow.svelte";
+export { default as DefaultText } from "./defaults/DefaultText.svelte";
+export { default as OpenPolicy } from "./OpenPolicy.svelte";
+export { default as PrivacyPolicy } from "./PrivacyPolicy.svelte";
+export type { PolicyOverrides } from "./types";

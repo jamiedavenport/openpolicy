@@ -1,8 +1,7 @@
+import { compile, type HeadingNode, type PrivacyPolicyConfig } from "@openpolicy/core";
 import { expect, test } from "vite-plus/test";
-import type { PrivacyPolicyConfig } from "@openpolicy/core";
-import { compile } from "@openpolicy/core";
-import { isVNode } from "vue";
-import { renderDocument } from ".";
+import { defineComponent, h, isVNode, type PropType } from "vue";
+import { type PolicyComponents, renderDocument } from ".";
 
 const company = {
 	name: "Acme",
@@ -54,4 +53,40 @@ test("renderDocument works with OpenPolicyConfig via compile", () => {
 	const doc = compile({ type: "privacy", ...privacyConfig });
 	const result = renderDocument(doc);
 	expect(result).toBeTruthy();
+});
+
+test("custom components in PolicyComponents override defaults", () => {
+	const CustomHeading = defineComponent({
+		name: "CustomHeading",
+		props: {
+			node: {
+				type: Object as PropType<HeadingNode>,
+				required: true,
+			},
+		},
+		setup(props) {
+			return () => h("div", { "data-custom-heading": "" }, props.node.value);
+		},
+	});
+
+	const components: PolicyComponents = { Heading: CustomHeading };
+	const doc = compile({ type: "privacy", ...privacyConfig });
+	const result = renderDocument(doc, components);
+
+	const containsCustomHeading = (value: unknown): boolean => {
+		if (!value) return false;
+		if (Array.isArray(value)) return value.some(containsCustomHeading);
+		if (isVNode(value)) {
+			if (value.type === CustomHeading) return true;
+			const children = value.children as unknown;
+			if (children && typeof children === "object" && "default" in children) {
+				const slot = (children as { default?: () => unknown }).default;
+				if (typeof slot === "function") return containsCustomHeading(slot());
+			}
+			return containsCustomHeading(children);
+		}
+		return false;
+	};
+
+	expect(containsCustomHeading(result)).toBe(true);
 });

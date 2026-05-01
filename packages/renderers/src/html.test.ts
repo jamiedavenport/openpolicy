@@ -134,6 +134,41 @@ test("renders italic as <em>", () => {
 	expect(result).toContain("<em>emphasis</em>");
 });
 
+test("renders a table with thead/tbody/th/td", () => {
+	const result = renderHTML(
+		doc([
+			{
+				type: "section",
+				id: "s1",
+				content: [
+					{
+						type: "table",
+						header: {
+							type: "tableRow",
+							cells: [
+								{ type: "tableCell", children: [{ type: "text", value: "Name" }] },
+								{ type: "tableCell", children: [{ type: "text", value: "Purpose" }] },
+							],
+						},
+						rows: [
+							{
+								type: "tableRow",
+								cells: [
+									{ type: "tableCell", children: [{ type: "bold", value: "Acme" }] },
+									{ type: "tableCell", children: [{ type: "text", value: "Auth" }] },
+								],
+							},
+						],
+					},
+				],
+			},
+		]),
+	);
+	expect(result).toContain("<table>");
+	expect(result).toContain("<thead><tr><th>Name</th><th>Purpose</th></tr></thead>");
+	expect(result).toContain("<tbody><tr><td><strong>Acme</strong></td><td>Auth</td></tr></tbody>");
+});
+
 test("renders list as <ul>/<li>", () => {
 	const result = renderHTML(
 		doc([

@@ -1,23 +1,15 @@
 import type { OpenPolicyConfig } from "@openpolicy/core";
-import {
-	defineComponent,
-	h,
-	type InjectionKey,
-	type PropType,
-	provide,
-	type Ref,
-	toRef,
-} from "vue";
+import { defineComponent, type InjectionKey, type PropType, provide, type Ref, toRef } from "vue";
 
-interface OpenPolicyContextValue {
-	config: Ref<OpenPolicyConfig | null>;
-}
+export type OpenPolicyContextValue = {
+	config: Ref<OpenPolicyConfig>;
+};
 
 export const OpenPolicyContextKey: InjectionKey<OpenPolicyContextValue> =
 	Symbol("OpenPolicyContext");
 
-export const OpenPolicyProvider = defineComponent({
-	name: "OpenPolicyProvider",
+export const OpenPolicy = defineComponent({
+	name: "OpenPolicy",
 	props: {
 		config: {
 			type: Object as PropType<OpenPolicyConfig>,
@@ -28,7 +20,6 @@ export const OpenPolicyProvider = defineComponent({
 		provide(OpenPolicyContextKey, {
 			config: toRef(props, "config"),
 		});
-
 		return () => slots.default?.();
 	},
 });

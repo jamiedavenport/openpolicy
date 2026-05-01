@@ -1,20 +1,21 @@
-// Components
 export { CookiePolicy } from "./components/CookiePolicy";
-// Default renderers
+export { PrivacyPolicy } from "./components/PrivacyPolicy";
+export { OpenPolicy } from "./context";
 export {
 	DefaultBold,
 	DefaultHeading,
+	DefaultItalic,
 	DefaultLink,
 	DefaultList,
 	DefaultParagraph,
 	DefaultSection,
+	DefaultTable,
+	DefaultTableBody,
+	DefaultTableCell,
+	DefaultTableHead,
+	DefaultTableHeader,
+	DefaultTableRow,
 	DefaultText,
-	renderNode,
-} from "./components/defaults";
-export { PrivacyPolicy } from "./components/PrivacyPolicy";
-// Context / Provider
-export { OpenPolicyProvider as OpenPolicy } from "./context";
-// Render
+} from "./defaults";
 export { renderDocument } from "./render";
-// Types
 export type { PolicyComponents } from "./types";

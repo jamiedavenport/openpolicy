@@ -24,6 +24,7 @@ That's the whole flow. The CLI is meant for one-time setup — once it's done, u
    - `vite` → `@openpolicy/vite` (devDependency)
    - `react` → `@openpolicy/react`
    - `vue` → `@openpolicy/vue`
+   - `svelte` → `@openpolicy/svelte`
    - `@openpolicy/sdk` is always installed.
 3. **Writes a starter `openpolicy.ts`** to `src/openpolicy.ts` if a `src/` directory exists, otherwise to the project root.
 4. **Prints an agent prompt** between delimiters so you can copy it into a coding agent and have the rest of your config filled in automatically from your codebase.

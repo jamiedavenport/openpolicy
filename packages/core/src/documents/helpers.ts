@@ -10,6 +10,9 @@ import type {
 	ListNode,
 	NodeContext,
 	ParagraphNode,
+	TableCellNode,
+	TableNode,
+	TableRowNode,
 	TextNode,
 } from "./types";
 
@@ -70,6 +73,26 @@ export const ol = (items: ListItemNode[], context?: NodeContext): ListNode => ({
 	type: "list",
 	ordered: true,
 	items,
+	...(context && { context }),
+});
+export const cell = (children: (string | InlineNode)[], context?: NodeContext): TableCellNode => ({
+	type: "tableCell",
+	children: children.map((c) => (typeof c === "string" ? text(c) : c)),
+	...(context && { context }),
+});
+export const row = (cells: TableCellNode[], context?: NodeContext): TableRowNode => ({
+	type: "tableRow",
+	cells,
+	...(context && { context }),
+});
+export const table = (
+	headerLabels: (string | InlineNode)[],
+	rows: TableRowNode[],
+	context?: NodeContext,
+): TableNode => ({
+	type: "table",
+	header: row(headerLabels.map((l) => cell([l]))),
+	rows,
 	...(context && { context }),
 });
 export const section = (

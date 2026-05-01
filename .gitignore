@@ -45,3 +45,6 @@ examples/tanstack/bundle-stats.html
 # Legal files synced from root by scripts/sync-legal.ts
 /packages/*/LICENSE.md
 /packages/*/NOTICE.md
+
+# Svelte
+.svelte-kit
