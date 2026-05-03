@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "openpolicy",
@@ -48,6 +49,7 @@
         "@astrojs/sitemap": "^3.7.0",
         "@astrojs/vercel": "^9.0.4",
         "@iconify-json/simple-icons": "^1.2.72",
+        "@offstage/browser": "^0.0.1",
         "@resvg/resvg-js": "^2.6.2",
         "@tailwindcss/vite": "^4.2.1",
         "astro": "^5.17.1",
@@ -182,7 +184,7 @@
     },
     "packages/cli": {
       "name": "@openpolicy/cli",
-      "version": "0.0.29",
+      "version": "0.0.30",
       "bin": {
         "openpolicy": "./dist/cli.js",
       },
@@ -196,7 +198,7 @@
     },
     "packages/core": {
       "name": "@openpolicy/core",
-      "version": "0.0.29",
+      "version": "0.0.30",
       "devDependencies": {
         "@openpolicy/tooling": "workspace:*",
         "vite-plus": "catalog:",
@@ -204,7 +206,7 @@
     },
     "packages/react": {
       "name": "@openpolicy/react",
-      "version": "0.0.29",
+      "version": "0.0.30",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
@@ -220,7 +222,7 @@
     },
     "packages/renderers": {
       "name": "@openpolicy/renderers",
-      "version": "0.0.29",
+      "version": "0.0.30",
       "dependencies": {
         "pdfkit": "^0.18.0",
       },
@@ -233,7 +235,7 @@
     },
     "packages/sdk": {
       "name": "@openpolicy/sdk",
-      "version": "0.0.29",
+      "version": "0.0.30",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
@@ -243,7 +245,7 @@
     },
     "packages/svelte": {
       "name": "@openpolicy/svelte",
-      "version": "0.0.29",
+      "version": "0.0.30",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
@@ -259,7 +261,7 @@
     },
     "packages/vite": {
       "name": "@openpolicy/vite",
-      "version": "0.0.29",
+      "version": "0.0.30",
       "dependencies": {
         "@openpolicy/core": "workspace:*",
         "bundle-require": "^5.1.0",
@@ -278,7 +280,7 @@
     },
     "packages/vue": {
       "name": "@openpolicy/vue",
-      "version": "0.0.29",
+      "version": "0.0.30",
       "devDependencies": {
         "@openpolicy/core": "workspace:*",
         "@openpolicy/tooling": "workspace:*",
@@ -657,6 +659,8 @@
     "@nodelib/fs.stat": ["@nodelib/fs.stat@2.0.5", "", {}, "sha512-RkhPPp2zrqDAQA/2jNhnztcPAlv64XdhIp7a7454A5ovI7Bukxgt7MX7udwAu3zg1DcpPU0rz3VV1SeaqvY4+A=="],
 
     "@nodelib/fs.walk": ["@nodelib/fs.walk@1.2.8", "", { "dependencies": { "@nodelib/fs.scandir": "2.1.5", "fastq": "^1.6.0" } }, "sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg=="],
+
+    "@offstage/browser": ["@offstage/browser@0.0.1", "", {}, "sha512-9SqPDAlGwWI1+HMbAHsEOnRndUO6scEJB6+N27zgrN9CJswkTKnTPqjUgFWlGBdinfiLtGiymdlikSetA/Fk0w=="],
 
     "@oozcitak/dom": ["@oozcitak/dom@2.0.2", "", { "dependencies": { "@oozcitak/infra": "^2.0.2", "@oozcitak/url": "^3.0.0", "@oozcitak/util": "^10.0.0" } }, "sha512-GjpKhkSYC3Mj4+lfwEyI1dqnsKTgwGy48ytZEhm4A/xnH/8z9M3ZVXKr/YGQi3uCLs1AEBS+x5T2JPiueEDW8w=="],
 

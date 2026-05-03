@@ -13,6 +13,7 @@
 		"@astrojs/sitemap": "^3.7.0",
 		"@astrojs/vercel": "^9.0.4",
 		"@iconify-json/simple-icons": "^1.2.72",
+		"@offstage/browser": "^0.0.1",
 		"@resvg/resvg-js": "^2.6.2",
 		"@tailwindcss/vite": "^4.2.1",
 		"astro": "^5.17.1",
