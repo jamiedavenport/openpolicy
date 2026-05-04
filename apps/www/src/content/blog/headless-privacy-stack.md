@@ -46,9 +46,9 @@ OpenPolicy is build-time and gets settled by `defineConfig`. OpenCookies is runt
 import openpolicy from "@/openpolicy";
 
 const cookieCategories = Object.entries(openpolicy.cookies.used).map(([key]) => ({
-  key,
-  label: openpolicy.cookies.context[key]?.label ?? key,
-  locked: key === "essential",
+	key,
+	label: openpolicy.cookies.context[key]?.label ?? key,
+	locked: key === "essential",
 }));
 ```
 

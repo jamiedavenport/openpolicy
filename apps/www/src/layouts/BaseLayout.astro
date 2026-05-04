@@ -64,14 +64,7 @@ const version = (sdkPkg as { version: string }).version;
     <slot name="head" />
   </head>
   <body class="bg-gray-50 md:h-svh md:flex md:flex-col md:overflow-hidden">
-    <!-- <a
-      href="https://plus.openpolicy.sh"
-      target="_blank"
-      class="group bg-black text-white text-xs font-medium flex items-center justify-center gap-2 px-4 py-2.5 hover:bg-gray-900 transition-colors duration-200 shrink-0"
-    >
-      <span>Announcing <span class="font-bold">OpenPolicy Plus</span> - privacy infrastructure at scale</span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-60 group-hover:translate-x-0.5 transition-transform duration-200"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-    </a> -->
+    <slot name="banner" />
     <div class="grid md:grid-cols-3 md:flex-1 md:min-h-0 md:overflow-hidden">
       <div
         class="md:col-span-1 border-b md:border-b-0 md:border-r p-10 lg:p-14 flex flex-col gap-10 border-gray-200"
