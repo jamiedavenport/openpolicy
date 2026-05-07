@@ -5,16 +5,17 @@ import {
 	isOpenPolicyConfig,
 	type OpenPolicyConfig,
 } from "@openpolicy/core";
-import { type CSSProperties, useContext } from "react";
+import { useContext } from "react";
 import { OpenPolicyContext } from "../context";
 import { renderDocument } from "../render";
 import type { PolicyComponents } from "../types";
+import { DefaultRoot } from "./defaults";
 
-interface CookiePolicyProps {
+type CookiePolicyProps = {
 	config?: OpenPolicyConfig | CookiePolicyConfig;
 	components?: PolicyComponents;
-	style?: CSSProperties;
-}
+	style?: unknown;
+};
 
 export function CookiePolicy({ config: configProp, components, style }: CookiePolicyProps) {
 	const { config: contextConfig } = useContext(OpenPolicyContext);
@@ -25,9 +26,6 @@ export function CookiePolicy({ config: configProp, components, style }: CookiePo
 		: { type: "cookie" as const, ...config };
 	if (!input) return null;
 	const doc = compile(input);
-	return (
-		<div data-op-policy style={style}>
-			{renderDocument(doc, components)}
-		</div>
-	);
+	const Root = components?.Root ?? DefaultRoot;
+	return <Root style={style}>{renderDocument(doc, components)}</Root>;
 }

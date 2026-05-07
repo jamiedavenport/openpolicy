@@ -4,14 +4,25 @@ import type {
 	HeadingNode,
 	ItalicNode,
 	LinkNode,
+	ListItemNode,
+	ListNode,
 	Node,
+	ParagraphNode,
 	TableCellNode,
 	TableNode,
 	TableRowNode,
 	TextNode,
 } from "@openpolicy/core";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { PolicyComponents } from "../types";
+
+export function DefaultRoot({ children, style }: { children: ReactNode; style?: unknown }) {
+	return (
+		<div data-op-policy style={style as CSSProperties | undefined}>
+			{children}
+		</div>
+	);
+}
 
 export function DefaultHeading({ node }: { node: HeadingNode }) {
 	const level = node.level ?? 2;
@@ -59,21 +70,25 @@ export function DefaultParagraph({
 	node: _node,
 	children,
 }: {
-	node: import("@openpolicy/core").ParagraphNode;
+	node: ParagraphNode;
 	children: ReactNode;
 }) {
 	return <p data-op-paragraph>{children}</p>;
 }
 
-export function DefaultList({
-	node,
-	children,
-}: {
-	node: import("@openpolicy/core").ListNode;
-	children: ReactNode;
-}) {
+export function DefaultList({ node, children }: { node: ListNode; children: ReactNode }) {
 	const Tag = node.ordered ? "ol" : "ul";
 	return <Tag data-op-list>{children}</Tag>;
+}
+
+export function DefaultListItem({
+	node: _node,
+	children,
+}: {
+	node: ListItemNode;
+	children: ReactNode;
+}) {
+	return <li data-op-list-item>{children}</li>;
 }
 
 export function DefaultTable({ node: _node, children }: { node: TableNode; children: ReactNode }) {
@@ -142,42 +157,31 @@ export function renderNode(node: Node, components: PolicyComponents, key?: numbe
 		}
 
 		case "paragraph": {
-			const children = node.children.map((n, i) => renderNode(n, components, i));
-			if (components.Paragraph)
-				return (
-					<components.Paragraph key={key} node={node}>
-						{children}
-					</components.Paragraph>
-				);
+			const ParagraphComp = components.Paragraph ?? DefaultParagraph;
 			return (
-				<p key={key} data-op-paragraph>
-					{children}
-				</p>
+				<ParagraphComp key={key} node={node}>
+					{node.children.map((n, i) => renderNode(n, components, i))}
+				</ParagraphComp>
 			);
 		}
 
 		case "list": {
-			const children = node.items.map((item, i) => renderNode(item, components, i));
-			if (components.List)
-				return (
-					<components.List key={key} node={node}>
-						{children}
-					</components.List>
-				);
-			const ListTag = node.ordered ? "ol" : "ul";
+			const ListComp = components.List ?? DefaultList;
 			return (
-				<ListTag key={key} data-op-list>
-					{children}
-				</ListTag>
+				<ListComp key={key} node={node}>
+					{node.items.map((item, i) => renderNode(item, components, i))}
+				</ListComp>
 			);
 		}
 
-		case "listItem":
+		case "listItem": {
+			const ListItemComp = components.ListItem ?? DefaultListItem;
 			return (
-				<li key={key} data-op-list-item>
+				<ListItemComp key={key} node={node}>
 					{node.children.map((n, i) => renderNode(n, components, i))}
-				</li>
+				</ListItemComp>
 			);
+		}
 
 		case "table": {
 			const TableComp = components.Table ?? DefaultTable;

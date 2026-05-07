@@ -4,6 +4,7 @@ import type {
 	HeadingNode,
 	ItalicNode,
 	LinkNode,
+	ListItemNode,
 	ListNode,
 	ParagraphNode,
 	TableCellNode,
@@ -13,11 +14,13 @@ import type {
 } from "@openpolicy/core";
 import type { ComponentType, ReactNode } from "react";
 
-export interface PolicyComponents {
+export type PolicyComponents = {
+	Root?: ComponentType<{ children: ReactNode; style?: unknown }>;
 	Section?: ComponentType<{ section: DocumentSection; children: ReactNode }>;
 	Heading?: ComponentType<{ node: HeadingNode }>;
 	Paragraph?: ComponentType<{ node: ParagraphNode; children: ReactNode }>;
 	List?: ComponentType<{ node: ListNode; children: ReactNode }>;
+	ListItem?: ComponentType<{ node: ListItemNode; children: ReactNode }>;
 	Table?: ComponentType<{ node: TableNode; children: ReactNode }>;
 	TableHeader?: ComponentType<{ children: ReactNode }>;
 	TableBody?: ComponentType<{ children: ReactNode }>;
@@ -28,4 +31,4 @@ export interface PolicyComponents {
 	Bold?: ComponentType<{ node: BoldNode }>;
 	Italic?: ComponentType<{ node: ItalicNode }>;
 	Link?: ComponentType<{ node: LinkNode }>;
-}
+};

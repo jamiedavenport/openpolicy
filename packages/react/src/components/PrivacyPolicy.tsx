@@ -5,16 +5,17 @@ import {
 	type OpenPolicyConfig,
 	type PrivacyPolicyConfig,
 } from "@openpolicy/core";
-import { type CSSProperties, useContext } from "react";
+import { useContext } from "react";
 import { OpenPolicyContext } from "../context";
 import { renderDocument } from "../render";
 import type { PolicyComponents } from "../types";
+import { DefaultRoot } from "./defaults";
 
-interface PrivacyPolicyProps {
+type PrivacyPolicyProps = {
 	config?: OpenPolicyConfig | PrivacyPolicyConfig;
 	components?: PolicyComponents;
-	style?: CSSProperties;
-}
+	style?: unknown;
+};
 
 export function PrivacyPolicy({ config: configProp, components, style }: PrivacyPolicyProps) {
 	const { config: contextConfig } = useContext(OpenPolicyContext);
@@ -25,9 +26,6 @@ export function PrivacyPolicy({ config: configProp, components, style }: Privacy
 		: { type: "privacy" as const, ...config };
 	if (!input) return null;
 	const doc = compile(input);
-	return (
-		<div data-op-policy style={style}>
-			{renderDocument(doc, components)}
-		</div>
-	);
+	const Root = components?.Root ?? DefaultRoot;
+	return <Root style={style}>{renderDocument(doc, components)}</Root>;
 }
