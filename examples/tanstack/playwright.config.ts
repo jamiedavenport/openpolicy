@@ -12,7 +12,7 @@ export default defineConfig({
 		},
 	],
 	webServer: {
-		command: "bun run dev",
+		command: "vp run dev",
 		url: "http://localhost:3000",
 		reuseExistingServer: !process.env.CI,
 	},
