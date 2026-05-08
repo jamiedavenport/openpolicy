@@ -78,7 +78,12 @@ const components: PolicyComponents = {
 	),
 	Paragraph: ({ children }) => <Text>{children}</Text>,
 	List: ({ children }) => <View>{children}</View>,
-	ListItem: ({ children }) => <Text>{"\u2022 "}{children}</Text>,
+	ListItem: ({ children }) => (
+		<Text>
+			{"\u2022 "}
+			{children}
+		</Text>
+	),
 	Text: ({ node }) => <>{node.value}</>,
 	Bold: ({ node }) => <Text style={{ fontWeight: "bold" }}>{node.value}</Text>,
 	Italic: ({ node }) => <Text style={{ fontStyle: "italic" }}>{node.value}</Text>,
