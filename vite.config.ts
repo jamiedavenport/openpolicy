@@ -5,7 +5,7 @@ export default defineConfig({
 	plugins: [svelte()],
 	fmt: {
 		useTabs: true,
-		ignorePatterns: ["**/*.gen.ts"],
+		ignorePatterns: ["**/*.gen.ts", "**/CHANGELOG.md"],
 	},
 	test: {
 		exclude: ["**/node_modules/**", "**/dist/**", "examples/tanstack/e2e/**"],
