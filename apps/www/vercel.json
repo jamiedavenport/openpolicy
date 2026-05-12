@@ -1,4 +1,8 @@
 {
+	"framework": null,
+	"buildCommand": null,
+	"installCommand": null,
+	"outputDirectory": null,
 	"redirects": [
 		{
 			"source": "/blog/tanstack",
