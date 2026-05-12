@@ -1,5 +1,12 @@
 import { expect, test } from "vite-plus/test";
-import { expandOpenPolicyConfig, isOpenPolicyConfig, shouldEmit } from "./index";
+import { compile } from "./documents";
+import {
+	compileCookiePolicy,
+	compilePrivacyPolicy,
+	expandOpenPolicyConfig,
+	isOpenPolicyConfig,
+	shouldEmit,
+} from "./index";
 import type { OpenPolicyConfig, PolicyInput } from "./types";
 
 const input: PolicyInput = {
@@ -178,4 +185,39 @@ test("shouldEmit honours explicit policies override", () => {
 	const inputs = expandOpenPolicyConfig(config);
 	expect(inputs).toHaveLength(1);
 	expect(inputs[0]?.type).toBe("privacy");
+});
+
+test("compilePrivacyPolicy returns a privacy Document when privacy should emit", () => {
+	const doc = compilePrivacyPolicy(fullConfig);
+	expect(doc?.type).toBe("document");
+	expect(doc?.policyType).toBe("privacy");
+	expect(doc?.sections.length).toBeGreaterThan(0);
+});
+
+test("compilePrivacyPolicy returns null when policies excludes privacy", () => {
+	expect(compilePrivacyPolicy({ ...fullConfig, policies: ["cookie"] })).toBeNull();
+});
+
+test("compileCookiePolicy returns a cookie Document when cookies are present", () => {
+	const doc = compileCookiePolicy(fullConfig);
+	expect(doc?.type).toBe("document");
+	expect(doc?.policyType).toBe("cookie");
+	expect(doc?.sections.length).toBeGreaterThan(0);
+});
+
+test("compileCookiePolicy returns null when only privacy fields are present", () => {
+	const { cookies: _, ...privacyOnly } = fullConfig;
+	expect(compileCookiePolicy(privacyOnly)).toBeNull();
+});
+
+test("compilePrivacyPolicy matches compile(expand(...).find(privacy))", () => {
+	const expanded = expandOpenPolicyConfig(fullConfig).find((i) => i.type === "privacy");
+	if (!expanded) throw new Error("expected privacy input");
+	expect(compilePrivacyPolicy(fullConfig)).toEqual(compile(expanded));
+});
+
+test("compileCookiePolicy matches compile(expand(...).find(cookie))", () => {
+	const expanded = expandOpenPolicyConfig(fullConfig).find((i) => i.type === "cookie");
+	if (!expanded) throw new Error("expected cookie input");
+	expect(compileCookiePolicy(fullConfig)).toEqual(compile(expanded));
 });
