@@ -71,6 +71,7 @@ export type {
 } from "./types";
 export { isOpenPolicyConfig } from "./types";
 export { Contractual, ContractPrerequisite, Statutory, Voluntary } from "./provision";
+export { computeCookieVersion, computePrivacyVersion } from "./policy-version";
 export { deriveUserRights } from "./user-rights";
 export { validatePrivacyPolicy } from "./validate";
 export { validateOpenPolicyConfig } from "./validate-config";
@@ -124,6 +125,7 @@ function buildPrivacyInput(config: OpenPolicyConfig): PrivacyInput | null {
 		userRights: deriveUserRights(config.jurisdictions),
 		children: config.children,
 		automatedDecisionMaking: config.automatedDecisionMaking,
+		version: config.privacyVersion,
 	};
 }
 
@@ -138,6 +140,7 @@ function buildCookieInput(config: OpenPolicyConfig): CookieInput | null {
 		thirdParties: config.thirdParties ?? [],
 		trackingTechnologies: config.trackingTechnologies,
 		consentMechanism: config.consentMechanism,
+		version: config.cookieVersion,
 	};
 }
 

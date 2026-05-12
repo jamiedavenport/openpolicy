@@ -15,5 +15,6 @@ export function toOpenCookiesConfig(
 			label: key.charAt(0).toUpperCase() + key.slice(1),
 			locked: key === "essential",
 		}));
-	return { ...options, categories };
+	const policyVersion = options?.policyVersion ?? policy.cookieVersion;
+	return { ...options, ...(policyVersion ? { policyVersion } : {}), categories };
 }

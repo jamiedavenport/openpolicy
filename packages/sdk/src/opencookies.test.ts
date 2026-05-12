@@ -63,3 +63,21 @@ test("override cannot replace categories", () => {
 	});
 	expect(config.categories.map((c) => c.key)).toEqual(["essential", "analytics"]);
 });
+
+test("defaults policyVersion from policy.cookieVersion when no option is provided", () => {
+	const config = toOpenCookiesConfig({ ...policy, cookieVersion: "abc12345" });
+	expect(config.policyVersion).toBe("abc12345");
+});
+
+test("explicit policyVersion option overrides policy.cookieVersion", () => {
+	const config = toOpenCookiesConfig(
+		{ ...policy, cookieVersion: "abc12345" },
+		{ policyVersion: "manual-v9" },
+	);
+	expect(config.policyVersion).toBe("manual-v9");
+});
+
+test("policy.privacyVersion is ignored by the bridge", () => {
+	const config = toOpenCookiesConfig({ ...policy, privacyVersion: "priv12345" });
+	expect(config.policyVersion).toBeUndefined();
+});
