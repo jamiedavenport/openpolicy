@@ -2,6 +2,7 @@ import type { EffectiveDate, Locale } from "../types";
 
 const LOCALE_TAG: Record<Locale, string> = {
 	en: "en-US",
+	fr: "fr-FR",
 };
 
 // Format an EffectiveDate (YYYY-MM-DD) into a locale-appropriate long-form date.

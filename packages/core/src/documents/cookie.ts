@@ -1,4 +1,5 @@
 import type { T } from "../i18n";
+import { formatDate } from "../i18n";
 import type { CookiePolicyConfig } from "../types";
 import { bold, cell, heading, li, link, p, row, section, table, ul } from "./helpers";
 import type { DocumentSection, TableRowNode } from "./types";
@@ -13,7 +14,7 @@ function buildIntroduction(config: CookiePolicyConfig, t: T): DocumentSection {
 		p([
 			t.cookie.introduction.body({
 				companyName: config.company.name,
-				effectiveDate: config.effectiveDate,
+				effectiveDate: formatDate(config.effectiveDate, config.locale),
 				versionSuffix: versionSuffix(config, t),
 			}),
 		]),
