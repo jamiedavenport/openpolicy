@@ -8,7 +8,7 @@ export type PolicyCategory = "privacy" | "cookie";
 // purposes, retention text, etc.) pass through untouched in whatever language
 // the caller wrote them — this union only governs the strings OpenPolicy itself
 // emits (headings, boilerplate, lookup-table labels).
-export type Locale = "en" | "fr";
+export type Locale = "en" | "fr" | "de" | "nl" | "es";
 
 export type Jurisdiction =
 	| "eu" //    European Union — GDPR

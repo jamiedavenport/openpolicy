@@ -48,10 +48,10 @@ const demos = [
 	},
 	{
 		to: "/fr" as const,
-		label: "Français",
+		label: "Localized policies",
 		description:
-			'Same defineConfig() call, but with locale: "fr". OpenPolicy translates the strings it emits (headings, boilerplate, GDPR/CCPA disclosures); user-supplied content stays in whichever language you wrote it.',
-		code: 'defineConfig({ locale: "fr", ... })',
+			"Render the same config in French, German, Dutch, or Spanish via a locale prop on PrivacyPolicy/CookiePolicy. OpenPolicy translates the strings it emits; user-supplied content stays in whichever language you wrote it. Switch via the nav: FR / DE / NL / ES.",
+		code: '<PrivacyPolicy locale="fr" />',
 		badge: "i18n",
 	},
 ];

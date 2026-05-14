@@ -88,7 +88,25 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 								to="/fr"
 								className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors [&.active]:text-foreground [&.active]:font-medium"
 							>
-								Français
+								FR
+							</Link>
+							<Link
+								to="/de"
+								className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors [&.active]:text-foreground [&.active]:font-medium"
+							>
+								DE
+							</Link>
+							<Link
+								to="/nl"
+								className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors [&.active]:text-foreground [&.active]:font-medium"
+							>
+								NL
+							</Link>
+							<Link
+								to="/es"
+								className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors [&.active]:text-foreground [&.active]:font-medium"
+							>
+								ES
 							</Link>
 						</nav>
 

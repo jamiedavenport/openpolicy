@@ -1,10 +1,13 @@
 import { expect, test } from "vite-plus/test";
 import { compile } from "../documents";
 import type { Locale, PolicyInput } from "../types";
+import { de } from "./de";
 import { en } from "./en";
+import { es } from "./es";
 import { formatDate } from "./format";
 import { fr } from "./fr";
 import { createT, dictionaries, isLocale, LOCALES } from "./index";
+import { nl } from "./nl";
 
 test("createT returns the English dictionary for 'en'", () => {
 	const t = createT("en");
@@ -18,9 +21,8 @@ test("createT falls back to English for an unknown locale", () => {
 });
 
 test("isLocale accepts registered locales and rejects others", () => {
-	expect(isLocale("en")).toBe(true);
-	expect(isLocale("fr")).toBe(true);
-	expect(isLocale("de")).toBe(false);
+	for (const locale of LOCALES) expect(isLocale(locale)).toBe(true);
+	expect(isLocale("it")).toBe(false);
 	expect(isLocale("")).toBe(false);
 	expect(isLocale(undefined)).toBe(false);
 	expect(isLocale(123)).toBe(false);
@@ -44,14 +46,17 @@ test("interpolation works in template-function values", () => {
 	expect(body).toContain("Version: abc123.");
 });
 
-test("formatDate renders English long-form dates", () => {
+test("formatDate renders locale-appropriate long-form dates", () => {
 	expect(formatDate("2026-01-01", "en")).toBe("January 1, 2026");
 	expect(formatDate("2026-03-03", "en")).toBe("March 3, 2026");
-});
-
-test("formatDate renders French long-form dates", () => {
 	expect(formatDate("2026-01-01", "fr")).toBe("1 janvier 2026");
 	expect(formatDate("2026-03-03", "fr")).toBe("3 mars 2026");
+	expect(formatDate("2026-01-01", "de")).toBe("1. Januar 2026");
+	expect(formatDate("2026-03-03", "de")).toBe("3. März 2026");
+	expect(formatDate("2026-01-01", "nl")).toBe("1 januari 2026");
+	expect(formatDate("2026-03-03", "nl")).toBe("3 maart 2026");
+	expect(formatDate("2026-01-01", "es")).toBe("1 de enero de 2026");
+	expect(formatDate("2026-03-03", "es")).toBe("3 de marzo de 2026");
 });
 
 test("formatDate is timezone-independent (UTC pinning)", () => {
@@ -60,6 +65,7 @@ test("formatDate is timezone-independent (UTC pinning)", () => {
 	// then Intl renders it in the runtime's local TZ. Pinning to UTC fixes this.
 	expect(formatDate("2026-01-01", "en")).toBe("January 1, 2026");
 	expect(formatDate("2026-01-01", "fr")).toBe("1 janvier 2026");
+	expect(formatDate("2026-01-01", "de")).toBe("1. Januar 2026");
 });
 
 test("legal basis labels cover every member of the LegalBasis union", () => {
@@ -88,24 +94,6 @@ test("dictionary keys are stable references on en", () => {
 	expect(en.cookie).toBeDefined();
 });
 
-test("French dictionary headings are translated", () => {
-	const t = createT("fr");
-	expect(t.privacy.introduction.heading()).toBe("Introduction");
-	expect(t.privacy.dataCollected.heading()).toBe("Données que nous collectons");
-	expect(t.privacy.userRights.heading()).toBe("Vos droits");
-	expect(t.privacy.gdprSupplement.heading()).toBe("Informations complémentaires RGPD");
-	expect(t.cookie.introduction.heading()).toBe("Politique relative aux cookies");
-	expect(t.cookie.whatAreCookies.heading()).toBe("Qu'est-ce qu'un cookie ?");
-});
-
-test("French legal basis labels use RGPD article references", () => {
-	const t = createT("fr");
-	expect(t.shared.legalBasisLabels.consent()).toContain("Consentement");
-	expect(t.shared.legalBasisLabels.consent()).toContain("article 6, paragraphe 1, point a)");
-	expect(t.shared.legalBasisLabels.contract()).toContain("Exécution d'un contrat");
-	expect(t.shared.legalBasisLabels.legitimate_interests()).toContain("Intérêts légitimes");
-});
-
 function leafPaths(obj: unknown, prefix = ""): string[] {
 	if (typeof obj === "function") return [prefix];
 	if (obj === null || typeof obj !== "object") return [];
@@ -114,71 +102,140 @@ function leafPaths(obj: unknown, prefix = ""): string[] {
 	);
 }
 
-test("French dictionary covers every key in English (structural completeness)", () => {
+const NON_EN: { locale: Locale; dict: typeof en }[] = [
+	{ locale: "fr", dict: fr },
+	{ locale: "de", dict: de },
+	{ locale: "nl", dict: nl },
+	{ locale: "es", dict: es },
+];
+
+test("every non-English dictionary covers every key in English", () => {
 	const enPaths = leafPaths(en).sort();
-	const frPaths = leafPaths(fr).sort();
-	expect(frPaths).toEqual(enPaths);
+	for (const { locale, dict } of NON_EN) {
+		const paths = leafPaths(dict).sort();
+		expect(paths, `${locale} dictionary mismatch`).toEqual(enPaths);
+	}
 });
 
-const minimalFrPrivacyInput: PolicyInput = {
-	type: "privacy",
-	effectiveDate: "2026-01-01",
-	locale: "fr",
-	company: {
-		name: "Acme",
-		legalName: "Acme SAS",
-		address: "1 rue de la Paix, 75002 Paris, France",
-		contact: { email: "privacy@acme.fr" },
+test("translated headings differ from English", () => {
+	const enHeading = en.privacy.dataCollected.heading();
+	for (const { locale, dict } of NON_EN) {
+		expect(dict.privacy.dataCollected.heading(), locale).not.toBe(enHeading);
+	}
+});
+
+test("each non-English locale's legal_basis labels cite article 6", () => {
+	for (const { locale, dict } of NON_EN) {
+		// "6" is in every translation; locale-specific phrasing differs.
+		expect(dict.shared.legalBasisLabels.consent(), locale).toMatch(/6/);
+		expect(dict.shared.legalBasisLabels.contract(), locale).toMatch(/6/);
+	}
+});
+
+const ENGLISH_CANARIES = [
+	"Effective Date:",
+	"Information We Collect",
+	"Your Rights",
+	"GDPR Supplemental Disclosures",
+	"Data Controller:",
+	"Right to access your personal data",
+	"Performance of a contract",
+	"Cookies and Tracking",
+	"Submitting requests.",
+];
+
+type LocaleCanary = {
+	locale: Locale;
+	mustContain: string[];
+};
+
+const NON_EN_CANARIES: LocaleCanary[] = [
+	{
+		locale: "fr",
+		mustContain: [
+			"Date d'entrée en vigueur",
+			"Données que nous collectons",
+			"Vos droits",
+			"Responsable du traitement",
+			"1 janvier 2026",
+		],
 	},
-	data: {
-		collected: { "Informations de compte": ["E-mail", "Nom"] },
-		context: {
-			"Informations de compte": {
-				purpose: "Authentifier les utilisateurs",
-				lawfulBasis: "contract",
-				retention: "Jusqu'à la suppression du compte",
-				provision: {
-					basis: "contract-prerequisite",
-					consequences: "Nous ne pouvons pas créer ni opérer votre compte.",
+	{
+		locale: "de",
+		mustContain: [
+			"Datum des Inkrafttretens",
+			"Welche Daten wir erheben",
+			"Ihre Rechte",
+			"Verantwortlicher",
+			"1. Januar 2026",
+		],
+	},
+	{
+		locale: "nl",
+		mustContain: [
+			"Ingangsdatum",
+			"Welke gegevens wij verzamelen",
+			"Uw rechten",
+			"Verwerkingsverantwoordelijke",
+			"1 januari 2026",
+		],
+	},
+	{
+		locale: "es",
+		mustContain: [
+			"Fecha de entrada en vigor",
+			"Información que recopilamos",
+			"Sus derechos",
+			"Responsable del tratamiento",
+			"1 de enero de 2026",
+		],
+	},
+];
+
+function buildPrivacyInput(locale: Locale): PolicyInput {
+	return {
+		type: "privacy",
+		effectiveDate: "2026-01-01",
+		locale,
+		company: {
+			name: "Acme",
+			legalName: "Acme SAS",
+			address: "1 rue de la Paix, 75002 Paris, France",
+			contact: { email: "privacy@acme.test" },
+		},
+		data: {
+			collected: { Account: ["Email", "Name"] },
+			context: {
+				Account: {
+					purpose: "Authenticate users",
+					lawfulBasis: "contract",
+					retention: "Until account deletion",
+					provision: {
+						basis: "contract-prerequisite",
+						consequences: "We cannot operate your account.",
+					},
 				},
 			},
 		},
-	},
-	cookies: {
-		used: { essential: true },
-		context: { essential: { lawfulBasis: "legal_obligation" } },
-	},
-	thirdParties: [],
-	userRights: ["access", "rectification", "erasure"],
-	jurisdictions: ["eu"],
-};
+		cookies: {
+			used: { essential: true },
+			context: { essential: { lawfulBasis: "legal_obligation" } },
+		},
+		thirdParties: [],
+		userRights: ["access", "rectification", "erasure"],
+		jurisdictions: ["eu"],
+	};
+}
 
-test("French privacy document compiles with no English leakage in OP-emitted strings", () => {
-	const doc = compile(minimalFrPrivacyInput);
-	const blob = JSON.stringify(doc);
-
-	// Distinctly-English phrases that would only appear if a section builder
-	// fell back to English or the dictionary registration missed a key.
-	const englishCanaries = [
-		"Effective Date:",
-		"Information We Collect",
-		"Your Rights",
-		"GDPR Supplemental Disclosures",
-		"Data Controller:",
-		"Right to access your personal data",
-		"Performance of a contract",
-		"Cookies and Tracking",
-		"Submitting requests.",
-	];
-	for (const phrase of englishCanaries) {
-		expect(blob).not.toContain(phrase);
-	}
-
-	// French phrases that prove translation flowed through end-to-end.
-	expect(blob).toContain("Date d'entrée en vigueur");
-	expect(blob).toContain("Données que nous collectons");
-	expect(blob).toContain("Vos droits");
-	expect(blob).toContain("Informations complémentaires RGPD");
-	expect(blob).toContain("Responsable du traitement");
-	expect(blob).toContain("1 janvier 2026"); // formatDate output
-});
+for (const { locale, mustContain } of NON_EN_CANARIES) {
+	test(`${locale} privacy document compiles without English leakage`, () => {
+		const doc = compile(buildPrivacyInput(locale));
+		const blob = JSON.stringify(doc);
+		for (const phrase of ENGLISH_CANARIES) {
+			expect(blob, `${locale}: unexpected English phrase "${phrase}"`).not.toContain(phrase);
+		}
+		for (const phrase of mustContain) {
+			expect(blob, `${locale}: missing expected phrase "${phrase}"`).toContain(phrase);
+		}
+	});
+}

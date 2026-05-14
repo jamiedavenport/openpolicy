@@ -6,8 +6,8 @@ Add an optional `locale` prop to `<PrivacyPolicy />` and `<CookiePolicy />`. Ove
 
 ```tsx
 <OpenPolicy config={openpolicy}>
-  <PrivacyPolicy />           {/* uses config.locale */}
-  <PrivacyPolicy locale="fr" /> {/* overrides → French */}
+	<PrivacyPolicy /> {/* uses config.locale */}
+	<PrivacyPolicy locale="fr" /> {/* overrides → French */}
 </OpenPolicy>
 ```
 
