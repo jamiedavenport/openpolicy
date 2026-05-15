@@ -29,7 +29,7 @@ export default defineConfig({
 `;
 }
 
-export type WriteStubResult = { path: string; written: boolean };
+type WriteStubResult = { path: string; written: boolean };
 
 export async function writeStub(path: string, force: boolean): Promise<WriteStubResult> {
 	if (existsSync(path) && !force) {

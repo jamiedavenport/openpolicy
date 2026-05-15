@@ -1,6 +1,6 @@
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
-/** @type {import('@sveltejs/kit').Config} */
+// Svelte config consumed by @sveltejs/package and svelte-check.
 const config = {
 	preprocess: vitePreprocess(),
 	compilerOptions: {

@@ -1,7 +1,7 @@
 import type { OpenPolicyConfig } from "@openpolicy/core";
 import { defineComponent, type InjectionKey, type PropType, provide, type Ref, toRef } from "vue";
 
-export type OpenPolicyContextValue = {
+type OpenPolicyContextValue = {
 	config: Ref<OpenPolicyConfig>;
 };
 

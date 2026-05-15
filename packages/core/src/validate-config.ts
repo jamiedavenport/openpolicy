@@ -1,7 +1,7 @@
 import { isLocale, LOCALES } from "./i18n";
 import { shouldEmit } from "./index";
 import { isJurisdiction, JURISDICTIONS } from "./jurisdictions";
-import type { OpenPolicyConfig, PolicyCategory, ValidationIssue } from "./types";
+import type { OpenPolicyConfig, ValidationIssue } from "./types";
 
 export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIssue[] {
 	const issues: ValidationIssue[] = [];
@@ -181,5 +181,3 @@ export function validateOpenPolicyConfig(config: OpenPolicyConfig): ValidationIs
 function hasAnyPrivacyField(config: OpenPolicyConfig): boolean {
 	return config.data !== undefined || config.children !== undefined;
 }
-
-export type { PolicyCategory };

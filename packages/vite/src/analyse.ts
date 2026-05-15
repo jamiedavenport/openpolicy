@@ -14,7 +14,7 @@ export type ThirdPartyEntry = {
 	policyUrl: string;
 };
 
-export type ExtractResult = {
+type ExtractResult = {
 	dataCollected: Record<string, string[]>;
 	thirdParties: ThirdPartyEntry[];
 	cookies: string[];

@@ -39,7 +39,6 @@
 		"@opencookies/core": "^0.0.2",
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
-		"@tanstack/intent": "^0.0.29",
 		"vite-plus": "catalog:"
 	},
 	"peerDependencies": {

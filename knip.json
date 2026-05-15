@@ -2,20 +2,21 @@
 	"$schema": "https://unpkg.com/knip@5/schema.json",
 	"tags": ["-lintignore"],
 	"ignoreBinaries": ["tsc"],
+	"ignore": ["**/*.gen.ts"],
 	"workspaces": {
-		".": {},
-		"apps/docs": {
-			"entry": ["source.config.ts"]
+		".": {
+			"entry": ["vite.config.ts"]
 		},
 		"packages/*": {
-			"entry": ["rolldown.config.ts"],
+			"entry": ["vite.config.ts", "**/*.test.{ts,tsx}"],
 			"ignoreDependencies": ["@openpolicy/tooling"]
 		},
-		"packages/renderers": {
+		"packages/svelte": {
+			"entry": ["src/lib/index.ts", "**/*.test.{ts,tsx}"],
 			"ignoreDependencies": ["@openpolicy/tooling"]
 		},
 		"examples/tanstack": {
-			"entry": ["src/openpolicy.ts"]
+			"entry": ["src/openpolicy.ts", "src/lib/collection.ts", "src/lib/stripe.ts"]
 		}
 	}
 }

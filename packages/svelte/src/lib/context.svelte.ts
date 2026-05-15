@@ -5,7 +5,7 @@ import type { PolicyOverrides } from "./types";
 const CONFIG_KEY = Symbol("openpolicy.config");
 const OVERRIDES_KEY = Symbol("openpolicy.overrides");
 
-export type ConfigGetter = () => OpenPolicyConfig | undefined;
+type ConfigGetter = () => OpenPolicyConfig | undefined;
 
 export function setConfigContext(getter: ConfigGetter): void {
 	setContext(CONFIG_KEY, getter);

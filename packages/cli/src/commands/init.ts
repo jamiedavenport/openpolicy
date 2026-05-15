@@ -15,7 +15,7 @@ import { resolveStubPath, writeStub } from "../utils/stub";
 
 const SDK_PACKAGE = "@openpolicy/sdk";
 
-export type InitArgs = {
+type InitArgs = {
 	cwd: string;
 	pm?: string;
 	skipInstall: boolean;

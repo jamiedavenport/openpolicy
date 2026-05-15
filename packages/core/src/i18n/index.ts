@@ -10,4 +10,4 @@ export function createT(locale: Locale): T {
 
 export { formatDate } from "./format";
 export { dictionaries, isLocale, LOCALES } from "./locales";
-export type { CookieCategory, CookieType, Dictionary } from "./types";
+export type { Dictionary } from "./types";
