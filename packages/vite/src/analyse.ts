@@ -14,10 +14,38 @@ export type ThirdPartyEntry = {
 	policyUrl: string;
 };
 
+/**
+ * Reason a *recognized* `collecting` / `thirdParty` / `defineCookie` call was
+ * skipped instead of contributing data. These codes surface in build/dev logs
+ * and are public API at 1.0 — keep the union narrow and the meanings stable.
+ */
+export type ScannerSkipCode =
+	| "missing-arguments" //        call has fewer args than the SDK function requires
+	| "non-literal-argument" //     a string-literal-expected arg isn't a string literal
+	| "non-object-label-map" //     collecting() 3rd arg isn't an object literal
+	| "spread-in-label-map" //      spread element inside collecting()'s label object
+	| "non-literal-label-value"; // a label value is neither a string literal nor Ignore
+
+/**
+ * A located build warning emitted for a recognized-but-unreadable call, so
+ * statically invisible privacy data never disappears silently. `line` and
+ * `column` are 1-based and point at the call expression.
+ */
+export type ScannerDiagnostic = {
+	code: ScannerSkipCode;
+	message: string;
+	file: string;
+	line: number;
+	column: number;
+};
+
+type RecordFn = (code: ScannerSkipCode, message: string, node: AnyNode | undefined) => void;
+
 type ExtractResult = {
 	dataCollected: Record<string, string[]>;
 	thirdParties: ThirdPartyEntry[];
 	cookies: string[];
+	diagnostics: ScannerDiagnostic[];
 };
 
 /**
@@ -25,9 +53,11 @@ type ExtractResult = {
  * from a single source file.
  *
  * Returns an `ExtractResult` with `dataCollected` (category → labels),
- * `thirdParties` (array of third-party entries), and `cookies` (array of
- * category names). Files with no matching calls — or that fail to parse —
- * return empty defaults.
+ * `thirdParties` (array of third-party entries), `cookies` (array of
+ * category names), and `diagnostics` — one located warning for every
+ * recognized call that couldn't be read statically (so no recognized call is
+ * ever dropped silently). Files with no matching calls — or that fail to
+ * parse — return empty defaults.
  *
  * The analyser runs in two phases:
  * 1. Collect local names bound to `collecting` / `thirdParty` / `defineCookie`
@@ -41,6 +71,7 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 		dataCollected: {},
 		thirdParties: [],
 		cookies: [],
+		diagnostics: [],
 	};
 	let result: ReturnType<typeof parseSync>;
 	try {
@@ -72,6 +103,13 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 	const thirdParties: ThirdPartyEntry[] = [];
 	const seenThirdParties = new Set<string>();
 	const cookieSet = new Set<string>();
+	const diagnostics: ScannerDiagnostic[] = [];
+	const locate = makeLineLocator(code);
+	const record: RecordFn = (skipCode, message, node) => {
+		const offset = node && typeof node.start === "number" ? (node.start as number) : 0;
+		const { line, column } = locate(offset);
+		diagnostics.push({ code: skipCode, message, file: filename, line, column });
+	};
 
 	walk(program, (node) => {
 		if (node.type !== "CallExpression") return;
@@ -82,11 +120,28 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 		const calleeName = callee.name as string;
 
 		if (collectingNames.has(calleeName)) {
-			if (!args || args.length < 3) return;
+			if (!args || args.length < 3) {
+				record(
+					"missing-arguments",
+					"collecting() requires 3 arguments (category, value, labels)",
+					node,
+				);
+				return;
+			}
 			const category = extractStringLiteral(args[0]);
-			if (category === null) return;
-			const labels = extractLabelKeys(args[2], ignoreNames);
-			if (labels === null) return;
+			if (category === null) {
+				record("non-literal-argument", "collecting() category must be a string literal", node);
+				return;
+			}
+			const labels = extractLabelKeys(args[2], ignoreNames, node, record);
+			if (labels === null) {
+				record(
+					"non-object-label-map",
+					"collecting() labels (3rd argument) must be an object literal",
+					node,
+				);
+				return;
+			}
 			const existing = dataCollected[category] ?? [];
 			const seen = new Set(existing);
 			for (const label of labels) {
@@ -100,13 +155,31 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 		}
 
 		if (thirdPartyNames.has(calleeName)) {
-			if (!args || args.length < 3) return;
+			if (!args || args.length < 3) {
+				record(
+					"missing-arguments",
+					"thirdParty() requires 3 arguments (name, purpose, policyUrl)",
+					node,
+				);
+				return;
+			}
 			const name = extractStringLiteral(args[0]);
-			if (name === null) return;
+			if (name === null) {
+				record("non-literal-argument", "thirdParty() name must be a string literal", node);
+				return;
+			}
 			const purpose = extractStringLiteral(args[1]);
-			if (purpose === null) return;
+			if (purpose === null) {
+				record("non-literal-argument", "thirdParty() purpose must be a string literal", node);
+				return;
+			}
 			const policyUrl = extractStringLiteral(args[2]);
-			if (policyUrl === null) return;
+			if (policyUrl === null) {
+				record("non-literal-argument", "thirdParty() policyUrl must be a string literal", node);
+				return;
+			}
+			// Within-file duplicate of an already-captured entry — intentional
+			// dedup, the data is not lost, so no diagnostic.
 			if (seenThirdParties.has(name)) return;
 			seenThirdParties.add(name);
 			thirdParties.push({ name, purpose, policyUrl });
@@ -114,14 +187,20 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 		}
 
 		if (defineCookieNames.has(calleeName)) {
-			if (!args || args.length < 1) return;
+			if (!args || args.length < 1) {
+				record("missing-arguments", "defineCookie() requires 1 argument (category)", node);
+				return;
+			}
 			const category = extractStringLiteral(args[0]);
-			if (category === null) return;
+			if (category === null) {
+				record("non-literal-argument", "defineCookie() category must be a string literal", node);
+				return;
+			}
 			cookieSet.add(category);
 		}
 	});
 
-	return { dataCollected, thirdParties, cookies: [...cookieSet] };
+	return { dataCollected, thirdParties, cookies: [...cookieSet], diagnostics };
 }
 
 /**
@@ -164,7 +243,7 @@ function collectBindings(program: AnyNode, moduleName: string, exportName: strin
 
 /**
  * If `node` is a string `Literal`, return its string value. Otherwise
- * return `null` so the caller silently skips the call.
+ * return `null` so the caller can record a diagnostic and skip the call.
  */
 function extractStringLiteral(node: AnyNode | undefined): string | null {
 	if (!node) return null;
@@ -174,16 +253,35 @@ function extractStringLiteral(node: AnyNode | undefined): string | null {
 }
 
 /**
+ * Best-effort property key name (`{ name: ... }` → `"name"`) for diagnostic
+ * messages. Returns `null` for computed/non-trivial keys.
+ */
+function propKeyName(prop: AnyNode): string | null {
+	const key = prop.key as AnyNode | undefined;
+	if (!key) return null;
+	if (key.type === "Identifier" && typeof key.name === "string") return key.name;
+	if (key.type === "Literal" && typeof key.value === "string") return key.value;
+	return null;
+}
+
+/**
  * Extract the string values from a plain `{ fieldName: "Human Label" }`
  * object literal. Returns an array of label strings, deduped while
- * preserving insertion order. Returns `null` if the shape doesn't match.
+ * preserving insertion order. Returns `null` if the node isn't an object
+ * literal so the caller can report `non-object-label-map`.
  *
- * Properties whose value is an `Identifier` matching a tracked local name
- * bound to the SDK's `Ignore` export are treated as explicit opt-outs and
- * skipped silently — producing the same observable result as omitting the
- * field from the record did before.
+ * Properties whose value is an `Identifier` bound to the SDK's `Ignore`
+ * export are explicit opt-outs and skipped without a diagnostic. Spread
+ * elements and any other non-string-literal value are *recognized but
+ * unreadable*, so each records a located diagnostic (`spread-in-label-map`
+ * / `non-literal-label-value`) against the call before being dropped.
  */
-function extractLabelKeys(node: AnyNode | undefined, ignoreNames: Set<string>): string[] | null {
+function extractLabelKeys(
+	node: AnyNode | undefined,
+	ignoreNames: Set<string>,
+	callNode: AnyNode,
+	record: RecordFn,
+): string[] | null {
 	if (!node || node.type !== "ObjectExpression") return null;
 	const properties = node.properties as AnyNode[] | undefined;
 	if (!properties) return null;
@@ -191,10 +289,19 @@ function extractLabelKeys(node: AnyNode | undefined, ignoreNames: Set<string>): 
 	const labels: string[] = [];
 	const seen = new Set<string>();
 	for (const prop of properties) {
-		if (prop.type !== "Property") continue; // drop SpreadElement silently
+		if (prop.type !== "Property") {
+			// SpreadElement: the labels behind the spread can't be read statically.
+			record(
+				"spread-in-label-map",
+				"collecting() label object uses a spread; spread labels can't be read statically",
+				callNode,
+			);
+			continue;
+		}
 		const val = prop.value as AnyNode | undefined;
 		if (!val) continue;
 		if (val.type === "Literal" && typeof val.value === "string") {
+			// Duplicate label string — already captured, intentional dedup.
 			if (seen.has(val.value)) continue;
 			seen.add(val.value);
 			labels.push(val.value);
@@ -205,9 +312,46 @@ function extractLabelKeys(node: AnyNode | undefined, ignoreNames: Set<string>): 
 			typeof val.name === "string" &&
 			ignoreNames.has(val.name as string)
 		) {
+			// Explicit `Ignore` opt-out — intentional, not data loss.
+			continue;
 		}
+		const field = propKeyName(prop);
+		record(
+			"non-literal-label-value",
+			`collecting() label ${field ? `"${field}" ` : ""}value must be a string literal or Ignore`,
+			callNode,
+		);
 	}
 	return labels;
+}
+
+/**
+ * Build a memoized offset → 1-based `{ line, column }` resolver for `code`.
+ * The newline index is computed once on first use (diagnostics are rare, so
+ * files with no skipped calls never pay for it).
+ */
+function makeLineLocator(code: string): (offset: number) => { line: number; column: number } {
+	let cached: number[] | null = null;
+	const lineStartsFor = (): number[] => {
+		if (cached) return cached;
+		const starts = [0];
+		for (let i = 0; i < code.length; i++) {
+			if (code.charCodeAt(i) === 10 /* \n */) starts.push(i + 1);
+		}
+		cached = starts;
+		return starts;
+	};
+	return (offset) => {
+		const starts = lineStartsFor();
+		let lo = 0;
+		let hi = starts.length - 1;
+		while (lo < hi) {
+			const mid = (lo + hi + 1) >> 1;
+			if ((starts[mid] ?? 0) <= offset) lo = mid;
+			else hi = mid - 1;
+		}
+		return { line: lo + 1, column: offset - (starts[lo] ?? 0) + 1 };
+	};
 }
 
 /**

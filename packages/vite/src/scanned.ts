@@ -1,4 +1,4 @@
-import type { ThirdPartyEntry } from "./analyse";
+import type { ScannerDiagnostic, ThirdPartyEntry } from "./analyse";
 
 export type CookieMap = { essential: boolean; [key: string]: boolean };
 
@@ -6,6 +6,11 @@ export type Scanned = {
 	dataCollected: Record<string, string[]>;
 	thirdParties: ThirdPartyEntry[];
 	cookies: CookieMap;
+	/**
+	 * Located warnings for recognized calls that couldn't be read statically.
+	 * Carried through the scan but never rendered into the generated module.
+	 */
+	diagnostics: ScannerDiagnostic[];
 };
 
 /**
