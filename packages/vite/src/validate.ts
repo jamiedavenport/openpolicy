@@ -7,6 +7,7 @@ import {
 	type ValidationIssue,
 } from "@openpolicy/core";
 import { bundleRequire } from "bundle-require";
+import type { ScannerDiagnostic } from "./analyse";
 
 export type ValidatedConfig = {
 	config: OpenPolicyConfig | null;
@@ -100,4 +101,13 @@ export async function loadAndValidateConfig(args: {
  */
 export function formatIssue(issue: ValidationIssue): string {
 	return `[openpolicy] ${issue.code}: ${issue.message}`;
+}
+
+/**
+ * Formats a located scanner diagnostic for terminal output as
+ * `[openpolicy] file:line:col code: message` — same greppable prefix as
+ * {@link formatIssue}, with a clickable `file:line:col` location.
+ */
+export function formatScannerDiagnostic(d: ScannerDiagnostic): string {
+	return `[openpolicy] ${d.file}:${d.line}:${d.column} ${d.code}: ${d.message}`;
 }

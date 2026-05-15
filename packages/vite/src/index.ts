@@ -1,11 +1,16 @@
 import { access, readFile, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
-import { extractFromFile, type ThirdPartyEntry } from "./analyse";
+import { extractFromFile, type ScannerDiagnostic, type ThirdPartyEntry } from "./analyse";
 import { KNOWN_COOKIE_PACKAGES, KNOWN_PACKAGES } from "./known-packages";
 import { walkSources } from "./scan";
 import { type CookieMap, renderGenModule, type Scanned } from "./scanned";
-import { formatIssue, loadAndValidateConfig, type ValidatedConfig } from "./validate";
+import {
+	formatIssue,
+	formatScannerDiagnostic,
+	loadAndValidateConfig,
+	type ValidatedConfig,
+} from "./validate";
 
 export type OpenPolicyOptions = {
 	/**
@@ -117,6 +122,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 		dataCollected: {},
 		thirdParties: [],
 		cookies: { essential: true },
+		diagnostics: [],
 	};
 
 	async function readPackageJsonDeps(root: string): Promise<Record<string, string>> {
@@ -169,6 +175,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 		const mergedParties: ThirdPartyEntry[] = [];
 		const seenParties = new Set<string>();
 		const cookieSet = new Set<string>();
+		const diagnostics: ScannerDiagnostic[] = [];
 		const genFile = resolvedConfigDir ? resolve(resolvedConfigDir, GEN_FILENAME) : null;
 		for (const file of files) {
 			if (file === genFile) continue;
@@ -179,6 +186,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 				continue;
 			}
 			const extracted = extractFromFile(file, code);
+			for (const d of extracted.diagnostics) diagnostics.push(d);
 			for (const [category, labels] of Object.entries(extracted.dataCollected)) {
 				const existing = mergedData[category] ?? [];
 				const seen = new Set(existing);
@@ -220,6 +228,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			dataCollected: mergedData,
 			thirdParties: mergedParties,
 			cookies,
+			diagnostics,
 		};
 	}
 
@@ -250,6 +259,10 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			scanned = next;
 			await writeGenModule(resolvedConfigDir, scanned);
 		}
+		// Re-emit scanner diagnostics every rescan (like validation below) so
+		// a skipped recognized call stays visible after each edit. Not gated
+		// by `validateOpt` — silent data loss is independent of config checks.
+		for (const d of next.diagnostics) server.config.logger.warn(formatScannerDiagnostic(d));
 		await runValidationDev(server);
 	}
 
@@ -294,6 +307,11 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			resolvedConfigFile = found.file;
 			scanned = await scanAndMerge();
 			await writeGenModule(resolvedConfigDir, scanned);
+			// Always surface scanner diagnostics — a recognized call that
+			// couldn't be read statically is silent data loss regardless of
+			// the `validate` option. `this.warn` routes to the Rollup build
+			// log on `vite build` and to Vite's logger on `vite dev` startup.
+			for (const d of scanned.diagnostics) this.warn(formatScannerDiagnostic(d));
 			// Only validate via Rollup's PluginContext in `vite build` —
 			// `this.error` aborts the build, which is the desired CI signal.
 			// In `vite dev` we let `configureServer` handle validation

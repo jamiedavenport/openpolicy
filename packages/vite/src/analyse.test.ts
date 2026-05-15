@@ -33,7 +33,10 @@ test("ignores collecting imported from a non-SDK module", () => {
 		import { collecting } from "./local-collecting";
 		collecting("Cat", v, { a: "Name" });
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({});
+	// Not a recognized call — must stay silent (scope boundary).
+	expect(result.diagnostics).toEqual([]);
 });
 
 test("ignores local `collecting` not imported from anywhere", () => {
@@ -41,7 +44,9 @@ test("ignores local `collecting` not imported from anywhere", () => {
 		function collecting(a, b, c) { return b; }
 		collecting("Cat", v, { a: "Name" });
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({});
+	expect(result.diagnostics).toEqual([]);
 });
 
 test("ignores type-only imports", () => {
@@ -49,36 +54,71 @@ test("ignores type-only imports", () => {
 		import type { collecting } from "@openpolicy/sdk";
 		collecting("Cat", v, { a: "Name" });
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({});
+	expect(result.diagnostics).toEqual([]);
 });
 
-test("skips template-literal category silently", () => {
+test("template-literal category is dropped with a located diagnostic", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
 		collecting(\`Cat\`, v, { a: "Name" });
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({});
+	expect(result.diagnostics).toEqual([
+		{
+			code: "non-literal-argument",
+			message: "collecting() category must be a string literal",
+			file: "a.ts",
+			line: 3,
+			column: 3,
+		},
+	]);
 });
 
-test("non-string values skipped silently, string values kept", () => {
+test("non-string label values diagnosed individually, string values kept", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
 		collecting("Cat", v, { a: 42, b: "Kept", c: true });
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
-		Cat: ["Kept"],
-	});
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({ Cat: ["Kept"] });
+	expect(result.diagnostics).toEqual([
+		{
+			code: "non-literal-label-value",
+			message: 'collecting() label "a" value must be a string literal or Ignore',
+			file: "a.ts",
+			line: 3,
+			column: 3,
+		},
+		{
+			code: "non-literal-label-value",
+			message: 'collecting() label "c" value must be a string literal or Ignore',
+			file: "a.ts",
+			line: 3,
+			column: 3,
+		},
+	]);
 });
 
-test("spread elements skipped silently", () => {
+test("spread in the label object is dropped with a diagnostic, string values kept", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
 		const rest = {};
 		collecting("Cat", v, { ...rest, b: "Kept" });
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
-		Cat: ["Kept"],
-	});
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({ Cat: ["Kept"] });
+	expect(result.diagnostics).toEqual([
+		{
+			code: "spread-in-label-map",
+			message: "collecting() label object uses a spread; spread labels can't be read statically",
+			file: "a.ts",
+			line: 4,
+			column: 3,
+		},
+	]);
 });
 
 test("malformed source returns empty without throwing", () => {
@@ -110,37 +150,69 @@ test("merges multiple calls with the same category", () => {
 	});
 });
 
-test("deduplicates repeated label values across and within calls", () => {
+test("deduplicates repeated label values — intentional dedup, no diagnostic", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
 		collecting("Cat", v, { a: "A", a2: "A" });
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({ Cat: ["A"] });
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({ Cat: ["A"] });
+	expect(result.diagnostics).toEqual([]);
 });
 
-test("skips calls with fewer than three arguments", () => {
+test("collecting with fewer than three arguments is diagnosed", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
 		collecting("Cat", v);
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({});
+	expect(result.diagnostics).toEqual([
+		{
+			code: "missing-arguments",
+			message: "collecting() requires 3 arguments (category, value, labels)",
+			file: "a.ts",
+			line: 3,
+			column: 3,
+		},
+	]);
 });
 
-test("skips calls whose third arg is a variable reference", () => {
+test("collecting whose third arg is a variable reference is diagnosed", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
 		const labels = { a: "Name" };
 		collecting("Cat", v, labels);
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({});
+	expect(result.diagnostics).toEqual([
+		{
+			code: "non-object-label-map",
+			message: "collecting() labels (3rd argument) must be an object literal",
+			file: "a.ts",
+			line: 4,
+			column: 3,
+		},
+	]);
 });
 
-test("skips calls whose third arg is an arrow function", () => {
+test("collecting whose third arg is an arrow function is diagnosed", () => {
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
 		collecting("Cat", v, (v) => ({ Name: v.a }));
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({});
+	expect(result.diagnostics).toEqual([
+		{
+			code: "non-object-label-map",
+			message: "collecting() labels (3rd argument) must be an object literal",
+			file: "a.ts",
+			line: 3,
+			column: 3,
+		},
+	]);
 });
 
 test("empty source returns empty", () => {
@@ -149,7 +221,7 @@ test("empty source returns empty", () => {
 	expect(result.thirdParties).toEqual([]);
 });
 
-test("Ignore sentinel omits the field but keeps other string-literal labels", () => {
+test("Ignore sentinel omits the field, keeps other labels, emits no diagnostic", () => {
 	const code = `
 		import { collecting, Ignore } from "@openpolicy/sdk";
 		collecting("Account Information", { name, hashedPassword }, {
@@ -157,12 +229,13 @@ test("Ignore sentinel omits the field but keeps other string-literal labels", ()
 			hashedPassword: Ignore,
 		});
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
-		"Account Information": ["Name"],
-	});
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({ "Account Information": ["Name"] });
+	// Ignore is an explicit, intentional opt-out — not data loss.
+	expect(result.diagnostics).toEqual([]);
 });
 
-test("Ignore recognised under a renamed import", () => {
+test("Ignore recognised under a renamed import emits no diagnostic", () => {
 	const code = `
 		import { collecting, Ignore as Skip } from "@openpolicy/sdk";
 		collecting("Cat", v, {
@@ -170,15 +243,15 @@ test("Ignore recognised under a renamed import", () => {
 			b: Skip,
 		});
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
-		Cat: ["Name"],
-	});
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({ Cat: ["Name"] });
+	expect(result.diagnostics).toEqual([]);
 });
 
-test("Ignore imported from a non-SDK module is not recognised", () => {
-	// The local `Ignore` here is unrelated to the SDK sentinel; its Identifier
-	// value falls through the conservative silent-skip path so the field is
-	// absent from labels (same observable result, but no special treatment).
+test("Ignore imported from a non-SDK module is diagnosed (not the sentinel)", () => {
+	// The local `Ignore` here is unrelated to the SDK sentinel, so its value
+	// is genuinely unreadable — that's ambiguous data loss and must surface a
+	// located diagnostic rather than vanish.
 	const code = `
 		import { collecting } from "@openpolicy/sdk";
 		import { Ignore } from "./somewhere-else";
@@ -187,12 +260,20 @@ test("Ignore imported from a non-SDK module is not recognised", () => {
 			b: Ignore,
 		});
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
-		Cat: ["Name"],
-	});
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({ Cat: ["Name"] });
+	expect(result.diagnostics).toEqual([
+		{
+			code: "non-literal-label-value",
+			message: 'collecting() label "b" value must be a string literal or Ignore',
+			file: "a.ts",
+			line: 4,
+			column: 3,
+		},
+	]);
 });
 
-test("all properties marked Ignore yields an empty label array for the category", () => {
+test("all properties marked Ignore yields an empty label array, no diagnostic", () => {
 	const code = `
 		import { collecting, Ignore } from "@openpolicy/sdk";
 		collecting("Cat", v, {
@@ -200,7 +281,9 @@ test("all properties marked Ignore yields an empty label array for the category"
 			b: Ignore,
 		});
 	`;
-	expect(extractFromFile("a.ts", code).dataCollected).toEqual({ Cat: [] });
+	const result = extractFromFile("a.ts", code);
+	expect(result.dataCollected).toEqual({ Cat: [] });
+	expect(result.diagnostics).toEqual([]);
 });
 
 test("calls nested inside other functions are still extracted", () => {
@@ -260,52 +343,95 @@ test("thirdParty: ignored if imported from non-SDK module", () => {
 	expect(extractFromFile("a.ts", code).thirdParties).toEqual([]);
 });
 
-test("thirdParty: ignored if fewer than 3 args", () => {
+test("thirdParty with fewer than 3 args is diagnosed", () => {
 	const code = `
 		import { thirdParty } from "@openpolicy/sdk";
 		thirdParty("Stripe", "Payments");
 	`;
-	expect(extractFromFile("a.ts", code).thirdParties).toEqual([]);
+	const result = extractFromFile("a.ts", code);
+	expect(result.thirdParties).toEqual([]);
+	expect(result.diagnostics).toEqual([
+		{
+			code: "missing-arguments",
+			message: "thirdParty() requires 3 arguments (name, purpose, policyUrl)",
+			file: "a.ts",
+			line: 3,
+			column: 3,
+		},
+	]);
 });
 
-test("thirdParty: ignored if first arg is non-literal", () => {
+test("thirdParty with a non-literal name is diagnosed", () => {
 	const code = `
 		import { thirdParty } from "@openpolicy/sdk";
 		const name = "Stripe";
 		thirdParty(name, "Payments", "https://stripe.com/privacy");
 	`;
-	expect(extractFromFile("a.ts", code).thirdParties).toEqual([]);
+	const result = extractFromFile("a.ts", code);
+	expect(result.thirdParties).toEqual([]);
+	expect(result.diagnostics).toEqual([
+		{
+			code: "non-literal-argument",
+			message: "thirdParty() name must be a string literal",
+			file: "a.ts",
+			line: 4,
+			column: 3,
+		},
+	]);
 });
 
-test("thirdParty: ignored if second arg is non-literal", () => {
+test("thirdParty with a non-literal purpose is diagnosed", () => {
 	const code = `
 		import { thirdParty } from "@openpolicy/sdk";
 		thirdParty("Stripe", getPurpose(), "https://stripe.com/privacy");
 	`;
-	expect(extractFromFile("a.ts", code).thirdParties).toEqual([]);
+	const result = extractFromFile("a.ts", code);
+	expect(result.thirdParties).toEqual([]);
+	expect(result.diagnostics).toEqual([
+		{
+			code: "non-literal-argument",
+			message: "thirdParty() purpose must be a string literal",
+			file: "a.ts",
+			line: 3,
+			column: 3,
+		},
+	]);
 });
 
-test("thirdParty: ignored if third arg is non-literal", () => {
+test("thirdParty with a non-literal policyUrl is diagnosed", () => {
 	const code = `
 		import { thirdParty } from "@openpolicy/sdk";
 		thirdParty("Stripe", "Payments", STRIPE_POLICY_URL);
 	`;
-	expect(extractFromFile("a.ts", code).thirdParties).toEqual([]);
+	const result = extractFromFile("a.ts", code);
+	expect(result.thirdParties).toEqual([]);
+	expect(result.diagnostics).toEqual([
+		{
+			code: "non-literal-argument",
+			message: "thirdParty() policyUrl must be a string literal",
+			file: "a.ts",
+			line: 3,
+			column: 3,
+		},
+	]);
 });
 
-test("thirdParty: deduplication — same name in same file appears once", () => {
+test("thirdParty: deduplication — same name in same file appears once, no diagnostic", () => {
 	const code = `
 		import { thirdParty } from "@openpolicy/sdk";
 		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
 		thirdParty("Stripe", "Billing", "https://stripe.com/other");
 	`;
-	expect(extractFromFile("a.ts", code).thirdParties).toEqual([
+	const result = extractFromFile("a.ts", code);
+	expect(result.thirdParties).toEqual([
 		{
 			name: "Stripe",
 			purpose: "Payments",
 			policyUrl: "https://stripe.com/privacy",
 		},
 	]);
+	// Within-file duplicate is intentional dedup, not data loss.
+	expect(result.diagnostics).toEqual([]);
 });
 
 test("thirdParty: multiple distinct entries", () => {
@@ -366,13 +492,15 @@ test("defineCookie: multiple distinct categories collected in insertion order", 
 	expect(extractFromFile("a.ts", code).cookies).toEqual(["analytics", "marketing"]);
 });
 
-test("defineCookie: duplicate categories deduped", () => {
+test("defineCookie: duplicate categories deduped, no diagnostic", () => {
 	const code = `
 		import { defineCookie } from "@openpolicy/sdk";
 		defineCookie("analytics");
 		defineCookie("analytics");
 	`;
-	expect(extractFromFile("a.ts", code).cookies).toEqual(["analytics"]);
+	const result = extractFromFile("a.ts", code);
+	expect(result.cookies).toEqual(["analytics"]);
+	expect(result.diagnostics).toEqual([]);
 });
 
 test("defineCookie: renamed import recognised", () => {
@@ -399,13 +527,23 @@ test("defineCookie: ignored for type-only imports", () => {
 	expect(extractFromFile("a.ts", code).cookies).toEqual([]);
 });
 
-test("defineCookie: non-literal argument skipped silently", () => {
+test("defineCookie with a non-literal argument is diagnosed", () => {
 	const code = `
 		import { defineCookie } from "@openpolicy/sdk";
 		const cat = "analytics";
 		defineCookie(cat);
 	`;
-	expect(extractFromFile("a.ts", code).cookies).toEqual([]);
+	const result = extractFromFile("a.ts", code);
+	expect(result.cookies).toEqual([]);
+	expect(result.diagnostics).toEqual([
+		{
+			code: "non-literal-argument",
+			message: "defineCookie() category must be a string literal",
+			file: "a.ts",
+			line: 4,
+			column: 3,
+		},
+	]);
 });
 
 test("cookies + collecting + thirdParty coexist in one file", () => {
@@ -420,4 +558,63 @@ test("cookies + collecting + thirdParty coexist in one file", () => {
 	expect(result.dataCollected).toEqual({ "Account Information": ["Name"] });
 	expect(result.thirdParties).toHaveLength(1);
 	expect(result.cookies.sort()).toEqual(["analytics", "marketing"]);
+	expect(result.diagnostics).toEqual([]);
+});
+
+// ---------------------------------------------------------------------------
+// diagnostic location + aggregation
+// ---------------------------------------------------------------------------
+
+test("diagnostic location is the 1-based line:column of the call expression", () => {
+	// Built without a leading newline so the line/column math is unambiguous:
+	// line 1 = import, line 2 = const, line 3 = the call indented 3 spaces.
+	const code =
+		'import { collecting } from "@openpolicy/sdk";\n' +
+		"const x = 1;\n" +
+		'   collecting(cat, v, { a: "Name" });\n';
+	const result = extractFromFile("src/x.ts", code);
+	expect(result.diagnostics).toEqual([
+		{
+			code: "non-literal-argument",
+			message: "collecting() category must be a string literal",
+			file: "src/x.ts",
+			line: 3,
+			column: 4,
+		},
+	]);
+});
+
+test("canonical valid calls produce zero diagnostics", () => {
+	const code = `
+		import { collecting, thirdParty, defineCookie } from "@openpolicy/sdk";
+		collecting("Account Information", { name }, { name: "Name" });
+		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
+		defineCookie("analytics");
+	`;
+	expect(extractFromFile("a.ts", code).diagnostics).toEqual([]);
+});
+
+test("multiple skipped calls each produce their own located diagnostic", () => {
+	const code = `
+		import { collecting, defineCookie } from "@openpolicy/sdk";
+		collecting(catA, v, { a: "Name" });
+		defineCookie(catB);
+	`;
+	const result = extractFromFile("a.ts", code);
+	expect(result.diagnostics).toEqual([
+		{
+			code: "non-literal-argument",
+			message: "collecting() category must be a string literal",
+			file: "a.ts",
+			line: 3,
+			column: 3,
+		},
+		{
+			code: "non-literal-argument",
+			message: "defineCookie() category must be a string literal",
+			file: "a.ts",
+			line: 4,
+			column: 3,
+		},
+	]);
 });
