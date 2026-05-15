@@ -6,21 +6,13 @@
 	"scripts": {
 		"changeset": "changeset",
 		"version-packages": "changeset version && pnpm install --lockfile-only",
-		"publish-packages": "tsx scripts/sync-legal.ts && vp run -r build && changeset publish",
-		"knip": "knip",
-		"bench": "tsx scripts/bench/bench.ts",
-		"bench:bundle": "tsx scripts/bench/bench.ts --only=bundle",
-		"bench:runtime": "tsx scripts/bench/bench.ts --only=runtime"
+		"publish-packages": "vp run -r build && changeset publish",
+		"knip": "knip"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.30.0",
-		"@openpolicy/react": "workspace:*",
-		"@openpolicy/sdk": "workspace:*",
-		"@sveltejs/vite-plugin-svelte": "^6.2.4",
-		"@tanstack/intent": "^0.0.29",
 		"@types/node": "^25.5.0",
 		"knip": "^5.86.0",
-		"svelte": "^5.51.0",
 		"tsx": "^4.19.2",
 		"vite-plus": "catalog:"
 	},

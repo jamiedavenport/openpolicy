@@ -25,27 +25,12 @@ importers:
       '@changesets/cli':
         specifier: ^2.30.0
         version: 2.31.0(@types/node@25.6.2)
-      '@openpolicy/react':
-        specifier: workspace:*
-        version: link:packages/react
-      '@openpolicy/sdk':
-        specifier: workspace:*
-        version: link:packages/sdk
-      '@sveltejs/vite-plugin-svelte':
-        specifier: ^6.2.4
-        version: 6.2.4(svelte@5.55.5)(vite@8.0.11(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.4))
-      '@tanstack/intent':
-        specifier: ^0.0.29
-        version: 0.0.29
       '@types/node':
         specifier: ^25.5.0
         version: 25.6.2
       knip:
         specifier: ^5.86.0
         version: 5.88.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(typescript@5.9.3)
-      svelte:
-        specifier: ^5.51.0
-        version: 5.55.5
       tsx:
         specifier: ^4.19.2
         version: 4.21.0

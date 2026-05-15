@@ -47,8 +47,6 @@ export async function compilePolicy(
 						content: await renderPDF(doc),
 					};
 				}
-				default:
-					throw new Error(`Format not yet implemented: ${format}`);
 			}
 		}),
 	);
