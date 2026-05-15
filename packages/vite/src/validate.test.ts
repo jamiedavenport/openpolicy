@@ -6,17 +6,19 @@ import { renderGenModule, type Scanned } from "./scanned";
 import { loadAndValidateConfig } from "./validate";
 
 /**
- * Tmp dirs sit inside the workspace root so node_modules resolution can
- * find `@openpolicy/sdk` (a workspace symlink at the repo's `node_modules/`).
- * `tmpdir()` would put us outside the workspace and the SDK would fail to
- * resolve from inside `bundle-require`'s esbuild pass.
+ * Tmp dirs sit inside this package's own directory so that `bundle-require`'s
+ * esbuild pass can resolve `@openpolicy/sdk` (a `workspace:*` devDependency,
+ * symlinked at `packages/vite/node_modules/@openpolicy/sdk`) from the bundled
+ * config. The workspace root doesn't have the SDK on its `node_modules` path
+ * (pnpm doesn't hoist it), and `tmpdir()` would escape the workspace
+ * entirely — either would make the SDK fail to resolve.
  */
-const WORKSPACE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 let tmp: string;
 
 beforeEach(async () => {
-	tmp = await mkdtemp(join(WORKSPACE_ROOT, ".tmp-validate-"));
+	tmp = await mkdtemp(join(PACKAGE_ROOT, ".tmp-validate-"));
 });
 
 afterEach(async () => {
