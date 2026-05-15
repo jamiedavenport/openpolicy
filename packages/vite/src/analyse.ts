@@ -1,6 +1,6 @@
 import { parseSync } from "oxc-parser";
+import { isCanonicalSdkSpecifier, type SdkSpecifierMatcher } from "./sdk-specifier";
 
-const SDK_SPECIFIER = "@openpolicy/sdk";
 const COLLECTING_NAME = "collecting";
 const THIRD_PARTY_NAME = "thirdParty";
 const IGNORE_NAME = "Ignore";
@@ -48,6 +48,71 @@ type ExtractResult = {
 	diagnostics: ScannerDiagnostic[];
 };
 
+function emptyResult(): ExtractResult {
+	return { dataCollected: {}, thirdParties: [], cookies: [], diagnostics: [] };
+}
+
+/**
+ * A successfully parsed module plus the metadata the scan pipeline needs
+ * before deciding SDK-ness. `importSources` is the de-duplicated set of
+ * non-type `import … from "<source>"` specifier strings — the Vite plugin
+ * resolves these through the Vite resolver to learn which (possibly aliased)
+ * specifiers point at the SDK before extraction runs.
+ */
+export type ParsedModule = {
+	program: AnyNode;
+	code: string;
+	filename: string;
+	importSources: string[];
+};
+
+/**
+ * Parse a single source file with oxc. Returns `null` on a hard parse
+ * failure (oxc still produces a usable AST for recoverable errors, so those
+ * are kept). Also collects the distinct non-type import source specifiers so
+ * the caller can resolve them once, in batch, before extraction.
+ */
+export function parseModule(filename: string, code: string): ParsedModule | null {
+	let result: ReturnType<typeof parseSync>;
+	try {
+		result = parseSync(filename, code);
+	} catch {
+		console.warn(`[openpolicy] parse error in ${filename}`);
+		return null;
+	}
+
+	if (result.errors.length > 0) {
+		// Hard parse failures only — oxc reports recoverable errors but still
+		// produces a usable AST, so we keep going and let the walker decide.
+		const fatal = result.errors.some((e) => e.severity === ("Error" as never));
+		if (fatal) {
+			console.warn(`[openpolicy] parse error in ${filename}`);
+			return null;
+		}
+	}
+
+	const program = result.program as unknown as AnyNode;
+	return { program, code, filename, importSources: collectImportSources(program) };
+}
+
+/**
+ * Distinct, non-type `import … from "<source>"` specifier strings in program
+ * order. Type-only declarations are skipped — they can't carry runtime SDK
+ * calls, so there's no point resolving them.
+ */
+function collectImportSources(program: AnyNode): string[] {
+	const seen = new Set<string>();
+	const body = program.body as AnyNode[] | undefined;
+	if (!body) return [];
+	for (const node of body) {
+		if (node.type !== "ImportDeclaration") continue;
+		if ((node.importKind as string | undefined) === "type") continue;
+		const source = node.source as AnyNode | undefined;
+		if (source && typeof source.value === "string") seen.add(source.value);
+	}
+	return [...seen];
+}
+
 /**
  * Extract `collecting()`, `thirdParty()`, and `defineCookie()` call metadata
  * from a single source file.
@@ -59,45 +124,46 @@ type ExtractResult = {
  * ever dropped silently). Files with no matching calls — or that fail to
  * parse — return empty defaults.
  *
- * The analyser runs in two phases:
+ * `isSdkSpecifier` decides whether an import source is the SDK. It defaults
+ * to {@link isCanonicalSdkSpecifier} (exact dual-scope match) so direct
+ * `@openpolicy/sdk` / `@policystack/sdk` imports work with no resolver; the
+ * Vite plugin swaps in a resolver-backed predicate so import aliases also
+ * resolve.
+ */
+export function extractFromFile(
+	filename: string,
+	code: string,
+	isSdkSpecifier: SdkSpecifierMatcher = isCanonicalSdkSpecifier,
+): ExtractResult {
+	const parsed = parseModule(filename, code);
+	if (!parsed) return emptyResult();
+	return extractFromParsed(parsed, isSdkSpecifier);
+}
+
+/**
+ * Extract call metadata from an already-parsed module. The scan pipeline
+ * parses every file once ({@link parseModule}), resolves the union of
+ * `importSources`, then calls this with a resolver-backed predicate — so
+ * parsing happens exactly once per file.
+ *
+ * Runs in two phases:
  * 1. Collect local names bound to `collecting` / `thirdParty` / `defineCookie`
- *    imported from `@openpolicy/sdk` (handles renamed imports, skips
- *    type-only imports, ignores look-alikes from other modules).
+ *    imported from an SDK specifier (handles renamed imports, skips type-only
+ *    imports, ignores look-alikes from other modules).
  * 2. Walk the program body and inspect `CallExpression` nodes whose target
  *    is one of those tracked local names.
  */
-export function extractFromFile(filename: string, code: string): ExtractResult {
-	const empty: ExtractResult = {
-		dataCollected: {},
-		thirdParties: [],
-		cookies: [],
-		diagnostics: [],
-	};
-	let result: ReturnType<typeof parseSync>;
-	try {
-		result = parseSync(filename, code);
-	} catch {
-		console.warn(`[openpolicy] parse error in ${filename}`);
-		return empty;
-	}
-
-	if (result.errors.length > 0) {
-		// Hard parse failures only — oxc reports recoverable errors but still
-		// produces a usable AST, so we keep going and let the walker decide.
-		const fatal = result.errors.some((e) => e.severity === ("Error" as never));
-		if (fatal) {
-			console.warn(`[openpolicy] parse error in ${filename}`);
-			return empty;
-		}
-	}
-
-	const program = result.program as unknown as AnyNode;
-	const collectingNames = collectBindings(program, SDK_SPECIFIER, COLLECTING_NAME);
-	const thirdPartyNames = collectBindings(program, SDK_SPECIFIER, THIRD_PARTY_NAME);
-	const ignoreNames = collectBindings(program, SDK_SPECIFIER, IGNORE_NAME);
-	const defineCookieNames = collectBindings(program, SDK_SPECIFIER, DEFINE_COOKIE_NAME);
+export function extractFromParsed(
+	parsed: ParsedModule,
+	isSdkSpecifier: SdkSpecifierMatcher,
+): ExtractResult {
+	const { program, code, filename } = parsed;
+	const collectingNames = collectBindings(program, isSdkSpecifier, COLLECTING_NAME);
+	const thirdPartyNames = collectBindings(program, isSdkSpecifier, THIRD_PARTY_NAME);
+	const ignoreNames = collectBindings(program, isSdkSpecifier, IGNORE_NAME);
+	const defineCookieNames = collectBindings(program, isSdkSpecifier, DEFINE_COOKIE_NAME);
 	if (collectingNames.size === 0 && thirdPartyNames.size === 0 && defineCookieNames.size === 0)
-		return empty;
+		return emptyResult();
 
 	const dataCollected: Record<string, string[]> = {};
 	const thirdParties: ThirdPartyEntry[] = [];
@@ -205,10 +271,15 @@ export function extractFromFile(filename: string, code: string): ExtractResult {
 
 /**
  * Walk `ImportDeclaration` nodes and return the local names bound to the given
- * `exportName` imported from `moduleName`. Skips type-only imports and
- * specifiers whose imported name doesn't match.
+ * `exportName` imported from a module `isSdkSpecifier` accepts. Skips type-only
+ * imports (so type-only imports are never resolved or matched) and specifiers
+ * whose imported name doesn't match.
  */
-function collectBindings(program: AnyNode, moduleName: string, exportName: string): Set<string> {
+function collectBindings(
+	program: AnyNode,
+	isSdkSpecifier: SdkSpecifierMatcher,
+	exportName: string,
+): Set<string> {
 	const names = new Set<string>();
 	const body = program.body as AnyNode[] | undefined;
 	if (!body) return names;
@@ -216,7 +287,7 @@ function collectBindings(program: AnyNode, moduleName: string, exportName: strin
 		if (node.type !== "ImportDeclaration") continue;
 		if ((node.importKind as string | undefined) === "type") continue;
 		const source = node.source as AnyNode | undefined;
-		if (!source || source.value !== moduleName) continue;
+		if (!source || typeof source.value !== "string" || !isSdkSpecifier(source.value)) continue;
 		const specifiers = node.specifiers as AnyNode[] | undefined;
 		if (!specifiers) continue;
 		for (const spec of specifiers) {

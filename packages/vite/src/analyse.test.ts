@@ -1,5 +1,6 @@
 import { expect, test } from "vite-plus/test";
-import { extractFromFile } from "./analyse";
+import { extractFromFile, extractFromParsed, parseModule } from "./analyse";
+import { isCanonicalSdkSpecifier, type SdkSpecifierMatcher } from "./sdk-specifier";
 
 // ---------------------------------------------------------------------------
 // collecting() tests
@@ -617,4 +618,68 @@ test("multiple skipped calls each produce their own located diagnostic", () => {
 			column: 3,
 		},
 	]);
+});
+
+// ---------------------------------------------------------------------------
+// SDK specifier predicate (PS-8)
+// ---------------------------------------------------------------------------
+
+test("default predicate recognises the @policystack/sdk scope (rename window)", () => {
+	const code = `
+		import { collecting } from "@policystack/sdk";
+		collecting("Account Information", v, { email: "Email address" });
+	`;
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
+		"Account Information": ["Email address"],
+	});
+});
+
+test("default predicate recognises a renamed import from @policystack/sdk", () => {
+	const code = `
+		import { collecting as col } from "@policystack/sdk";
+		col("Contact", v, { phone: "Phone number" });
+	`;
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({
+		Contact: ["Phone number"],
+	});
+});
+
+test("an injected predicate makes an aliased specifier collectable", () => {
+	const code = `
+		import { collecting } from "#sdk";
+		collecting("Account Information", v, { email: "Email address" });
+	`;
+	const aliasMatcher: SdkSpecifierMatcher = (s) => s === "#sdk";
+	expect(extractFromFile("a.ts", code, aliasMatcher).dataCollected).toEqual({
+		"Account Information": ["Email address"],
+	});
+	// The default (canonical) predicate must NOT match the alias.
+	expect(extractFromFile("a.ts", code).dataCollected).toEqual({});
+});
+
+test("parseModule + extractFromParsed equals extractFromFile (single-parse seam)", () => {
+	const code = `
+		import { collecting, thirdParty } from "@openpolicy/sdk";
+		collecting("Account Information", v, { email: "Email" });
+		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
+	`;
+	const parsed = parseModule("a.ts", code);
+	expect(parsed).not.toBeNull();
+	if (!parsed) return;
+	expect(parsed.importSources).toEqual(["@openpolicy/sdk"]);
+	expect(extractFromParsed(parsed, isCanonicalSdkSpecifier)).toEqual(extractFromFile("a.ts", code));
+});
+
+test("parseModule skips type-only import sources", () => {
+	const code = `
+		import type { PolicyConfig } from "@openpolicy/core";
+		import { collecting } from "@openpolicy/sdk";
+		collecting("C", v, { a: "A" });
+	`;
+	const parsed = parseModule("a.ts", code);
+	expect(parsed?.importSources).toEqual(["@openpolicy/sdk"]);
+});
+
+test("parseModule returns null on a hard parse failure", () => {
+	expect(parseModule("a.ts", "import { from 'broken")).toBeNull();
 });

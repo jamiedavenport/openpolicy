@@ -33,9 +33,21 @@ type PluginContextStub = {
 	warnings: string[];
 	error(msg: string): never;
 	warn(msg: string): void;
+	resolve?: (
+		source: string,
+		importer?: string,
+		options?: { skipSelf?: boolean },
+	) => Promise<{ id: string } | null>;
 };
 
-function createPluginContext(): PluginContextStub {
+/**
+ * `resolveMap` maps an import specifier to the id Rollup's resolver would
+ * return. When provided, a fake `this.resolve` is installed so the
+ * resolver-backed SDK matcher can be exercised; omit it (the default) and the
+ * plugin falls back to pure dual-scope matching — the path every pre-existing
+ * test relies on.
+ */
+function createPluginContext(resolveMap?: Record<string, string>): PluginContextStub {
 	const ctx: PluginContextStub = {
 		errors: [],
 		warnings: [],
@@ -47,6 +59,12 @@ function createPluginContext(): PluginContextStub {
 			ctx.warnings.push(msg);
 		},
 	};
+	if (resolveMap) {
+		ctx.resolve = async (source) => {
+			const id = resolveMap[source];
+			return id ? { id } : null;
+		};
+	}
 	return ctx;
 }
 
@@ -871,5 +889,100 @@ test("validate:false still writes the gen module so scanned data still flows thr
 	await runPluginBuildStart(plugin, tmp);
 	expect((await readScanned(tmp)).dataCollected).toEqual({
 		"Account Information": ["Name"],
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Resolver-backed SDK matching (PS-8)
+// ---------------------------------------------------------------------------
+
+test("recognises an aliased SDK import end-to-end via the Vite resolver", async () => {
+	await touch(
+		"src/lib/db.ts",
+		`
+		import { collecting } from "@/sdk";
+		collecting("Account Information", v, { email: "Email address" });
+		`,
+	);
+
+	const plugin = openPolicy();
+	const sdkId = join(tmp, "node_modules/@openpolicy/sdk/dist/index.js");
+	const ctx = createPluginContext({ "@openpolicy/sdk": sdkId, "@/sdk": sdkId });
+	await runPluginBuildStart(plugin, tmp, { ctx });
+
+	expect((await readScanned(tmp)).dataCollected).toEqual({
+		"Account Information": ["Email address"],
+	});
+});
+
+test("an alias resolving elsewhere is NOT treated as the SDK", async () => {
+	await touch(
+		"src/lib/db.ts",
+		`
+		import { collecting } from "@openpolicy/sdk-fake";
+		collecting("Should Not Appear", v, { x: "X" });
+		`,
+	);
+
+	const plugin = openPolicy();
+	const ctx = createPluginContext({
+		"@openpolicy/sdk": join(tmp, "node_modules/@openpolicy/sdk/dist/index.js"),
+		"@openpolicy/sdk-fake": join(tmp, "node_modules/@openpolicy/sdk-fake/index.js"),
+	});
+	await runPluginBuildStart(plugin, tmp, { ctx });
+
+	expect((await readScanned(tmp)).dataCollected).toEqual({});
+});
+
+test("recognises @policystack/sdk with no resolver (rename window, fallback path)", async () => {
+	await touch(
+		"src/lib/db.ts",
+		`
+		import { collecting } from "@policystack/sdk";
+		collecting("Account Information", v, { email: "Email address" });
+		`,
+	);
+
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp); // default ctx → no this.resolve
+
+	expect((await readScanned(tmp)).dataCollected).toEqual({
+		"Account Information": ["Email address"],
+	});
+});
+
+test("dev rescan reuses the resolver matcher captured at buildStart", async () => {
+	await touch(
+		"src/lib/db.ts",
+		`
+		import { collecting } from "@/sdk";
+		collecting("Initial", v, { x: "X" });
+		`,
+	);
+
+	const plugin = openPolicy();
+	const sdkId = join(tmp, "node_modules/@openpolicy/sdk/dist/index.js");
+	const ctx = createPluginContext({ "@openpolicy/sdk": sdkId, "@/sdk": sdkId });
+	await runPluginBuildStart(plugin, tmp, { ctx });
+	expect((await readScanned(tmp)).dataCollected).toEqual({ Initial: ["X"] });
+
+	const stub = createStubServer();
+	await runConfigureServer(plugin, stub.server);
+
+	// configureServer has no PluginContext, so the alias is only still
+	// recognised if the buildStart-captured matcher is reused.
+	await touch(
+		"src/lib/db.ts",
+		`
+		import { collecting } from "@/sdk";
+		collecting("Initial", v, { x: "X" });
+		collecting("Added", v, { y: "Y" });
+		`,
+	);
+	await stub.runHandler("change", join(tmp, "src/lib/db.ts"));
+
+	expect((await readScanned(tmp)).dataCollected).toEqual({
+		Initial: ["X"],
+		Added: ["Y"],
 	});
 });
