@@ -24,8 +24,8 @@ import type {
 	VendorRegistry,
 } from "./types";
 
-const DEFAULT_INCLUDE = ["**/*.{js,jsx,ts,tsx,vue,svelte,mjs,cjs,mts,cts}"];
-const DEFAULT_EXCLUDE = [
+export const DEFAULT_INCLUDE = ["**/*.{js,jsx,ts,tsx,vue,svelte,mjs,cjs,mts,cts}"];
+export const DEFAULT_EXCLUDE = [
 	"**/node_modules/**",
 	"**/dist/**",
 	"**/build/**",
