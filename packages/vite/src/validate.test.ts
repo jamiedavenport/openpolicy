@@ -54,7 +54,7 @@ export default defineConfig({
 		dpo: { required: false, reason: "small-scale processing" },
 	},
 	effectiveDate: "2026-01-01",
-	jurisdictions: ["eu"],
+	jurisdictions: ["eea"],
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
 		context: {
@@ -89,7 +89,7 @@ test("surfaces effective-date-required as an error", async () => {
 
 test("surfaces company-contact-phone-recommended warning under us-ca", async () => {
 	const file = await writeConfig(
-		VALID_CONFIG.replace('jurisdictions: ["eu"],', 'jurisdictions: ["us-ca"],'),
+		VALID_CONFIG.replace('jurisdictions: ["eea"],', 'jurisdictions: ["us-ca"],'),
 	);
 	const result = await loadAndValidateConfig({ configFile: file });
 	expect(result.loadError).toBeNull();
@@ -116,7 +116,7 @@ export default defineConfig({
 		dpo: { required: false, reason: "small-scale processing" },
 	},
 	effectiveDate: "2026-01-01",
-	jurisdictions: ["eu"],
+	jurisdictions: ["eea"],
 	data: {
 		collected: { ...dataCollected },
 		context: {},

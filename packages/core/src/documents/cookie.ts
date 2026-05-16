@@ -115,7 +115,7 @@ function buildManaging(t: T): DocumentSection {
 }
 
 function buildJurisdictionEuUk(config: CookiePolicyConfig, t: T): DocumentSection | null {
-	const hasEu = config.jurisdictions.includes("eu");
+	const hasEu = config.jurisdictions.includes("eea");
 	const hasUk = config.jurisdictions.includes("uk");
 	if (!hasEu && !hasUk) return null;
 	const branch: "euAndUk" | "eu" | "uk" = hasEu && hasUk ? "euAndUk" : hasEu ? "eu" : "uk";

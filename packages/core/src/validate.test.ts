@@ -1,10 +1,11 @@
 import { expect, test } from "vite-plus/test";
-import { isJurisdiction, JURISDICTIONS } from "./jurisdictions";
+import { isJurisdictionId, JURISDICTION_IDS } from "./jurisdiction-id";
 import type { OpenPolicyConfig } from "./types";
 import { validate } from "./validate";
 
-// Fully valid flat config under a non-GDPR jurisdiction — produces zero issues.
-// Tests override slices to exercise individual checks.
+// Valid flat config under an `equivalent` (non-gating) jurisdiction. It emits
+// exactly one issue — the `jurisdiction-generic-policy-text` honesty warning
+// for "ca" — and zero errors. Tests override slices to exercise each check.
 const baseConfig: OpenPolicyConfig = {
 	company: {
 		name: "Acme Inc.",
@@ -39,34 +40,41 @@ const baseConfig: OpenPolicyConfig = {
 	},
 };
 
-test("validate: no issues for a well-formed config", () => {
-	expect(validate(baseConfig)).toEqual([]);
+test("validate: a well-formed config emits only the honesty warning, no errors", () => {
+	const issues = validate(baseConfig);
+	expect(issues).toHaveLength(1);
+	expect(issues[0]?.code).toBe("jurisdiction-generic-policy-text");
+	expect(issues[0]?.level).toBe("warning");
+	expect(issues.some((i) => i.level === "error")).toBe(false);
 });
 
 // --- jurisdiction guard + codes ---
 
-test("isJurisdiction is true for every documented code", () => {
-	for (const code of JURISDICTIONS) {
-		expect(isJurisdiction(code)).toBe(true);
+test("isJurisdictionId is true for every canonical code", () => {
+	for (const code of JURISDICTION_IDS) {
+		expect(isJurisdictionId(code)).toBe(true);
 	}
 });
 
-test("isJurisdiction is false for retired codes and regulation names", () => {
-	expect(isJurisdiction("us")).toBe(false);
-	expect(isJurisdiction("nz")).toBe(false);
-	expect(isJurisdiction("other")).toBe(false);
-	expect(isJurisdiction("gdpr")).toBe(false);
-	expect(isJurisdiction("ccpa")).toBe(false);
-	expect(isJurisdiction("")).toBe(false);
+test("isJurisdictionId is false for retired codes and regulation names", () => {
+	expect(isJurisdictionId("eu")).toBe(false);
+	expect(isJurisdictionId("nz")).toBe(false);
+	expect(isJurisdictionId("au")).toBe(false);
+	expect(isJurisdictionId("jp")).toBe(false);
+	expect(isJurisdictionId("sg")).toBe(false);
+	expect(isJurisdictionId("other")).toBe(false);
+	expect(isJurisdictionId("gdpr")).toBe(false);
+	expect(isJurisdictionId("ccpa")).toBe(false);
+	expect(isJurisdictionId("")).toBe(false);
 });
 
 test("validate rejects a retired code with a helpful message listing valid codes", () => {
-	const issues = validate({ ...baseConfig, jurisdictions: ["us" as never] });
-	const bad = issues.find((i) => i.message.startsWith('Unknown jurisdiction "us"'));
+	const issues = validate({ ...baseConfig, jurisdictions: ["eu" as never] });
+	const bad = issues.find((i) => i.message.startsWith('Unknown jurisdiction "eu"'));
 	expect(bad).toBeDefined();
 	expect(bad?.code).toBe("jurisdiction-unknown");
 	expect(bad?.level).toBe("error");
-	for (const code of JURISDICTIONS) {
+	for (const code of JURISDICTION_IDS) {
 		expect(bad?.message).toContain(code);
 	}
 });
@@ -80,11 +88,31 @@ test("validate rejects a typo'd code", () => {
 	).toBe(true);
 });
 
-test("validate accepts every documented code", () => {
-	for (const code of JURISDICTIONS) {
+test("validate accepts every canonical code", () => {
+	for (const code of JURISDICTION_IDS) {
 		const issues = validate({ ...baseConfig, jurisdictions: [code] });
 		expect(issues.some((i) => i.message.startsWith("Unknown jurisdiction"))).toBe(false);
 	}
+});
+
+test("validate: an equivalent jurisdiction emits jurisdiction-generic-policy-text once; specific does not", () => {
+	const equivalent = validate({ ...baseConfig, jurisdictions: ["ch"] });
+	const generic = equivalent.filter((i) => i.code === "jurisdiction-generic-policy-text");
+	expect(generic).toHaveLength(1);
+	expect(generic[0]?.level).toBe("warning");
+	expect(generic[0]?.message).toContain('"ch"');
+
+	const specific = validate({ ...baseConfig, jurisdictions: ["eea"] });
+	expect(specific.some((i) => i.code === "jurisdiction-generic-policy-text")).toBe(false);
+});
+
+test("validate: the us-${string} state tail falls back to parent us — no unknown error", () => {
+	const issues = validate({ ...baseConfig, jurisdictions: ["us-fl" as never] });
+	expect(issues.some((i) => i.code === "jurisdiction-unknown")).toBe(false);
+	const generic = issues.find((i) => i.code === "jurisdiction-generic-policy-text");
+	expect(generic).toBeDefined();
+	expect(generic?.level).toBe("warning");
+	expect(generic?.message).toContain('resolved to "us"');
 });
 
 test("validate errors on an empty jurisdictions array", () => {
@@ -274,7 +302,7 @@ test("validate: emits retention-incomplete when a category lacks retention", () 
 // --- GDPR lawful basis / provision ---
 
 test("validate: emits lawful-basis-incomplete under EU/UK when a basis is missing or empty", () => {
-	for (const jx of [["eu"], ["uk"]] as const) {
+	for (const jx of [["eea"], ["uk"]] as const) {
 		const issues = validate({
 			...baseConfig,
 			jurisdictions: [...jx],
@@ -297,7 +325,7 @@ test("validate: emits lawful-basis-incomplete under EU/UK when a basis is missin
 
 	const emptyBasis = validate({
 		...baseConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		data: {
 			collected: { "Account Information": ["Name"] },
 			context: {
@@ -339,7 +367,7 @@ test("validate: no lawful-basis-incomplete for non-GDPR jurisdictions", () => {
 test("validate: emits statutory-contractual-obligation when provision is missing under GDPR", () => {
 	const issues = validate({
 		...baseConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		data: {
 			collected: { "Account Information": ["Name", "Email"] },
 			context: {
@@ -363,7 +391,7 @@ test("validate: emits statutory-contractual-obligation when provision is missing
 test("validate: emits statutory-contractual-obligation when consequences is empty", () => {
 	const issues = validate({
 		...baseConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		data: {
 			collected: { "Account Information": ["Name", "Email"] },
 			context: {
@@ -407,7 +435,7 @@ test("validate: no statutory-contractual-obligation for non-GDPR jurisdictions",
 // --- automated decision-making ---
 
 test("validate: warns automated-decision-making under EU/UK when the field is omitted", () => {
-	for (const jx of [["eu"], ["uk"]] as const) {
+	for (const jx of [["eea"], ["uk"]] as const) {
 		const issues = validate({ ...baseConfig, jurisdictions: [...jx] });
 		expect(
 			issues.some((i) => i.code === "automated-decision-making" && i.level === "warning"),
@@ -416,12 +444,12 @@ test("validate: warns automated-decision-making under EU/UK when the field is om
 });
 
 test("validate: no automated-decision-making warning when declared empty or populated", () => {
-	const empty = validate({ ...baseConfig, jurisdictions: ["eu"], automatedDecisionMaking: [] });
+	const empty = validate({ ...baseConfig, jurisdictions: ["eea"], automatedDecisionMaking: [] });
 	expect(empty.some((i) => i.code === "automated-decision-making")).toBe(false);
 
 	const populated = validate({
 		...baseConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		automatedDecisionMaking: [
 			{ name: "Fraud scoring", logic: "Rules engine", significance: "May decline" },
 		],
@@ -437,7 +465,7 @@ test("validate: no automated-decision-making warning for non-GDPR jurisdictions"
 // --- DPO warning ---
 
 test("validate: warns when an EU/UK jurisdiction has no company.dpo", () => {
-	const issues = validate({ ...baseConfig, jurisdictions: ["eu"] });
+	const issues = validate({ ...baseConfig, jurisdictions: ["eea"] });
 	expect(issues.some((i) => i.code === "company-dpo-undeclared" && i.level === "warning")).toBe(
 		true,
 	);
@@ -446,14 +474,14 @@ test("validate: warns when an EU/UK jurisdiction has no company.dpo", () => {
 test("validate: no DPO warning when company.dpo is provided or required:false", () => {
 	const provided = validate({
 		...baseConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		company: { ...baseConfig.company, dpo: { email: "dpo@acme.com" } },
 	});
 	expect(provided.some((i) => i.code === "company-dpo-undeclared")).toBe(false);
 
 	const notNeeded = validate({
 		...baseConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		company: { ...baseConfig.company, dpo: { required: false } },
 	});
 	expect(notNeeded.some((i) => i.code === "company-dpo-undeclared")).toBe(false);
@@ -485,7 +513,7 @@ test("validate: no phone warning when phone is set or jurisdiction is not us-ca"
 	});
 	expect(withPhone.some((i) => i.code === "company-contact-phone-recommended")).toBe(false);
 
-	const nonCcpa = validate({ ...baseConfig, jurisdictions: ["eu"] });
+	const nonCcpa = validate({ ...baseConfig, jurisdictions: ["eea"] });
 	expect(nonCcpa.some((i) => i.code === "company-contact-phone-recommended")).toBe(false);
 });
 
@@ -528,7 +556,7 @@ test("validate: warns when consentMechanism is not provided", () => {
 });
 
 test("validate: EU/UK + canWithdraw:false warns; canWithdraw:true does not", () => {
-	for (const jx of [["eu"], ["uk"]] as const) {
+	for (const jx of [["eea"], ["uk"]] as const) {
 		const cannot = validate({
 			...baseConfig,
 			jurisdictions: [...jx],
@@ -541,7 +569,7 @@ test("validate: EU/UK + canWithdraw:false warns; canWithdraw:true does not", () 
 
 	const can = validate({
 		...baseConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		consentMechanism: { hasBanner: true, hasPreferencePanel: true, canWithdraw: true },
 	});
 	expect(can.some((i) => i.code === "consent-withdrawal-required")).toBe(false);

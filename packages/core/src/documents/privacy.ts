@@ -56,7 +56,7 @@ function buildChildrenPrivacy(config: PrivacyPolicyConfig, t: T): DocumentSectio
 function buildDataCollected(config: PrivacyPolicyConfig, t: T): DocumentSection {
 	const { collected, context } = config.data;
 	const includeLegalBasis =
-		config.jurisdictions.includes("eu") || config.jurisdictions.includes("uk");
+		config.jurisdictions.includes("eea") || config.jurisdictions.includes("uk");
 	const rows: TableRowNode[] = Object.entries(collected).map(([category, fields]) => {
 		const entry = context[category];
 		if (!entry?.purpose) {
@@ -103,7 +103,7 @@ function usesConsent(config: PrivacyPolicyConfig): boolean {
 }
 
 function buildConsentWithdrawal(config: PrivacyPolicyConfig, t: T): DocumentSection | null {
-	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
+	if (!config.jurisdictions.includes("eea") && !config.jurisdictions.includes("uk")) return null;
 	if (!usesConsent(config)) return null;
 	return section("consent-withdrawal", [
 		heading(t.privacy.consentWithdrawal.heading(), {
@@ -119,7 +119,7 @@ function buildConsentWithdrawal(config: PrivacyPolicyConfig, t: T): DocumentSect
 }
 
 function buildAutomatedDecisionMaking(config: PrivacyPolicyConfig, t: T): DocumentSection | null {
-	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
+	if (!config.jurisdictions.includes("eea") && !config.jurisdictions.includes("uk")) return null;
 	const decisions = config.automatedDecisionMaking;
 	if (decisions === undefined) return null;
 
@@ -175,7 +175,7 @@ function buildDataRetention(config: PrivacyPolicyConfig, t: T): DocumentSection 
 }
 
 function buildProvisionRequirement(config: PrivacyPolicyConfig, t: T): DocumentSection | null {
-	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
+	if (!config.jurisdictions.includes("eea") && !config.jurisdictions.includes("uk")) return null;
 	const entries = Object.entries(config.data.context);
 	if (entries.length === 0) return null;
 	const rows: TableRowNode[] = entries.map(([category, entry]) => {
@@ -285,7 +285,7 @@ function euRepresentativeParagraph(config: PrivacyPolicyConfig, t: T): ContentNo
 }
 
 function buildGdprSupplement(config: PrivacyPolicyConfig, t: T): DocumentSection | null {
-	if (!config.jurisdictions.includes("eu")) return null;
+	if (!config.jurisdictions.includes("eea")) return null;
 	const content: ContentNode[] = [
 		heading(t.privacy.gdprSupplement.heading(), {
 			reason: {

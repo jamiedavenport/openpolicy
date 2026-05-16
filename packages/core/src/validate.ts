@@ -1,6 +1,6 @@
 import { isLocale, LOCALES } from "./i18n";
 import { shouldEmit } from "./index";
-import { isJurisdiction, JURISDICTIONS } from "./jurisdictions";
+import { JURISDICTION_IDS, JURISDICTION_TABLE, resolveJurisdiction } from "./jurisdiction-id";
 import type { Issue, OpenPolicyConfig } from "./types";
 
 /**
@@ -54,11 +54,19 @@ export function validate(config: OpenPolicyConfig): Issue[] {
 		});
 	} else {
 		for (const code of config.jurisdictions) {
-			if (!isJurisdiction(code)) {
+			const resolved = resolveJurisdiction(code);
+			if (resolved === null) {
 				issues.push({
 					code: "jurisdiction-unknown",
 					level: "error",
-					message: `Unknown jurisdiction "${code}" — valid codes: ${JURISDICTIONS.join(", ")}`,
+					message: `Unknown jurisdiction "${code}" — valid codes: ${JURISDICTION_IDS.join(", ")}`,
+				});
+			} else if (JURISDICTION_TABLE[resolved].policyText === "equivalent") {
+				const via = resolved === code ? "" : ` (resolved to "${resolved}")`;
+				issues.push({
+					code: "jurisdiction-generic-policy-text",
+					level: "warning",
+					message: `Jurisdiction "${code}"${via} ships generic policy text only — it is supported at the "equivalent" tier (posture-correct + parent text), not the hand-authored "specific" tier.`,
 				});
 			}
 		}
@@ -96,7 +104,7 @@ export function validate(config: OpenPolicyConfig): Issue[] {
 		}
 	}
 
-	const gdprScope = config.jurisdictions?.includes("eu") || config.jurisdictions?.includes("uk");
+	const gdprScope = config.jurisdictions?.includes("eea") || config.jurisdictions?.includes("uk");
 
 	if (wantPrivacy) {
 		if (!config.data) {

@@ -103,7 +103,7 @@ test("defineConfig rejects data context missing entries for every collected cate
 	defineConfig({
 		company: fixture.company,
 		effectiveDate: "2026-01-01",
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		data: {
 			collected: { "Account Information": ["Email"] },
 			// @ts-expect-error — missing "Account Information" in context
@@ -117,7 +117,7 @@ test("defineConfig rejects cookies.context without entry for every used cookie",
 	defineConfig({
 		company: fixture.company,
 		effectiveDate: "2026-01-01",
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		data: fixture.data,
 		cookies: {
 			used: { essential: true, analytics: true },

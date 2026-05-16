@@ -1,4 +1,5 @@
-import type { Jurisdiction, UserRight } from "./types";
+import type { JurisdictionId } from "./jurisdiction-id";
+import type { UserRight } from "./types";
 
 const GDPR_RIGHTS: readonly UserRight[] = [
 	"access",
@@ -9,8 +10,8 @@ const GDPR_RIGHTS: readonly UserRight[] = [
 	"objection",
 ];
 
-const RIGHTS_BY_JURISDICTION: Partial<Record<Jurisdiction, readonly UserRight[]>> = {
-	eu: GDPR_RIGHTS,
+const RIGHTS_BY_JURISDICTION: Partial<Record<JurisdictionId, readonly UserRight[]>> = {
+	eea: GDPR_RIGHTS,
 	uk: GDPR_RIGHTS,
 	"us-ca": ["access", "erasure", "opt_out_sale", "non_discrimination"],
 };
@@ -26,7 +27,7 @@ const CANONICAL_ORDER: readonly UserRight[] = [
 	"non_discrimination",
 ];
 
-export function deriveUserRights(jurisdictions: Jurisdiction[]): UserRight[] {
+export function deriveUserRights(jurisdictions: JurisdictionId[]): UserRight[] {
 	const set = new Set<UserRight>();
 	for (const j of jurisdictions) {
 		for (const right of RIGHTS_BY_JURISDICTION[j] ?? []) set.add(right);

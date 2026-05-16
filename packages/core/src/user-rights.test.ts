@@ -13,8 +13,8 @@ const GDPR_RIGHTS: UserRight[] = [
 	"objection",
 ];
 
-test("deriveUserRights: EU-only returns the six GDPR rights in canonical order", () => {
-	expect(deriveUserRights(["eu"])).toEqual(GDPR_RIGHTS);
+test("deriveUserRights: EEA-only returns the six GDPR rights in canonical order", () => {
+	expect(deriveUserRights(["eea"])).toEqual(GDPR_RIGHTS);
 });
 
 test("deriveUserRights: UK-only returns the six GDPR rights (UK-GDPR parity)", () => {
@@ -30,7 +30,7 @@ test("deriveUserRights: US-CA-only returns the four CCPA rights in canonical ord
 	]);
 });
 
-test("deriveUserRights: EU+US-CA returns the union in canonical order regardless of input order", () => {
+test("deriveUserRights: EEA+US-CA returns the union in canonical order regardless of input order", () => {
 	const expected: UserRight[] = [
 		"access",
 		"rectification",
@@ -41,12 +41,12 @@ test("deriveUserRights: EU+US-CA returns the union in canonical order regardless
 		"opt_out_sale",
 		"non_discrimination",
 	];
-	expect(deriveUserRights(["eu", "us-ca"])).toEqual(expected);
-	expect(deriveUserRights(["us-ca", "eu"])).toEqual(expected);
+	expect(deriveUserRights(["eea", "us-ca"])).toEqual(expected);
+	expect(deriveUserRights(["us-ca", "eea"])).toEqual(expected);
 });
 
-test("deriveUserRights: EU dedupes with UK (both grant the same GDPR rights)", () => {
-	expect(deriveUserRights(["eu", "uk"])).toEqual(GDPR_RIGHTS);
+test("deriveUserRights: EEA dedupes with UK (both grant the same GDPR rights)", () => {
+	expect(deriveUserRights(["eea", "uk"])).toEqual(GDPR_RIGHTS);
 });
 
 test("deriveUserRights: a reserved jurisdiction with no shipped content returns an empty array", () => {

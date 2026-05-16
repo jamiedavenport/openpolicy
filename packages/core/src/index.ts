@@ -46,8 +46,13 @@ export {
 	ul,
 	visit,
 } from "./documents";
-export type { JurisdictionId } from "./jurisdiction-id";
-export { isJurisdiction, JURISDICTIONS } from "./jurisdictions";
+export type { JurisdictionCapability, JurisdictionId, JurisdictionTable } from "./jurisdiction-id";
+export {
+	isJurisdictionId,
+	JURISDICTION_IDS,
+	JURISDICTION_TABLE,
+	resolveJurisdiction,
+} from "./jurisdiction-id";
 export { CONTAINER_SLOTS, SLOT_NAMES } from "./slots";
 export type { ContainerSlotName, SlotName, SlotNodes } from "./slots";
 export type {
@@ -72,7 +77,6 @@ export type {
 	EuRepresentative,
 	Issue,
 	IssueCode,
-	Jurisdiction,
 	LegalBasis,
 	Locale,
 	OpenPolicyConfig,

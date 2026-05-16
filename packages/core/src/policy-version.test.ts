@@ -12,7 +12,7 @@ const company = {
 const base: OpenPolicyConfig = {
 	company,
 	effectiveDate: "2026-01-01",
-	jurisdictions: ["eu"],
+	jurisdictions: ["eea"],
 	data: {
 		collected: { "Account Information": ["Name", "Email"] },
 		context: {

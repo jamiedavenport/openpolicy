@@ -70,7 +70,7 @@ test("EU config includes lawful-basis column in data-collected and gdpr-suppleme
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 	});
 	const ids = doc.sections.map((s) => s.id);
 	expect(ids).toContain("gdpr-supplement");
@@ -214,7 +214,7 @@ test("gdpr-supplement mentions DPO when one is configured", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		company: {
 			...minimalPrivacyConfig.company,
 			dpo: { email: "dpo@acme.com", name: "Jane Doe", phone: "+1 555 010 2030" },
@@ -232,7 +232,7 @@ test("gdpr-supplement states no DPO when company.dpo.required === false", () => 
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		company: {
 			...minimalPrivacyConfig.company,
 			dpo: { required: false, reason: "Small-scale processing only." },
@@ -249,7 +249,7 @@ test("gdpr-supplement falls back to no-DPO disclosure when unset", () => {
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 	});
 	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
 	const blob = JSON.stringify(gdpr);
@@ -315,7 +315,7 @@ test("data-collected table includes lawful-basis labels with Article 6 sub-claus
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		data: {
 			collected: {
 				"Personal Information": ["Name", "Email"],
@@ -355,7 +355,7 @@ test("consent-withdrawal section is rendered when any data category uses consent
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		data: {
 			collected: {
 				"Personal Information": ["Name"],
@@ -396,7 +396,7 @@ test("consent-withdrawal section is rendered when only cookies use consent (EU)"
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		cookies: {
 			used: { essential: true, analytics: true },
 			context: {
@@ -415,7 +415,7 @@ test("consent-withdrawal section is omitted when no data or cookie basis is cons
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		data: {
 			collected: {
 				"Personal Information": ["Name"],
@@ -470,7 +470,7 @@ test("data-collected section does not carry the consent-withdrawal paragraph (it
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		data: {
 			collected: { "Marketing Data": ["Email"] },
 			context: {
@@ -517,7 +517,7 @@ test("automated-decision-making section is omitted when field is undefined under
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 	});
 	expect(doc.sections.find((s) => s.id === "automated-decision-making")).toBeUndefined();
 });
@@ -526,7 +526,7 @@ test("automated-decision-making section emits explicit-none paragraph when [] un
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		automatedDecisionMaking: [],
 	});
 	const adm = doc.sections.find((s) => s.id === "automated-decision-making")!;
@@ -541,7 +541,7 @@ test("gdpr-supplement complaint paragraph links to EDPB members directory", () =
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 	});
 	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
 	const blob = JSON.stringify(gdpr);
@@ -554,7 +554,7 @@ test("gdpr-supplement does not mention Article 27 representative when unset", ()
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 	});
 	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
 	const blob = JSON.stringify(gdpr);
@@ -566,7 +566,7 @@ test("gdpr-supplement renders Article 27 representative paragraph when configure
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		company: {
 			...minimalPrivacyConfig.company,
 			euRepresentative: {
@@ -588,7 +588,7 @@ test("gdpr-supplement names specific Article 46 transfer safeguards and links th
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 	});
 	const gdpr = doc.sections.find((s) => s.id === "gdpr-supplement")!;
 	const blob = JSON.stringify(gdpr);
@@ -619,7 +619,7 @@ test("provision-requirement section renders one paragraph per category covering 
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		data: {
 			collected: {
 				"Account Information": ["Email"],
@@ -703,7 +703,7 @@ test("automated-decision-making section enumerates each activity and appends Art
 	const doc = compile({
 		type: "privacy",
 		...minimalPrivacyConfig,
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		automatedDecisionMaking: [
 			{
 				name: "Fraud scoring",
