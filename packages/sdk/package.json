@@ -23,9 +23,9 @@
 			"import": "./dist/index.js",
 			"types": "./dist/index.d.ts"
 		},
-		"./opencookies": {
-			"import": "./dist/opencookies.js",
-			"types": "./dist/opencookies.d.ts"
+		"./consent": {
+			"import": "./dist/consent.js",
+			"types": "./dist/consent.d.ts"
 		}
 	},
 	"scripts": {
@@ -36,17 +36,8 @@
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"@opencookies/core": "^0.0.2",
 		"@openpolicy/core": "workspace:*",
 		"@openpolicy/tooling": "workspace:*",
 		"vite-plus": "catalog:"
-	},
-	"peerDependencies": {
-		"@opencookies/core": "*"
-	},
-	"peerDependenciesMeta": {
-		"@opencookies/core": {
-			"optional": true
-		}
 	}
 }

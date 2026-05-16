@@ -1,5 +1,5 @@
 import type { OpenPolicyConfig } from "@openpolicy/core";
-import type { Category, OpenCookiesConfig } from "@opencookies/core";
+import type { Category, OpenCookiesConfig } from "@openpolicy/core/consent";
 
 export type ToOpenCookiesConfigOptions = Omit<OpenCookiesConfig, "categories">;
 

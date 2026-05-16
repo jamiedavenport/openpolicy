@@ -10,7 +10,7 @@ export default defineConfig({
 		entry: {
 			index: "./src/index.ts",
 			"auto-collected": "./src/auto-collected.ts",
-			opencookies: "./src/opencookies.ts",
+			consent: "./src/consent.ts",
 		},
 		format: "esm",
 		dts: true,

@@ -3,7 +3,7 @@ import { compile } from "@openpolicy/core";
 import { isValidElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vite-plus/test";
-import { PrivacyPolicy, renderDocument } from ".";
+import { PrivacyPolicy, renderDocument } from "./policy";
 import type { PolicyComponents } from "./types";
 
 const company = {
