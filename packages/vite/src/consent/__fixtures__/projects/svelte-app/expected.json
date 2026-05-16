@@ -1,0 +1,5 @@
+{
+  "cookies": { "count": 0, "kinds": [] },
+  "vendors": { "minCount": 1, "vendors": ["sentry"] },
+  "ungated": { "min": 1 }
+}

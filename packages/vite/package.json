@@ -34,7 +34,8 @@
 	"dependencies": {
 		"@openpolicy/core": "workspace:*",
 		"bundle-require": "^5.1.0",
-		"oxc-parser": "^0.124.0"
+		"oxc-parser": "^0.124.0",
+		"tinyglobby": "^0.2.0"
 	},
 	"devDependencies": {
 		"@openpolicy/sdk": "workspace:*",
