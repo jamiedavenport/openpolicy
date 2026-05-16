@@ -95,9 +95,12 @@ export { Contractual, ContractPrerequisite, Statutory, Voluntary } from "./provi
 export { computeCookieVersion, computePrivacyVersion } from "./policy-version";
 export { deriveUserRights } from "./user-rights";
 export { validate } from "./validate";
+export { createT } from "./i18n";
+export type { Dictionary, T } from "./i18n";
 
 import { compile } from "./documents";
 import type { Document } from "./documents";
+import type { Dictionary } from "./i18n";
 import type {
 	CookiePolicyCookies,
 	DataConfig,
@@ -174,12 +177,18 @@ export function expandOpenPolicyConfig(config: OpenPolicyConfig): PolicyInput[] 
 	return inputs;
 }
 
-export function compilePrivacyPolicy(config: OpenPolicyConfig): Document | null {
+export function compilePrivacyPolicy(
+	config: OpenPolicyConfig,
+	dictionary?: Dictionary,
+): Document | null {
 	const input = buildPrivacyInput(config);
-	return input ? compile(input) : null;
+	return input ? compile(input, dictionary) : null;
 }
 
-export function compileCookiePolicy(config: OpenPolicyConfig): Document | null {
+export function compileCookiePolicy(
+	config: OpenPolicyConfig,
+	dictionary?: Dictionary,
+): Document | null {
 	const input = buildCookieInput(config);
-	return input ? compile(input) : null;
+	return input ? compile(input, dictionary) : null;
 }
