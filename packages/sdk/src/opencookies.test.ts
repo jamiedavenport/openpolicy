@@ -11,7 +11,7 @@ const policy: OpenPolicyConfig = {
 		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
-	jurisdictions: ["eu"],
+	jurisdictions: ["eea"],
 	data: { collected: {}, context: {} },
 	cookies: {
 		used: { essential: true, analytics: true, marketing: false },

@@ -223,7 +223,7 @@ function buildPrivacyInput(locale: Locale): PolicyInput {
 		},
 		thirdParties: [],
 		userRights: ["access", "rectification", "erasure"],
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 	};
 }
 

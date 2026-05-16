@@ -20,7 +20,7 @@ export type {
 	Dpo,
 	EffectiveDate,
 	EuRepresentative,
-	Jurisdiction,
+	JurisdictionId,
 	LegalBasis,
 	Locale,
 	OpenPolicyConfig,

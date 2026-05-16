@@ -1,3 +1,5 @@
+import type { JurisdictionId } from "./jurisdiction-id";
+
 export type OutputFormat = "markdown" | "html" | "pdf";
 
 export type CompileOptions = { formats: OutputFormat[] };
@@ -9,18 +11,6 @@ export type PolicyCategory = "privacy" | "cookie";
 // the caller wrote them — this union only governs the strings OpenPolicy itself
 // emits (headings, boilerplate, lookup-table labels).
 export type Locale = "en" | "fr" | "de" | "nl" | "es";
-
-export type Jurisdiction =
-	| "eu" //    European Union — GDPR
-	| "uk" //    United Kingdom — UK-GDPR + Data Protection Act 2018
-	| "us-ca" // California, USA — CCPA / CPRA
-	| "us-va" // Virginia, USA — VCDPA (reserved; no gated content in 0.1.0)
-	| "us-co" // Colorado, USA — CPA (reserved; no gated content in 0.1.0)
-	| "br" //    Brazil — LGPD (reserved; no gated content in 0.1.0)
-	| "ca" //    Canada — PIPEDA (reserved; no gated content in 0.1.0)
-	| "au" //    Australia — Privacy Act 1988 (reserved; no gated content in 0.1.0)
-	| "jp" //    Japan — APPI (reserved; no gated content in 0.1.0)
-	| "sg"; //   Singapore — PDPA (reserved; no gated content in 0.1.0)
 
 export type UserRight =
 	| "access"
@@ -154,7 +144,7 @@ export type PrivacyPolicyConfig = {
 	cookies: CookiePolicyCookies;
 	thirdParties: ThirdParty[];
 	userRights: UserRight[];
-	jurisdictions: Jurisdiction[];
+	jurisdictions: JurisdictionId[];
 	children?: ChildrenConfig;
 	automatedDecisionMaking?: AutomatedDecisionMaking;
 	version?: string;
@@ -170,7 +160,7 @@ export type CookiePolicyConfig = {
 	thirdParties: ThirdParty[];
 	trackingTechnologies?: TrackingTechnology[];
 	consentMechanism?: ConsentMechanism;
-	jurisdictions: Jurisdiction[];
+	jurisdictions: JurisdictionId[];
 	version?: string;
 };
 
@@ -182,7 +172,7 @@ export type PolicyInput =
 export type OpenPolicyConfig = {
 	company: CompanyConfig;
 	effectiveDate: EffectiveDate;
-	jurisdictions: Jurisdiction[];
+	jurisdictions: JurisdictionId[];
 
 	// Language for OpenPolicy-emitted strings. Defaults to "en" when omitted.
 	locale?: Locale;
@@ -227,7 +217,7 @@ export type IssueCode =
 	| "company-address-required" //         error   — company.address missing
 	| "company-contact-required" //         error   — company.contact.email missing
 	| "jurisdictions-required" //           error   — jurisdictions empty
-	| "jurisdiction-unknown" //             error   — code not in JURISDICTIONS
+	| "jurisdiction-unknown" //             error   — code not a recognised JurisdictionId
 	| "locale-unknown" //                   error   — locale not in LOCALES
 	| "policy-empty" //                     error   — config produces no policy
 	| "policy-cookie-empty" //              error   — policies has "cookie" but cookies unset
@@ -247,7 +237,8 @@ export type IssueCode =
 	| "cookies-empty" //                    error   — no cookie category enabled
 	| "cookie-lawful-basis-missing" //      error   — enabled cookie lacks lawful basis
 	| "consent-mechanism-undeclared" //     warning — consentMechanism absent
-	| "consent-withdrawal-required"; //     warning — withdrawal not enabled under GDPR/UK
+	| "consent-withdrawal-required" //      warning — withdrawal not enabled under GDPR/UK
+	| "jurisdiction-generic-policy-text"; //warning — declared jurisdiction ships only equivalent (parent) policy text
 
 export type Issue = {
 	code: IssueCode;

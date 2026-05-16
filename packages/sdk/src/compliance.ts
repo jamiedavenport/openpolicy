@@ -1,13 +1,13 @@
-import type { Jurisdiction } from "@openpolicy/core";
+import type { JurisdictionId } from "@openpolicy/core";
 
 export const Compliance = {
 	GDPR: {
-		jurisdictions: ["eu"] as Jurisdiction[],
+		jurisdictions: ["eea"] as JurisdictionId[],
 	},
 	UK_GDPR: {
-		jurisdictions: ["uk"] as Jurisdiction[],
+		jurisdictions: ["uk"] as JurisdictionId[],
 	},
 	CCPA: {
-		jurisdictions: ["us-ca"] as Jurisdiction[],
+		jurisdictions: ["us-ca"] as JurisdictionId[],
 	},
 } as const;
