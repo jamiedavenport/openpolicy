@@ -1,6 +1,8 @@
 <script lang="ts">
 import type { CookiePolicyConfig, OpenPolicyConfig } from "@openpolicy/core";
+import { visit } from "@openpolicy/core";
 import { setOverridesContext } from "./context.svelte";
+import { planVisitor } from "./plan";
 import RenderNode from "./RenderNode.svelte";
 import type { PolicyOverrides } from "./types";
 import { resolveDocument } from "./usePolicyDocument.svelte";
@@ -13,6 +15,7 @@ type Props = {
 const props: Props = $props();
 
 const doc = $derived(resolveDocument("cookie", props.config));
+const plan = $derived(doc ? visit(doc, planVisitor) : null);
 
 const overrides = $derived({
 	section: props.section,
@@ -34,8 +37,8 @@ const overrides = $derived({
 setOverridesContext(() => overrides);
 </script>
 
-{#if doc}
+{#if plan}
 	<div data-op-policy="" style={props.style}>
-		<RenderNode node={doc} />
+		<RenderNode {plan} />
 	</div>
 {/if}
