@@ -55,6 +55,8 @@ export type {
 	Dpo,
 	EffectiveDate,
 	EuRepresentative,
+	Issue,
+	IssueCode,
 	Jurisdiction,
 	LegalBasis,
 	Locale,
@@ -68,15 +70,12 @@ export type {
 	ThirdParty,
 	TrackingTechnology,
 	UserRight,
-	ValidationIssue,
 } from "./types";
 export { isOpenPolicyConfig } from "./types";
 export { Contractual, ContractPrerequisite, Statutory, Voluntary } from "./provision";
 export { computeCookieVersion, computePrivacyVersion } from "./policy-version";
 export { deriveUserRights } from "./user-rights";
-export { validatePrivacyPolicy } from "./validate";
-export { validateOpenPolicyConfig } from "./validate-config";
-export { validateCookiePolicy } from "./validate-cookie";
+export { validate } from "./validate";
 
 import { compile } from "./documents";
 import type { Document } from "./documents";
