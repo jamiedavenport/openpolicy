@@ -1,78 +1,59 @@
-import type { Document, InlineNode, ListItemNode, ListNode, TableNode } from "@openpolicy/core";
+import type { Document, InlineNode, ListNode, Visitor } from "@openpolicy/core";
+import { visit } from "@openpolicy/core";
 
-function renderInline(node: InlineNode): string {
-	switch (node.type) {
-		case "text":
-			return node.value;
-		case "bold":
-			return `**${node.value}**`;
-		case "italic":
-			return `_${node.value}_`;
-		case "link":
-			return `[${node.value}](${node.href})`;
-	}
-}
-
-function renderListItem(item: ListItemNode, indent = "", ordered = false, index = 0): string {
-	const parts: string[] = [];
-	let nestedList: ListNode | null = null;
-	for (const child of item.children) {
-		if (child.type === "list") {
-			nestedList = child;
-		} else {
-			parts.push(renderInline(child));
-		}
-	}
-	const bullet = ordered ? `${index + 1}.` : "-";
-	const line = `${indent}${bullet} ${parts.join("")}`;
-	if (nestedList) {
-		const nested = nestedList.items
-			.map((i, idx) => renderListItem(i, `${indent}  `, nestedList!.ordered, idx))
-			.join("\n");
-		return `${line}\n${nested}`;
-	}
-	return line;
-}
-
-function renderCellInline(children: InlineNode[]): string {
-	return children.map(renderInline).join("").replace(/\|/g, "\\|").replace(/\n/g, " ");
-}
-
-function renderRowCells(cells: { children: InlineNode[] }[]): string {
-	return `| ${cells.map((c) => renderCellInline(c.children)).join(" | ")} |`;
-}
-
-function renderTable(node: TableNode): string {
-	const headerLine = renderRowCells(node.header.cells);
-	const separatorLine = `| ${node.header.cells.map(() => "---").join(" | ")} |`;
-	const bodyLines = node.rows.map((r) => renderRowCells(r.cells));
-	return [headerLine, separatorLine, ...bodyLines].join("\n");
-}
+// One visitor map consumed by the shared core `visit()` — no hand-rolled walk.
+// The `list` arm owns its whole subtree because ordered numbering and nested
+// indent are positional and `visit()` threads no depth; nested lists recurse
+// back through `v` and are re-indented by line-prefix (composable, so no depth
+// param is needed). The `table` arm likewise owns its grid. `listItem` /
+// `tableRow` / `tableHeaderRow` / `tableCell` / `tableHeaderCell` are therefore
+// exhaustiveness-only no-ops (ADR 0001 unifying principle).
+const mdVisitor: Visitor<string> = {
+	document: (node, v) => node.sections.map(v).join("\n\n---\n\n"),
+	section: (node, v) => node.content.map(v).join("\n\n"),
+	heading: (node) => `${"#".repeat(node.level ?? 2)} ${node.value}`,
+	paragraph: (node, v) => node.children.map(v).join(""),
+	list: (node, v) =>
+		node.items
+			.map((item, index) => {
+				const parts: string[] = [];
+				let nested: ListNode | null = null;
+				for (const child of item.children) {
+					if (child.type === "list") nested = child;
+					else parts.push(v(child));
+				}
+				const bullet = node.ordered ? `${index + 1}.` : "-";
+				const line = `${bullet} ${parts.join("")}`;
+				if (!nested) return line;
+				const sub = v(nested)
+					.split("\n")
+					.map((l) => `  ${l}`)
+					.join("\n");
+				return `${line}\n${sub}`;
+			})
+			.join("\n"),
+	table: (node, v) => {
+		const cellText = (cell: { children: InlineNode[] }) =>
+			cell.children.map(v).join("").replace(/\|/g, "\\|").replace(/\n/g, " ");
+		const headerLine = `| ${node.header.cells.map(cellText).join(" | ")} |`;
+		const separatorLine = `| ${node.header.cells.map(() => "---").join(" | ")} |`;
+		const bodyLines = node.rows.map((r) => `| ${r.cells.map(cellText).join(" | ")} |`);
+		return [headerLine, separatorLine, ...bodyLines].join("\n");
+	},
+	text: (node) => node.value,
+	bold: (node) => `**${node.value}**`,
+	italic: (node) => `_${node.value}_`,
+	link: (node) => `[${node.value}](${node.href})`,
+	// Owned by the `list` / `table` arms — present only for exhaustiveness.
+	listItem: () => "",
+	tableHeaderRow: () => "",
+	tableRow: () => "",
+	tableHeaderCell: () => "",
+	tableCell: () => "",
+	// forward-compat: unrecognized node renders as nothing (ADR 0001)
+	unknown: () => "",
+};
 
 export function renderMarkdown(doc: Document): string {
-	return doc.sections
-		.map((section) => {
-			// biome-ignore lint/suspicious/useIterableCallbackReturn: typed
-			const blocks = section.content.map((node) => {
-				switch (node.type) {
-					case "heading": {
-						const hashes = "#".repeat(node.level ?? 2);
-						return `${hashes} ${node.value}`;
-					}
-					case "paragraph":
-						return node.children.map(renderInline).join("");
-					case "list":
-						return node.items
-							.map((item, idx) => renderListItem(item, "", node.ordered, idx))
-							.join("\n");
-					case "table":
-						return renderTable(node);
-					case "unknown":
-						// forward-compat: unrecognized node renders as nothing (ADR 0001)
-						return "";
-				}
-			});
-			return blocks.join("\n\n");
-		})
-		.join("\n\n---\n\n");
+	return visit(doc, mdVisitor);
 }
