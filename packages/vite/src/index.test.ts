@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, test } from "vite-plus/test";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import type { ThirdPartyEntry } from "./analyse";
@@ -14,6 +14,9 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+	// A test may have made tmp read-only to force a gen-file write failure;
+	// restore write perms so the recursive cleanup can remove its contents.
+	await chmod(tmp, 0o755).catch(() => {});
 	await rm(tmp, { recursive: true, force: true });
 });
 
@@ -205,6 +208,77 @@ test("buildStart writes scanned categories to the gen module", async () => {
 	expect((await readScanned(tmp)).dataCollected).toEqual({
 		"Account Information": ["Name", "Email address"],
 	});
+});
+
+test("buildStart degrades gracefully when the gen module can't be written", async () => {
+	await touch(
+		"src/lib/db.ts",
+		`
+		import { collecting } from "@openpolicy/sdk";
+		collecting("Account Information", v, { name: "Name" });
+		`,
+	);
+	// Seed a known-good gen module, then make its directory read-only so the
+	// atomic temp-write/rename fails. The build must not crash and the
+	// last-good file must survive untouched.
+	const lastGood = "// SEEDED LAST-GOOD — must survive a failed write\n";
+	await writeFile(join(tmp, "openpolicy.gen.ts"), lastGood, "utf8");
+	await chmod(tmp, 0o555);
+
+	const plugin = openPolicy();
+	let ctx: Awaited<ReturnType<typeof runPluginBuildStart>>;
+	try {
+		ctx = await runPluginBuildStart(plugin, tmp);
+	} finally {
+		await chmod(tmp, 0o755);
+	}
+
+	expect(ctx.errors).toEqual([]);
+	expect(ctx.warnings.some((w) => w.includes("could not write openpolicy.gen.ts"))).toBe(true);
+	expect(await readFile(join(tmp, "openpolicy.gen.ts"), "utf8")).toBe(lastGood);
+});
+
+test("dev rescan retries the write after a failure (in-memory state not advanced)", async () => {
+	await touch(
+		"src/a.ts",
+		`
+		import { collecting } from "@openpolicy/sdk";
+		collecting("A", v, { x: "X" });
+		`,
+	);
+
+	const plugin = openPolicy();
+	await runPluginBuildStart(plugin, tmp);
+	const before = await readFile(join(tmp, "openpolicy.gen.ts"), "utf8");
+
+	const stub = createStubServer();
+	await runConfigureServer(plugin, stub.server);
+
+	// Change the scan output, then block the write — the gen file stays at
+	// last-good and a warning is logged through the dev-server logger.
+	await touch(
+		"src/a.ts",
+		`
+		import { collecting } from "@openpolicy/sdk";
+		collecting("B", v, { y: "Y" });
+		`,
+	);
+	await chmod(tmp, 0o555);
+	try {
+		await stub.runHandler("change", join(tmp, "src/a.ts"));
+	} finally {
+		await chmod(tmp, 0o755);
+	}
+	expect(stub.loggedWarnings.some((w) => w.includes("could not write openpolicy.gen.ts"))).toBe(
+		true,
+	);
+	expect(await readFile(join(tmp, "openpolicy.gen.ts"), "utf8")).toBe(before);
+
+	// Because the failed write did NOT advance the in-memory `scanned`, the
+	// next event still sees a change and retries — the write now lands.
+	await stub.runHandler("change", join(tmp, "src/a.ts"));
+	const after = await readScanned(tmp);
+	expect(after.dataCollected).toEqual({ B: ["Y"] });
 });
 
 test("merges calls across multiple files", async () => {
