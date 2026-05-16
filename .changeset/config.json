@@ -11,7 +11,10 @@
 			"@openpolicy/react",
 			"@openpolicy/vue",
 			"@openpolicy/svelte",
-			"@openpolicy/renderers"
+			"@openpolicy/renderers",
+			"@openpolicy/solid",
+			"@openpolicy/angular",
+			"@openpolicy/scripts"
 		]
 	],
 	"linked": [],
