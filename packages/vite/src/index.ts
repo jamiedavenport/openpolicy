@@ -1,5 +1,6 @@
 import { access, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
+import type { IssueCode } from "@openpolicy/core";
 import type { Plugin, ViteDevServer } from "vite";
 import {
 	extractFromParsed,
@@ -51,8 +52,28 @@ export type OpenPolicyOptions = {
 	 * (`PluginContext.error`); warnings are reported (`PluginContext.warn`)
 	 * but never block. In dev, both error and warning issues are logged
 	 * through the dev-server logger and never crash HMR. Defaults to `true`.
+	 *
+	 * `strict` / `suppress` (below) shape the issue list before this
+	 * error/warn split is applied.
 	 */
 	validate?: boolean;
+
+	/**
+	 * Promote every remaining warning to an error, so they fail `vite build`
+	 * the same way real errors do. Applied *after* `suppress` — a suppressed
+	 * code is never promoted. In dev, promoted issues log at error level but
+	 * still never crash HMR. Defaults to `false`.
+	 */
+	strict?: boolean;
+
+	/**
+	 * Issue codes to drop from the result entirely, at any level (errors
+	 * included). Applied *before* `strict`. Use this to accept a known
+	 * disclosure gap — the list lives in `vite.config.ts`, so the decision is
+	 * committed and shows up in review. Does not silence config load/parse
+	 * failures. Defaults to `[]`.
+	 */
+	suppress?: IssueCode[];
 };
 
 /**
@@ -141,6 +162,8 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 	const usePackageJsonOpt = options.thirdParties?.usePackageJson ?? false;
 	const useCookiesPackageJsonOpt = options.cookies?.usePackageJson ?? false;
 	const validateOpt = options.validate ?? true;
+	const strictOpt = options.strict ?? false;
+	const suppressOpt = options.suppress ?? [];
 	let resolvedRoot: string;
 	let resolvedSrcDir: string;
 	let resolvedConfigDir: string;
@@ -333,6 +356,8 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 		try {
 			result = await loadAndValidateConfig({
 				configFile: resolvedConfigFile,
+				strict: strictOpt,
+				suppress: suppressOpt,
 			});
 		} catch (err) {
 			server.config.logger.error(`[openpolicy] validation crashed: ${err}`);
@@ -410,6 +435,8 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			if (validateOpt && resolvedConfigFile && resolvedCommand === "build") {
 				const result = await loadAndValidateConfig({
 					configFile: resolvedConfigFile,
+					strict: strictOpt,
+					suppress: suppressOpt,
 				});
 				if (result.loadError) {
 					this.warn(

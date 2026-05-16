@@ -216,8 +216,10 @@ export function isOpenPolicyConfig(value: unknown): value is OpenPolicyConfig {
 }
 
 // Stable public diagnostic codes emitted by validate(). Frozen at 1.0 (§6);
-// each is one-per-condition. Severity in the trailing comment is the default
-// (PS-13 may later allow promotion/suppression).
+// each is one-per-condition. The trailing severity is exactly what validate()
+// emits — it stays pure and frozen. Promotion (warnings→errors) and per-code
+// suppression are applied downstream by the @openpolicy/vite plugin's
+// `strict` / `suppress` options (PS-13), not here.
 export type IssueCode =
 	| "effective-date-required" //          error   — effectiveDate missing
 	| "company-name-required" //            error   — company.name missing
