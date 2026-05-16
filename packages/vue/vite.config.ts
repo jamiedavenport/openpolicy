@@ -2,7 +2,8 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
 	pack: {
-		entry: "./src/index.ts",
+		// Split entries — `./policy` and `./consent` never cross-import.
+		entry: ["./src/policy.ts", "./src/consent.ts"],
 		format: "esm",
 		dts: true,
 		fixedExtension: false,

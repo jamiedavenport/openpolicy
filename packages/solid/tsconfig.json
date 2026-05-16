@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"target": "esnext",
+		"lib": ["es2023", "DOM"],
+		"moduleDetection": "force",
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		"resolveJsonModule": true,
+		"types": ["node"],
+		"jsx": "react-jsx",
+		"jsxImportSource": "solid-js",
+		"strict": true,
+		"noUnusedLocals": true,
+		"declaration": true,
+		"noEmit": true,
+		"allowImportingTsExtensions": true,
+		"esModuleInterop": true,
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+		"skipLibCheck": true
+	}
+}

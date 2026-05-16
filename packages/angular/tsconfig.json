@@ -1,0 +1,26 @@
+{
+	"compilerOptions": {
+		"target": "es2022",
+		"lib": ["es2023", "DOM"],
+		"module": "es2022",
+		"moduleResolution": "bundler",
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": false,
+		"useDefineForClassFields": false,
+		"strict": true,
+		"noUnusedLocals": true,
+		"declaration": true,
+		"noEmit": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"isolatedModules": true,
+		"resolveJsonModule": true,
+		"moduleDetection": "force"
+	},
+	"angularCompilerOptions": {
+		"strictTemplates": true,
+		"strictInjectionParameters": true,
+		"enableI18nLegacyMessageIdFormat": false
+	},
+	"include": ["src/**/*.ts"]
+}

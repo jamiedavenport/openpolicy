@@ -1,0 +1,47 @@
+{
+	"name": "@openpolicy/angular",
+	"version": "0.0.34",
+	"description": "Angular consent service and components for OpenPolicy",
+	"license": "Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jamiedavenport/openpolicy",
+		"directory": "packages/angular"
+	},
+	"files": [
+		"src",
+		"README.md",
+		"NOTICE.md"
+	],
+	"type": "module",
+	"sideEffects": false,
+	"exports": {
+		"./consent": {
+			"types": "./src/public-api.ts",
+			"default": "./src/public-api.ts"
+		},
+		"./package.json": "./package.json"
+	},
+	"scripts": {
+		"dev": "vp run check-types",
+		"build": "vp run check-types",
+		"check-types": "tsc --noEmit",
+		"test": "vp test"
+	},
+	"dependencies": {
+		"tslib": "^2.6.0"
+	},
+	"devDependencies": {
+		"@angular/common": "^19.0.0",
+		"@angular/compiler": "^19.0.0",
+		"@angular/core": "^19.0.0",
+		"@openpolicy/core": "workspace:*",
+		"happy-dom": "^15.0.0",
+		"vite-plus": "catalog:",
+		"zone.js": "^0.15.0"
+	},
+	"peerDependencies": {
+		"@angular/common": ">=18.0.0",
+		"@angular/core": ">=18.0.0"
+	}
+}

@@ -1,0 +1,44 @@
+{
+	"name": "@openpolicy/solid",
+	"version": "0.0.34",
+	"description": "Solid consent components and hooks for OpenPolicy",
+	"license": "Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jamiedavenport/openpolicy",
+		"directory": "packages/solid"
+	},
+	"files": [
+		"src",
+		"README.md",
+		"NOTICE.md"
+	],
+	"type": "module",
+	"sideEffects": false,
+	"exports": {
+		"./consent": {
+			"solid": "./src/index.ts",
+			"types": "./src/index.ts",
+			"default": "./src/index.ts"
+		},
+		"./package.json": "./package.json"
+	},
+	"scripts": {
+		"dev": "vp run check-types",
+		"build": "vp run check-types",
+		"check-types": "tsc --noEmit",
+		"test": "vp test"
+	},
+	"devDependencies": {
+		"@openpolicy/core": "workspace:*",
+		"@solidjs/testing-library": "^0.8.10",
+		"@testing-library/jest-dom": "^6.6.0",
+		"happy-dom": "^15.0.0",
+		"solid-js": "^1.9.0",
+		"vite-plugin-solid": "^2.11.0",
+		"vite-plus": "catalog:"
+	},
+	"peerDependencies": {
+		"solid-js": ">=1.8"
+	}
+}

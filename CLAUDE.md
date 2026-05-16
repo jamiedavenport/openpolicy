@@ -55,6 +55,7 @@ There are a few other directories that might be useful to know about when workin
 We're actively working on the 1.0.0 release.
 
 - The primary branch for this is `v1`.
+- **All PRs for 1.0 / PolicyStack work (any `PS-*` ticket) MUST target the `v1` branch, not `main`.** `v1` is well ahead of `main`; opening against `main` produces a wrong, bloated diff. Cut feature branches from `v1` and set the PR base to `v1` explicitly (the harness default of `main` is incorrect for this work).
 - Breaking changes are allowed on the `v1` branch.
 - Failing tests are acceptable on the `v1` branch.
 - Projects and tickets are in the `PolicyStack 1.0` team in Linear.

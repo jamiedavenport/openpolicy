@@ -1,7 +1,7 @@
 // src/routes/__root.tsx
 /// <reference types="vite-plus/client" />
 
-import { OpenPolicy } from "@openpolicy/react";
+import { OpenPolicy } from "@openpolicy/react/policy";
 import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 

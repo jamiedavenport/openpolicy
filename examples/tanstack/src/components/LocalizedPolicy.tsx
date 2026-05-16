@@ -1,4 +1,4 @@
-import { CookiePolicy, PrivacyPolicy } from "@openpolicy/react";
+import { CookiePolicy, PrivacyPolicy } from "@openpolicy/react/policy";
 import type { ReactNode } from "react";
 import type { Locale } from "@openpolicy/sdk";
 import { cn } from "@/lib/utils";

@@ -6,7 +6,7 @@ import {
 } from "@openpolicy/core";
 import { expect, test } from "vite-plus/test";
 import { defineComponent, h, isVNode, type PropType } from "vue";
-import { type PolicyComponents, renderDocument } from ".";
+import { type PolicyComponents, renderDocument } from "./policy";
 
 const company = {
 	name: "Acme",

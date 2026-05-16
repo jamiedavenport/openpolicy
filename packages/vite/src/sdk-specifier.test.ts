@@ -14,7 +14,7 @@ test("look-alikes and subpaths are rejected", () => {
 		"@openpolicy/sdk-x",
 		"@openpolicy/sdkk",
 		"@openpolicy/sdk/foo",
-		"@policystack/sdk/opencookies",
+		"@policystack/sdk/consent",
 		"openpolicy-sdk",
 		"@openpolicy/core",
 		"./sdk",
