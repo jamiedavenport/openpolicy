@@ -82,3 +82,64 @@ test("policy.privacyVersion is ignored by the bridge", () => {
 	const config = toOpenCookiesConfig({ ...policy, privacyVersion: "priv12345" });
 	expect(config.policyVersion).toBeUndefined();
 });
+
+test("lawful basis drives locked, not the category key name", () => {
+	const config = toOpenCookiesConfig({
+		...policy,
+		cookies: {
+			used: { essential: true, security: true },
+			context: {
+				// `essential` named but consent-based ⇒ gated (the old
+				// key === "essential" heuristic would wrongly lock this).
+				essential: { lawfulBasis: "consent" },
+				// non-`essential` name but a non-consent basis ⇒ not gated.
+				security: { lawfulBasis: "legal_obligation" },
+			},
+		},
+	});
+	expect(config.categories.find((c) => c.key === "essential")?.locked).toBe(false);
+	expect(config.categories.find((c) => c.key === "security")?.locked).toBe(true);
+});
+
+test("non-consent lawful bases are all treated as not gated", () => {
+	const config = toOpenCookiesConfig({
+		...policy,
+		cookies: {
+			used: { essential: true, a: true, b: true, c: true, d: true },
+			context: {
+				essential: { lawfulBasis: "legal_obligation" },
+				a: { lawfulBasis: "contract" },
+				b: { lawfulBasis: "legitimate_interests" },
+				c: { lawfulBasis: "vital_interests" },
+				d: { lawfulBasis: "public_task" },
+			},
+		},
+	});
+	expect(config.categories.every((cat) => cat.locked === true)).toBe(true);
+});
+
+test("carries lawfulBasis onto each derived category", () => {
+	const config = toOpenCookiesConfig(policy);
+	expect(config.categories.find((c) => c.key === "essential")?.lawfulBasis).toBe(
+		"legal_obligation",
+	);
+	expect(config.categories.find((c) => c.key === "analytics")?.lawfulBasis).toBe("consent");
+});
+
+test("leaves vendor and purpose unset (filled by downstream tickets)", () => {
+	const config = toOpenCookiesConfig(policy);
+	for (const cat of config.categories) {
+		expect(cat.vendor).toBeUndefined();
+		expect(cat.purpose).toBeUndefined();
+	}
+});
+
+test("enabled cookie with no context entry is gated with no lawfulBasis", () => {
+	const config = toOpenCookiesConfig({
+		...policy,
+		cookies: { used: { essential: true, analytics: true }, context: {} },
+	});
+	const analytics = config.categories.find((c) => c.key === "analytics");
+	expect(analytics?.lawfulBasis).toBeUndefined();
+	expect(analytics?.locked).toBe(false);
+});

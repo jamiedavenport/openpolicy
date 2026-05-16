@@ -35,6 +35,24 @@ describe("createConsentStore", () => {
 			});
 		});
 
+		it("bridge metadata (lawfulBasis/vendor/purpose) is inert — gating keys only on locked", () => {
+			const store = createConsentStore(
+				makeConfig({
+					categories: [
+						{ key: "essential", label: "Essential", locked: true, lawfulBasis: "consent" },
+						{
+							key: "analytics",
+							label: "Analytics",
+							lawfulBasis: "legitimate_interests",
+							vendor: "Acme",
+							purpose: "metrics",
+						},
+					],
+				}),
+			);
+			expect(store.getState().decisions).toEqual({ essential: true, analytics: false });
+		});
+
 		it("decidedAt is null and route is 'cookie' by default", () => {
 			const s = createConsentStore(makeConfig()).getState();
 			expect(s.decidedAt).toBeNull();
