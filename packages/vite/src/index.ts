@@ -20,6 +20,8 @@ import {
 	loadAndValidateConfig,
 	type ValidatedConfig,
 } from "./validate";
+import type { Logger, Mode } from "./consent/reporter";
+import { type ConsentRunner, createConsentRunner } from "./consent/runner";
 
 export type OpenPolicyOptions = {
 	/**
@@ -74,6 +76,32 @@ export type OpenPolicyOptions = {
 	 * failures. Defaults to `[]`.
 	 */
 	suppress?: IssueCode[];
+
+	/**
+	 * Opt-in OpenCookies consent scanner (folded in by PS-19). When this key
+	 * is present, the same plugin also runs a *separate* oxc walk that flags
+	 * ungated cookie writes / tracking-vendor usage. Omit it entirely to skip
+	 * the consent scan — existing policy behaviour is unaffected.
+	 *
+	 * This is structural co-location only: the consent walk never contributes
+	 * to `openpolicy.gen.ts` and is independent of `validate()` / `strict` /
+	 * `suppress`. A single unified walk + declared-vs-used cross-check is
+	 * PS-25.
+	 */
+	consent?: {
+		/**
+		 * `"error"` fails `vite build` on ungated findings (thrown from
+		 * `buildEnd`); `"warn"` logs them; `"off"` disables the scan while
+		 * keeping the option present. Defaults to `"error"` on `vite build`
+		 * and `"warn"` on `vite dev`.
+		 */
+		mode?: Mode;
+		/** Glob(s) of files to scan. Defaults to the consent scanner's own
+		 * source globs (js/ts/jsx/tsx/vue/svelte). */
+		include?: string[];
+		/** Glob(s) to exclude. Defaults to node_modules/dist/build/etc. */
+		exclude?: string[];
+	};
 };
 
 /**
@@ -169,6 +197,10 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 	let resolvedConfigDir: string;
 	let resolvedConfigFile: string | null = null;
 	let resolvedCommand: "build" | "serve" = "build";
+	// Opt-in OpenCookies consent scanner (PS-19). Stays null unless
+	// `options.consent` is set, so existing policy-only users see no change.
+	let consentRunner: ConsentRunner | null = null;
+	let consentLogger: Logger | null = null;
 	// Resolver-backed SDK matcher, built from `this.resolve` in `buildStart`.
 	// Defaults are the pure dual-scope predicate so an out-of-order or
 	// resolver-less call (test stubs, a dev rescan that somehow beats
@@ -386,6 +418,19 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			resolvedRoot = config.root;
 			resolvedSrcDir = resolve(config.root, srcDirOpt);
 			resolvedCommand = config.command;
+			if (options.consent) {
+				const mode: Mode = options.consent.mode ?? (config.command === "build" ? "error" : "warn");
+				// Report through Vite's logger (captured here), never via
+				// `this.error` — the consent scan must only abort the build
+				// from `buildEnd`, exactly like the old @opencookies/vite.
+				consentLogger = config.logger;
+				consentRunner = createConsentRunner({
+					root: config.root,
+					mode,
+					include: options.consent.include,
+					exclude: options.consent.exclude,
+				});
+			}
 		},
 		async buildStart() {
 			const found = await findConfig(resolvedRoot);
@@ -454,6 +499,17 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 					}
 				}
 			}
+			// Co-located OpenCookies consent scan (PS-19). Runs *after*
+			// policy validation, so a policy `this.error()` abort still
+			// short-circuits it. Reports through Vite's logger; only
+			// `buildEnd` fails the build — `build()` never rethrows.
+			if (consentRunner && consentLogger) {
+				try {
+					await consentRunner.build(consentLogger);
+				} catch (err) {
+					consentLogger.warn(`[opencookies] consent scan failed: ${err}`);
+				}
+			}
 		},
 		configureServer(server) {
 			// Make sure chokidar watches the whole src tree, not just files
@@ -467,6 +523,15 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			if (resolvedConfigFile) server.watcher.add(resolvedConfigFile);
 
 			const handler = async (file: string): Promise<void> => {
+				// Consent rescan runs on its own broader gate (vue/svelte,
+				// files outside srcDir) *before* the policy early-return.
+				if (consentRunner) {
+					try {
+						await consentRunner.hotUpdate(file, server.config.logger);
+					} catch (error) {
+						server.config.logger.error(`[opencookies] consent rescan failed: ${error}`);
+					}
+				}
 				const tracked = isTrackedSource(file);
 				const isConfig = resolvedConfigFile !== null && file === resolvedConfigFile;
 				if (!tracked && !isConfig) return;
@@ -489,6 +554,12 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			// the terminal in the same way — so we re-emit through the
 			// server logger for visibility on `vite dev` startup.
 			void runValidationDev(server);
+		},
+		// Consent build-fail seam (PS-19): mirrors the old @opencookies/vite
+		// — throws on remaining ungated findings when mode === "error".
+		// Policy still fails separately via `this.error()` in buildStart.
+		buildEnd(err?: Error) {
+			consentRunner?.buildEnd(err);
 		},
 	};
 }

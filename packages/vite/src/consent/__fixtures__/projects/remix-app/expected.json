@@ -1,0 +1,13 @@
+{
+  "cookies": {
+    "count": 2,
+    "kinds": ["set-cookie-header", "set-cookie-header"]
+  },
+  "vendors": {
+    "count": 1,
+    "vendors": ["segment"]
+  },
+  "ungated": {
+    "min": 2
+  }
+}

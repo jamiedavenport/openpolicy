@@ -1,0 +1,5 @@
+{
+  "cookies": { "count": 0, "kinds": [] },
+  "vendors": { "count": 2, "vendors": ["google-analytics", "google-analytics"] },
+  "ungated": { "exact": 1, "files": ["Ungated.tsx"] }
+}

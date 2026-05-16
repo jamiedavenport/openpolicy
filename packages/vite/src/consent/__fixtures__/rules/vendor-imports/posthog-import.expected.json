@@ -1,0 +1,5 @@
+{
+  "cookies": [],
+  "vendors": [{ "vendor": "posthog", "category": "analytics", "via": "import", "line": 1 }],
+  "ungated": []
+}
