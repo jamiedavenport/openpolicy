@@ -1,3 +1,5 @@
+import type { LegalBasis } from "../types";
+
 export type Route = "cookie" | "preferences" | "closed";
 
 export type Category = {
@@ -6,6 +8,9 @@ export type Category = {
 	locked?: boolean;
 	description?: string;
 	respectGPC?: boolean;
+	lawfulBasis?: LegalBasis;
+	vendor?: string;
+	purpose?: string;
 };
 
 export type ConsentSource = "default" | "user" | "gpc";
