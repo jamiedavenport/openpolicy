@@ -11,6 +11,7 @@ import {
 	loadAndValidateConfig,
 	type ValidatedConfig,
 } from "./validate";
+import { applyDriftPolicy, crossCheck, type DriftCode, formatDrift } from "./drift";
 import {
 	formatHitLocation,
 	formatUngated,
@@ -67,13 +68,13 @@ export type OpenPolicyOptions = {
 	strict?: boolean;
 
 	/**
-	 * Issue codes to drop from the result entirely, at any level (errors
-	 * included). Applied *before* `strict`. Use this to accept a known
-	 * disclosure gap — the list lives in `vite.config.ts`, so the decision is
-	 * committed and shows up in review. Does not silence config load/parse
-	 * failures. Defaults to `[]`.
+	 * Issue / drift codes to drop from the result entirely, at any level
+	 * (errors included). Applied *before* `strict`. Use this to accept a known
+	 * disclosure gap or an intentional declared-vs-used drift — the list lives
+	 * in `vite.config.ts`, so the decision is committed and shows up in
+	 * review. Does not silence config load/parse failures. Defaults to `[]`.
 	 */
-	suppress?: IssueCode[];
+	suppress?: (IssueCode | DriftCode)[];
 
 	/**
 	 * Opt-in OpenCookies consent scanner (folded in by PS-19). When this key
@@ -290,6 +291,19 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			if (issue.level === "error") server.config.logger.error(line);
 			else server.config.logger.warn(line);
 		}
+		// §4.3 declared-vs-used cross-check replayed through the dev logger
+		// (never crashes HMR — mirrors the validation dev path above).
+		if (result.config) {
+			const drift = applyDriftPolicy(
+				crossCheck(result.config, scanned, unifiedScanner?.lastConsent()?.vendors ?? []),
+				{ strict: strictOpt, suppress: suppressOpt },
+			);
+			for (const d of drift) {
+				const line = formatDrift(d);
+				if (d.level === "error") server.config.logger.error(line);
+				else server.config.logger.warn(line);
+			}
+		}
 	}
 
 	return {
@@ -386,6 +400,23 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 						this.error(
 							`OpenPolicy validation found ${errors.length} error${errors.length === 1 ? "" : "s"}:\n${lines}`,
 						);
+					}
+					// §4.3 declared-vs-used cross-check (PS-25). Ordered *after*
+					// config validation so a config `this.error()` abort
+					// short-circuits it; drift then fails the build the same way.
+					if (result.config) {
+						const drift = applyDriftPolicy(
+							crossCheck(result.config, scanned, unified.consent.vendors),
+							{ strict: strictOpt, suppress: suppressOpt },
+						);
+						const driftErrors = drift.filter((d) => d.level === "error");
+						for (const d of drift) if (d.level === "warning") this.warn(formatDrift(d));
+						if (driftErrors.length > 0) {
+							const lines = driftErrors.map(formatDrift).join("\n");
+							this.error(
+								`OpenPolicy found ${driftErrors.length} declared-vs-used drift error${driftErrors.length === 1 ? "" : "s"}:\n${lines}`,
+							);
+						}
 					}
 				}
 			}
