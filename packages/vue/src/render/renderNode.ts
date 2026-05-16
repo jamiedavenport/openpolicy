@@ -79,7 +79,11 @@ function buildVisitor(components: PolicyComponents): Visitor<VNodeChild> {
 			const headerCells = node.header.cells.map((c, ci) =>
 				h(TableHeaderCellComp, { key: ci, node: c }, { default: () => cellKids(c, v) }),
 			);
-			const headerRow = h(TableHeaderRowComp, { node: node.header }, { default: () => headerCells });
+			const headerRow = h(
+				TableHeaderRowComp,
+				{ node: node.header },
+				{ default: () => headerCells },
+			);
 			const bodyRows = node.rows.map((row, ri) =>
 				h(
 					TableRowComp,

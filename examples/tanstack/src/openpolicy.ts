@@ -9,7 +9,7 @@ export default defineConfig({
 		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-03-03",
-	jurisdictions: ["eu", "us-ca"],
+	jurisdictions: ["eea", "us-ca"],
 	data: {
 		collected: {
 			...dataCollected,

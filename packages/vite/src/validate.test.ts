@@ -205,7 +205,7 @@ test("applyIssuePolicy: suppress runs before strict — a suppressed code is nev
 
 test("loadAndValidateConfig: strict flips the us-ca phone warning to an error", async () => {
 	const file = await writeConfig(
-		VALID_CONFIG.replace('jurisdictions: ["eu"],', 'jurisdictions: ["us-ca"],'),
+		VALID_CONFIG.replace('jurisdictions: ["eea"],', 'jurisdictions: ["us-ca"],'),
 	);
 	const result = await loadAndValidateConfig({ configFile: file, strict: true });
 	expect(result.loadError).toBeNull();
@@ -217,7 +217,7 @@ test("loadAndValidateConfig: strict flips the us-ca phone warning to an error", 
 
 test("loadAndValidateConfig: suppress removes a code entirely", async () => {
 	const file = await writeConfig(
-		VALID_CONFIG.replace('jurisdictions: ["eu"],', 'jurisdictions: ["us-ca"],'),
+		VALID_CONFIG.replace('jurisdictions: ["eea"],', 'jurisdictions: ["us-ca"],'),
 	);
 	const result = await loadAndValidateConfig({
 		configFile: file,
