@@ -1,0 +1,317 @@
+---
+title: "Ship a cookie banner in your Astro site without a framework"
+excerpt: "Astro renders the markup at build time; ~40 lines of vanilla JavaScript wire it to OpenCookies' headless state machine. No React, no hydration island, no third-party iframe — just progressive enhancement and a banner that's part of your design system."
+date: "2026-05-10"
+tag: engineering
+---
+
+Astro is the awkward case for cookie banners. Most consent libraries assume you brought a framework — they ship a React component, a Vue plugin, a Svelte action — and the banner is the one part of your site that drags an entire runtime onto a page that was otherwise pure HTML. The alternative is a third-party SaaS embed that paints over your design system and flashes in on every page load.
+
+OpenCookies takes a different shape, and that shape happens to fit Astro perfectly. The runtime is a sub-4kb headless state machine — categories, decisions, jurisdiction, GPC, persistence — with no bundled UI. The markup is whatever you write. On Astro that means the banner template lives in an `.astro` component, gets server-rendered like the rest of your site, and a small `<script>` tag wires it to the store at runtime. No island, no hydration, no framework adapter. The full working example is at [opencookies/examples/astro](https://github.com/jamiedavenport/opencookies/tree/main/examples/astro); this post walks through it.
+
+## What this looks like in Astro
+
+Astro's component model is a good match for headless consent. A `.astro` file has two halves:
+
+- **The frontmatter and template** run at build time (or on the server, if you're using SSR). This is where the banner's HTML lives — categories, copy, buttons, the preferences modal. You write it like any other Astro component, with Tailwind or your own CSS.
+- **A `<script>` tag** at the bottom is hoisted, bundled, and shipped as a normal ES module. This is where `@opencookies/core` lives. It reads the markup the template produced, subscribes to the store, and toggles `hidden` attributes when state changes.
+
+The result: the banner's HTML is on the page from the first byte. The script has one job — flip a `hidden` attribute and wire up clicks. There is no framework runtime to download, nothing to hydrate, no FOUC where the banner pops in half a second after the page renders.
+
+## Install
+
+You only need `@opencookies/core` — no framework adapter:
+
+```bash file="terminal" tag="bash"
+bun add @opencookies/core
+```
+
+That's the whole runtime dependency.
+
+## Define categories once
+
+The categories are referenced from two places — the SSR template (to render the checkboxes) and the runtime script (to construct the store). Defining them in a shared module means you can change them in one place and the build will fail if either side falls out of sync:
+
+```ts file="src/lib/cookie-categories.ts"
+import type { Category } from "@opencookies/core";
+
+export const categories: Category[] = [
+  {
+    key: "essential",
+    label: "Essential",
+    locked: true,
+    description: "Required for the site to work.",
+  },
+  {
+    key: "analytics",
+    label: "Analytics",
+    description: "Helps us understand how the site is used.",
+  },
+  {
+    key: "marketing",
+    label: "Marketing",
+    description: "Used to personalize ads and campaigns.",
+  },
+];
+```
+
+`locked: true` means essential is always granted and the user can't toggle it off — the cookies your app needs to function (session, CSRF, the consent record itself). Anything else is opt-in.
+
+## The banner component
+
+`src/components/CookieBanner.astro` is one file with three layers: the bottom-of-page banner, a centred preferences modal, and the script that drives both. The template uses data attributes (`data-opencookies-banner`, `data-action="all"`) so the script has stable hooks without relying on class names you might restyle later.
+
+```astro file="src/components/CookieBanner.astro"
+---
+import { categories } from "../lib/cookie-categories";
+---
+
+<div
+  data-opencookies-banner
+  hidden
+  class="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white shadow-lg"
+>
+  <div class="mx-auto flex max-w-3xl flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-sm text-slate-700">
+      We use cookies to improve your experience. Choose what you'd like to allow.
+    </p>
+    <div class="flex flex-wrap gap-2">
+      <button type="button" data-action="customize" class="btn-ghost">Customize</button>
+      <button type="button" data-action="necessary" class="btn-ghost">Necessary only</button>
+      <button type="button" data-action="all" class="btn-primary">Accept all</button>
+    </div>
+  </div>
+</div>
+
+<div
+  data-opencookies-prefs
+  hidden
+  class="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4"
+>
+  <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+    <h2 class="text-base font-semibold">Cookie preferences</h2>
+    <p class="mt-1 text-sm text-slate-600">
+      Choose which categories of cookies to allow. Essential cookies are always on.
+    </p>
+    <div class="mt-4 flex flex-col gap-2">
+      {categories.map((c) => (
+        <label class="flex items-start justify-between gap-4 rounded-md border px-4 py-3">
+          <span class="flex flex-col">
+            <span class="text-sm font-medium">{c.label}</span>
+            {c.description && <span class="text-xs text-slate-500">{c.description}</span>}
+          </span>
+          <input
+            type="checkbox"
+            data-category={c.key}
+            disabled={c.locked}
+            class="mt-1 h-4 w-4 disabled:opacity-50"
+          />
+        </label>
+      ))}
+    </div>
+    <div class="mt-5 flex justify-end gap-2">
+      <button type="button" data-action="cancel" class="btn-ghost">Cancel</button>
+      <button type="button" data-action="save" class="btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+```
+
+Two things worth noticing. The `hidden` attribute is what makes this work without flicker — both surfaces are off by default, and the script flips them on when the store says to. And `data-category={c.key}` on each checkbox lets the script find the right input without coupling the markup to a particular order.
+
+## Wire up the store
+
+Astro's `<script>` tags are bundled by Vite, so this looks like a normal module — `import` works, TypeScript works, tree-shaking works. Drop this at the bottom of `CookieBanner.astro`:
+
+```astro file="src/components/CookieBanner.astro"
+<script>
+  import { createConsentStore, timezoneResolver } from "@opencookies/core";
+  import { localStorageAdapter } from "@opencookies/core/storage/local-storage";
+  import { categories } from "../lib/cookie-categories";
+
+  const store = createConsentStore({
+    categories,
+    adapter: localStorageAdapter(),
+    jurisdictionResolver: timezoneResolver(),
+  });
+
+  const banner = document.querySelector<HTMLElement>("[data-opencookies-banner]")!;
+  const prefs = document.querySelector<HTMLElement>("[data-opencookies-prefs]")!;
+  const checkboxes = prefs.querySelectorAll<HTMLInputElement>("input[data-category]");
+
+  const render = (state: ReturnType<typeof store.getState>) => {
+    banner.hidden = state.route !== "cookie";
+    prefs.hidden = state.route !== "preferences";
+    for (const cb of checkboxes) {
+      const key = cb.dataset.category;
+      if (key) cb.checked = state.decisions[key] ?? false;
+    }
+  };
+  store.subscribe(render);
+  render(store.getState());
+
+  banner.querySelector('[data-action="customize"]')!
+    .addEventListener("click", () => store.setRoute("preferences"));
+  banner.querySelector('[data-action="necessary"]')!
+    .addEventListener("click", () => store.acceptNecessary());
+  banner.querySelector('[data-action="all"]')!
+    .addEventListener("click", () => store.acceptAll());
+
+  for (const cb of checkboxes) {
+    cb.addEventListener("change", () => store.toggle(cb.dataset.category!));
+  }
+  prefs.querySelector('[data-action="cancel"]')!
+    .addEventListener("click", () => store.setRoute("cookie"));
+  prefs.querySelector('[data-action="save"]')!
+    .addEventListener("click", () => store.save());
+
+  window.addEventListener("opencookies:open", () => store.setRoute("cookie"));
+</script>
+```
+
+That's the whole adapter. `store.subscribe(render)` calls `render` whenever state changes; `render` flips the two `hidden` attributes and ticks the checkboxes. The buttons forward clicks to the store. The `opencookies:open` custom event at the end is how you reopen the banner from a footer link — more on that below.
+
+`route` is the store's view of which surface should be visible — `"cookie"` for the banner, `"preferences"` for the modal, and a hidden state once a decision is on file. The store handles the transitions; the script just mirrors them into the DOM.
+
+## Drop it on the page
+
+Use the component in any layout or page. It's safe to render on every page — the script only does work when state changes, and the markup is `hidden` until the store says otherwise:
+
+```astro file="src/pages/index.astro"
+---
+import CookieBanner from "../components/CookieBanner.astro";
+---
+
+<html lang="en">
+  <body>
+    <header>
+      <h1>OpenCookies + Astro</h1>
+      <button type="button" data-opencookies-open>Cookie settings</button>
+    </header>
+    <main><!-- ... --></main>
+
+    <CookieBanner />
+
+    <script>
+      document.querySelectorAll("[data-opencookies-open]").forEach((el) => {
+        el.addEventListener("click", () =>
+          window.dispatchEvent(new CustomEvent("opencookies:open")),
+        );
+      });
+    </script>
+  </body>
+</html>
+```
+
+Any element with `data-opencookies-open` becomes a re-open trigger — footer links, settings pages, the "Privacy" item in your account menu. The page-level script dispatches a custom event; the banner's script is already listening for it. The banner component doesn't need to know who its triggers are, and the rest of your site doesn't need to import the store.
+
+## Persistence and jurisdiction
+
+The two pieces the store cares about beyond categories are **where decisions live** and **what region the visitor is in**.
+
+**Storage adapters** decide how the consent record survives a refresh:
+
+- `@opencookies/core/storage/local-storage` — browser localStorage with cross-tab sync. The right default for a static or client-rendered Astro site: zero network, the user's other tabs see the change immediately.
+- `@opencookies/core/storage/cookie` — `document.cookie` with a configurable name, domain, and Max-Age. Pick this when you want the record to span subdomains, or when you're using Astro SSR and want the server to read consent on the request (e.g. to omit the analytics script tag entirely on SSR for users who declined).
+- `@opencookies/core/storage/server` — header-based reader for SSR runtimes (Astro on Cloudflare, Vercel, Netlify). Build the store on the server, hydrate the user's existing decision before the first paint, avoid the banner-flash where someone who clicked "accept" two weeks ago still sees the banner for half a second on every visit.
+
+Custom backends — IndexedDB, your own database — implement the `StorageAdapter` interface (`read`, `write`, `clear`, optional `subscribe`). The adapter is just a port; the store doesn't care.
+
+**Jurisdiction resolvers** decide what region's defaults apply before the user clicks anything. The example uses `timezoneResolver()` because it's zero-network and runs on the client — a sensible default for a static Astro site. Three others ship:
+
+- `headerResolver()` — reads country headers set by your edge (`x-vercel-ip-country`, `cf-ipcountry`). The most accurate option, server-only. Reach for it if you're running Astro SSR on an edge runtime.
+- `manualResolver("eu" | "us-ca" | …)` — pin to a fixed value. Useful in tests and Storybook so you can render the EU and California variants of the banner deterministically.
+- `clientGeoResolver({ endpoint })` — fetches from a geo endpoint you operate. Slowest of the four; reach for it only when the others won't do.
+
+Why this matters: GDPR demands opt-in (categories default to denied, banner shows on first visit), CCPA/CPRA demands a "Do Not Sell or Share" affordance and respects Global Privacy Control as a legally binding signal in California, and most other regions sit somewhere in between. The store reads the resolver once on init, applies the right defaults, and exposes `state.jurisdiction` so your banner copy can branch on it.
+
+## Gate third-party scripts
+
+The banner being correct is half the job. The other half is making sure the analytics SDK doesn't fire before the user clicks. `gateScript()` from core stubs the global (`gtag`, `fbq`, etc.) before the script loads, queues calls made before consent, and replays them once the script is on the page and consent is granted:
+
+```ts file="src/lib/analytics.ts"
+import { defineScript, gateScript, createConsentStore } from "@opencookies/core";
+import { localStorageAdapter } from "@opencookies/core/storage/local-storage";
+import { categories } from "./cookie-categories";
+
+const store = createConsentStore({
+  categories,
+  adapter: localStorageAdapter(),
+});
+
+const ga4 = defineScript({
+  id: "ga4",
+  requires: "analytics",
+  src: "https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX",
+  queue: ["dataLayer.push"],
+  init: () => {
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function gtag() { window.dataLayer.push(arguments); };
+  },
+});
+
+gateScript(store, ga4);
+```
+
+Import this from a page-level `<script>` tag (or your `BaseLayout.astro`) and the script will only attach to the document once `analytics` is granted. The `@opencookies/scripts` package ships pre-built `defineScript` factories for GA4, Meta Pixel, PostHog, Segment, GTM, and Hotjar if you'd rather not hand-roll it.
+
+If you want to share the same store between the banner and the analytics module, lift the `createConsentStore` call into `src/lib/cookie-store.ts` and import it from both places — the example keeps them separate for clarity, but a single store is the more common shape.
+
+## Optional: catch ungated cookies at dev time
+
+Astro uses Vite under the hood, so the `@opencookies/vite` plugin works the same way it does for any other Vite project. It's a separate, opt-in safety net — it doesn't affect the runtime, it just watches your source for cookie writes and vendor calls that aren't wrapped in a consent gate, and tells you about them while you're typing.
+
+```bash file="terminal" tag="bash"
+bun add -D @opencookies/vite
+```
+
+```ts file="astro.config.mjs"
+import { defineConfig } from "astro/config";
+import tailwindcss from "@tailwindcss/vite";
+import { openCookies } from "@opencookies/vite";
+import { categories } from "./src/lib/cookie-categories";
+
+export default defineConfig({
+  vite: {
+    plugins: [
+      openCookies({ config: { categories } }),
+      tailwindcss(),
+    ],
+  },
+});
+```
+
+On every dev start and HMR update it runs a static scan and reports:
+
+```text file="terminal" tag="text"
+[opencookies] 1 ungated finding
+
+src/components/upsell.astro:42:5
+  rule:    no-ungated-cookie
+  fix:     gate this script with gateScript() or move into a consent-gated effect
+  suppress: // opencookies-disable-next-line no-ungated-cookie
+```
+
+In dev that's a yellow warning. In CI it's a non-zero exit. The bug pattern this kills is the one where someone copies a Hotjar snippet into a layout file three weeks before an audit and nobody notices — because the build passes, the tests pass, and the banner that looks correct in the browser is still letting Hotjar fire on first paint regardless of what the user clicked.
+
+You can add this on day one or on the day before your first audit; the runtime doesn't change either way.
+
+## Why this shape fits Astro
+
+Astro's whole pitch is "ship less JavaScript by default." A consent library that pulls in a framework runtime to render two divs and a checkbox column is at odds with that. OpenCookies' split between consent logic and consent UI lines up cleanly with how Astro components are already structured:
+
+- **The markup is server-rendered**, so the banner is on the page from the first byte. No flash, no island boot, no `client:load` directive.
+- **The script is a normal ES module**, bundled by Vite and ~4kb on the wire. No React, no Vue, no Svelte runtime — just a state machine and your event listeners.
+- **The state machine is testable.** Decisions, GPC, jurisdiction, re-consent triggers — all of that is plain functions over a store. You can unit-test "GPC sets analytics to denied" without rendering anything Astro at all.
+- **The banner is part of your design system**, because it's just markup. There's no theme to fight, no `!important` arms race, no third-party iframe sitting outside your CSS scope.
+
+## Where to go next
+
+You've got a banner that lives in your `.astro` components, a state machine that handles the parts you'd otherwise get wrong, and — if you want it — a build-time check that fails the PR when someone forgets the gate. A few adjacent pieces:
+
+- **[OpenPolicy](/openpolicy)** — the policy half. The same pattern, applied to your privacy and cookie policies: TypeScript config, framework-agnostic renderer, Vite plugin that scans for undeclared third parties. The categories you defined here are the categories that show up in the rendered cookie policy.
+- **[Astro example](https://github.com/jamiedavenport/opencookies/tree/main/examples/astro)** — the working version of everything in this post. Clone it, run `bun install && bun run dev`, and you've got a banner you can iterate on.
+- **[Open source](https://github.com/jamiedavenport/opencookies)** — Apache-2.0, pre-1.0 but actively developed. Issues and PRs welcome.
+- **[PolicyCloud](/policycloud)** — the hosted control plane. Versioning and audit trails for consent records, a PR bot that flags when a category is added without policy updates.
+
+If you'd rather hand the wiring to your coding agent: point Claude Code or Cursor at the OpenCookies repo and ask for "an Astro cookie banner using `@opencookies/core` directly, categories essential/analytics/marketing, localStorage persistence, timezone resolver, matching the styles in `src/components`." Because OpenCookies ships primitives instead of UI, the agent reads your existing components, picks up your tokens, and produces a banner that looks like it was always there.
