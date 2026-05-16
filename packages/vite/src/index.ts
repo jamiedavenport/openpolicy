@@ -1,10 +1,18 @@
 import { access, readFile, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
-import { extractFromFile, type ScannerDiagnostic, type ThirdPartyEntry } from "./analyse";
+import {
+	extractFromParsed,
+	parseModule,
+	type ParsedModule,
+	type ScannerDiagnostic,
+	type ThirdPartyEntry,
+} from "./analyse";
 import { KNOWN_COOKIE_PACKAGES, KNOWN_PACKAGES } from "./known-packages";
 import { walkSources } from "./scan";
 import { type CookieMap, renderGenModule, type Scanned } from "./scanned";
+import { createSdkMatcher, type ResolveId } from "./sdk-resolver";
+import { isCanonicalSdkSpecifier, type SdkSpecifierMatcher } from "./sdk-specifier";
 import {
 	formatIssue,
 	formatScannerDiagnostic,
@@ -118,6 +126,15 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 	let resolvedConfigDir: string;
 	let resolvedConfigFile: string | null = null;
 	let resolvedCommand: "build" | "serve" = "build";
+	// Resolver-backed SDK matcher, built from `this.resolve` in `buildStart`.
+	// Defaults are the pure dual-scope predicate so an out-of-order or
+	// resolver-less call (test stubs, a dev rescan that somehow beats
+	// `buildStart`) still recognises direct `@openpolicy/sdk` /
+	// `@policystack/sdk` imports. Vite runs `buildStart` before the
+	// `configureServer` watcher fires, so dev rescans reuse the captured
+	// resolver matcher — no `PluginContext` is needed in `configureServer`.
+	let sdkMatcher: SdkSpecifierMatcher = isCanonicalSdkSpecifier;
+	let prewarmSdk: (specifiers: Iterable<string>) => Promise<void> = async () => {};
 	let scanned: Scanned = {
 		dataCollected: {},
 		thirdParties: [],
@@ -177,6 +194,11 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 		const cookieSet = new Set<string>();
 		const diagnostics: ScannerDiagnostic[] = [];
 		const genFile = resolvedConfigDir ? resolve(resolvedConfigDir, GEN_FILENAME) : null;
+		// Phase 1: parse every file once and collect the union of import
+		// specifiers, so the resolver runs once per distinct specifier (in
+		// batch) — not once per import per file.
+		const parsedModules: ParsedModule[] = [];
+		const allImportSources = new Set<string>();
 		for (const file of files) {
 			if (file === genFile) continue;
 			let code: string;
@@ -185,7 +207,16 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			} catch {
 				continue;
 			}
-			const extracted = extractFromFile(file, code);
+			const parsed = parseModule(file, code);
+			if (!parsed) continue;
+			parsedModules.push(parsed);
+			for (const s of parsed.importSources) allImportSources.add(s);
+		}
+		// Phase 2: resolve specifiers, then extract from the already-parsed
+		// modules with the resolver-backed predicate (extraction stays sync).
+		await prewarmSdk(allImportSources);
+		for (const parsed of parsedModules) {
+			const extracted = extractFromParsed(parsed, sdkMatcher);
 			for (const d of extracted.diagnostics) diagnostics.push(d);
 			for (const [category, labels] of Object.entries(extracted.dataCollected)) {
 				const existing = mergedData[category] ?? [];
@@ -305,6 +336,27 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			const found = await findConfig(resolvedRoot);
 			resolvedConfigDir = found.dir;
 			resolvedConfigFile = found.file;
+			// Adapt Rollup's `this.resolve` to the matcher's `ResolveId`. The
+			// test stub omits `resolve`, so guard at runtime — a missing
+			// resolver falls back to pure dual-scope matching.
+			const resolveId: ResolveId | null =
+				typeof this.resolve === "function"
+					? async (source, importer) => {
+							const r = await this.resolve(source, importer, {});
+							return r ? { id: r.id } : null;
+						}
+					: null;
+			// Resolve the canonical specifier from inside the user's project
+			// (the config if found, else its package.json) so pnpm's strict
+			// layout picks the same SDK copy the user's source files see.
+			const sdkImporter = resolvedConfigFile ?? resolve(resolvedRoot, "package.json");
+			const matcher = await createSdkMatcher({
+				resolve: resolveId,
+				importer: sdkImporter,
+				warn: (msg) => this.warn(msg),
+			});
+			sdkMatcher = matcher.match;
+			prewarmSdk = matcher.prewarm;
 			scanned = await scanAndMerge();
 			await writeGenModule(resolvedConfigDir, scanned);
 			// Always surface scanner diagnostics — a recognized call that
