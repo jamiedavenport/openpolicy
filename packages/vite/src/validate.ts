@@ -1,4 +1,4 @@
-import { type Issue, type OpenPolicyConfig, validate } from "@openpolicy/core";
+import { type Issue, type IssueCode, type OpenPolicyConfig, validate } from "@openpolicy/core";
 import { bundleRequire } from "bundle-require";
 import type { ScannerDiagnostic } from "./analyse";
 
@@ -9,6 +9,29 @@ export type ValidatedConfig = {
 };
 
 /**
+ * The Vite plugin's `strict` / `suppress` issue policy (PS-13). `validate()`
+ * itself stays pure and frozen; promotion/suppression is applied here, in the
+ * one OSS consumer of `validate()`.
+ */
+export type IssuePolicy = {
+	strict?: boolean;
+	suppress?: readonly IssueCode[];
+};
+
+/**
+ * Applies the {@link IssuePolicy} to a raw `validate()` result. Order matters:
+ * `suppress` drops every issue whose `code` matches FIRST (any level), then
+ * `strict` promotes the remaining warnings to errors — so a suppressed code is
+ * never promoted. Pure; an absent/empty policy is the identity transform.
+ */
+export function applyIssuePolicy(issues: Issue[], policy: IssuePolicy): Issue[] {
+	const suppressed = new Set<IssueCode>(policy.suppress ?? []);
+	const kept = suppressed.size > 0 ? issues.filter((i) => !suppressed.has(i.code)) : issues;
+	if (!policy.strict) return kept;
+	return kept.map((i) => (i.level === "warning" ? { ...i, level: "error" } : i));
+}
+
+/**
  * Loads the user's `openpolicy.ts` via bundle-require, then runs the single
  * `validate()` exported from `@openpolicy/core` against the resolved config.
  * The config imports its scanned values from the on-disk `./openpolicy.gen`
@@ -16,15 +39,20 @@ export type ValidatedConfig = {
  * interception shim is needed. The caller must have written `openpolicy.gen.ts`
  * (via `writeGenModule`) before calling this. `validate()` operates on the
  * flat config and emits each code at most once, so no dedupe pass is needed.
+ * The raw result is then run through {@link applyIssuePolicy} with the caller's
+ * `strict` / `suppress` options. `loadError` is independent of the policy —
+ * suppression never silences a config load/parse failure.
  *
  * Bundle-require errors (TS syntax errors, missing imports, runtime throws in
  * the user's config module) are surfaced as `loadError` rather than thrown so
  * the caller can decide whether to forward — TS errors should already be
  * caught by the user's type-check pipeline; we don't want to double-report.
  */
-export async function loadAndValidateConfig(args: {
-	configFile: string;
-}): Promise<ValidatedConfig> {
+export async function loadAndValidateConfig(
+	args: {
+		configFile: string;
+	} & IssuePolicy,
+): Promise<ValidatedConfig> {
 	let mod: { default?: OpenPolicyConfig };
 	try {
 		const result = await bundleRequire({
@@ -66,7 +94,10 @@ export async function loadAndValidateConfig(args: {
 
 	return {
 		config,
-		issues: validate(config),
+		issues: applyIssuePolicy(validate(config), {
+			strict: args.strict,
+			suppress: args.suppress,
+		}),
 		loadError: null,
 	};
 }

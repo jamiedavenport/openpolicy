@@ -1,9 +1,10 @@
+import type { Issue, IssueCode } from "@openpolicy/core";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, expect, test } from "vite-plus/test";
 import { renderGenModule, type Scanned } from "./scanned";
-import { loadAndValidateConfig } from "./validate";
+import { applyIssuePolicy, loadAndValidateConfig } from "./validate";
 
 /**
  * Tmp dirs sit inside this package's own directory so that `bundle-require`'s
@@ -158,4 +159,81 @@ test("captures missing default export as a load error", async () => {
 	const result = await loadAndValidateConfig({ configFile: file });
 	expect(result.loadError).toBeInstanceOf(Error);
 	expect(result.loadError?.message).toContain("no default export");
+});
+
+// --- applyIssuePolicy (PS-13: strict + per-code suppression) ---
+
+const warn = (code: IssueCode): Issue => ({ code, level: "warning", message: `${code} msg` });
+const err = (code: IssueCode): Issue => ({ code, level: "error", message: `${code} msg` });
+
+test("applyIssuePolicy: no options is the identity transform", () => {
+	const issues = [err("effective-date-required"), warn("automated-decision-making")];
+	expect(applyIssuePolicy(issues, {})).toEqual(issues);
+});
+
+test("applyIssuePolicy: suppress drops a warning code", () => {
+	const issues = [warn("automated-decision-making"), warn("company-dpo-undeclared")];
+	const out = applyIssuePolicy(issues, { suppress: ["automated-decision-making"] });
+	expect(out).toEqual([warn("company-dpo-undeclared")]);
+});
+
+test("applyIssuePolicy: suppress drops an error code too (any level)", () => {
+	const issues = [err("effective-date-required"), warn("automated-decision-making")];
+	const out = applyIssuePolicy(issues, { suppress: ["effective-date-required"] });
+	expect(out).toEqual([warn("automated-decision-making")]);
+});
+
+test("applyIssuePolicy: strict promotes every warning to an error, codes/messages preserved", () => {
+	const issues = [err("effective-date-required"), warn("automated-decision-making")];
+	const out = applyIssuePolicy(issues, { strict: true });
+	expect(out).toEqual([
+		{ code: "effective-date-required", level: "error", message: "effective-date-required msg" },
+		{ code: "automated-decision-making", level: "error", message: "automated-decision-making msg" },
+	]);
+});
+
+test("applyIssuePolicy: suppress runs before strict — a suppressed code is never promoted", () => {
+	const issues = [warn("automated-decision-making"), warn("company-dpo-undeclared")];
+	const out = applyIssuePolicy(issues, {
+		strict: true,
+		suppress: ["automated-decision-making"],
+	});
+	expect(out).toEqual([
+		{ code: "company-dpo-undeclared", level: "error", message: "company-dpo-undeclared msg" },
+	]);
+});
+
+test("loadAndValidateConfig: strict flips the us-ca phone warning to an error", async () => {
+	const file = await writeConfig(
+		VALID_CONFIG.replace('jurisdictions: ["eu"],', 'jurisdictions: ["us-ca"],'),
+	);
+	const result = await loadAndValidateConfig({ configFile: file, strict: true });
+	expect(result.loadError).toBeNull();
+	const hit = result.issues.find((i) => i.code === "company-contact-phone-recommended");
+	expect(hit).toBeDefined();
+	expect(hit?.level).toBe("error");
+	expect(result.issues.some((i) => i.level === "warning")).toBe(false);
+});
+
+test("loadAndValidateConfig: suppress removes a code entirely", async () => {
+	const file = await writeConfig(
+		VALID_CONFIG.replace('jurisdictions: ["eu"],', 'jurisdictions: ["us-ca"],'),
+	);
+	const result = await loadAndValidateConfig({
+		configFile: file,
+		suppress: ["company-contact-phone-recommended"],
+	});
+	expect(result.loadError).toBeNull();
+	expect(result.issues.some((i) => i.code === "company-contact-phone-recommended")).toBe(false);
+});
+
+test("loadAndValidateConfig: suppress does not silence config load failures", async () => {
+	const file = await writeConfig("export default this is not valid typescript;");
+	const result = await loadAndValidateConfig({
+		configFile: file,
+		suppress: ["effective-date-required"],
+		strict: true,
+	});
+	expect(result.loadError).toBeInstanceOf(Error);
+	expect(result.issues).toEqual([]);
 });
