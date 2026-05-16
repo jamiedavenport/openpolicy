@@ -76,3 +76,27 @@ test("returns absolute paths", async () => {
 	expect(files).toHaveLength(1);
 	expect(files[0]?.startsWith("/")).toBe(true);
 });
+
+// FROZEN 1.0 CONTRACT (1.md §6 / §7.6). The multi-file merge order is the
+// lexicographic sort of absolute source paths; it determines `dataCollected`
+// / `thirdParties` array order in `openpolicy.gen.ts` and therefore the
+// policy `version` hash. This test pins that order so a future refactor that
+// reorders the walk fails loudly. Do not relax it without a deliberate
+// breaking-change decision.
+test("merge order is the frozen lexicographic sort regardless of creation order", async () => {
+	// Created in deliberately scrambled order.
+	await touch("m/charlie.ts", "");
+	await touch("a/zulu.ts", "");
+	await touch("a/alpha.ts", "");
+	await touch("z/bravo.ts", "");
+	await touch("m/alpha.ts", "");
+
+	const files = await walkSources(tmp, [".ts"]);
+	expect(files.map((f) => relative(tmp, f))).toEqual([
+		"a/alpha.ts",
+		"a/zulu.ts",
+		"m/alpha.ts",
+		"m/charlie.ts",
+		"z/bravo.ts",
+	]);
+});

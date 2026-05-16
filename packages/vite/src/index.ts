@@ -1,4 +1,4 @@
-import { access, readFile, writeFile } from "node:fs/promises";
+import { access, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
 import {
@@ -96,9 +96,29 @@ async function findConfig(root: string): Promise<{ dir: string; file: string | n
  * and `provision`) and `cookies.context` entries. Commit the file — that
  * keeps both the values and the type-level constraints live in CI without
  * needing to run the Vite plugin first.
+ *
+ * The write is atomic: content goes to a unique temp sibling and is then
+ * `rename`d over the target. A crashed or partial write (ENOSPC, an EACCES
+ * mid-write, …) leaves the previously committed `openpolicy.gen.ts` intact —
+ * the last-good output is retained rather than truncated. Throws on failure;
+ * callers decide whether to warn-and-continue (build) or skip-and-retry (dev).
  */
 async function writeGenModule(targetDir: string, scanned: Scanned): Promise<void> {
-	await writeFile(resolve(targetDir, GEN_FILENAME), renderGenModule(scanned), "utf8");
+	const target = resolve(targetDir, GEN_FILENAME);
+	// Same-directory temp so `rename` stays on one filesystem (atomic on
+	// POSIX, replace-on-Windows). The `.tmp` extension keeps it out of
+	// `walkSources` / `isTrackedSource`, which both gate on `.ts`/`.tsx`.
+	const tmp = resolve(
+		targetDir,
+		`${GEN_FILENAME}.${process.pid}-${Math.random().toString(36).slice(2)}.tmp`,
+	);
+	try {
+		await writeFile(tmp, renderGenModule(scanned), "utf8");
+		await rename(tmp, target);
+	} catch (err) {
+		await rm(tmp, { force: true });
+		throw err;
+	}
 }
 
 /**
@@ -287,8 +307,18 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 		const next = await scanAndMerge();
 		const changed = JSON.stringify(next) !== JSON.stringify(scanned);
 		if (changed) {
-			scanned = next;
-			await writeGenModule(resolvedConfigDir, scanned);
+			// Commit the new in-memory state only once the write succeeds. On
+			// failure `scanned` stays put so the `changed` check re-fires on
+			// the next file event and retries — no permanent disk/memory drift,
+			// and the prior `openpolicy.gen.ts` remains as last-good.
+			try {
+				await writeGenModule(resolvedConfigDir, next);
+				scanned = next;
+			} catch (err) {
+				server.config.logger.warn(
+					`[openpolicy] could not write ${GEN_FILENAME}: ${err}; keeping the previously generated module`,
+				);
+			}
 		}
 		// Re-emit scanner diagnostics every rescan (like validation below) so
 		// a skipped recognized call stays visible after each edit. Not gated
@@ -358,7 +388,16 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			sdkMatcher = matcher.match;
 			prewarmSdk = matcher.prewarm;
 			scanned = await scanAndMerge();
-			await writeGenModule(resolvedConfigDir, scanned);
+			// A failed write must not abort the build. The in-memory `scanned`
+			// stays fresh, so the validation block below is unaffected — only
+			// the committed artifact is stale (last-good is retained on disk).
+			try {
+				await writeGenModule(resolvedConfigDir, scanned);
+			} catch (err) {
+				this.warn(
+					`[openpolicy] could not write ${GEN_FILENAME}: ${err}; keeping the previously generated module`,
+				);
+			}
 			// Always surface scanner diagnostics — a recognized call that
 			// couldn't be read statically is silent data loss regardless of
 			// the `validate` option. `this.warn` routes to the Rollup build
