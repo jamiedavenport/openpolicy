@@ -8,7 +8,7 @@ PolicyStack ships small, composable building blocks that let teams handle privac
 
 Today's privacy story is heavy SaaS banners glued to hand-written legal pages. Nothing composes with your stack. Nothing is testable. Nothing speaks to AI agents.
 
-PolicyStack is built on the opposite premise: consent and policy are *infrastructure*. They belong in your repo, behind types, in your tests, and out of the way.
+PolicyStack is built on the opposite premise: consent and policy are _infrastructure_. They belong in your repo, behind types, in your tests, and out of the way.
 
 ## Three building blocks
 

@@ -24,16 +24,16 @@ import { OpenCookiesPlugin } from "@opencookies/vue";
 import App from "./App.vue";
 
 createApp(App)
-  .use(OpenCookiesPlugin, {
-    config: {
-      categories: [
-        { key: "essential", label: "Essential", locked: true },
-        { key: "analytics", label: "Analytics" },
-        { key: "marketing", label: "Marketing" },
-      ],
-    },
-  })
-  .mount("#app");
+	.use(OpenCookiesPlugin, {
+		config: {
+			categories: [
+				{ key: "essential", label: "Essential", locked: true },
+				{ key: "analytics", label: "Analytics" },
+				{ key: "marketing", label: "Marketing" },
+			],
+		},
+	})
+	.mount("#app");
 ```
 
 Or scope a store to a subtree with the `<OpenCookiesProvider>` component:
@@ -44,9 +44,9 @@ import { OpenCookiesProvider } from "@opencookies/vue";
 </script>
 
 <template>
-  <OpenCookiesProvider :config="{ categories }">
-    <App />
-  </OpenCookiesProvider>
+	<OpenCookiesProvider :config="{ categories }">
+		<App />
+	</OpenCookiesProvider>
 </template>
 ```
 
@@ -66,11 +66,11 @@ const { route, decisions, acceptAll, acceptNecessary, setRoute } = useConsent();
 </script>
 
 <template>
-  <div v-if="route === 'cookie'">
-    <button @click="acceptNecessary">Necessary only</button>
-    <button @click="acceptAll">Accept all</button>
-    <button @click="setRoute('preferences')">Customize</button>
-  </div>
+	<div v-if="route === 'cookie'">
+		<button @click="acceptNecessary">Necessary only</button>
+		<button @click="acceptAll">Accept all</button>
+		<button @click="setRoute('preferences')">Customize</button>
+	</div>
 </template>
 ```
 
@@ -86,10 +86,10 @@ const { granted, toggle } = useCategory("analytics");
 </script>
 
 <template>
-  <label>
-    <input type="checkbox" :checked="granted" @change="toggle" />
-    Analytics
-  </label>
+	<label>
+		<input type="checkbox" :checked="granted" @change="toggle" />
+		Analytics
+	</label>
 </template>
 ```
 
@@ -105,16 +105,16 @@ import EnablePrompt from "./EnablePrompt.vue";
 </script>
 
 <template>
-  <ConsentGate requires="analytics">
-    <Chart />
-    <template #fallback>
-      <EnablePrompt />
-    </template>
-  </ConsentGate>
+	<ConsentGate requires="analytics">
+		<Chart />
+		<template #fallback>
+			<EnablePrompt />
+		</template>
+	</ConsentGate>
 
-  <ConsentGate :requires="{ and: ['analytics', 'marketing'] }">
-    <PersonalizedPromo />
-  </ConsentGate>
+	<ConsentGate :requires="{ and: ['analytics', 'marketing'] }">
+		<PersonalizedPromo />
+	</ConsentGate>
 </template>
 ```
 
@@ -128,17 +128,17 @@ import { defineComponent } from "vue";
 import { useConsent, useCategory } from "@opencookies/vue";
 
 export default defineComponent({
-  setup() {
-    const consent = useConsent();
-    const analytics = useCategory("analytics");
-    return { consent, analytics };
-  },
+	setup() {
+		const consent = useConsent();
+		const analytics = useCategory("analytics");
+		return { consent, analytics };
+	},
 });
 </script>
 
 <template>
-  <button @click="consent.acceptAll()">Accept all</button>
-  <input type="checkbox" :checked="analytics.granted" @change="analytics.toggle()" />
+	<button @click="consent.acceptAll()">Accept all</button>
+	<input type="checkbox" :checked="analytics.granted" @change="analytics.toggle()" />
 </template>
 ```
 
@@ -152,12 +152,12 @@ import { OpenCookiesPlugin } from "@opencookies/vue";
 import type { Category } from "@opencookies/core";
 
 const categories: Category[] = [
-  { key: "essential", label: "Essential", locked: true },
-  { key: "analytics", label: "Analytics" },
+	{ key: "essential", label: "Essential", locked: true },
+	{ key: "analytics", label: "Analytics" },
 ];
 
 export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.vueApp.use(OpenCookiesPlugin, { config: { categories } });
+	nuxtApp.vueApp.use(OpenCookiesPlugin, { config: { categories } });
 });
 ```
 

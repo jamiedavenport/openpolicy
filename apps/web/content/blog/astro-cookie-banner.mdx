@@ -36,22 +36,22 @@ The categories are referenced from two places — the SSR template (to render th
 import type { Category } from "@opencookies/core";
 
 export const categories: Category[] = [
-  {
-    key: "essential",
-    label: "Essential",
-    locked: true,
-    description: "Required for the site to work.",
-  },
-  {
-    key: "analytics",
-    label: "Analytics",
-    description: "Helps us understand how the site is used.",
-  },
-  {
-    key: "marketing",
-    label: "Marketing",
-    description: "Used to personalize ads and campaigns.",
-  },
+	{
+		key: "essential",
+		label: "Essential",
+		locked: true,
+		description: "Required for the site to work.",
+	},
+	{
+		key: "analytics",
+		label: "Analytics",
+		description: "Helps us understand how the site is used.",
+	},
+	{
+		key: "marketing",
+		label: "Marketing",
+		description: "Used to personalize ads and campaigns.",
+	},
 ];
 ```
 
@@ -235,19 +235,21 @@ import { localStorageAdapter } from "@opencookies/core/storage/local-storage";
 import { categories } from "./cookie-categories";
 
 const store = createConsentStore({
-  categories,
-  adapter: localStorageAdapter(),
+	categories,
+	adapter: localStorageAdapter(),
 });
 
 const ga4 = defineScript({
-  id: "ga4",
-  requires: "analytics",
-  src: "https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX",
-  queue: ["dataLayer.push"],
-  init: () => {
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function gtag() { window.dataLayer.push(arguments); };
-  },
+	id: "ga4",
+	requires: "analytics",
+	src: "https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX",
+	queue: ["dataLayer.push"],
+	init: () => {
+		window.dataLayer = window.dataLayer || [];
+		window.gtag = function gtag() {
+			window.dataLayer.push(arguments);
+		};
+	},
 });
 
 gateScript(store, ga4);
@@ -272,12 +274,9 @@ import { openCookies } from "@opencookies/vite";
 import { categories } from "./src/lib/cookie-categories";
 
 export default defineConfig({
-  vite: {
-    plugins: [
-      openCookies({ config: { categories } }),
-      tailwindcss(),
-    ],
-  },
+	vite: {
+		plugins: [openCookies({ config: { categories } }), tailwindcss()],
+	},
 });
 ```
 

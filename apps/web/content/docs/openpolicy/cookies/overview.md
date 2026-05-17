@@ -30,11 +30,9 @@ import { toOpenCookiesConfig } from "@openpolicy/sdk/opencookies";
 import openpolicy from "./openpolicy";
 
 export function Root({ children }: { children: React.ReactNode }) {
-  return (
-    <OpenCookiesProvider config={toOpenCookiesConfig(openpolicy)}>
-      {children}
-    </OpenCookiesProvider>
-  );
+	return (
+		<OpenCookiesProvider config={toOpenCookiesConfig(openpolicy)}>{children}</OpenCookiesProvider>
+	);
 }
 ```
 

@@ -31,16 +31,16 @@ export function PrivacyPolicyPage() {
 
 Same legal coverage you'd get from a lawyer, a template, or one of the incumbent SaaS tools — without the invoice, the dashboard, or the drift.
 
-| Feature | OpenPolicy | Lawyers | Templates | Termly | iubenda |
-|---|---|---|---|---|---|
-| Developer workflow (Git, TypeScript, CI) | ✓ | ✗ | ✗ | ✗ | ✗ |
-| Version controlled | ✓ | ✗ | ✗ | ✗ | ✗ |
-| Renders as a React / Vue / Svelte component | ✓ | ✗ | ✗ | ✗ | ✗ |
-| Always in sync with the codebase | ✓ | ✗ | ✗ | ✗ | ✗ |
-| Markdown / HTML / PDF output | ✓ | PDF only | Word / PDF | Hosted page | Hosted widget |
-| GDPR + CCPA coverage | ✓ | ✓ | Varies | ✓ | ✓ |
-| No ongoing subscription | ✓ | ✗ | ✓ | ✗ | ✗ |
-| Self-hostable / open source | ✓ | — | — | ✗ | ✗ |
+| Feature                                     | OpenPolicy | Lawyers  | Templates  | Termly      | iubenda       |
+| ------------------------------------------- | ---------- | -------- | ---------- | ----------- | ------------- |
+| Developer workflow (Git, TypeScript, CI)    | ✓          | ✗        | ✗          | ✗           | ✗             |
+| Version controlled                          | ✓          | ✗        | ✗          | ✗           | ✗             |
+| Renders as a React / Vue / Svelte component | ✓          | ✗        | ✗          | ✗           | ✗             |
+| Always in sync with the codebase            | ✓          | ✗        | ✗          | ✗           | ✗             |
+| Markdown / HTML / PDF output                | ✓          | PDF only | Word / PDF | Hosted page | Hosted widget |
+| GDPR + CCPA coverage                        | ✓          | ✓        | Varies     | ✓           | ✓             |
+| No ongoing subscription                     | ✓          | ✗        | ✓          | ✗           | ✗             |
+| Self-hostable / open source                 | ✓          | —        | —          | ✗           | ✗             |
 
 GDPR and CCPA coverage is the floor — OpenPolicy is not legal advice and is not a replacement for counsel on high-stakes matters.
 
@@ -48,22 +48,24 @@ GDPR and CCPA coverage is the floor — OpenPolicy is not legal advice and is no
 
 Pass `locale` to `defineConfig` and the ~125 strings OpenPolicy emits — headings, table headers, GDPR/CCPA boilerplate, formatted dates — render in your chosen language. Your company name, processing purposes, retention text, and third-party descriptions pass through as you wrote them.
 
-| Locale | Tag |
-|---|---|
+| Locale  | Tag  |
+| ------- | ---- |
 | English | `en` |
-| French | `fr` |
-| German | `de` |
-| Dutch | `nl` |
+| French  | `fr` |
+| German  | `de` |
+| Dutch   | `nl` |
 | Spanish | `es` |
 
 ```ts
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: { name: "Acme, Inc." },
-  jurisdictions: ["eu", "fr"],
-  locale: "fr",
-  data: { /* ... */ },
+	company: { name: "Acme, Inc." },
+	jurisdictions: ["eu", "fr"],
+	locale: "fr",
+	data: {
+		/* ... */
+	},
 });
 ```
 
@@ -81,13 +83,13 @@ pnpm dlx @openpolicy/cli init
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: { name: "Acme, Inc." },
-  jurisdictions: ["eu", "us-ca"],
-  data: {
-    collected: {
-      "Account Information": ["Name", "Email"],
-    },
-  },
+	company: { name: "Acme, Inc." },
+	jurisdictions: ["eu", "us-ca"],
+	data: {
+		collected: {
+			"Account Information": ["Name", "Email"],
+		},
+	},
 });
 ```
 

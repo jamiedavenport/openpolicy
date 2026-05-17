@@ -42,12 +42,12 @@ import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [
-    tsConfigPaths(),
-    openPolicy({ srcDir: "./src", thirdParties: { usePackageJson: true } }),
-    tanstackStart(),
-    viteReact(),
-  ],
+	plugins: [
+		tsConfigPaths(),
+		openPolicy({ srcDir: "./src", thirdParties: { usePackageJson: true } }),
+		tanstackStart(),
+		viteReact(),
+	],
 });
 ```
 
@@ -59,60 +59,60 @@ The config is a single `defineConfig()` call. The latest format leans on a handf
 
 ```ts file="openpolicy.ts"
 import {
-  ContractPrerequisite,
-  cookies,
-  dataCollected,
-  defineConfig,
-  LegalBases,
-  thirdParties,
+	ContractPrerequisite,
+	cookies,
+	dataCollected,
+	defineConfig,
+	LegalBases,
+	thirdParties,
 } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Acme Inc.",
-    legalName: "Acme Corporation",
-    address: "123 Main St, Springfield, USA",
-    contact: { email: "privacy@acme.com" },
-  },
-  effectiveDate: "2026-05-04",
-  jurisdictions: ["eu", "us-ca"],
-  data: {
-    collected: {
-      ...dataCollected,
-      "Usage Data": ["Pages visited", "Browser type", "IP address"],
-    },
-    context: {
-      "Account Information": {
-        purpose: "To authenticate users and send service notifications",
-        lawfulBasis: LegalBases.Contract,
-        retention: "Until account deletion",
-        provision: ContractPrerequisite("We cannot create or operate your account."),
-      },
-      "Usage Data": {
-        purpose: "To understand product usage and improve the service",
-        lawfulBasis: LegalBases.LegitimateInterests,
-        retention: "90 days",
-        provision: ContractPrerequisite("We cannot deliver or secure the service."),
-      },
-    },
-  },
-  cookies: {
-    used: cookies,
-    context: {
-      essential: { lawfulBasis: LegalBases.LegalObligation },
-      analytics: { lawfulBasis: LegalBases.Consent },
-      marketing: { lawfulBasis: LegalBases.Consent },
-    },
-  },
-  thirdParties,
-  trackingTechnologies: ["web beacons", "local storage"],
-  consentMechanism: {
-    hasBanner: true,
-    hasPreferencePanel: true,
-    canWithdraw: true,
-  },
-  children: { underAge: 16, noticeUrl: "https://acme.com/parental-notice" },
-  automatedDecisionMaking: [],
+	company: {
+		name: "Acme Inc.",
+		legalName: "Acme Corporation",
+		address: "123 Main St, Springfield, USA",
+		contact: { email: "privacy@acme.com" },
+	},
+	effectiveDate: "2026-05-04",
+	jurisdictions: ["eu", "us-ca"],
+	data: {
+		collected: {
+			...dataCollected,
+			"Usage Data": ["Pages visited", "Browser type", "IP address"],
+		},
+		context: {
+			"Account Information": {
+				purpose: "To authenticate users and send service notifications",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot create or operate your account."),
+			},
+			"Usage Data": {
+				purpose: "To understand product usage and improve the service",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "90 days",
+				provision: ContractPrerequisite("We cannot deliver or secure the service."),
+			},
+		},
+	},
+	cookies: {
+		used: cookies,
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
+		},
+	},
+	thirdParties,
+	trackingTechnologies: ["web beacons", "local storage"],
+	consentMechanism: {
+		hasBanner: true,
+		hasPreferencePanel: true,
+		canWithdraw: true,
+	},
+	children: { underAge: 16, noticeUrl: "https://acme.com/parental-notice" },
+	automatedDecisionMaking: [],
 });
 ```
 
@@ -130,15 +130,15 @@ import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
 import openpolicy from "@/openpolicy";
 
 export const Route = createFileRoute("/privacy")({
-  component: PrivacyPolicyPage,
+	component: PrivacyPolicyPage,
 });
 
 function PrivacyPolicyPage() {
-  return (
-    <OpenPolicy config={openpolicy}>
-      <PrivacyPolicy />
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={openpolicy}>
+			<PrivacyPolicy />
+		</OpenPolicy>
+	);
 }
 ```
 
@@ -154,37 +154,31 @@ import { OpenPolicy, PrivacyPolicy, type PolicyComponents } from "@openpolicy/re
 import openpolicy from "@/openpolicy";
 
 const components: PolicyComponents = {
-  Heading: ({ node }) => {
-    const Tag = `h${node.level ?? 2}` as const;
-    return (
-      <Tag className="mt-12 text-2xl font-medium tracking-tight text-ink">
-        {node.value}
-      </Tag>
-    );
-  },
-  Paragraph: ({ children }) => (
-    <p className="mt-4 text-pretty text-mute">{children}</p>
-  ),
-  Link: ({ node }) => (
-    <a
-      href={node.href}
-      className="underline decoration-mute underline-offset-4 hover:decoration-ink"
-    >
-      {node.value}
-    </a>
-  ),
+	Heading: ({ node }) => {
+		const Tag = `h${node.level ?? 2}` as const;
+		return <Tag className="mt-12 text-2xl font-medium tracking-tight text-ink">{node.value}</Tag>;
+	},
+	Paragraph: ({ children }) => <p className="mt-4 text-pretty text-mute">{children}</p>,
+	Link: ({ node }) => (
+		<a
+			href={node.href}
+			className="underline decoration-mute underline-offset-4 hover:decoration-ink"
+		>
+			{node.value}
+		</a>
+	),
 };
 
 export const Route = createFileRoute("/privacy")({
-  component: PrivacyPolicyPage,
+	component: PrivacyPolicyPage,
 });
 
 function PrivacyPolicyPage() {
-  return (
-    <OpenPolicy config={openpolicy}>
-      <PrivacyPolicy components={components} />
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={openpolicy}>
+			<PrivacyPolicy components={components} />
+		</OpenPolicy>
+	);
 }
 ```
 
@@ -200,13 +194,11 @@ The hardest part of a code-first policy isn't the initial setup — it's keeping
 import { collecting } from "@openpolicy/sdk";
 
 export async function createUser(name: string, email: string) {
-  return db.insert(users).values(
-    collecting(
-      "Account Information",
-      { name, email },
-      { name: "Name", email: "Email address" },
-    ),
-  );
+	return db
+		.insert(users)
+		.values(
+			collecting("Account Information", { name, email }, { name: "Name", email: "Email address" }),
+		);
 }
 ```
 

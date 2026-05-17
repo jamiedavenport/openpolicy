@@ -146,7 +146,7 @@ The user rights you're legally required to disclose (access, erasure, portabilit
 import openpolicy from "./openpolicy";
 
 openpolicy.privacyVersion; // "a1b2c3d4"
-openpolicy.cookieVersion;  // "f5e6d7c8"
+openpolicy.cookieVersion; // "f5e6d7c8"
 ```
 
 When set, the version is rendered inline with the effective-date sentence in each policy's intro — `… Effective Date: 2026-01-01. Version: a1b2c3d4.` — so customers have a printed reference they can quote.
@@ -155,8 +155,8 @@ Pin a manual version (e.g. for a published v3 doc) by passing it on input:
 
 ```ts
 defineConfig({
-  // ...
-  privacyVersion: "v3",
+	// ...
+	privacyVersion: "v3",
 });
 ```
 

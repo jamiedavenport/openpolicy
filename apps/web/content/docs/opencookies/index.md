@@ -41,39 +41,39 @@ npm install @opencookies/core @opencookies/angular
 import { OpenCookiesProvider, useConsent, ConsentGate } from "@opencookies/react";
 
 const config = {
-  categories: [
-    { key: "essential", label: "Essential", locked: true },
-    { key: "analytics", label: "Analytics" },
-    { key: "marketing", label: "Marketing" },
-  ],
+	categories: [
+		{ key: "essential", label: "Essential", locked: true },
+		{ key: "analytics", label: "Analytics" },
+		{ key: "marketing", label: "Marketing" },
+	],
 };
 
 function App() {
-  return (
-    <OpenCookiesProvider config={config}>
-      <YourApp />
-      <CookieBanner />
-    </OpenCookiesProvider>
-  );
+	return (
+		<OpenCookiesProvider config={config}>
+			<YourApp />
+			<CookieBanner />
+		</OpenCookiesProvider>
+	);
 }
 
 function CookieBanner() {
-  const { route, acceptAll, acceptNecessary, setRoute } = useConsent();
-  if (route !== "cookie") return null;
+	const { route, acceptAll, acceptNecessary, setRoute } = useConsent();
+	if (route !== "cookie") return null;
 
-  return (
-    <div className="your-styles-here">
-      <p>We use cookies to improve your experience.</p>
-      <button onClick={acceptAll}>Accept all</button>
-      <button onClick={acceptNecessary}>Necessary only</button>
-      <button onClick={() => setRoute("preferences")}>Customise</button>
-    </div>
-  );
+	return (
+		<div className="your-styles-here">
+			<p>We use cookies to improve your experience.</p>
+			<button onClick={acceptAll}>Accept all</button>
+			<button onClick={acceptNecessary}>Necessary only</button>
+			<button onClick={() => setRoute("preferences")}>Customise</button>
+		</div>
+	);
 }
 
 // Gate third-party code on consent
 <ConsentGate requires="analytics">
-  <GoogleAnalytics />
+	<GoogleAnalytics />
 </ConsentGate>;
 ```
 
@@ -96,7 +96,7 @@ function CookieBanner() {
 import openCookies from "@opencookies/vite";
 
 export default {
-  plugins: [openCookies({ mode: "warn" })],
+	plugins: [openCookies({ mode: "warn" })],
 };
 ```
 
@@ -104,8 +104,8 @@ The plugin scans your code for cookie writes and known third-party vendors, and 
 
 ## Packages
 
-| Package                                       | Description                                                                                   |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Package                                             | Description                                                                                   |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | [`@opencookies/core`](/docs/opencookies/core)       | Headless consent store, GPC handling, jurisdiction resolvers, script gating, storage adapters |
 | [`@opencookies/react`](/docs/opencookies/react)     | React 18+ adapter — `useConsent`, `useCategory`, `<ConsentGate>`                              |
 | [`@opencookies/vue`](/docs/opencookies/vue)         | Vue 3 adapter — plugin or `<OpenCookiesProvider>`, composables, `<ConsentGate>`               |

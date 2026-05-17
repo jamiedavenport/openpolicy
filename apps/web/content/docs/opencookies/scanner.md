@@ -93,22 +93,22 @@ is what enforces consent. See [OpenCookies core] for the runtime story.
 import { defineRule, scan, defaultRules } from "@opencookies/scanner";
 
 const banPlausible = defineRule({
-  name: "plausible-import",
-  visit: (ctx) => {
-    if (ctx.node.type !== "ImportDeclaration") return;
-    const src = (ctx.node as { source?: { value?: string } }).source?.value;
-    if (src === "plausible-tracker") {
-      const { line, column } = ctx.position(ctx.node.start);
-      ctx.report({
-        file: ctx.file,
-        line,
-        column,
-        vendor: "plausible",
-        category: "analytics",
-        via: "import",
-      });
-    }
-  },
+	name: "plausible-import",
+	visit: (ctx) => {
+		if (ctx.node.type !== "ImportDeclaration") return;
+		const src = (ctx.node as { source?: { value?: string } }).source?.value;
+		if (src === "plausible-tracker") {
+			const { line, column } = ctx.position(ctx.node.start);
+			ctx.report({
+				file: ctx.file,
+				line,
+				column,
+				vendor: "plausible",
+				category: "analytics",
+				via: "import",
+			});
+		}
+	},
 });
 
 await scan({ cwd: process.cwd(), rules: [...defaultRules, banPlausible] });
@@ -121,11 +121,11 @@ entry has the shape:
 
 ```json
 {
-  "vendor": "stripe",
-  "category": "payments",
-  "imports": ["@stripe/stripe-js", "stripe"],
-  "globals": ["Stripe"],
-  "scriptUrls": ["https://js.stripe.com/v3/"]
+	"vendor": "stripe",
+	"category": "payments",
+	"imports": ["@stripe/stripe-js", "stripe"],
+	"globals": ["Stripe"],
+	"scriptUrls": ["https://js.stripe.com/v3/"]
 }
 ```
 
