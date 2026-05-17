@@ -1,7 +1,7 @@
 // src/routes/__root.tsx
 /// <reference types="vite-plus/client" />
 
-import { OpenPolicy } from "@openpolicy/react/policy";
+import { PolicyStackProvider } from "@openpolicy/react/provider";
 import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
@@ -38,9 +38,11 @@ function RootComponent() {
 	return (
 		<RootDocument>
 			<TooltipProvider>
-				<OpenPolicy config={openpolicy}>
+				{/* One provider for everything: supplies the policy context AND,
+				    because this config declares `cookies`, the consent store. */}
+				<PolicyStackProvider config={openpolicy}>
 					<Outlet />
-				</OpenPolicy>
+				</PolicyStackProvider>
 			</TooltipProvider>
 		</RootDocument>
 	);
