@@ -1,0 +1,40 @@
+import { expect, test } from "vite-plus/test";
+import { buildAgentPrompt } from "./prompt";
+
+const base = { stubRel: "src/openpolicy.ts", llmsRel: "src/openpolicy.llms.txt" };
+
+test("prompt always points at the SDK reference and the stub", () => {
+	const out = buildAgentPrompt(base);
+	expect(out).toContain("src/openpolicy.llms.txt");
+	expect(out).toContain("src/openpolicy.ts");
+});
+
+test("prompt has both a config step and a provider-wiring step", () => {
+	const out = buildAgentPrompt(base);
+	expect(out).toContain("1. Generate src/openpolicy.ts");
+	expect(out).toContain("2. Wire the provider");
+	// One provider for both concerns — never a separate consent provider.
+	expect(out).toContain("Do NOT add a separate consent");
+});
+
+test("no framework → framework-generic wording, no react hard-coding", () => {
+	const out = buildAgentPrompt(base);
+	expect(out).toContain("ONE OpenPolicy provider for your");
+	expect(out).not.toContain("PolicyStackProvider");
+	expect(out).not.toContain("@openpolicy/react/provider");
+});
+
+test("react → PolicyStackProvider snippet from @openpolicy/react/provider", () => {
+	const out = buildAgentPrompt({ ...base, framework: "react" });
+	expect(out).toContain("PolicyStackProvider");
+	expect(out).toContain('from "@openpolicy/react/provider"');
+	expect(out).toContain("<PolicyStackProvider config={config}>");
+	// import path is derived from the stub's basename
+	expect(out).toContain('import config from "./openpolicy"');
+});
+
+test("non-react framework stays generic (no react import path)", () => {
+	const out = buildAgentPrompt({ ...base, framework: "vue" });
+	expect(out).toContain("ONE OpenPolicy provider for your");
+	expect(out).not.toContain("@openpolicy/react/provider");
+});

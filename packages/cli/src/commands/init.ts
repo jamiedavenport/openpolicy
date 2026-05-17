@@ -75,6 +75,12 @@ export async function runInit(args: InitArgs): Promise<void> {
 	const prodDeps = [SDK_PACKAGE, ...integrations.filter((i) => !i.dev).map((i) => i.pkg)];
 	const devDeps = integrations.filter((i) => i.dev).map((i) => i.pkg);
 
+	// The single UI framework drives the provider-wiring snippet in the prompt
+	// (the `vite` integration is a bundler entry, not a UI framework).
+	const framework = (["react", "vue", "svelte"] as const).find((f) =>
+		integrations.some((i) => i.trigger === f),
+	);
+
 	const plan = [
 		{ deps: prodDeps, dev: false },
 		...(devDeps.length > 0 ? [{ deps: devDeps, dev: true }] : []),
@@ -127,7 +133,7 @@ export async function runInit(args: InitArgs): Promise<void> {
 		consola.success(`${llms.written ? "Created" : "Updated"} ${llmsRel}`);
 	}
 
-	printPrompt(buildAgentPrompt({ stubRel, llmsRel }));
+	printPrompt(buildAgentPrompt({ stubRel, llmsRel, framework }));
 
 	consola.success(
 		"Paste the prompt above into your coding agent (Claude Code, Cursor, etc.) to finish setup.",

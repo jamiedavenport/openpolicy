@@ -44,6 +44,18 @@ test("getStubContents contains required defineConfig fields", () => {
 	expect(out).toContain("collected: {}");
 });
 
+test("getStubContents ships a commented cookies + consent skeleton", () => {
+	const out = getStubContents("2026-04-22");
+	expect(out).toContain("Cookies & consent");
+	expect(out).toContain("// cookies: {");
+	expect(out).toContain("// consentMechanism: {");
+	expect(out).toContain("PolicyStackProvider");
+	// The skeleton stays commented so the stub type-checks exactly as written —
+	// no uncommented top-level cookies/consentMechanism keys.
+	expect(out).not.toContain("\n\tcookies:");
+	expect(out).not.toContain("\n\tconsentMechanism:");
+});
+
 test("writeStub writes a new file", async () => {
 	const target = join(dir, "openpolicy.ts");
 	const res = await writeStub(target, false);
