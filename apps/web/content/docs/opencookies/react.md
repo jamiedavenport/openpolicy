@@ -24,15 +24,15 @@ import type { Category } from "@opencookies/core";
 import { createRoot } from "react-dom/client";
 
 const categories: Category[] = [
-  { key: "essential", label: "Essential", locked: true },
-  { key: "analytics", label: "Analytics" },
-  { key: "marketing", label: "Marketing" },
+	{ key: "essential", label: "Essential", locked: true },
+	{ key: "analytics", label: "Analytics" },
+	{ key: "marketing", label: "Marketing" },
 ];
 
 createRoot(document.getElementById("root")!).render(
-  <OpenCookiesProvider config={{ categories }}>
-    <App />
-  </OpenCookiesProvider>,
+	<OpenCookiesProvider config={{ categories }}>
+		<App />
+	</OpenCookiesProvider>,
 );
 ```
 
@@ -50,16 +50,16 @@ Returns the current consent state plus action methods. Re-renders the consumer w
 import { useConsent } from "@opencookies/react";
 
 function Banner() {
-  const { route, acceptAll, acceptNecessary, setRoute } = useConsent();
-  if (route !== "cookie") return null;
+	const { route, acceptAll, acceptNecessary, setRoute } = useConsent();
+	if (route !== "cookie") return null;
 
-  return (
-    <div className="banner">
-      <button onClick={acceptNecessary}>Necessary only</button>
-      <button onClick={acceptAll}>Accept all</button>
-      <button onClick={() => setRoute("preferences")}>Customize</button>
-    </div>
-  );
+	return (
+		<div className="banner">
+			<button onClick={acceptNecessary}>Necessary only</button>
+			<button onClick={acceptAll}>Accept all</button>
+			<button onClick={() => setRoute("preferences")}>Customize</button>
+		</div>
+	);
 }
 ```
 
@@ -71,13 +71,13 @@ Granular per-category access. Returns `{ granted, toggle }`.
 import { useCategory } from "@opencookies/react";
 
 function AnalyticsToggle() {
-  const { granted, toggle } = useCategory("analytics");
-  return (
-    <label>
-      <input type="checkbox" checked={granted} onChange={toggle} />
-      Analytics
-    </label>
-  );
+	const { granted, toggle } = useCategory("analytics");
+	return (
+		<label>
+			<input type="checkbox" checked={granted} onChange={toggle} />
+			Analytics
+		</label>
+	);
 }
 ```
 
@@ -89,11 +89,11 @@ Renders `children` when the expression is satisfied; renders `fallback` otherwis
 import { ConsentGate } from "@opencookies/react";
 
 <ConsentGate requires="analytics" fallback={<EnablePrompt />}>
-  <Chart />
+	<Chart />
 </ConsentGate>;
 
 <ConsentGate requires={{ and: ["analytics", "marketing"] }}>
-  <PersonalizedPromo />
+	<PersonalizedPromo />
 </ConsentGate>;
 ```
 
@@ -110,12 +110,12 @@ import { OpenCookiesProvider } from "@opencookies/react";
 import type { Category } from "@opencookies/core";
 
 const categories: Category[] = [
-  { key: "essential", label: "Essential", locked: true },
-  { key: "analytics", label: "Analytics" },
+	{ key: "essential", label: "Essential", locked: true },
+	{ key: "analytics", label: "Analytics" },
 ];
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <OpenCookiesProvider config={{ categories }}>{children}</OpenCookiesProvider>;
+	return <OpenCookiesProvider config={{ categories }}>{children}</OpenCookiesProvider>;
 }
 ```
 
@@ -124,13 +124,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
 import { Providers } from "./providers";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html>
-      <body>
-        <Providers>{children}</Providers>
-      </body>
-    </html>
-  );
+	return (
+		<html>
+			<body>
+				<Providers>{children}</Providers>
+			</body>
+		</html>
+	);
 }
 ```
 

@@ -63,21 +63,21 @@ import type { Category } from "@opencookies/core";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 
 const categories: Category[] = [
-  { key: "essential", label: "Essential", locked: true },
-  { key: "analytics", label: "Analytics" },
-  { key: "marketing", label: "Marketing" },
+	{ key: "essential", label: "Essential", locked: true },
+	{ key: "analytics", label: "Analytics" },
+	{ key: "marketing", label: "Marketing" },
 ];
 
 export const Route = createRootRoute({
-  component: RootComponent,
+	component: RootComponent,
 });
 
 function RootComponent() {
-  return (
-    <OpenCookiesProvider config={{ categories }}>
-      <Outlet />
-    </OpenCookiesProvider>
-  );
+	return (
+		<OpenCookiesProvider config={{ categories }}>
+			<Outlet />
+		</OpenCookiesProvider>
+	);
 }
 ```
 
@@ -92,13 +92,13 @@ import { createConsentStore, timezoneResolver } from "@opencookies/core";
 import { localStorageAdapter } from "@opencookies/core/storage/local-storage";
 
 export const store = createConsentStore({
-  categories: [
-    { key: "essential", label: "Essential", locked: true },
-    { key: "analytics", label: "Analytics" },
-    { key: "marketing", label: "Marketing" },
-  ],
-  adapter: localStorageAdapter(),
-  jurisdictionResolver: timezoneResolver(),
+	categories: [
+		{ key: "essential", label: "Essential", locked: true },
+		{ key: "analytics", label: "Analytics" },
+		{ key: "marketing", label: "Marketing" },
+	],
+	adapter: localStorageAdapter(),
+	jurisdictionResolver: timezoneResolver(),
 });
 ```
 
@@ -110,8 +110,8 @@ import { store } from "@/lib/consent-store";
 
 // ...
 <OpenCookiesProvider store={store}>
-  <Outlet />
-</OpenCookiesProvider>
+	<Outlet />
+</OpenCookiesProvider>;
 ```
 
 **Storage adapters** decide where the consent record gets written and how it survives a refresh. Three ship in the box:
@@ -139,28 +139,28 @@ Why this matters: GDPR demands opt-in (categories default to denied, banner show
 import { useConsent } from "@opencookies/react";
 
 export function CookieBanner() {
-  const { route, acceptAll, acceptNecessary, setRoute } = useConsent();
-  if (route !== "cookie") return null;
+	const { route, acceptAll, acceptNecessary, setRoute } = useConsent();
+	if (route !== "cookie") return null;
 
-  return (
-    <div className="fixed inset-x-4 bottom-4 rounded-2xl border border-line bg-bg p-5 shadow-lg sm:inset-x-auto sm:right-4 sm:max-w-sm">
-      <p className="text-sm text-mute">
-        We use cookies to keep the app running and, with your permission, to
-        understand how it's used. You can change this any time in settings.
-      </p>
-      <div className="mt-4 flex gap-2">
-        <button onClick={acceptNecessary} className="btn btn-ghost flex-1">
-          Necessary only
-        </button>
-        <button onClick={() => setRoute("preferences")} className="btn btn-ghost flex-1">
-          Customize
-        </button>
-        <button onClick={acceptAll} className="btn btn-primary flex-1">
-          Accept all
-        </button>
-      </div>
-    </div>
-  );
+	return (
+		<div className="fixed inset-x-4 bottom-4 rounded-2xl border border-line bg-bg p-5 shadow-lg sm:inset-x-auto sm:right-4 sm:max-w-sm">
+			<p className="text-sm text-mute">
+				We use cookies to keep the app running and, with your permission, to understand how it's
+				used. You can change this any time in settings.
+			</p>
+			<div className="mt-4 flex gap-2">
+				<button onClick={acceptNecessary} className="btn btn-ghost flex-1">
+					Necessary only
+				</button>
+				<button onClick={() => setRoute("preferences")} className="btn btn-ghost flex-1">
+					Customize
+				</button>
+				<button onClick={acceptAll} className="btn btn-primary flex-1">
+					Accept all
+				</button>
+			</div>
+		</div>
+	);
 }
 ```
 
@@ -172,32 +172,36 @@ The preferences panel is a second component reading `useCategory(key)` for each 
 import { useConsent, useCategory } from "@opencookies/react";
 
 function Toggle({ k, label }: { k: "analytics" | "marketing"; label: string }) {
-  const { granted, toggle } = useCategory(k);
-  return (
-    <label className="flex items-center justify-between py-3">
-      <span>{label}</span>
-      <input type="checkbox" checked={granted} onChange={toggle} />
-    </label>
-  );
+	const { granted, toggle } = useCategory(k);
+	return (
+		<label className="flex items-center justify-between py-3">
+			<span>{label}</span>
+			<input type="checkbox" checked={granted} onChange={toggle} />
+		</label>
+	);
 }
 
 export function CookiePreferences() {
-  const { route, save, setRoute } = useConsent();
-  if (route !== "preferences") return null;
+	const { route, save, setRoute } = useConsent();
+	if (route !== "preferences") return null;
 
-  return (
-    <div className="fixed inset-0 grid place-items-center bg-bg/70 p-4">
-      <div className="w-full max-w-md rounded-2xl border border-line bg-bg p-6">
-        <h2 className="text-lg font-medium">Cookie preferences</h2>
-        <Toggle k="analytics" label="Analytics" />
-        <Toggle k="marketing" label="Marketing" />
-        <div className="mt-4 flex justify-end gap-2">
-          <button onClick={() => setRoute("cookie")} className="btn btn-ghost">Back</button>
-          <button onClick={save} className="btn btn-primary">Save</button>
-        </div>
-      </div>
-    </div>
-  );
+	return (
+		<div className="fixed inset-0 grid place-items-center bg-bg/70 p-4">
+			<div className="w-full max-w-md rounded-2xl border border-line bg-bg p-6">
+				<h2 className="text-lg font-medium">Cookie preferences</h2>
+				<Toggle k="analytics" label="Analytics" />
+				<Toggle k="marketing" label="Marketing" />
+				<div className="mt-4 flex justify-end gap-2">
+					<button onClick={() => setRoute("cookie")} className="btn btn-ghost">
+						Back
+					</button>
+					<button onClick={save} className="btn btn-primary">
+						Save
+					</button>
+				</div>
+			</div>
+		</div>
+	);
 }
 ```
 
@@ -211,15 +215,15 @@ For inline UI that depends on consent — an analytics chart, a personalised pro
 import { ConsentGate } from "@opencookies/react";
 
 function EnableAnalyticsPrompt() {
-  return <p className="text-sm text-mute">Enable analytics to see this chart.</p>;
+	return <p className="text-sm text-mute">Enable analytics to see this chart.</p>;
 }
 
 export function Dashboard() {
-  return (
-    <ConsentGate requires="analytics" fallback={<EnableAnalyticsPrompt />}>
-      <UsageChart />
-    </ConsentGate>
-  );
+	return (
+		<ConsentGate requires="analytics" fallback={<EnableAnalyticsPrompt />}>
+			<UsageChart />
+		</ConsentGate>
+	);
 }
 ```
 
@@ -234,16 +238,16 @@ import { defineScript, gateScript } from "@opencookies/core";
 import { store } from "@/lib/consent-store";
 
 const ga4 = defineScript({
-  id: "ga4",
-  requires: "analytics",
-  src: "https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX",
-  queue: ["dataLayer.push"],
-  init: () => {
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function gtag() {
-      window.dataLayer.push(arguments);
-    };
-  },
+	id: "ga4",
+	requires: "analytics",
+	src: "https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX",
+	queue: ["dataLayer.push"],
+	init: () => {
+		window.dataLayer = window.dataLayer || [];
+		window.gtag = function gtag() {
+			window.dataLayer.push(arguments);
+		};
+	},
 });
 
 gateScript(store, ga4);
@@ -273,20 +277,20 @@ import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [
-    tsConfigPaths(),
-    openCookies({
-      config: {
-        categories: [
-          { key: "essential", label: "Essential", locked: true },
-          { key: "analytics", label: "Analytics" },
-          { key: "marketing", label: "Marketing" },
-        ],
-      },
-    }),
-    tanstackStart(),
-    viteReact(),
-  ],
+	plugins: [
+		tsConfigPaths(),
+		openCookies({
+			config: {
+				categories: [
+					{ key: "essential", label: "Essential", locked: true },
+					{ key: "analytics", label: "Analytics" },
+					{ key: "marketing", label: "Marketing" },
+				],
+			},
+		}),
+		tanstackStart(),
+		viteReact(),
+	],
 });
 ```
 

@@ -21,12 +21,12 @@ import { createConsentStore } from "@opencookies/core";
 import { localStorageAdapter } from "@opencookies/core/storage/local-storage";
 
 const store = createConsentStore({
-  categories: [
-    { key: "essential", label: "Essential", locked: true },
-    { key: "analytics", label: "Analytics" },
-    { key: "marketing", label: "Marketing" },
-  ],
-  adapter: localStorageAdapter(),
+	categories: [
+		{ key: "essential", label: "Essential", locked: true },
+		{ key: "analytics", label: "Analytics" },
+		{ key: "marketing", label: "Marketing" },
+	],
+	adapter: localStorageAdapter(),
 });
 
 store.subscribe((state) => render(state));
@@ -54,9 +54,9 @@ import { createConsentStore, headerResolver } from "@opencookies/core";
 
 // Edge runtime (Cloudflare, Vercel, Netlify): read country from request headers.
 const store = createConsentStore({
-  categories,
-  jurisdictionResolver: headerResolver(),
-  request, // standard Request, or anything with a Headers instance
+	categories,
+	jurisdictionResolver: headerResolver(),
+	request, // standard Request, or anything with a Headers instance
 });
 ```
 
@@ -79,13 +79,13 @@ Implement the `JurisdictionResolver` interface and reuse `countryToJurisdiction`
 import { type JurisdictionResolver, countryToJurisdiction } from "@opencookies/core";
 
 export function ipApiResolver(): JurisdictionResolver {
-  return {
-    async resolve() {
-      const res = await fetch("https://ipapi.co/json/");
-      const { country_code } = await res.json();
-      return countryToJurisdiction(country_code);
-    },
-  };
+	return {
+		async resolve() {
+			const res = await fetch("https://ipapi.co/json/");
+			const { country_code } = await res.json();
+			return countryToJurisdiction(country_code);
+		},
+	};
 }
 ```
 
@@ -112,8 +112,8 @@ To scope GPC to the legally-required US states only:
 import { GPC_LEGALLY_REQUIRED_JURISDICTIONS, createConsentStore } from "@opencookies/core";
 
 const store = createConsentStore({
-  categories,
-  gpc: { applicableJurisdictions: GPC_LEGALLY_REQUIRED_JURISDICTIONS },
+	categories,
+	gpc: { applicableJurisdictions: GPC_LEGALLY_REQUIRED_JURISDICTIONS },
 });
 ```
 
@@ -121,9 +121,9 @@ A category that should ignore GPC sets `respectGPC: false`:
 
 ```ts
 const categories = [
-  { key: "essential", label: "Essential", locked: true },
-  { key: "analytics", label: "Analytics", respectGPC: false },
-  { key: "marketing", label: "Marketing" },
+	{ key: "essential", label: "Essential", locked: true },
+	{ key: "analytics", label: "Analytics", respectGPC: false },
+	{ key: "marketing", label: "Marketing" },
 ];
 ```
 
@@ -141,13 +141,13 @@ When a decision is persisted via a `StorageAdapter`, the store serialises it as 
 
 ```ts
 type ConsentRecord = {
-  schemaVersion: 1;
-  decisions: Record<string, boolean>;
-  policyVersion: string;
-  decidedAt: string; // ISO-8601
-  jurisdiction: Jurisdiction | null;
-  locale: string;
-  source: "banner" | "preferences" | "api" | "import";
+	schemaVersion: 1;
+	decisions: Record<string, boolean>;
+	policyVersion: string;
+	decidedAt: string; // ISO-8601
+	jurisdiction: Jurisdiction | null;
+	locale: string;
+	source: "banner" | "preferences" | "api" | "import";
 };
 ```
 
@@ -164,9 +164,9 @@ Read the current record via `store.getConsentRecord()` (or the binding-level `us
 
 ```ts
 const store = createConsentStore({
-  categories,
-  locale: "en-GB", // optional; falls back to navigator.language, then "en"
-  adapter: cookieAdapter(),
+	categories,
+	locale: "en-GB", // optional; falls back to navigator.language, then "en"
+	adapter: cookieAdapter(),
 });
 
 store.acceptAll();
@@ -192,15 +192,15 @@ A stored `ConsentRecord` can become stale: the cookie policy is updated, a new c
 
 ```ts
 const store = createConsentStore({
-  categories,
-  policyVersion: "v2",
-  adapter: cookieAdapter(),
-  triggers: {
-    policyVersionChanged: true, // config.policyVersion !== record.policyVersion
-    categoriesAdded: true, // a category in config is missing from the record
-    expiresAfter: "13 months", // older than the duration → re-prompt
-    jurisdictionChanged: true, // current jurisdiction differs from the recorded one
-  },
+	categories,
+	policyVersion: "v2",
+	adapter: cookieAdapter(),
+	triggers: {
+		policyVersionChanged: true, // config.policyVersion !== record.policyVersion
+		categoriesAdded: true, // a category in config is missing from the record
+		expiresAfter: "13 months", // older than the duration → re-prompt
+		jurisdictionChanged: true, // current jurisdiction differs from the recorded one
+	},
 });
 ```
 
@@ -217,8 +217,8 @@ When any trigger fires, the store invalidates state — `route` returns to `"coo
 const { repromptReason, getPreviousRecord } = useConsent();
 
 if (repromptReason !== null) {
-  console.log(`Re-prompting because: ${repromptReason}`);
-  console.log("Previous decisions:", getPreviousRecord()?.decisions);
+	console.log(`Re-prompting because: ${repromptReason}`);
+	console.log("Previous decisions:", getPreviousRecord()?.decisions);
 }
 ```
 
@@ -228,7 +228,7 @@ For analytics, the store emits an `oncookies:reprompt` event on `globalThis` whe
 
 ```ts
 globalThis.addEventListener("oncookies:reprompt", (event) => {
-  analytics.track("consent_reprompt", { reason: event.detail.reason });
+	analytics.track("consent_reprompt", { reason: event.detail.reason });
 });
 ```
 
@@ -242,18 +242,18 @@ import { createConsentStore, defineScript, gateScript } from "@opencookies/core"
 const store = createConsentStore({ categories });
 
 const ga4 = defineScript({
-  id: "ga4",
-  requires: "analytics",
-  src: "https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX",
-  queue: ["dataLayer.push"],
-  init: () => {
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function gtag() {
-      window.dataLayer.push(arguments);
-    };
-    window.gtag("js", new Date());
-    window.gtag("config", "G-XXXXXXX");
-  },
+	id: "ga4",
+	requires: "analytics",
+	src: "https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX",
+	queue: ["dataLayer.push"],
+	init: () => {
+		window.dataLayer = window.dataLayer || [];
+		window.gtag = function gtag() {
+			window.dataLayer.push(arguments);
+		};
+		window.gtag("js", new Date());
+		window.gtag("config", "G-XXXXXXX");
+	},
 });
 
 gateScript(store, ga4);

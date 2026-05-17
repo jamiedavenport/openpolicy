@@ -34,52 +34,47 @@ pnpm add @opencookies/core @openpolicy/core @openpolicy/sdk
 The point of doing this once on day one is that the privacy policy, the cookie policy, and the banner's categories all come from the same source. Put it under `app/data/`:
 
 ```ts file="app/data/openpolicy.ts"
-import {
-  ContractPrerequisite,
-  LegalBases,
-  Voluntary,
-  defineConfig,
-} from '@openpolicy/sdk'
+import { ContractPrerequisite, LegalBases, Voluntary, defineConfig } from "@openpolicy/sdk";
 
 export const policy = defineConfig({
-  company: {
-    name: 'Acme',
-    legalName: 'Acme Ltd',
-    address: '1 Demo Lane, London, UK',
-    contact: { email: 'privacy@acme.com' },
-  },
-  effectiveDate: '2026-05-12',
-  jurisdictions: ['eu', 'uk'],
-  data: {
-    collected: {
-      'Account Information': ['Name', 'Email address'],
-      'Usage Data': ['Pages visited', 'IP address'],
-    },
-    context: {
-      'Account Information': {
-        purpose: 'To authenticate users and send service notifications.',
-        lawfulBasis: LegalBases.Contract,
-        retention: 'Until account deletion',
-        provision: ContractPrerequisite('We cannot operate your account.'),
-      },
-      'Usage Data': {
-        purpose: 'To understand product usage and improve the service.',
-        lawfulBasis: LegalBases.LegitimateInterests,
-        retention: '90 days',
-        provision: Voluntary('None — your service is unaffected.'),
-      },
-    },
-  },
-  thirdParties: [],
-  cookies: {
-    used: { essential: true, analytics: true, marketing: false },
-    context: {
-      essential: { lawfulBasis: LegalBases.LegalObligation },
-      analytics: { lawfulBasis: LegalBases.Consent },
-      marketing: { lawfulBasis: LegalBases.Consent },
-    },
-  },
-})
+	company: {
+		name: "Acme",
+		legalName: "Acme Ltd",
+		address: "1 Demo Lane, London, UK",
+		contact: { email: "privacy@acme.com" },
+	},
+	effectiveDate: "2026-05-12",
+	jurisdictions: ["eu", "uk"],
+	data: {
+		collected: {
+			"Account Information": ["Name", "Email address"],
+			"Usage Data": ["Pages visited", "IP address"],
+		},
+		context: {
+			"Account Information": {
+				purpose: "To authenticate users and send service notifications.",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot operate your account."),
+			},
+			"Usage Data": {
+				purpose: "To understand product usage and improve the service.",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "90 days",
+				provision: Voluntary("None — your service is unaffected."),
+			},
+		},
+	},
+	thirdParties: [],
+	cookies: {
+		used: { essential: true, analytics: true, marketing: false },
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
+		},
+	},
+});
 ```
 
 This is the only file you edit when something changes. Add an SDK that drops a third-party cookie? It goes in `thirdParties`. Change retention on usage data? You change one line. The banner's category list and both policy documents update from the same config.
@@ -89,28 +84,28 @@ This is the only file you edit when something changes. Add an SDK that drops a t
 `@openpolicy/core` exposes two compiler functions — `compilePrivacyPolicy` and `compileCookiePolicy` — that produce a Document AST. Compile once at module load, then hand the result to a server component that walks the tree:
 
 ```tsx file="app/controllers/privacy.tsx"
-import { compilePrivacyPolicy } from '@openpolicy/core'
-import type { BuildAction } from 'remix/fetch-router'
+import { compilePrivacyPolicy } from "@openpolicy/core";
+import type { BuildAction } from "remix/fetch-router";
 
-import { policy } from '../data/openpolicy.ts'
-import type { routes } from '../routes.ts'
-import { Layout } from '../ui/layout.tsx'
-import { PolicyDocument } from '../ui/policy-document.tsx'
-import { render } from '../utils/render.tsx'
+import { policy } from "../data/openpolicy.ts";
+import type { routes } from "../routes.ts";
+import { Layout } from "../ui/layout.tsx";
+import { PolicyDocument } from "../ui/policy-document.tsx";
+import { render } from "../utils/render.tsx";
 
-const privacyDoc = compilePrivacyPolicy(policy)
-if (!privacyDoc) throw new Error('No privacy policy configured')
+const privacyDoc = compilePrivacyPolicy(policy);
+if (!privacyDoc) throw new Error("No privacy policy configured");
 
-export const privacy: BuildAction<'GET', typeof routes.privacy> = {
-  handler({ request }) {
-    return render(
-      <Layout title="Privacy Policy">
-        <PolicyDocument doc={privacyDoc} />
-      </Layout>,
-      request,
-    )
-  },
-}
+export const privacy: BuildAction<"GET", typeof routes.privacy> = {
+	handler({ request }) {
+		return render(
+			<Layout title="Privacy Policy">
+				<PolicyDocument doc={privacyDoc} />
+			</Layout>,
+			request,
+		);
+	},
+};
 ```
 
 The cookie policy is the same controller with `compileCookiePolicy` instead. Both run server-only — no `clientEntry`, no hydration, no client JS for the document content.
@@ -118,47 +113,45 @@ The cookie policy is the same controller with `compileCookiePolicy` instead. Bot
 `PolicyDocument` is the framework-specific bit. Because the AST is plain data (`Document → DocumentSection → ContentNode → InlineNode`), the walker is short and reads like a stand-alone HTML transformer:
 
 ```tsx file="app/ui/policy-document.tsx"
-import type {
-  ContentNode,
-  Document,
-  InlineNode,
-  ListNode,
-  TableNode,
-} from '@openpolicy/core'
-import { css, type Handle, type RemixNode } from 'remix/ui'
+import type { ContentNode, Document, InlineNode, ListNode, TableNode } from "@openpolicy/core";
+import { css, type Handle, type RemixNode } from "remix/ui";
 
 export function PolicyDocument(handle: Handle<{ doc: Document }>) {
-  return () => (
-    <article mix={css({ maxWidth: '42rem', margin: '2rem auto', lineHeight: 1.6 })}>
-      {handle.props.doc.sections.map((section) => (
-        <section id={section.id}>{section.content.map(renderContent)}</section>
-      ))}
-    </article>
-  )
+	return () => (
+		<article mix={css({ maxWidth: "42rem", margin: "2rem auto", lineHeight: 1.6 })}>
+			{handle.props.doc.sections.map((section) => (
+				<section id={section.id}>{section.content.map(renderContent)}</section>
+			))}
+		</article>
+	);
 }
 
 function renderContent(node: ContentNode): RemixNode {
-  switch (node.type) {
-    case 'heading': {
-      const Tag = `h${node.level ?? 2}` as 'h1' | 'h2' | 'h3'
-      return <Tag>{node.value}</Tag>
-    }
-    case 'paragraph':
-      return <p>{node.children.map(renderInline)}</p>
-    case 'list':
-      return renderList(node)
-    case 'table':
-      return renderTable(node)
-  }
+	switch (node.type) {
+		case "heading": {
+			const Tag = `h${node.level ?? 2}` as "h1" | "h2" | "h3";
+			return <Tag>{node.value}</Tag>;
+		}
+		case "paragraph":
+			return <p>{node.children.map(renderInline)}</p>;
+		case "list":
+			return renderList(node);
+		case "table":
+			return renderTable(node);
+	}
 }
 
 function renderInline(node: InlineNode): RemixNode {
-  switch (node.type) {
-    case 'text':    return node.value
-    case 'bold':    return <strong>{node.value}</strong>
-    case 'italic':  return <em>{node.value}</em>
-    case 'link':    return <a href={node.href}>{node.value}</a>
-  }
+	switch (node.type) {
+		case "text":
+			return node.value;
+		case "bold":
+			return <strong>{node.value}</strong>;
+		case "italic":
+			return <em>{node.value}</em>;
+		case "link":
+			return <a href={node.href}>{node.value}</a>;
+	}
 }
 ```
 
@@ -171,50 +164,49 @@ What you get is a privacy policy and a cookie policy that render with zero clien
 The banner is the one piece that has to run on the client — visitor clicks "Accept all," the store updates, the banner re-renders, and on the next page load the analytics SDKs are allowed to load. In Remix 3 that's a single `clientEntry` module that wraps an `@opencookies/core` store:
 
 ```tsx file="app/ui/cookie-banner.tsx"
-import {
-  createConsentStore,
-  timezoneResolver,
-  type ConsentStore,
-} from '@opencookies/core'
-import { localStorageAdapter } from '@opencookies/core/storage/local-storage'
-import { toOpenCookiesConfig } from '@openpolicy/sdk/opencookies'
-import { clientEntry, css, on, type Handle } from 'remix/ui'
+import { createConsentStore, timezoneResolver, type ConsentStore } from "@opencookies/core";
+import { localStorageAdapter } from "@opencookies/core/storage/local-storage";
+import { toOpenCookiesConfig } from "@openpolicy/sdk/opencookies";
+import { clientEntry, css, on, type Handle } from "remix/ui";
 
-import { policy } from '../data/openpolicy.ts'
+import { policy } from "../data/openpolicy.ts";
 
 const consentConfig = toOpenCookiesConfig(policy, {
-  jurisdictionResolver: timezoneResolver(),
-})
+	jurisdictionResolver: timezoneResolver(),
+});
 
-export const CookieBanner = clientEntry(
-  import.meta.url,
-  function CookieBanner(handle: Handle) {
-    let store: ConsentStore | null = null
+export const CookieBanner = clientEntry(import.meta.url, function CookieBanner(handle: Handle) {
+	let store: ConsentStore | null = null;
 
-    if (typeof window !== 'undefined') {
-      store = createConsentStore({ ...consentConfig, adapter: localStorageAdapter() })
-      let unsubscribe = store.subscribe(() => handle.update())
-      handle.signal.addEventListener('abort', unsubscribe)
-    }
+	if (typeof window !== "undefined") {
+		store = createConsentStore({ ...consentConfig, adapter: localStorageAdapter() });
+		let unsubscribe = store.subscribe(() => handle.update());
+		handle.signal.addEventListener("abort", unsubscribe);
+	}
 
-    return () => {
-      let route = store?.getState().route
-      if (route !== 'cookie') return <div data-cookie-banner hidden />
-      return (
-        <div role="dialog" aria-label="Cookie consent" mix={css({ /* ... */ })}>
-          <p>We use cookies to improve your experience.</p>
-          <button mix={on('click', () => store?.acceptAll())}>Accept all</button>
-          <button mix={on('click', () => store?.acceptNecessary())}>Necessary only</button>
-        </div>
-      )
-    }
-  },
-)
+	return () => {
+		let route = store?.getState().route;
+		if (route !== "cookie") return <div data-cookie-banner hidden />;
+		return (
+			<div
+				role="dialog"
+				aria-label="Cookie consent"
+				mix={css({
+					/* ... */
+				})}
+			>
+				<p>We use cookies to improve your experience.</p>
+				<button mix={on("click", () => store?.acceptAll())}>Accept all</button>
+				<button mix={on("click", () => store?.acceptNecessary())}>Necessary only</button>
+			</div>
+		);
+	};
+});
 ```
 
 Three things worth pointing at:
 
-- **`toOpenCookiesConfig(policy)`** derives the consent categories — `essential`, `analytics`, `marketing` — directly from the OpenPolicy config. The cookie policy's category list and the banner's category list cannot drift apart, because they're computed from the same source. A `marketing: true` flip in `app/data/openpolicy.ts` adds the marketing checkbox to the banner *and* the marketing disclosure to the cookie policy on the same deploy.
+- **`toOpenCookiesConfig(policy)`** derives the consent categories — `essential`, `analytics`, `marketing` — directly from the OpenPolicy config. The cookie policy's category list and the banner's category list cannot drift apart, because they're computed from the same source. A `marketing: true` flip in `app/data/openpolicy.ts` adds the marketing checkbox to the banner _and_ the marketing disclosure to the cookie policy on the same deploy.
 - **`handle.update()`** is Remix 3's "tell the framework to re-render this entry." We pass it to the store's `subscribe` callback so the banner re-renders on every state change. `handle.signal` is an `AbortSignal` for the lifetime of the entry — we register the `unsubscribe` against it, so when the framework tears the banner down (navigation, replacement, server hand-off), the subscription goes with it. No leaks, no manual lifecycle.
 - **The `typeof window` guard** is the Remix 3-shaped equivalent of "only touch localStorage in the browser." `clientEntry` modules also run on the server during the initial render so the framework knows what to ship; the store gets constructed only when `window` exists.
 
@@ -223,19 +215,19 @@ Three things worth pointing at:
 The banner sits in the shared layout, so every page gets it:
 
 ```tsx file="app/ui/layout.tsx"
-import type { RemixNode } from 'remix/ui'
+import type { RemixNode } from "remix/ui";
 
-import { CookieBanner } from './cookie-banner.tsx'
-import { Document } from './document.tsx'
+import { CookieBanner } from "./cookie-banner.tsx";
+import { Document } from "./document.tsx";
 
 export function Layout() {
-  return ({ title, children }: { title?: string; children?: RemixNode }) => (
-    <Document title={title}>
-      <header>{/* nav */}</header>
-      <main>{children}</main>
-      <CookieBanner />
-    </Document>
-  )
+	return ({ title, children }: { title?: string; children?: RemixNode }) => (
+		<Document title={title}>
+			<header>{/* nav */}</header>
+			<main>{children}</main>
+			<CookieBanner />
+		</Document>
+	);
 }
 ```
 
@@ -246,18 +238,18 @@ That's it. The banner is one entry, hydrated independently. The policy pages sta
 Remix 3's asset server has a deliberate allow-list for what files the browser can load. In a consent-aware app, that's not just hygiene — it's a useful enforcement boundary:
 
 ```ts file="app/assets.ts"
-import { createAssetServer } from 'remix/assets'
+import { createAssetServer } from "remix/assets";
 
 export const assets = createAssetServer({
-  basePath: '/assets',
-  rootDir: process.cwd(),
-  fileMap: {
-    'app/*path': 'app/*path',
-    'node_modules/*path': 'node_modules/*path',
-  },
-  allow: ['app/assets/**', 'app/data/**', 'app/ui/cookie-banner.tsx', 'node_modules/**'],
-  deny: ['app/**/*.server.*'],
-})
+	basePath: "/assets",
+	rootDir: process.cwd(),
+	fileMap: {
+		"app/*path": "app/*path",
+		"node_modules/*path": "node_modules/*path",
+	},
+	allow: ["app/assets/**", "app/data/**", "app/ui/cookie-banner.tsx", "node_modules/**"],
+	deny: ["app/**/*.server.*"],
+});
 ```
 
 `app/ui/cookie-banner.tsx` is explicitly allow-listed because it's the only UI module a client needs to load. Add an analytics SDK wrapper? You add it to `allow` consciously, with a PR that reviews against the consent config. Forget? It 404s in dev. Compared to the React-meta-framework default of "the bundler ships whatever you import," this is a real constraint on what can fire without consent.

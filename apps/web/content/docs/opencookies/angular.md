@@ -25,18 +25,18 @@ import { localStorageAdapter } from "@opencookies/core/storage/local-storage";
 import { AppComponent } from "./app.component";
 
 bootstrapApplication(AppComponent, {
-  providers: [
-    provideOpenCookies({
-      config: {
-        categories: [
-          { key: "essential", label: "Essential", locked: true },
-          { key: "analytics", label: "Analytics" },
-          { key: "marketing", label: "Marketing" },
-        ],
-        adapter: localStorageAdapter(),
-      },
-    }),
-  ],
+	providers: [
+		provideOpenCookies({
+			config: {
+				categories: [
+					{ key: "essential", label: "Essential", locked: true },
+					{ key: "analytics", label: "Analytics" },
+					{ key: "marketing", label: "Marketing" },
+				],
+				adapter: localStorageAdapter(),
+			},
+		}),
+	],
 });
 ```
 
@@ -60,20 +60,20 @@ import { Component, inject } from "@angular/core";
 import { ConsentService } from "@opencookies/angular";
 
 @Component({
-  selector: "app-banner",
-  standalone: true,
-  template: `
-    @if (consent.route() === "cookie") {
-      <div>
-        <button (click)="consent.acceptNecessary()">Necessary only</button>
-        <button (click)="consent.acceptAll()">Accept all</button>
-        <button (click)="consent.setRoute('preferences')">Customize</button>
-      </div>
-    }
-  `,
+	selector: "app-banner",
+	standalone: true,
+	template: `
+		@if (consent.route() === "cookie") {
+			<div>
+				<button (click)="consent.acceptNecessary()">Necessary only</button>
+				<button (click)="consent.acceptAll()">Accept all</button>
+				<button (click)="consent.setRoute('preferences')">Customize</button>
+			</div>
+		}
+	`,
 })
 export class BannerComponent {
-  readonly consent = inject(ConsentService);
+	readonly consent = inject(ConsentService);
 }
 ```
 
@@ -90,17 +90,17 @@ import { Component } from "@angular/core";
 import { injectCategory } from "@opencookies/angular";
 
 @Component({
-  selector: "category-row",
-  standalone: true,
-  template: `
-    <label>
-      <input type="checkbox" [checked]="analytics.granted()" (change)="analytics.toggle()" />
-      Analytics
-    </label>
-  `,
+	selector: "category-row",
+	standalone: true,
+	template: `
+		<label>
+			<input type="checkbox" [checked]="analytics.granted()" (change)="analytics.toggle()" />
+			Analytics
+		</label>
+	`,
 })
 export class CategoryRowComponent {
-  readonly analytics = injectCategory("analytics");
+	readonly analytics = injectCategory("analytics");
 }
 ```
 
@@ -115,17 +115,17 @@ import { ChartComponent } from "./chart.component";
 import { EnablePromptComponent } from "./enable-prompt.component";
 
 @Component({
-  selector: "gated-chart",
-  standalone: true,
-  imports: [ConsentGate, ChartComponent, EnablePromptComponent],
-  template: `
-    <chart *ocConsent="'analytics'; else fallback"></chart>
-    <ng-template #fallback>
-      <enable-prompt></enable-prompt>
-    </ng-template>
+	selector: "gated-chart",
+	standalone: true,
+	imports: [ConsentGate, ChartComponent, EnablePromptComponent],
+	template: `
+		<chart *ocConsent="'analytics'; else fallback"></chart>
+		<ng-template #fallback>
+			<enable-prompt></enable-prompt>
+		</ng-template>
 
-    <personalized-promo *ocConsent="{ and: ['analytics', 'marketing'] }"></personalized-promo>
-  `,
+		<personalized-promo *ocConsent="{ and: ['analytics', 'marketing'] }"></personalized-promo>
+	`,
 })
 export class GatedChartComponent {}
 ```

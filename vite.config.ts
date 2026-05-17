@@ -15,6 +15,9 @@ export default defineConfig({
 		exclude: ["**/node_modules/**", "**/dist/**"],
 	},
 	staged: {
-		"*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,json,jsonc}": "vp check --fix",
+		// Include md/mdx/css so prose + styles are auto-formatted on commit.
+		// `vp check` checks them in CI, so the staged set must match or content
+		// edits drift red (the gap that left 21 apps/web files unformatted).
+		"*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,json,jsonc,md,mdx,css}": "vp check --fix",
 	},
 });

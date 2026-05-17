@@ -20,17 +20,17 @@ import { defineConfig } from "vite";
 import { openCookies } from "@opencookies/vite";
 
 export default defineConfig({
-  plugins: [
-    openCookies({
-      config: {
-        categories: [
-          { key: "necessary", label: "Necessary", locked: true },
-          { key: "analytics", label: "Analytics" },
-          { key: "marketing", label: "Marketing" },
-        ],
-      },
-    }),
-  ],
+	plugins: [
+		openCookies({
+			config: {
+				categories: [
+					{ key: "necessary", label: "Necessary", locked: true },
+					{ key: "analytics", label: "Analytics" },
+					{ key: "marketing", label: "Marketing" },
+				],
+			},
+		}),
+	],
 });
 ```
 

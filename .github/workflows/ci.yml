@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [main]
+    branches: [main, v1]
   pull_request:
     branches: [main, v1]
 concurrency:
@@ -20,9 +20,13 @@ jobs:
       - run: vp run -r build
       - run: vp check
       - run: vp run -r check-types
-      # TEMP: svelte tests pass per-package (`cd packages/svelte && vp test`)
-      # but the root aggregate run doesn't apply the package's `svelte()` Vite
-      # plugin, so .svelte SFC imports fail to transform. Excluded until the
-      # root test-aggregation config is sorted (PS-15 follow-up).
-      - run: vp test --run --exclude '**/packages/svelte/**'
-      # - run: vp run knip
+      # Per-package (dep order) so each package's own vite.config.ts applies —
+      # the root aggregate `vp test` drops per-package plugins (vite-plugin-solid,
+      # @sveltejs/vite-plugin-svelte) so solid renders SSR-only and svelte SFCs
+      # fail to transform. Recursive run fixes both; no exclusions needed.
+      - run: vp run -r test
+      # Non-blocking for now: knip surfaces dead deps/exports but still has
+      # per-workspace entry-config noise. Tracked as a follow-up to retune
+      # knip.json then drop continue-on-error.
+      - run: vp run knip
+        continue-on-error: true

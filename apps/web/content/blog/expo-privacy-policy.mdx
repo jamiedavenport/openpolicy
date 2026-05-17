@@ -33,44 +33,44 @@ The whole policy is one file at the project root. Here's the example app's [`ope
 
 ```ts file="openpolicy.ts"
 import {
-  Compliance,
-  defineConfig,
-  LegalBases,
-  Providers,
-  Retention,
-  Voluntary,
+	Compliance,
+	defineConfig,
+	LegalBases,
+	Providers,
+	Retention,
+	Voluntary,
 } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: {
-    name: "Expo Example",
-    legalName: "Expo Example, Inc.",
-    address: "1 Example Way, San Francisco, CA 94107, USA",
-    contact: { email: "privacy@example.com" },
-  },
-  effectiveDate: "2026-05-07",
-  jurisdictions: Compliance.GDPR.jurisdictions,
-  data: {
-    collected: {
-      "Account Information": ["Name", "Email address"],
-      "Usage Data": ["Pages visited", "Features used"],
-    },
-    context: {
-      "Account Information": {
-        purpose: "Create and manage your account.",
-        lawfulBasis: LegalBases.Contract,
-        retention: Retention.UntilAccountDeletion,
-        provision: Voluntary("You can use the app without an account."),
-      },
-      "Usage Data": {
-        purpose: "Understand how the app is used and improve it.",
-        lawfulBasis: LegalBases.LegitimateInterests,
-        retention: Retention.NinetyDays,
-        provision: Voluntary("You can opt out of analytics in app settings."),
-      },
-    },
-  },
-  thirdParties: [Providers.Sentry],
+	company: {
+		name: "Expo Example",
+		legalName: "Expo Example, Inc.",
+		address: "1 Example Way, San Francisco, CA 94107, USA",
+		contact: { email: "privacy@example.com" },
+	},
+	effectiveDate: "2026-05-07",
+	jurisdictions: Compliance.GDPR.jurisdictions,
+	data: {
+		collected: {
+			"Account Information": ["Name", "Email address"],
+			"Usage Data": ["Pages visited", "Features used"],
+		},
+		context: {
+			"Account Information": {
+				purpose: "Create and manage your account.",
+				lawfulBasis: LegalBases.Contract,
+				retention: Retention.UntilAccountDeletion,
+				provision: Voluntary("You can use the app without an account."),
+			},
+			"Usage Data": {
+				purpose: "Understand how the app is used and improve it.",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: Retention.NinetyDays,
+				provision: Voluntary("You can opt out of analytics in app settings."),
+			},
+		},
+	},
+	thirdParties: [Providers.Sentry],
 });
 ```
 
@@ -93,37 +93,42 @@ import { Linking, StyleSheet, Text, View } from "react-native";
 import type { PolicyComponents } from "@openpolicy/react";
 
 const HEADING_SIZES: Record<1 | 2 | 3 | 4 | 5 | 6, number> = {
-  1: 28, 2: 22, 3: 18, 4: 16, 5: 15, 6: 14,
+	1: 28,
+	2: 22,
+	3: 18,
+	4: 16,
+	5: 15,
+	6: 14,
 };
 
 const policyComponents: PolicyComponents = {
-  Root: ({ children }) => <View>{children}</View>,
-  Section: ({ children }) => <View style={styles.section}>{children}</View>,
-  Heading: ({ node }) => {
-    const level = (node.level ?? 2) as 1 | 2 | 3 | 4 | 5 | 6;
-    return (
-      <Text
-        style={[
-          styles.heading,
-          { fontSize: HEADING_SIZES[level], marginTop: level <= 2 ? 20 : 14 },
-        ]}
-      >
-        {node.value}
-      </Text>
-    );
-  },
-  Paragraph: ({ children }) => <Text style={styles.paragraph}>{children}</Text>,
-  // ...List, ListItem, Table, TableRow, TableCell, Bold, Italic, Text...
-  Link: ({ node }) => (
-    <Text
-      style={styles.link}
-      onPress={() => {
-        Linking.openURL(node.href).catch(() => {});
-      }}
-    >
-      {node.value}
-    </Text>
-  ),
+	Root: ({ children }) => <View>{children}</View>,
+	Section: ({ children }) => <View style={styles.section}>{children}</View>,
+	Heading: ({ node }) => {
+		const level = (node.level ?? 2) as 1 | 2 | 3 | 4 | 5 | 6;
+		return (
+			<Text
+				style={[
+					styles.heading,
+					{ fontSize: HEADING_SIZES[level], marginTop: level <= 2 ? 20 : 14 },
+				]}
+			>
+				{node.value}
+			</Text>
+		);
+	},
+	Paragraph: ({ children }) => <Text style={styles.paragraph}>{children}</Text>,
+	// ...List, ListItem, Table, TableRow, TableCell, Bold, Italic, Text...
+	Link: ({ node }) => (
+		<Text
+			style={styles.link}
+			onPress={() => {
+				Linking.openURL(node.href).catch(() => {});
+			}}
+		>
+			{node.value}
+		</Text>
+	),
 };
 ```
 
@@ -148,16 +153,16 @@ import openpolicy from "../openpolicy";
 import policyComponents from "../components/PolicyComponents";
 
 export default function PrivacyPolicyScreen() {
-  return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Privacy Policy</Text>
-        <OpenPolicy config={openpolicy}>
-          <PrivacyPolicy components={policyComponents} />
-        </OpenPolicy>
-      </ScrollView>
-    </SafeAreaView>
-  );
+	return (
+		<SafeAreaView style={styles.safe}>
+			<ScrollView contentContainerStyle={styles.content}>
+				<Text style={styles.title}>Privacy Policy</Text>
+				<OpenPolicy config={openpolicy}>
+					<PrivacyPolicy components={policyComponents} />
+				</OpenPolicy>
+			</ScrollView>
+		</SafeAreaView>
+	);
 }
 ```
 
@@ -170,12 +175,12 @@ import { StatusBar } from "expo-status-bar";
 import PrivacyPolicyScreen from "./screens/PrivacyPolicyScreen";
 
 export default function App() {
-  return (
-    <>
-      <PrivacyPolicyScreen />
-      <StatusBar style="auto" />
-    </>
-  );
+	return (
+		<>
+			<PrivacyPolicyScreen />
+			<StatusBar style="auto" />
+		</>
+	);
 }
 ```
 

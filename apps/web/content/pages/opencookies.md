@@ -5,28 +5,25 @@
 Tiny core. Adapters for every major framework. A Vite plugin that yells at you when a script sets a cookie behind a category the user hasn't accepted yet.
 
 ```tsx
-import {
-  OpenCookiesProvider,
-  ConsentGate,
-} from "@opencookies/react";
+import { OpenCookiesProvider, ConsentGate } from "@opencookies/react";
 
 const config = {
-  categories: [
-    { key: "essential", label: "Essential", locked: true },
-    { key: "analytics", label: "Analytics" },
-    { key: "marketing", label: "Marketing" },
-  ],
+	categories: [
+		{ key: "essential", label: "Essential", locked: true },
+		{ key: "analytics", label: "Analytics" },
+		{ key: "marketing", label: "Marketing" },
+	],
 };
 
 export function App() {
-  return (
-    <OpenCookiesProvider config={config}>
-      <YourApp />
-      <ConsentGate requires="analytics">
-        <GoogleAnalytics />
-      </ConsentGate>
-    </OpenCookiesProvider>
-  );
+	return (
+		<OpenCookiesProvider config={config}>
+			<YourApp />
+			<ConsentGate requires="analytics">
+				<GoogleAnalytics />
+			</ConsentGate>
+		</OpenCookiesProvider>
+	);
 }
 ```
 
@@ -61,13 +58,13 @@ pnpm add @opencookies/core @opencookies/react
 import { useConsent } from "@opencookies/react";
 
 export function CookieBanner() {
-  const { acceptAll, acceptNecessary } = useConsent();
-  return (
-    <div>
-      <button onClick={acceptAll}>Accept all</button>
-      <button onClick={acceptNecessary}>Necessary only</button>
-    </div>
-  );
+	const { acceptAll, acceptNecessary } = useConsent();
+	return (
+		<div>
+			<button onClick={acceptAll}>Accept all</button>
+			<button onClick={acceptNecessary}>Necessary only</button>
+		</div>
+	);
 }
 ```
 

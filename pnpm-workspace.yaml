@@ -4,10 +4,28 @@ packages:
   - "tooling/*"
   - "examples/*"
 
+# Pinned (not `latest`) so a new Vite+ release can't turn CI red with zero
+# repo changes — toolchain bumps land as deliberate, reviewable PRs.
 catalog:
-  vite: "npm:@voidzero-dev/vite-plus-core@latest"
-  vitest: "npm:@voidzero-dev/vite-plus-test@latest"
-  vite-plus: "latest"
+  vite: "npm:@voidzero-dev/vite-plus-core@0.1.21"
+  vitest: "npm:@voidzero-dev/vite-plus-test@0.1.21"
+  vite-plus: "0.1.21"
+
+# Supply-chain defense: a newly published version can't be installed until it
+# has been public for 7 days (value in minutes), blunting the npm
+# publish-malware-then-yank window. `--frozen-lockfile` installs from the
+# resolved lockfile and doesn't re-resolve, so this only gates new deps/bumps.
+minimumReleaseAge: 10080
+# Exempt the Vite+ toolchain: it's pinned exactly above and bumped on purpose,
+# so the grace period shouldn't stall a deliberate toolchain upgrade. Listed by
+# both the catalog alias (`vite`/`vitest` — always aliased to vite-plus via
+# `overrides`, the real packages are never installed) and the real names.
+minimumReleaseAgeExclude:
+  - "vite"
+  - "vitest"
+  - "vite-plus"
+  - "@voidzero-dev/vite-plus-core"
+  - "@voidzero-dev/vite-plus-test"
 
 onlyBuiltDependencies:
   - esbuild

@@ -30,11 +30,13 @@ Either set `locale` once on the config and every render uses it:
 import { defineConfig } from "@openpolicy/sdk";
 
 export default defineConfig({
-  company: { name: "Acme, Inc." },
-  effectiveDate: "2026-01-01",
-  jurisdictions: ["eu", "fr"],
-  locale: "fr",
-  data: { /* ... */ },
+	company: { name: "Acme, Inc." },
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["eu", "fr"],
+	locale: "fr",
+	data: {
+		/* ... */
+	},
 });
 ```
 
@@ -45,12 +47,12 @@ import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
 import openpolicy from "@/openpolicy";
 
 export function PrivacyPolicyPage() {
-  return (
-    <OpenPolicy config={openpolicy}>
-      <PrivacyPolicy />              {/* uses config.locale */}
-      <PrivacyPolicy locale="fr" />  {/* override → French */}
-    </OpenPolicy>
-  );
+	return (
+		<OpenPolicy config={openpolicy}>
+			<PrivacyPolicy /> {/* uses config.locale */}
+			<PrivacyPolicy locale="fr" /> {/* override → French */}
+		</OpenPolicy>
+	);
 }
 ```
 

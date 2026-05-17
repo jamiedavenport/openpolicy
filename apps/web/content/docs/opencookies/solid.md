@@ -24,18 +24,18 @@ import type { Category } from "@opencookies/core";
 import { render } from "solid-js/web";
 
 const categories: Category[] = [
-  { key: "essential", label: "Essential", locked: true },
-  { key: "analytics", label: "Analytics" },
-  { key: "marketing", label: "Marketing" },
+	{ key: "essential", label: "Essential", locked: true },
+	{ key: "analytics", label: "Analytics" },
+	{ key: "marketing", label: "Marketing" },
 ];
 
 render(
-  () => (
-    <OpenCookiesProvider config={{ categories }}>
-      <App />
-    </OpenCookiesProvider>
-  ),
-  document.getElementById("root")!,
+	() => (
+		<OpenCookiesProvider config={{ categories }}>
+			<App />
+		</OpenCookiesProvider>
+	),
+	document.getElementById("root")!,
 );
 ```
 
@@ -52,16 +52,16 @@ import { useConsent } from "@opencookies/solid";
 import { Show } from "solid-js";
 
 function Banner() {
-  const { route, acceptAll, acceptNecessary, setRoute } = useConsent();
-  return (
-    <Show when={route() === "cookie"}>
-      <div class="banner">
-        <button onClick={acceptNecessary}>Necessary only</button>
-        <button onClick={acceptAll}>Accept all</button>
-        <button onClick={() => setRoute("preferences")}>Customize</button>
-      </div>
-    </Show>
-  );
+	const { route, acceptAll, acceptNecessary, setRoute } = useConsent();
+	return (
+		<Show when={route() === "cookie"}>
+			<div class="banner">
+				<button onClick={acceptNecessary}>Necessary only</button>
+				<button onClick={acceptAll}>Accept all</button>
+				<button onClick={() => setRoute("preferences")}>Customize</button>
+			</div>
+		</Show>
+	);
 }
 ```
 
@@ -73,13 +73,13 @@ Granular per-category access.
 import { useCategory } from "@opencookies/solid";
 
 function AnalyticsToggle() {
-  const analytics = useCategory("analytics");
-  return (
-    <label>
-      <input type="checkbox" checked={analytics.granted()} onChange={analytics.toggle} />
-      Analytics
-    </label>
-  );
+	const analytics = useCategory("analytics");
+	return (
+		<label>
+			<input type="checkbox" checked={analytics.granted()} onChange={analytics.toggle} />
+			Analytics
+		</label>
+	);
 }
 ```
 
@@ -111,13 +111,13 @@ import { FileRoutes } from "@solidjs/start/router";
 import { categories } from "./cookies";
 
 export default function App() {
-  return (
-    <OpenCookiesProvider config={{ categories }}>
-      <Router>
-        <FileRoutes />
-      </Router>
-    </OpenCookiesProvider>
-  );
+	return (
+		<OpenCookiesProvider config={{ categories }}>
+			<Router>
+				<FileRoutes />
+			</Router>
+		</OpenCookiesProvider>
+	);
 }
 ```
 
