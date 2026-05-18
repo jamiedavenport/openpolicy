@@ -23,8 +23,8 @@ const ORG_JSON_LD = {
 	url: SITE_URL,
 	logo: `${SITE_URL}/logo512.png`,
 	sameAs: [
-		"https://github.com/jamiedavenport/openpolicy",
-		"https://github.com/jamiedavenport/opencookies",
+		"https://github.com/jamiedavenport/policystack",
+		"https://github.com/jamiedavenport/policystack",
 	],
 };
 

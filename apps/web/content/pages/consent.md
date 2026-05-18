@@ -72,4 +72,4 @@ export function CookieBanner() {
 
 - [Docs: PolicyStack Consent](https://policystack.dev/docs/consent.md)
 - [PolicyStack](https://policystack.dev/policy.md) — wire them together
-- GitHub: <https://github.com/jamiedavenport/opencookies>
+- GitHub: <https://github.com/jamiedavenport/policystack>

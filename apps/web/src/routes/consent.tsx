@@ -90,7 +90,7 @@ function ConsentPage() {
 				}}
 				secondary={{
 					label: "github",
-					href: "https://github.com/jamiedavenport/opencookies",
+					href: "https://github.com/jamiedavenport/policystack",
 					icon: "arrow-up-right",
 				}}
 				snippetFile="App.tsx"

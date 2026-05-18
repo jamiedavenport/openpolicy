@@ -150,7 +150,7 @@ function PolicyStack() {
 				primary={{ label: "pnpm dlx @policystack/cli init", href: "#install", icon: "arrow-right" }}
 				secondary={{
 					label: "github",
-					href: "https://github.com/jamiedavenport/openpolicy",
+					href: "https://github.com/jamiedavenport/policystack",
 					icon: "arrow-up-right",
 				}}
 				snippetFile="privacy.tsx"

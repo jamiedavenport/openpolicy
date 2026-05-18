@@ -122,7 +122,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 								policystack.dev
 							</a>
 							<a
-								href="https://github.com/jamiedavenport/openpolicy"
+								href="https://github.com/jamiedavenport/policystack"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-muted-foreground hover:text-foreground transition-colors"
@@ -159,13 +159,13 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 							</a>
 						</span>
 						<a
-							href="https://github.com/jamiedavenport/openpolicy"
+							href="https://github.com/jamiedavenport/policystack"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="flex items-center gap-1.5 hover:text-foreground transition-colors"
 						>
 							<GithubIcon className="size-3.5" />
-							jamiedavenport/openpolicy
+							jamiedavenport/policystack
 						</a>
 					</div>
 				</footer>

@@ -125,8 +125,8 @@ PolicyStack Consent pairs with [PolicyStack](https://policystack.dev) for the fu
 
 ## Status
 
-Pre-1.0 and under active development. APIs may change before v1. Track progress on the [roadmap](https://github.com/jamiedavenport/opencookies/issues).
+Pre-1.0 and under active development. APIs may change before v1. Track progress on the [roadmap](https://github.com/jamiedavenport/policystack/issues).
 
 ## License
 
-[Apache-2.0](https://github.com/jamiedavenport/opencookies/blob/main/LICENSE)
+[Apache-2.0](https://github.com/jamiedavenport/policystack/blob/main/LICENSE)

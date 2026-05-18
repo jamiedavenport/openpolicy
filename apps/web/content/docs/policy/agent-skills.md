@@ -19,7 +19,7 @@ review your policies before publication.
 In Claude Code:
 
 ```
-/plugin marketplace add jamiedavenport/openpolicy
+/plugin marketplace add jamiedavenport/policystack
 /plugin install policystack
 ```
 

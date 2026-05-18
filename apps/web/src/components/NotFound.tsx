@@ -340,7 +340,7 @@ function Help() {
 							report a broken link
 						</a>
 						<a
-							href="https://github.com/jamiedavenport/openpolicy/issues"
+							href="https://github.com/jamiedavenport/policystack/issues"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="inline-flex items-center justify-center gap-2.5 border-2 border-black px-6 py-3.5 text-sm tracking-wide uppercase hover:bg-black hover:text-white"

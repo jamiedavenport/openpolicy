@@ -84,7 +84,7 @@ function RouteComponent() {
 						<ArrowRight className="size-3.5" />
 					</a>
 					<a
-						href="https://github.com/jamiedavenport/openpolicy"
+						href="https://github.com/jamiedavenport/policystack"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors"

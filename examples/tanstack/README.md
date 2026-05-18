@@ -55,4 +55,4 @@ vp build    # production build
 
 - [PolicyStack](https://policystack.dev)
 - [Documentation](https://policystack.dev/docs)
-- [GitHub repository](https://github.com/jamiedavenport/openpolicy)
+- [GitHub repository](https://github.com/jamiedavenport/policystack)

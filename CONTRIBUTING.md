@@ -3,7 +3,7 @@
 ## Setup
 
 ```bash
-git clone https://github.com/jamiedavenport/openpolicy
+git clone https://github.com/jamiedavenport/policystack
 cd openpolicy
 corepack enable      # picks up the pnpm version pinned in package.json
 pnpm install

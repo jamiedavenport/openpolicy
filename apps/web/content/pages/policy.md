@@ -97,4 +97,4 @@ export default defineConfig({
 
 - [Docs: PolicyStack](https://policystack.dev/docs/policy.md)
 - [PolicyStack Consent](https://policystack.dev/consent.md) — pair with PolicyStack for consent state
-- GitHub: <https://github.com/jamiedavenport/openpolicy>
+- GitHub: <https://github.com/jamiedavenport/policystack>

@@ -6,7 +6,7 @@ product: policy
 
 The cookie banner, preferences panel, and consent runtime previously shipped as part of PolicyStack have moved to a sibling project: **PolicyStack Consent**.
 
-> [github.com/jamiedavenport/opencookies](https://github.com/jamiedavenport/opencookies)
+> [github.com/jamiedavenport/policystack](https://github.com/jamiedavenport/policystack)
 
 PolicyStack Consent and PolicyStack are designed to work together: the same `cookies` config in your `policystack.ts` drives both the cookie _policy_ (the legal document) and the cookie _banner_ (the consent UI).
 

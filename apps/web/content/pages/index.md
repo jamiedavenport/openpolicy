@@ -38,6 +38,6 @@ Claude reading the same typed config is just what falls out. The machine-readabl
 Pick a repo, install one package, and have a typed policy and a working consent flow before lunch.
 
 - Docs: <https://policystack.dev/docs>
-- GitHub (PolicyStack): <https://github.com/jamiedavenport/openpolicy>
-- GitHub (PolicyStack Consent): <https://github.com/jamiedavenport/opencookies>
+- GitHub (PolicyStack): <https://github.com/jamiedavenport/policystack>
+- GitHub (PolicyStack Consent): <https://github.com/jamiedavenport/policystack>
 - Demo (PolicyStack Cloud): <https://cal.eu/jamie-policy/policy-chat-demo>

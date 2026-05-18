@@ -103,12 +103,12 @@ Full field reference and guides: [policystack.dev/docs](https://policystack.dev/
 For Claude Code, install the PolicyStack skill pack — guided procedures for setup, auditing, jurisdiction posture, and data-flow instrumentation, all resolved against the frozen SDK surface:
 
 ```
-/plugin marketplace add jamiedavenport/openpolicy
+/plugin marketplace add jamiedavenport/policystack
 /plugin install policystack
 ```
 
 ## Links
 
-- [GitHub](https://github.com/jamiedavenport/openpolicy)
+- [GitHub](https://github.com/jamiedavenport/policystack)
 - [policystack.dev](https://policystack.dev)
 - [npm](https://www.npmjs.com/package/@policystack/sdk)

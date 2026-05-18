@@ -74,6 +74,6 @@ policyStack({
 
 ## Links
 
-- [GitHub](https://github.com/jamiedavenport/openpolicy)
+- [GitHub](https://github.com/jamiedavenport/policystack)
 - [policystack.dev](https://policystack.dev)
 - [npm](https://www.npmjs.com/package/@policystack/vite)
