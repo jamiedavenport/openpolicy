@@ -17,7 +17,7 @@ export {
 	text,
 	ul,
 } from "./helpers";
-export { AST_VERSION, PROVENANCE_CODES } from "./types";
+export { AST_VERSION } from "./types";
 export type {
 	BoldNode,
 	ComplianceReason,
@@ -34,7 +34,6 @@ export type {
 	NodeContext,
 	ParagraphNode,
 	PolicyType,
-	ProvenanceCode,
 	TableCellNode,
 	TableHeaderCellNode,
 	TableHeaderRowNode,

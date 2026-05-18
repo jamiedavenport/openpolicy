@@ -14,7 +14,6 @@ export type {
 	NodeContext,
 	ParagraphNode,
 	PolicyType,
-	ProvenanceCode,
 	TableCellNode,
 	TableHeaderCellNode,
 	TableHeaderRowNode,
@@ -23,13 +22,14 @@ export type {
 	TextNode,
 	UnknownNode,
 	Visitor,
-	// The frozen validator `IssueCode` is re-exported once from "./types"
-	// (PS-11). It is a different axis from the AST's `ProvenanceCode` (above):
-	// diagnostics vs. why-a-node-exists.
+	// `IssueCode` is re-exported once from "./types" (PS-11 froze it there
+	// alongside `Issue`); the duplicate "./documents" re-export was a latent
+	// TS2300 inherited from the v1 base and is dropped here. The AST's
+	// `ProvenanceCode` (a different axis: why-a-node-exists, not diagnostics)
+	// stays internal to ./documents — nothing outside core consumes it.
 } from "./documents";
 export {
 	AST_VERSION,
-	PROVENANCE_CODES,
 	bold,
 	cell,
 	headerCell,

@@ -6,10 +6,11 @@ import type { LegalBasis } from "../types";
  * {@link ComplianceReason} — *why* that node was emitted. This is a distinct
  * axis from the validator's diagnostic `IssueCode` (issue-codes.ts): a
  * provenance code traces emitted document structure, a diagnostic code flags a
- * config problem. Frozen registry (house style, like `ISSUE_CODES`) so the
- * union is derived with no drift and a builder typo is a compile error.
+ * config problem. Module-local frozen list: it exists only to derive the
+ * `ProvenanceCode` union so a builder typo is a compile error — nothing
+ * enumerates it at runtime (unlike `ISSUE_CODES`), so it stays internal.
  */
-export const PROVENANCE_CODES = [
+const PROVENANCE_CODES = [
 	"automated-decision-making",
 	"ccpa-supplement",
 	"children-privacy",
