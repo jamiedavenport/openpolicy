@@ -14,9 +14,9 @@ import type { Rule } from "../types";
  * within-file dedup state is per-file) and reads `extractor.result()` after
  * the walk.
  */
-export function makeOpenPolicyRule(extractor: PolicyExtractor): Rule {
+export function makePolicyStackRule(extractor: PolicyExtractor): Rule {
 	return {
-		name: "openpolicy",
+		name: "policystack",
 		visit: (ctx) => extractor.visit(ctx.node),
 	};
 }

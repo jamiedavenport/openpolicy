@@ -2,7 +2,12 @@ import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { OpenCookiesError } from "./errors";
 import { evaluate } from "./expr";
 import { createConsentStore } from "./store";
-import type { Category, ConsentState, OpenCookiesConfig, UnknownCategoryBehavior } from "./types";
+import type {
+	Category,
+	ConsentState,
+	PolicyStackConsentConfig,
+	UnknownCategoryBehavior,
+} from "./types";
 
 const baseCategories: Category[] = [
 	{ key: "essential", label: "Essential", locked: true },
@@ -12,7 +17,7 @@ const baseCategories: Category[] = [
 
 function makeState(
 	overrides: Partial<ConsentState> = {},
-	configOverrides: Partial<OpenCookiesConfig> = {},
+	configOverrides: Partial<PolicyStackConsentConfig> = {},
 ): ConsentState {
 	const store = createConsentStore({
 		categories: baseCategories,

@@ -8,7 +8,7 @@ import {
 	type ConsentRecordSource,
 	type ConsentStore,
 	type Jurisdiction,
-	type OpenCookiesConfig,
+	type PolicyStackConsentConfig,
 	type RepromptReason,
 	type Route,
 } from "@policystack/core/consent";
@@ -22,7 +22,7 @@ import {
 } from "react";
 
 export type OpenCookiesProviderProps =
-	| { config: OpenCookiesConfig; store?: undefined; children: ReactNode }
+	| { config: PolicyStackConsentConfig; store?: undefined; children: ReactNode }
 	| { store: ConsentStore; config?: undefined; children: ReactNode };
 
 const StoreContext = createContext<ConsentStore | null>(null);

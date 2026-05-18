@@ -10,7 +10,7 @@ export const Route = createFileRoute("/policycloud")({
 			{
 				title: "PolicyCloud — the hosted control plane for your policies | PolicyStack",
 				description:
-					"Centralized policy versioning, audit trails, and consent analytics across every app in your stack. The hosted control plane on top of OpenPolicy and OpenCookies.",
+					"Centralized policy versioning, audit trails, and consent analytics across every app in your stack. The hosted control plane on top of PolicyStack and OpenCookies.",
 				path: "/policycloud",
 			},
 			ctx,
@@ -195,7 +195,7 @@ function Pricing() {
 						name="open source"
 						price="$0"
 						blurb="Self-hosted. Apache-2.0. Yours forever."
-						features={["OpenPolicy", "OpenCookies", "Vite plugin", "CLI"]}
+						features={["PolicyStack", "OpenCookies", "Vite plugin", "CLI"]}
 						position="first"
 					/>
 					<Tier

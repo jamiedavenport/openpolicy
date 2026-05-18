@@ -1,21 +1,21 @@
 "use client";
 
-import { isConsentGated, type OpenPolicyConfig } from "@policystack/core";
-import type { Category, OpenCookiesConfig } from "@policystack/core/consent";
+import { isConsentGated, type PolicyStackConfig } from "@policystack/core";
+import type { Category, PolicyStackConsentConfig } from "@policystack/core/consent";
 import { useState, type ReactNode } from "react";
 import { OpenCookiesProvider } from "./consent";
-import { OpenPolicyContext } from "./context";
+import { PolicyStackContext } from "./context";
 
-// Local copy of the @policystack/sdk `toOpenCookiesConfig` derivation, narrowed
-// to the authored `OpenPolicyConfig.consent` shape (policyVersion / locale /
+// Local copy of the @policystack/sdk `toPolicyStackConsentConfig` derivation, narrowed
+// to the authored `PolicyStackConfig.consent` shape (policyVersion / locale /
 // canWithdraw are ALWAYS derived from the policy, never authored in `consent`).
-// Kept here — rather than importing `toOpenCookiesConfig` — so @policystack/
+// Kept here — rather than importing `toPolicyStackConsentConfig` — so @policystack/
 // react's only @policystack/* runtime dependency stays @policystack/core (no
 // react → sdk edge). The canonical bridge is @policystack/sdk's
-// `toOpenCookiesConfig`; provider.test.tsx pins this copy to it, so if either
+// `toPolicyStackConsentConfig`; provider.test.tsx pins this copy to it, so if either
 // drifts the parity test fails. Exported as that parity seam and a legitimate
-// escape hatch — equivalent to `toOpenCookiesConfig(policy, policy.consent)`.
-export function deriveConsentConfig(policy: OpenPolicyConfig): OpenCookiesConfig {
+// escape hatch — equivalent to `toPolicyStackConsentConfig(policy, policy.consent)`.
+export function deriveConsentConfig(policy: PolicyStackConfig): PolicyStackConsentConfig {
 	const used: Record<string, boolean> = policy.cookies?.used ?? {};
 	const context = policy.cookies?.context ?? {};
 	const categories: Category[] = Object.keys(used)
@@ -45,7 +45,7 @@ export function deriveConsentConfig(policy: OpenPolicyConfig): OpenCookiesConfig
 }
 
 export type PolicyStackProviderProps = {
-	config: OpenPolicyConfig;
+	config: PolicyStackConfig;
 	children?: ReactNode;
 };
 
@@ -69,15 +69,15 @@ export function PolicyStackProvider({ config, children }: PolicyStackProviderPro
 	// Derive once per provider instance. Each SSR request mounts its own
 	// provider, so the consent store never leaks across requests — same
 	// rationale as OpenCookiesProvider's own useState store memoization.
-	const [consentConfig] = useState<OpenCookiesConfig>(() => deriveConsentConfig(config));
+	const [consentConfig] = useState<PolicyStackConsentConfig>(() => deriveConsentConfig(config));
 
 	return (
-		<OpenPolicyContext.Provider value={{ config }}>
+		<PolicyStackContext.Provider value={{ config }}>
 			{consentConfig.categories.length > 0 ? (
 				<OpenCookiesProvider config={consentConfig}>{children}</OpenCookiesProvider>
 			) : (
 				children
 			)}
-		</OpenPolicyContext.Provider>
+		</PolicyStackContext.Provider>
 	);
 }

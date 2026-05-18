@@ -7,7 +7,7 @@ export type {
 	ConsentState,
 	ConsentStore,
 	Jurisdiction,
-	OpenCookiesConfig,
+	PolicyStackConsentConfig,
 	RepromptReason,
 	Route,
 } from "@policystack/core/consent";

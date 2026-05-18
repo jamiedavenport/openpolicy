@@ -1,8 +1,8 @@
 import { expect, test } from "vite-plus/test";
-import type { OpenPolicyConfig } from "./index";
+import type { PolicyStackConfig } from "./index";
 import { defineConfig } from "./index";
 
-const fixture: OpenPolicyConfig = {
+const fixture: PolicyStackConfig = {
 	company: {
 		name: "Acme Inc.",
 		legalName: "Acme Corporation",

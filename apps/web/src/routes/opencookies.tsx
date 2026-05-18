@@ -144,7 +144,7 @@ function OpenCookies() {
 					{ tag: "bash", html: installHtml },
 					{ tag: "CookieBanner.tsx", html: useHtml },
 				]}
-				next={{ to: "/openpolicy", label: "Already using OpenPolicy? Wire them together" }}
+				next={{ to: "/openpolicy", label: "Already using PolicyStack? Wire them together" }}
 			/>
 
 			<Sponsor index="04" />

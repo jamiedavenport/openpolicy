@@ -6,7 +6,7 @@ import type { VendorRegistry } from "./consent/types";
  * two legacy sources that were keyed on different dimensions and disagreed on
  * categories:
  *
- *  - OpenPolicy `known-packages.ts` — npm-dependency keyed, carried the
+ *  - PolicyStack `known-packages.ts` — npm-dependency keyed, carried the
  *    disclosure metadata (`name` / `purpose` / `policyUrl`).
  *  - OpenCookies `vendors.json` — import/global/scriptUrl keyed, carried the
  *    consent `category`.

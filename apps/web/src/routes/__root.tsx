@@ -210,7 +210,7 @@ function SiteFooter() {
 					title="open source"
 					links={[
 						{ to: "/opencookies", label: "OpenCookies" },
-						{ to: "/openpolicy", label: "OpenPolicy" },
+						{ to: "/openpolicy", label: "PolicyStack" },
 						{ to: "/policycloud", label: "PolicyCloud" },
 					]}
 				/>

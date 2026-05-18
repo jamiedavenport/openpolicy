@@ -1,4 +1,4 @@
-import type { OpenPolicyConfig } from "@policystack/core";
+import type { PolicyStackConfig } from "@policystack/core";
 import type { VendorHit } from "./consent/types";
 import { vendorById } from "./registry";
 import type { Scanned } from "./scanned";
@@ -31,11 +31,11 @@ export type DriftFinding = {
 
 const ESSENTIAL = "essential";
 
-function declaredVendorNames(config: OpenPolicyConfig): Set<string> {
+function declaredVendorNames(config: PolicyStackConfig): Set<string> {
 	return new Set((config.thirdParties ?? []).map((t) => t.name));
 }
 
-function declaredCookieCategories(config: OpenPolicyConfig): Set<string> {
+function declaredCookieCategories(config: PolicyStackConfig): Set<string> {
 	const used = config.cookies?.used ?? {};
 	const out = new Set<string>();
 	for (const [key, enabled] of Object.entries(used)) {
@@ -65,7 +65,7 @@ function usedCookieCategories(scanned: Scanned, vendors: VendorHit[]): Set<strin
  * (sharing edges, cookie categories, declared third parties).
  */
 export function crossCheck(
-	config: OpenPolicyConfig,
+	config: PolicyStackConfig,
 	scanned: Scanned,
 	vendors: VendorHit[],
 ): DriftFinding[] {
@@ -189,13 +189,13 @@ export function applyDriftPolicy(
 }
 
 /**
- * Formats a drift finding for the terminal — same greppable `[openpolicy]`
+ * Formats a drift finding for the terminal — same greppable `[policystack]`
  * prefix as `formatIssue`, with an optional `file:line:col` and the
  * actionable "add this to openpolicy.ts" suggestion.
  */
 export function formatDrift(f: DriftFinding): string {
 	const loc = f.file && f.line !== undefined ? ` ${f.file}:${f.line}:${f.column ?? 0}` : "";
-	const lines = [`[openpolicy]${loc} ${f.code}: ${f.message}`];
+	const lines = [`[policystack]${loc} ${f.code}: ${f.message}`];
 	if (f.suggestion) lines.push(`  ${f.suggestion.replace(/\n/g, "\n  ")}`);
 	return lines.join("\n");
 }

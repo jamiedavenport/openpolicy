@@ -17,7 +17,7 @@ import {
 	type ConsentState,
 	type ConsentStore,
 	type Jurisdiction,
-	type OpenCookiesConfig,
+	type PolicyStackConsentConfig,
 	type RepromptReason,
 	type Route,
 } from "@policystack/core/consent";
@@ -39,7 +39,7 @@ function useBound(): Bound {
 }
 
 export type OpenCookiesProviderProps = (
-	| { config: OpenCookiesConfig; store?: undefined }
+	| { config: PolicyStackConsentConfig; store?: undefined }
 	| { store: ConsentStore; config?: undefined }
 ) & { children?: JSX.Element };
 
@@ -157,7 +157,7 @@ export type {
 	ConsentState,
 	ConsentStore,
 	Jurisdiction,
-	OpenCookiesConfig,
+	PolicyStackConsentConfig,
 	RepromptReason,
 	Route,
 };

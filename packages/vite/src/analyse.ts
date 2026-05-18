@@ -90,7 +90,7 @@ export function parseModule(filename: string, code: string): ParsedModule | null
 	try {
 		result = parseSync(filename, code);
 	} catch {
-		console.warn(`[openpolicy] parse error in ${filename}`);
+		console.warn(`[policystack] parse error in ${filename}`);
 		return null;
 	}
 
@@ -99,7 +99,7 @@ export function parseModule(filename: string, code: string): ParsedModule | null
 		// produces a usable AST, so we keep going and let the walker decide.
 		const fatal = result.errors.some((e) => e.severity === ("Error" as never));
 		if (fatal) {
-			console.warn(`[openpolicy] parse error in ${filename}`);
+			console.warn(`[policystack] parse error in ${filename}`);
 			return null;
 		}
 	}

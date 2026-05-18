@@ -22,21 +22,23 @@ OpenPolicy still generates the **cookie policy** — the legal document describi
 
 ## Wire them together
 
-`@policystack/sdk/opencookies` exports `toOpenCookiesConfig(policy)` which translates `policy.cookies.used` into an `OpenCookiesConfig` — the `categories` array, with `essential` automatically locked and labels capitalized. You don't hand-roll the category list a second time next to your banner.
+`@policystack/sdk/opencookies` exports `toPolicyStackConsentConfig(policy)` which translates `policy.cookies.used` into an `PolicyStackConsentConfig` — the `categories` array, with `essential` automatically locked and labels capitalized. You don't hand-roll the category list a second time next to your banner.
 
 ```tsx
 import { OpenCookiesProvider } from "@opencookies/react";
-import { toOpenCookiesConfig } from "@policystack/sdk/opencookies";
+import { toPolicyStackConsentConfig } from "@policystack/sdk/opencookies";
 import openpolicy from "./openpolicy";
 
 export function Root({ children }: { children: React.ReactNode }) {
 	return (
-		<OpenCookiesProvider config={toOpenCookiesConfig(openpolicy)}>{children}</OpenCookiesProvider>
+		<OpenCookiesProvider config={toPolicyStackConsentConfig(openpolicy)}>
+			{children}
+		</OpenCookiesProvider>
 	);
 }
 ```
 
-The bridge also defaults `OpenCookiesConfig.policyVersion` from `policy.cookieVersion` — so `triggers.policyVersionChanged` reprompts consent when (and only when) the cookie slice of your config actually changes. Pass `options` to override anything: `toOpenCookiesConfig(openpolicy, { policyVersion: "v3", storage: customStorage })`.
+The bridge also defaults `PolicyStackConsentConfig.policyVersion` from `policy.cookieVersion` — so `triggers.policyVersionChanged` reprompts consent when (and only when) the cookie slice of your config actually changes. Pass `options` to override anything: `toPolicyStackConsentConfig(openpolicy, { policyVersion: "v3", storage: customStorage })`.
 
 The bridge uses a type-only import from `@opencookies/core`, declared as an optional peer dependency. If you don't render a banner, you pay nothing.
 

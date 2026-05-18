@@ -21,7 +21,7 @@ import {
 	type ConsentState,
 	type ConsentStore,
 	type Jurisdiction,
-	type OpenCookiesConfig,
+	type PolicyStackConsentConfig,
 	type RepromptReason,
 	type Route,
 } from "@policystack/core/consent";
@@ -48,7 +48,7 @@ function useStoreState(store: ConsentStore): Ref<ConsentState> {
 }
 
 export type OpenCookiesPluginOptions =
-	| { config: OpenCookiesConfig; store?: undefined }
+	| { config: PolicyStackConsentConfig; store?: undefined }
 	| { store: ConsentStore; config?: undefined };
 
 export const OpenCookiesPlugin = {
@@ -67,7 +67,7 @@ export const OpenCookiesProvider = defineComponent({
 	name: "OpenCookiesProvider",
 	props: {
 		config: {
-			type: Object as PropType<OpenCookiesConfig>,
+			type: Object as PropType<PolicyStackConsentConfig>,
 			default: undefined,
 		},
 		store: {
@@ -173,7 +173,7 @@ export type {
 	ConsentState,
 	ConsentStore,
 	Jurisdiction,
-	OpenCookiesConfig,
+	PolicyStackConsentConfig,
 	RepromptReason,
 	Route,
 };

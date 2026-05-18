@@ -34,7 +34,7 @@ const PRODUCTS = [
 
 const QUICK_LINKS = [
 	{ to: "/", label: "Home", hint: "the whole stack" },
-	{ to: "/openpolicy", label: "OpenPolicy", hint: "policy-as-code" },
+	{ to: "/openpolicy", label: "PolicyStack", hint: "policy-as-code" },
 	{ to: "/opencookies", label: "OpenCookies", hint: "consent state machine" },
 	{ to: "/policycloud", label: "PolicyCloud", hint: "hosted control plane" },
 	{ to: "/docs", label: "Documentation", hint: "guides and reference" },
@@ -94,8 +94,9 @@ function Hero() {
 
 				<p className="mt-12 max-w-[60ch] text-lg text-pretty text-mute">
 					The page you wanted isn&rsquo;t here. If you followed a link from openpolicy.sh, that site
-					folded into PolicyStack &mdash; everything OpenPolicy lives under this roof now, alongside
-					OpenCookies and PolicyCloud. Otherwise, it&rsquo;s probably a typo or a stale link.
+					folded into PolicyStack &mdash; everything PolicyStack lives under this roof now,
+					alongside OpenCookies and PolicyCloud. Otherwise, it&rsquo;s probably a typo or a stale
+					link.
 				</p>
 
 				<div className="mt-12 max-w-xl border-2 border-black">

@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { type Issue, type OpenPolicyConfig, validate } from "@policystack/core";
+import { type Issue, type PolicyStackConfig, validate } from "@policystack/core";
 import { bundleRequire } from "bundle-require";
 import { defineCommand } from "citty";
 import consola from "consola";
@@ -25,7 +25,7 @@ export type ValidateResult = {
 
 /**
  * Loads the user's config via bundle-require and returns the merged config
- * surface — the flat {@link OpenPolicyConfig} that `defineConfig()` produces
+ * surface — the flat {@link PolicyStackConfig} that `defineConfig()` produces
  * (the §4.1 shared-config bridge, PS-23). This deliberately mirrors
  * `@policystack/vite`'s `loadAndValidateConfig` rather than importing it: the
  * CLI must not depend on the bundler plugin (and its oxc-parser graph), and it
@@ -35,7 +35,7 @@ export type ValidateResult = {
  */
 async function loadConfig(
 	file: string,
-): Promise<{ config: OpenPolicyConfig | null; loadError: Error | null }> {
+): Promise<{ config: PolicyStackConfig | null; loadError: Error | null }> {
 	try {
 		const { mod } = await bundleRequire({
 			filepath: file,
@@ -48,7 +48,7 @@ async function loadConfig(
 				logLevel: "silent",
 			},
 		});
-		const config = (mod as { default?: OpenPolicyConfig }).default;
+		const config = (mod as { default?: PolicyStackConfig }).default;
 		if (!config) {
 			return { config: null, loadError: new Error(`${file} has no default export`) };
 		}

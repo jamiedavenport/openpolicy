@@ -7,14 +7,14 @@ import { Sponsor } from "../components/Sponsor";
 import { highlight } from "../lib/shiki";
 import { pageMeta } from "../lib/seo";
 
-const HERO_SNIPPET = `import { OpenPolicy, PrivacyPolicy } from "@policystack/react";
+const HERO_SNIPPET = `import { PolicyStack, PrivacyPolicy } from "@policystack/react";
 import openpolicy from "@/openpolicy";
 
 export function PrivacyPolicyPage() {
   return (
-    <OpenPolicy config={openpolicy}>
+    <PolicyStack config={openpolicy}>
       <PrivacyPolicy />
-    </OpenPolicy>
+    </PolicyStack>
   );
 }`;
 
@@ -109,11 +109,11 @@ const COMPARISON_ROWS: ComparisonRow[] = [
 ];
 
 export const Route = createFileRoute("/openpolicy")({
-	component: OpenPolicy,
+	component: PolicyStack,
 	head: (ctx) =>
 		pageMeta(
 			{
-				title: "OpenPolicy — your privacy policy as a typed config | PolicyStack",
+				title: "PolicyStack — your privacy policy as a typed config | PolicyStack",
 				description:
 					"Define your privacy and cookie policy once in TypeScript. Render it as React components, generate Markdown, ship a consent banner — all from one source of truth.",
 				path: "/openpolicy",
@@ -134,7 +134,7 @@ export const Route = createFileRoute("/openpolicy")({
 	},
 });
 
-function OpenPolicy() {
+function PolicyStack() {
 	const { heroHtml, installHtml, useHtml } = Route.useLoaderData();
 	return (
 		<>
@@ -364,7 +364,7 @@ function Comparison({ index, rows }: { index: string; rows: ComparisonRow[] }) {
 									Feature
 								</th>
 								<th className="border-l-2 border-black bg-yellow-300/30 px-5 py-4 text-xs font-medium tracking-wide text-ink uppercase">
-									OpenPolicy
+									PolicyStack
 								</th>
 								{competitors.map((c) => (
 									<th
@@ -400,7 +400,7 @@ function Comparison({ index, rows }: { index: string; rows: ComparisonRow[] }) {
 				</div>
 
 				<p className="mt-10 max-w-[60ch] text-sm text-pretty text-mute">
-					GDPR and CCPA coverage is the floor — OpenPolicy is not legal advice and is not a
+					GDPR and CCPA coverage is the floor — PolicyStack is not legal advice and is not a
 					replacement for counsel on high-stakes matters.
 				</p>
 			</div>

@@ -19,7 +19,7 @@ test("prompt has both a config step and a provider-wiring step", () => {
 
 test("no framework → framework-generic wording, no react hard-coding", () => {
 	const out = buildAgentPrompt(base);
-	expect(out).toContain("ONE OpenPolicy provider for your");
+	expect(out).toContain("ONE PolicyStack provider for your");
 	expect(out).not.toContain("PolicyStackProvider");
 	expect(out).not.toContain("@policystack/react/provider");
 });
@@ -35,6 +35,6 @@ test("react → PolicyStackProvider snippet from @policystack/react/provider", (
 
 test("non-react framework stays generic (no react import path)", () => {
 	const out = buildAgentPrompt({ ...base, framework: "vue" });
-	expect(out).toContain("ONE OpenPolicy provider for your");
+	expect(out).toContain("ONE PolicyStack provider for your");
 	expect(out).not.toContain("@policystack/react/provider");
 });

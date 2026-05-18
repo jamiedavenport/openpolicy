@@ -1,5 +1,5 @@
 import type { Locale } from "../types";
-import type { OpenCookiesConfig } from "./types";
+import type { PolicyStackConsentConfig } from "./types";
 
 // Canonical locale codes, kept dependency-free on purpose: importing the i18n
 // locale registry would drag the policy dictionaries into the lean consent
@@ -48,7 +48,7 @@ export function normalizeLocale(input: string): Locale {
 }
 // ─── end PS-26 shim ───
 
-export function resolveLocale(config: OpenCookiesConfig): Locale {
+export function resolveLocale(config: PolicyStackConsentConfig): Locale {
 	if (config.locale) return normalizeLocale(config.locale);
 	const nav = (globalThis as { navigator?: { language?: string } }).navigator;
 	return coerceLocale(nav?.language ?? "en");

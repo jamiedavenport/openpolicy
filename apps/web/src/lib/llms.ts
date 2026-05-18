@@ -81,11 +81,11 @@ export function renderLlmsTxt() {
 	const lines = [
 		"# PolicyStack",
 		"",
-		"> Open-source primitives for privacy and consent. OpenPolicy turns your privacy and cookie policy into a typed TypeScript config that renders as React components or Markdown. OpenCookies is a sub-4kb headless cookie-consent state machine with adapters for React, Vue, Solid, Svelte, and Angular. PolicyCloud is the hosted control plane on top — policy versioning, audit trails, and consent analytics.",
+		"> Open-source primitives for privacy and consent. PolicyStack turns your privacy and cookie policy into a typed TypeScript config that renders as React components or Markdown. OpenCookies is a sub-4kb headless cookie-consent state machine with adapters for React, Vue, Solid, Svelte, and Angular. PolicyCloud is the hosted control plane on top — policy versioning, audit trails, and consent analytics.",
 		"",
 		"## Products",
 		"",
-		`- [OpenPolicy](${SITE}/openpolicy.md): TypeScript-defined privacy policies, rendered with framework-native components`,
+		`- [PolicyStack](${SITE}/openpolicy.md): TypeScript-defined privacy policies, rendered with framework-native components`,
 		`- [OpenCookies](${SITE}/opencookies.md): Sub-4kb headless cookie-consent state machine`,
 		`- [PolicyCloud](${SITE}/policycloud.md): Hosted policy versioning and consent analytics (early access)`,
 		"",
@@ -99,13 +99,13 @@ export function renderLlmsTxt() {
 
 	if (indexDoc) {
 		lines.push(
-			`- [Documentation home](${SITE}/docs.md): ${indexDoc.description ?? "Reference for OpenPolicy and OpenCookies"}`,
+			`- [Documentation home](${SITE}/docs.md): ${indexDoc.description ?? "Reference for PolicyStack and OpenCookies"}`,
 		);
 	}
 	lines.push("");
 
 	if (openpolicyDocs.length) {
-		lines.push("### OpenPolicy docs", "");
+		lines.push("### PolicyStack docs", "");
 		for (const doc of openpolicyDocs) lines.push(formatDocLink(doc));
 		lines.push("");
 	}

@@ -1,4 +1,4 @@
-import type { OpenPolicyConfig, PrivacyPolicyConfig, SlotName } from "@policystack/core";
+import type { PolicyStackConfig, PrivacyPolicyConfig, SlotName } from "@policystack/core";
 import { render } from "svelte/server";
 import { expect, test } from "vite-plus/test";
 import CookiePolicy from "./lib/CookiePolicy.svelte";
@@ -55,8 +55,8 @@ test("compileDocument returns null when config is undefined", () => {
 	expect(compileDocument("privacy", undefined)).toBeNull();
 });
 
-test("compileDocument expands an OpenPolicyConfig and picks the right policy", () => {
-	const openConfig: OpenPolicyConfig = {
+test("compileDocument expands an PolicyStackConfig and picks the right policy", () => {
+	const openConfig: PolicyStackConfig = {
 		company,
 		effectiveDate: "2026-01-01",
 		jurisdictions: ["ca"],
@@ -77,8 +77,8 @@ test("PrivacyPolicy SSR-renders a data-op-policy wrapper with sections", () => {
 	expect(body).toContain("<h2");
 });
 
-test("CookiePolicy SSR-renders the cookie policy from an OpenPolicyConfig", () => {
-	const openConfig: OpenPolicyConfig = {
+test("CookiePolicy SSR-renders the cookie policy from an PolicyStackConfig", () => {
+	const openConfig: PolicyStackConfig = {
 		company,
 		effectiveDate: "2026-01-01",
 		jurisdictions: ["ca"],

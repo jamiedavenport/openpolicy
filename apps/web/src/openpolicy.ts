@@ -58,7 +58,7 @@ export default defineConfig({
 	// derived from `cookies` above (analytics is Consent ⇒ a real toggle;
 	// essential stays locked); only the storage adapter and jurisdiction
 	// resolver are authored here. <PolicyStackProvider> reads this and spins
-	// up the consent store — no separate config, no toOpenCookiesConfig call.
+	// up the consent store — no separate config, no toPolicyStackConsentConfig call.
 	consent: {
 		adapter: localStorageAdapter(),
 		jurisdictionResolver: timezoneResolver(),

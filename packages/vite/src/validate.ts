@@ -1,9 +1,9 @@
-import { type Issue, type OpenPolicyConfig, validate } from "@policystack/core";
+import { type Issue, type PolicyStackConfig, validate } from "@policystack/core";
 import { bundleRequire } from "bundle-require";
 import type { ScannerDiagnostic } from "./analyse";
 
 export type ValidatedConfig = {
-	config: OpenPolicyConfig | null;
+	config: PolicyStackConfig | null;
 	issues: Issue[];
 	loadError: Error | null;
 };
@@ -57,7 +57,7 @@ export async function loadAndValidateConfig(
 		configFile: string;
 	} & IssuePolicy,
 ): Promise<ValidatedConfig> {
-	let mod: { default?: OpenPolicyConfig };
+	let mod: { default?: PolicyStackConfig };
 	try {
 		const result = await bundleRequire({
 			filepath: args.configFile,
@@ -68,7 +68,7 @@ export async function loadAndValidateConfig(
 			// SDK is a workspace package that isn't present in every ambient
 			// `node_modules` (pnpm doesn't hoist it to the workspace root), so
 			// an externalised import would fail to resolve at runtime.
-			notExternal: [/^@openpolicy\//],
+			notExternal: [/^@policystack\//],
 			esbuildOptions: {
 				platform: "node",
 				// Esbuild prints to stderr by default. Silence it — we surface
@@ -78,7 +78,7 @@ export async function loadAndValidateConfig(
 				logLevel: "silent",
 			},
 		});
-		mod = result.mod as { default?: OpenPolicyConfig };
+		mod = result.mod as { default?: PolicyStackConfig };
 	} catch (err) {
 		return {
 			config: null,
@@ -107,18 +107,18 @@ export async function loadAndValidateConfig(
 }
 
 /**
- * Formats a validation issue for terminal output. Prefixes with `[openpolicy]`
+ * Formats a validation issue for terminal output. Prefixes with `[policystack]`
  * so users can grep the build log for our messages.
  */
 export function formatIssue(issue: Issue): string {
-	return `[openpolicy] ${issue.code}: ${issue.message}`;
+	return `[policystack] ${issue.code}: ${issue.message}`;
 }
 
 /**
  * Formats a located scanner diagnostic for terminal output as
- * `[openpolicy] file:line:col code: message` — same greppable prefix as
+ * `[policystack] file:line:col code: message` — same greppable prefix as
  * {@link formatIssue}, with a clickable `file:line:col` location.
  */
 export function formatScannerDiagnostic(d: ScannerDiagnostic): string {
-	return `[openpolicy] ${d.file}:${d.line}:${d.column} ${d.code}: ${d.message}`;
+	return `[policystack] ${d.file}:${d.line}:${d.column} ${d.code}: ${d.message}`;
 }

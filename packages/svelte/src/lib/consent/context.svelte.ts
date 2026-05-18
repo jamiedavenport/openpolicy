@@ -7,7 +7,7 @@ import {
 	type ConsentState,
 	type ConsentStore,
 	type Jurisdiction,
-	type OpenCookiesConfig,
+	type PolicyStackConsentConfig,
 	type RepromptReason,
 	type Route,
 } from "@policystack/core/consent";
@@ -105,7 +105,7 @@ export class CategoryRune {
 }
 
 export type SetContextOptions =
-	| { config: OpenCookiesConfig; store?: undefined }
+	| { config: PolicyStackConsentConfig; store?: undefined }
 	| { store: ConsentStore; config?: undefined };
 
 export function setOpenCookiesContext(options: SetContextOptions): ConsentRune {

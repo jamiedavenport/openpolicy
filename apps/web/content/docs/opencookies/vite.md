@@ -38,7 +38,7 @@ export default defineConfig({
 
 | Option     | Type                         | Default                             | Description                                                                                                                                     |
 | ---------- | ---------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `config`   | `OpenCookiesConfig`          | required                            | The runtime consent config used at runtime. The plugin uses `categories[].key` to know which categories are covered when `autoSync` is enabled. |
+| `config`   | `PolicyStackConsentConfig`   | required                            | The runtime consent config used at runtime. The plugin uses `categories[].key` to know which categories are covered when `autoSync` is enabled. |
 | `mode`     | `"warn" \| "error" \| "off"` | `"warn"` in dev, `"error"` in build | Controls how findings are reported. `error` causes `vite build` to fail when ungated findings remain. `off` skips scanning entirely.            |
 | `include`  | `string[]`                   | scanner default                     | Forwarded to the scanner.                                                                                                                       |
 | `exclude`  | `string[]`                   | scanner default                     | Forwarded to the scanner.                                                                                                                       |

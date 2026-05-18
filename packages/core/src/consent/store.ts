@@ -12,7 +12,7 @@ import type {
 	ConsentState,
 	ConsentStore,
 	Jurisdiction,
-	OpenCookiesConfig,
+	PolicyStackConsentConfig,
 	RepromptReason,
 	ResolverContext,
 	Route,
@@ -20,7 +20,7 @@ import type {
 
 type Listener = (state: ConsentState) => void;
 
-export function createConsentStore(config: OpenCookiesConfig): ConsentStore {
+export function createConsentStore(config: PolicyStackConsentConfig): ConsentStore {
 	const listeners = new Set<Listener>();
 	const locale = resolveLocale(config);
 
@@ -330,7 +330,7 @@ type InitialJurisdiction = {
 };
 
 function resolveSync(
-	config: OpenCookiesConfig,
+	config: PolicyStackConsentConfig,
 	req: ResolverContext | undefined,
 ): InitialJurisdiction {
 	const resolver = config.jurisdictionResolver;
@@ -382,7 +382,7 @@ type InitialRecord = {
 	pending: Promise<ConsentRecord | null> | null;
 };
 
-function readSync(config: OpenCookiesConfig, locale: string): InitialRecord {
+function readSync(config: PolicyStackConsentConfig, locale: string): InitialRecord {
 	if (!config.adapter) return { value: null, pending: null };
 	let result: Promise<ConsentRecord | null> | ConsentRecord | null;
 	try {

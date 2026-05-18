@@ -1,28 +1,28 @@
-import type { OpenPolicyConfig } from "@policystack/core";
+import type { PolicyStackConfig } from "@policystack/core";
 import { isConsentGated } from "@policystack/core";
-import type { Category, OpenCookiesConfig } from "@policystack/core/consent";
+import type { Category, PolicyStackConsentConfig } from "@policystack/core/consent";
 
-export type ToOpenCookiesConfigOptions = Omit<OpenCookiesConfig, "categories">;
+export type ToConsentConfigOptions = Omit<PolicyStackConsentConfig, "categories">;
 
-// The canonical home for these options is `OpenPolicyConfig.consent` — re-export
+// The canonical home for these options is `PolicyStackConfig.consent` — re-export
 // the type here so power users authoring the field import it alongside the
 // bridge that consumes it.
-export type { OpenPolicyConsentConfig } from "@policystack/core/consent";
+export type { PolicyStackConsentOptions } from "@policystack/core/consent";
 
-// Derives an OpenCookiesConfig from the policy: categories + `locked` flags come
+// Derives an PolicyStackConsentConfig from the policy: categories + `locked` flags come
 // from `cookies.used`/`.context`, version/locale/canWithdraw from the policy.
 // `options` are the runtime-only knobs that cannot be derived.
 //
 // This stays the public, pure derivation primitive for non-React frameworks and
 // power users — but it is OFF the documented happy path. The single-config flow
-// is: author `OpenPolicyConfig.consent` and pass the whole config to
-// `<PolicyStackProvider>`, which calls `toOpenCookiesConfig(config, config.consent)`
-// internally. `OpenPolicyConsentConfig` is exactly assignable to the `options`
-// type here (both are `OpenCookiesConfig` minus `categories`).
-export function toOpenCookiesConfig(
-	policy: OpenPolicyConfig,
-	options?: ToOpenCookiesConfigOptions,
-): OpenCookiesConfig {
+// is: author `PolicyStackConfig.consent` and pass the whole config to
+// `<PolicyStackProvider>`, which calls `toPolicyStackConsentConfig(config, config.consent)`
+// internally. `PolicyStackConsentOptions` is exactly assignable to the `options`
+// type here (both are `PolicyStackConsentConfig` minus `categories`).
+export function toPolicyStackConsentConfig(
+	policy: PolicyStackConfig,
+	options?: ToConsentConfigOptions,
+): PolicyStackConsentConfig {
 	const used: Record<string, boolean> = policy.cookies?.used ?? {};
 	const context = policy.cookies?.context ?? {};
 	const categories: Category[] = Object.keys(used)
@@ -44,7 +44,7 @@ export function toOpenCookiesConfig(
 		});
 	const policyVersion = options?.policyVersion ?? policy.cookieVersion;
 	const canWithdraw = options?.canWithdraw ?? policy.consentMechanism?.canWithdraw;
-	// The OpenPolicy version hash drives an automatic re-prompt on policy
+	// The PolicyStack version hash drives an automatic re-prompt on policy
 	// change: default `policyVersionChanged` on so a changed `cookieVersion`
 	// actually invalidates stored consent. Callers can still override any
 	// individual trigger via `options.triggers`.

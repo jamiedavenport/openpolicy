@@ -37,7 +37,7 @@ const config = {
 	}),
 
 	"/docs": () => ({
-		title: "OpenPolicy and OpenCookies documentation.",
+		title: "PolicyStack and OpenCookies documentation.",
 		description: "policystack.dev/docs",
 		type: "website",
 		eyebrow: "DOCS",

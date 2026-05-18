@@ -2,7 +2,7 @@ import type {
 	ConsentExpr,
 	ConsentState,
 	ConsentStore,
-	OpenCookiesConfig,
+	PolicyStackConsentConfig,
 	Route,
 } from "@policystack/core/consent";
 import { createConsentStore } from "@policystack/core/consent";
@@ -19,7 +19,7 @@ export type ConsentStoreReadable = Readable<ConsentState> & {
 };
 
 export function createConsentReadable(
-	options: { config: OpenCookiesConfig; store?: undefined } | { store: ConsentStore },
+	options: { config: PolicyStackConsentConfig; store?: undefined } | { store: ConsentStore },
 ): ConsentStoreReadable {
 	const store = options.store ?? createConsentStore(options.config);
 	const readableStore = readable<ConsentState>(store.getState(), (set) => {

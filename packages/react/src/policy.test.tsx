@@ -50,7 +50,7 @@ test("renderDocument returns a React element", () => {
 	expect(isValidElement(result)).toBe(true);
 });
 
-test("renderDocument works with OpenPolicyConfig via compile", () => {
+test("renderDocument works with PolicyStackConfig via compile", () => {
 	const doc = compile({ type: "privacy", ...privacyConfig });
 	const result = renderDocument(doc);
 	expect(result).toBeTruthy();

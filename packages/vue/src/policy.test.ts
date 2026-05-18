@@ -55,7 +55,7 @@ test("renderDocument returns Vue VNodes", () => {
 	expect(isVNode(result[0])).toBe(true);
 });
 
-test("renderDocument works with OpenPolicyConfig via compile", () => {
+test("renderDocument works with PolicyStackConfig via compile", () => {
 	const doc = compile({ type: "privacy", ...privacyConfig });
 	const result = renderDocument(doc);
 	expect(result).toBeTruthy();

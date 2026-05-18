@@ -16,7 +16,7 @@ import { parseFile } from "./consent/parser";
 import { DEFAULT_EXCLUDE, DEFAULT_INCLUDE, defaultRules } from "./consent/scan";
 import { applySuppressions } from "./consent/suppress";
 import { CONSENT_REGISTRY } from "./registry";
-import { makeOpenPolicyRule } from "./consent/rules/openpolicy";
+import { makePolicyStackRule } from "./consent/rules/policystack";
 import type {
 	Cookie,
 	Hit,
@@ -185,7 +185,7 @@ export function createUnifiedScanner(opts: UnifiedScanOptions): UnifiedScanner {
 							return { line: p.line + lineOffset, column: p.column };
 						};
 			extractor = createPolicyExtractor({ filename: file, bindings, locate });
-			rules.push(makeOpenPolicyRule(extractor));
+			rules.push(makePolicyStackRule(extractor));
 		}
 
 		if (rules.length === 0) return { cookies: [], vendors: [], ungated: [] };

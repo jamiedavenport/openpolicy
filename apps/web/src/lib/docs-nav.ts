@@ -21,7 +21,7 @@ export type DocsGroup = {
 export const docsNav: DocsGroup[] = [
 	{
 		index: "00",
-		label: "OpenPolicy",
+		label: "PolicyStack",
 		rootSlug: "openpolicy",
 		items: [
 			{ type: "link", slug: "openpolicy", title: "Introduction" },

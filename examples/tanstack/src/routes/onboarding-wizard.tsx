@@ -33,7 +33,7 @@ function RouteComponent() {
 				<h1 className="mb-2 text-2xl font-semibold tracking-tight">Welcome to Acme</h1>
 				<p className="text-sm text-muted-foreground">
 					Before you get started, here's a quick tour of what we collect — all pulled directly from
-					your OpenPolicy config at build time.
+					your PolicyStack config at build time.
 				</p>
 			</div>
 

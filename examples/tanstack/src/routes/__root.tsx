@@ -22,11 +22,11 @@ export const Route = createRootRoute({
 		meta: [
 			{ charSet: "utf-8" },
 			{ name: "viewport", content: "width=device-width, initial-scale=1" },
-			{ title: "OpenPolicy — TanStack Example" },
+			{ title: "PolicyStack — TanStack Example" },
 			{
 				name: "description",
 				content:
-					"Demo app showing three ways to style OpenPolicy React components in a TanStack Start app.",
+					"Demo app showing three ways to style PolicyStack React components in a TanStack Start app.",
 			},
 		],
 		links: [{ rel: "stylesheet", href: appCss }],
@@ -61,7 +61,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 							to="/"
 							className="flex items-center gap-2 font-semibold text-foreground hover:opacity-80 transition-opacity"
 						>
-							<span className="text-lg">OpenPolicy</span>
+							<span className="text-lg">PolicyStack</span>
 							<span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
 								TanStack
 							</span>
@@ -146,7 +146,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 								rel="noopener noreferrer"
 								className="hover:text-foreground transition-colors underline underline-offset-2"
 							>
-								OpenPolicy
+								PolicyStack
 							</a>{" "}
 							+{" "}
 							<a

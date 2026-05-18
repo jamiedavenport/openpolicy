@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { ConsentExpr, ConsentStore, OpenCookiesConfig } from "@policystack/core/consent";
+  import type { ConsentExpr, ConsentStore, PolicyStackConsentConfig } from "@policystack/core/consent";
   import ConsentGate from "../lib/consent/ConsentGate.svelte";
   import { getCategory, getConsent, setOpenCookiesContext } from "../lib/consent/context.svelte";
 
   type Props = {
-    config?: OpenCookiesConfig;
+    config?: PolicyStackConsentConfig;
     store?: ConsentStore;
     requires?: ConsentExpr;
     withFallback?: boolean;

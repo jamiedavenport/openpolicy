@@ -487,7 +487,7 @@ function Philosophy() {
 		{
 			n: "04",
 			title: "Tiny",
-			body: "OpenCookies core ships under 4kb gzipped. OpenPolicy renders zero JS by default.",
+			body: "OpenCookies core ships under 4kb gzipped. PolicyStack renders zero JS by default.",
 		},
 		{
 			n: "05",

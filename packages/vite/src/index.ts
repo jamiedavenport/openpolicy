@@ -22,7 +22,7 @@ import {
 } from "./consent/reporter";
 import { createUnifiedScanner, type UnifiedScanner } from "./unified-scan";
 
-export type OpenPolicyOptions = {
+export type PolicyStackOptions = {
 	/**
 	 * Directory walked for `collecting()` calls. Resolved relative to the
 	 * Vite project root. Defaults to `"src"`.
@@ -182,7 +182,7 @@ async function writeGenModule(targetDir: string, scanned: Scanned): Promise<void
  * `@policystack/sdk`'s `ScannedCollectionKeys` / `ScannedCookieKeys` so
  * `defineConfig` still forces a sibling legal-context entry per scanned key.
  */
-export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
+export function policyStack(options: PolicyStackOptions = {}): Plugin {
 	const srcDirOpt = options.srcDir ?? "src";
 	const extensions = options.extensions ?? [".ts", ".tsx"];
 	const ignore = options.ignore ?? [];
@@ -253,7 +253,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 				scanned = next;
 			} catch (err) {
 				server.config.logger.warn(
-					`[openpolicy] could not write ${GEN_FILENAME}: ${err}; keeping the previously generated module`,
+					`[policystack] could not write ${GEN_FILENAME}: ${err}; keeping the previously generated module`,
 				);
 			}
 		}
@@ -274,7 +274,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 				suppress: suppressOpt,
 			});
 		} catch (err) {
-			server.config.logger.error(`[openpolicy] validation crashed: ${err}`);
+			server.config.logger.error(`[policystack] validation crashed: ${err}`);
 			return;
 		}
 		if (result.loadError) {
@@ -282,7 +282,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 			// already shows them. Surface only the message at warn level so
 			// it's discoverable without spamming.
 			server.config.logger.warn(
-				`[openpolicy] could not load config for validation: ${result.loadError.message}`,
+				`[policystack] could not load config for validation: ${result.loadError.message}`,
 			);
 			return;
 		}
@@ -307,7 +307,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 	}
 
 	return {
-		name: "openpolicy",
+		name: "policystack",
 		enforce: "pre",
 		configResolved(config) {
 			resolvedRoot = config.root;
@@ -369,7 +369,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 				await writeGenModule(resolvedConfigDir, scanned);
 			} catch (err) {
 				this.warn(
-					`[openpolicy] could not write ${GEN_FILENAME}: ${err}; keeping the previously generated module`,
+					`[policystack] could not write ${GEN_FILENAME}: ${err}; keeping the previously generated module`,
 				);
 			}
 			// Always surface scanner diagnostics — a recognized call that
@@ -389,7 +389,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 				});
 				if (result.loadError) {
 					this.warn(
-						`[openpolicy] could not load config for validation: ${result.loadError.message}`,
+						`[policystack] could not load config for validation: ${result.loadError.message}`,
 					);
 				} else {
 					const errors = result.issues.filter((i) => i.level === "error");
@@ -398,7 +398,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 					if (errors.length > 0) {
 						const lines = errors.map(formatIssue).join("\n");
 						this.error(
-							`OpenPolicy validation found ${errors.length} error${errors.length === 1 ? "" : "s"}:\n${lines}`,
+							`PolicyStack validation found ${errors.length} error${errors.length === 1 ? "" : "s"}:\n${lines}`,
 						);
 					}
 					// §4.3 declared-vs-used cross-check (PS-25). Ordered *after*
@@ -414,7 +414,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 						if (driftErrors.length > 0) {
 							const lines = driftErrors.map(formatDrift).join("\n");
 							this.error(
-								`OpenPolicy found ${driftErrors.length} declared-vs-used drift error${driftErrors.length === 1 ? "" : "s"}:\n${lines}`,
+								`PolicyStack found ${driftErrors.length} declared-vs-used drift error${driftErrors.length === 1 ? "" : "s"}:\n${lines}`,
 							);
 						}
 					}
@@ -464,7 +464,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 				try {
 					await rescanAndRefresh(server);
 				} catch (error) {
-					server.config.logger.error(`[openpolicy] rescan failed: ${error}`);
+					server.config.logger.error(`[policystack] rescan failed: ${error}`);
 				}
 			};
 
