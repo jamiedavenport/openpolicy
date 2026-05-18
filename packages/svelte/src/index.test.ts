@@ -55,7 +55,7 @@ test("compileDocument returns null when config is undefined", () => {
 	expect(compileDocument("privacy", undefined)).toBeNull();
 });
 
-test("compileDocument expands an PolicyStackConfig and picks the right policy", () => {
+test("compileDocument expands a PolicyStackConfig and picks the right policy", () => {
 	const openConfig: PolicyStackConfig = {
 		company,
 		effectiveDate: "2026-01-01",
@@ -77,7 +77,7 @@ test("PrivacyPolicy SSR-renders a data-op-policy wrapper with sections", () => {
 	expect(body).toContain("<h2");
 });
 
-test("CookiePolicy SSR-renders the cookie policy from an PolicyStackConfig", () => {
+test("CookiePolicy SSR-renders the cookie policy from a PolicyStackConfig", () => {
 	const openConfig: PolicyStackConfig = {
 		company,
 		effectiveDate: "2026-01-01",

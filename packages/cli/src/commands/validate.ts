@@ -147,7 +147,7 @@ export const validateCommand = defineCommand({
 	meta: {
 		name: "validate",
 		description:
-			"Validate an policystack config and report issues. Exits non-zero when there are errors; --json emits structured issues for unattended agent loops.",
+			"Validate a policystack config and report issues. Exits non-zero when there are errors; --json emits structured issues for unattended agent loops.",
 	},
 	args: {
 		config: {

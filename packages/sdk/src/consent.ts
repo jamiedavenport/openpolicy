@@ -9,7 +9,7 @@ export type ToConsentConfigOptions = Omit<PolicyStackConsentConfig, "categories"
 // bridge that consumes it.
 export type { PolicyStackConsentOptions } from "@policystack/core/consent";
 
-// Derives an PolicyStackConsentConfig from the policy: categories + `locked` flags come
+// Derives a PolicyStackConsentConfig from the policy: categories + `locked` flags come
 // from `cookies.used`/`.context`, version/locale/canWithdraw from the policy.
 // `options` are the runtime-only knobs that cannot be derived.
 //

@@ -7,7 +7,7 @@ import { walkSources } from "./scan";
 let tmp: string;
 
 beforeEach(async () => {
-	tmp = await mkdtemp(join(tmpdir(), "openpolicy-scan-"));
+	tmp = await mkdtemp(join(tmpdir(), "policystack-scan-"));
 });
 
 afterEach(async () => {

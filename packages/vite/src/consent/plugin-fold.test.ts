@@ -61,7 +61,7 @@ function callBuildEnd(plugin: ReturnType<typeof policyStack>): void {
 
 let tmp: string;
 beforeEach(async () => {
-	tmp = await mkdtemp(join(tmpdir(), "openpolicy-consent-fold-"));
+	tmp = await mkdtemp(join(tmpdir(), "policystack-consent-fold-"));
 });
 afterEach(async () => {
 	await rm(tmp, { recursive: true, force: true });
@@ -70,7 +70,7 @@ afterEach(async () => {
 describe("PS-19 single-plugin fold", () => {
 	it("exposes one plugin with both rule sets' lifecycle hooks", () => {
 		const plugin = policyStack({ consent: { mode: "warn" } });
-		expect(plugin.name).toBe("openpolicy");
+		expect(plugin.name).toBe("policystack");
 		expect(typeof plugin.buildStart).toBe("function");
 		expect(typeof plugin.configureServer).toBe("function");
 		// `buildEnd` is the consent build-fail seam added by PS-19.

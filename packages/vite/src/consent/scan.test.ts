@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { afterAll, describe, expect, it } from "vite-plus/test";
 import { scan } from "./scan";
 
-const root = mkdtempSync(join(tmpdir(), "opencookies-scan-"));
+const root = mkdtempSync(join(tmpdir(), "policystack-consent-scan-"));
 
 function file(rel: string, body: string): void {
 	const full = join(root, rel);

@@ -56,7 +56,7 @@ export function registerTools(server: McpServer): void {
 	server.registerTool(
 		"validate_config",
 		{
-			title: "Validate an policystack config",
+			title: "Validate a policystack config",
 			description:
 				"Run the frozen validate() over the project's policystack config and return the structured ValidateResult ({ ok, config, issues, errorCount, warningCount, loadError }). Same result the `policystack validate --json` command emits. Use explain_issue for any returned code.",
 			inputSchema: {

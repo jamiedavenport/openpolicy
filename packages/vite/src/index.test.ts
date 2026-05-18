@@ -10,7 +10,7 @@ type PluginInstance = ReturnType<typeof policyStack>;
 let tmp: string;
 
 beforeEach(async () => {
-	tmp = await mkdtemp(join(tmpdir(), "openpolicy-vite-"));
+	tmp = await mkdtemp(join(tmpdir(), "policystack-vite-"));
 });
 
 afterEach(async () => {

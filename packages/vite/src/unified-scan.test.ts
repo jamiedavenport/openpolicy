@@ -7,7 +7,7 @@ import { createUnifiedScanner } from "./unified-scan";
 
 let tmp: string;
 beforeEach(async () => {
-	tmp = await mkdtemp(join(tmpdir(), "openpolicy-unified-"));
+	tmp = await mkdtemp(join(tmpdir(), "policystack-unified-"));
 	await mkdir(join(tmp, "src"), { recursive: true });
 });
 afterEach(async () => {
