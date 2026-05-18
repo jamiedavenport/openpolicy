@@ -11,12 +11,12 @@ It works through two complementary mechanisms:
 - **`collecting()`** — a zero-cost wrapper you place around data storage calls to declare what you're storing
 - **`thirdParty()`** — a side-effect-free call you place next to third-party SDK initialisation to declare an external service
 
-The `@openpolicy/vite` plugin scans your source files at build time, extracts these declarations, and exposes them to `@openpolicy/sdk` at runtime so they render inside your policy.
+The `@policystack/vite` plugin scans your source files at build time, extracts these declarations, and exposes them to `@policystack/sdk` at runtime so they render inside your policy.
 
 ## Install
 
 ```sh
-bun add -D @openpolicy/vite
+bun add -D @policystack/vite
 ```
 
 ## Setup
@@ -26,7 +26,7 @@ Add `openPolicy()` to your Vite plugin array. The scan runs during `buildStart` 
 ```ts
 // vite.config.ts
 import { defineConfig } from "vite";
-import { openPolicy } from "@openpolicy/vite";
+import { openPolicy } from "@policystack/vite";
 
 export default defineConfig({
 	plugins: [openPolicy()],
@@ -38,7 +38,7 @@ export default defineConfig({
 Wrap any call that stores personal data with `collecting()`. It returns the second argument unchanged at runtime, so it composes naturally with ORM insert calls and similar patterns.
 
 ```ts
-import { collecting } from "@openpolicy/sdk";
+import { collecting } from "@policystack/sdk";
 
 export async function createUser(name: string, email: string) {
 	return db.insert(users).values(
@@ -62,13 +62,13 @@ export async function createUser(name: string, email: string) {
 **Constraints:**
 
 - The `category` string and all label **values** must be string literals. Dynamic values (variables, template literals) are silently skipped by the analyser.
-- Every key of `value` must appear in the label record. To exclude a field from the policy — for example an internal column like `hashedPassword` — use the `Ignore` sentinel re-exported from `@openpolicy/sdk`.
+- Every key of `value` must appear in the label record. To exclude a field from the policy — for example an internal column like `hashedPassword` — use the `Ignore` sentinel re-exported from `@policystack/sdk`.
 - Multiple `collecting()` calls with the same category are merged; duplicate labels are deduplicated.
 
 ### Excluding sensitive fields with `Ignore`
 
 ```ts
-import { collecting, Ignore } from "@openpolicy/sdk";
+import { collecting, Ignore } from "@policystack/sdk";
 
 export async function createUser(name: string, email: string, hashedPassword: string) {
 	return db.insert(users).values(
@@ -92,7 +92,7 @@ Using `Ignore` forces each exclusion to be explicit, so a reviewer can see at a 
 Call `thirdParty()` next to third-party SDK initialisation to declare an external service. This is a no-op at runtime.
 
 ```ts
-import { thirdParty } from "@openpolicy/sdk";
+import { thirdParty } from "@policystack/sdk";
 import { PostHog } from "posthog-js";
 
 thirdParty(

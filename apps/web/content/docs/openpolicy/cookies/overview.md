@@ -22,11 +22,11 @@ OpenPolicy still generates the **cookie policy** — the legal document describi
 
 ## Wire them together
 
-`@openpolicy/sdk/opencookies` exports `toOpenCookiesConfig(policy)` which translates `policy.cookies.used` into an `OpenCookiesConfig` — the `categories` array, with `essential` automatically locked and labels capitalized. You don't hand-roll the category list a second time next to your banner.
+`@policystack/sdk/opencookies` exports `toOpenCookiesConfig(policy)` which translates `policy.cookies.used` into an `OpenCookiesConfig` — the `categories` array, with `essential` automatically locked and labels capitalized. You don't hand-roll the category list a second time next to your banner.
 
 ```tsx
 import { OpenCookiesProvider } from "@opencookies/react";
-import { toOpenCookiesConfig } from "@openpolicy/sdk/opencookies";
+import { toOpenCookiesConfig } from "@policystack/sdk/opencookies";
 import openpolicy from "./openpolicy";
 
 export function Root({ children }: { children: React.ReactNode }) {

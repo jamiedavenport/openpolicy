@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { ISSUE_CATALOG, JURISDICTION_IDS } from "@openpolicy/core";
+import { ISSUE_CATALOG, JURISDICTION_IDS } from "@policystack/core";
 import { expect, test } from "vite-plus/test";
 import { createMcpServer } from "./server";
 import { TOOL_NAMES } from "./tools";

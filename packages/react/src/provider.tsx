@@ -1,17 +1,17 @@
 "use client";
 
-import { isConsentGated, type OpenPolicyConfig } from "@openpolicy/core";
-import type { Category, OpenCookiesConfig } from "@openpolicy/core/consent";
+import { isConsentGated, type OpenPolicyConfig } from "@policystack/core";
+import type { Category, OpenCookiesConfig } from "@policystack/core/consent";
 import { useState, type ReactNode } from "react";
 import { OpenCookiesProvider } from "./consent";
 import { OpenPolicyContext } from "./context";
 
-// Local copy of the @openpolicy/sdk `toOpenCookiesConfig` derivation, narrowed
+// Local copy of the @policystack/sdk `toOpenCookiesConfig` derivation, narrowed
 // to the authored `OpenPolicyConfig.consent` shape (policyVersion / locale /
 // canWithdraw are ALWAYS derived from the policy, never authored in `consent`).
-// Kept here — rather than importing `toOpenCookiesConfig` — so @openpolicy/
-// react's only @openpolicy/* runtime dependency stays @openpolicy/core (no
-// react → sdk edge). The canonical bridge is @openpolicy/sdk's
+// Kept here — rather than importing `toOpenCookiesConfig` — so @policystack/
+// react's only @policystack/* runtime dependency stays @policystack/core (no
+// react → sdk edge). The canonical bridge is @policystack/sdk's
 // `toOpenCookiesConfig`; provider.test.tsx pins this copy to it, so if either
 // drifts the parity test fails. Exported as that parity seam and a legitimate
 // escape hatch — equivalent to `toOpenCookiesConfig(policy, policy.consent)`.
@@ -60,9 +60,9 @@ export type PolicyStackProviderProps = {
  * - Consent-only: a minimal `data` with `cookies` still works; `<PrivacyPolicy>`
  *   simply renders nothing when there is no privacy content.
  *
- * Exported from `@openpolicy/react/provider` — a deliberate third entry that
+ * Exported from `@policystack/react/provider` — a deliberate third entry that
  * unions the `./policy` and `./consent` trees. Those two entries stay
- * untouched, so a single-concern consumer importing only `@openpolicy/react/
+ * untouched, so a single-concern consumer importing only `@policystack/react/
  * policy` or `/consent` still tree-shakes the other out.
  */
 export function PolicyStackProvider({ config, children }: PolicyStackProviderProps) {

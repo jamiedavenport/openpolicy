@@ -5,7 +5,7 @@
 Define your policy once in TypeScript. Render it as React components, generate Markdown, ship a consent banner — all driven from the same source of truth.
 
 ```ts
-import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
+import { OpenPolicy, PrivacyPolicy } from "@policystack/react";
 import openpolicy from "@/openpolicy";
 
 export function PrivacyPolicyPage() {
@@ -57,7 +57,7 @@ Pass `locale` to `defineConfig` and the ~125 strings OpenPolicy emits — headin
 | Spanish | `es` |
 
 ```ts
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig } from "@policystack/sdk";
 
 export default defineConfig({
 	company: { name: "Acme, Inc." },
@@ -76,11 +76,11 @@ The React adapter also accepts a `locale` prop on `<PrivacyPolicy />` and `<Cook
 Two lines and you're shipping.
 
 ```bash
-pnpm dlx @openpolicy/cli init
+pnpm dlx @policystack/cli init
 ```
 
 ```ts
-import { defineConfig } from "@openpolicy/sdk";
+import { defineConfig } from "@policystack/sdk";
 
 export default defineConfig({
 	company: { name: "Acme, Inc." },

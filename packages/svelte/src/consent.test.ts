@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { createConsentStore, type Category } from "@openpolicy/core/consent";
+import { createConsentStore, type Category } from "@policystack/core/consent";
 import { cleanup, render } from "@testing-library/svelte";
 import { flushSync } from "svelte";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";

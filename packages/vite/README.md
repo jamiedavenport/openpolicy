@@ -1,15 +1,15 @@
-# `@openpolicy/vite`
+# `@policystack/vite`
 
 > Vite plugin that scans source files for [OpenPolicy](https://openpolicy.sh) `collecting()`, `thirdParty()`, `defineCookie()`, and `sharing()` calls and populates the SDK's auto-collected registry at build time.
 
-At `buildStart` the plugin walks your `srcDir`, extracts every `collecting()` / `thirdParty()` / `defineCookie()` / `sharing()` call from `@openpolicy/sdk`, and emits the merged result (`dataCollected` / `thirdParties` / `cookies` / `sharing`) into the on-disk `openpolicy.gen.ts` your config imports. `sharing(key, recipient, value)` marks personal data _leaving_ to a third party at the egress point — the data-flow edge that feeds the CCPA/CPRA sell/share posture, distinct from `thirdParty()` which only declares that a vendor exists.
+At `buildStart` the plugin walks your `srcDir`, extracts every `collecting()` / `thirdParty()` / `defineCookie()` / `sharing()` call from `@policystack/sdk`, and emits the merged result (`dataCollected` / `thirdParties` / `cookies` / `sharing`) into the on-disk `openpolicy.gen.ts` your config imports. `sharing(key, recipient, value)` marks personal data _leaving_ to a third party at the egress point — the data-flow edge that feeds the CCPA/CPRA sell/share posture, distinct from `thirdParty()` which only declares that a vendor exists.
 
 ## Install
 
 ```sh
-bun add -D @openpolicy/vite
-bun add @openpolicy/sdk
-# or: npm install --save-dev @openpolicy/vite && npm install @openpolicy/sdk
+bun add -D @policystack/vite
+bun add @policystack/sdk
+# or: npm install --save-dev @policystack/vite && npm install @policystack/sdk
 ```
 
 ## Setup
@@ -17,7 +17,7 @@ bun add @openpolicy/sdk
 ```ts
 // vite.config.ts
 import { defineConfig } from "vite";
-import { openPolicy } from "@openpolicy/vite";
+import { openPolicy } from "@policystack/vite";
 
 export default defineConfig({
 	plugins: [openPolicy()],
@@ -41,7 +41,7 @@ Astro users: add it the same way under `vite.plugins` in `astro.config.mjs`.
 ## Validation
 
 When `validate` is `true`, the plugin runs the single `validate()` from
-`@openpolicy/core` against your resolved config after every scan and reports
+`@policystack/core` against your resolved config after every scan and reports
 each [`IssueCode`](https://docs.openpolicy.sh) once:
 
 - In **`vite build`**, errors abort the build (`PluginContext.error`); warnings
@@ -76,4 +76,4 @@ openPolicy({
 
 - [GitHub](https://github.com/jamiedavenport/openpolicy)
 - [openpolicy.sh](https://openpolicy.sh)
-- [npm](https://www.npmjs.com/package/@openpolicy/vite)
+- [npm](https://www.npmjs.com/package/@policystack/vite)

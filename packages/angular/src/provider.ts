@@ -3,7 +3,7 @@ import {
 	createConsentStore,
 	type ConsentStore,
 	type OpenCookiesConfig,
-} from "@openpolicy/core/consent";
+} from "@policystack/core/consent";
 import { OPEN_COOKIES_STORE } from "./tokens";
 
 export type ProvideOpenCookiesOptions =

@@ -1,6 +1,6 @@
-import { ContractPrerequisite, defineConfig, LegalBases } from "@openpolicy/sdk";
-import { timezoneResolver } from "@openpolicy/core/consent";
-import { localStorageAdapter } from "@openpolicy/core/consent/storage/local-storage";
+import { ContractPrerequisite, defineConfig, LegalBases } from "@policystack/sdk";
+import { timezoneResolver } from "@policystack/core/consent";
+import { localStorageAdapter } from "@policystack/core/consent/storage/local-storage";
 
 export default defineConfig({
 	company: {

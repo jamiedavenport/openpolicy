@@ -26,9 +26,9 @@ function providerSection(stubRel: string, framework?: Framework): string {
 	if (framework === "react") {
 		const importName = stubRel.replace(/^.*\//, "").replace(/\.tsx?$/, "");
 		return [
-			`2. Wire the provider. There is ONE provider for everything: import \`PolicyStackProvider\` from \`@openpolicy/react/provider\` and mount it at the root of your app (the outermost component / root layout) so it wraps the whole tree, passing it the config from ${stubRel}:`,
+			`2. Wire the provider. There is ONE provider for everything: import \`PolicyStackProvider\` from \`@policystack/react/provider\` and mount it at the root of your app (the outermost component / root layout) so it wraps the whole tree, passing it the config from ${stubRel}:`,
 			"",
-			`    import { PolicyStackProvider } from "@openpolicy/react/provider";`,
+			`    import { PolicyStackProvider } from "@policystack/react/provider";`,
 			`    import config from "./${importName}";`,
 			"",
 			`    <PolicyStackProvider config={config}>`,

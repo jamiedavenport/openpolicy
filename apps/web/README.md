@@ -12,7 +12,7 @@ The project is split across several open-source repos. This repo is just the web
 
 ### [openpolicy](https://github.com/jamiedavenport/openpolicy) — `openpolicy.sh`
 
-Define a privacy/cookie policy once as a TypeScript config, render it as React components. Ships a shadcn-style consent banner. Disclaimer: it generates documents, it doesn't give legal advice. Mostly TypeScript with Astro docs and a Svelte adapter. Active — currently around `@openpolicy/react@0.0.30`.
+Define a privacy/cookie policy once as a TypeScript config, render it as React components. Ships a shadcn-style consent banner. Disclaimer: it generates documents, it doesn't give legal advice. Mostly TypeScript with Astro docs and a Svelte adapter. Active — currently around `@policystack/react@0.0.30`.
 
 ### [opencookies](https://github.com/jamiedavenport/opencookies)
 

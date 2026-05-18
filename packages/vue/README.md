@@ -1,20 +1,20 @@
-# `@openpolicy/vue`
+# `@policystack/vue`
 
 > Vue components for rendering [OpenPolicy](https://openpolicy.sh) documents at runtime.
 
-`@openpolicy/vue` provides headless Vue components that compile and render policies directly from config.
+`@policystack/vue` provides headless Vue components that compile and render policies directly from config.
 
 ## Install
 
 ```sh
-bun add @openpolicy/vue @openpolicy/sdk
+bun add @policystack/vue @policystack/sdk
 ```
 
 ## Usage
 
 ```ts
 // openpolicy.ts
-import { ContractPrerequisite, defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases } from "@policystack/sdk";
 
 export default defineConfig({
 	company: {
@@ -51,7 +51,7 @@ export default defineConfig({
 ```ts
 // App.ts
 import openpolicy from "./openpolicy";
-import { OpenPolicy, PrivacyPolicy } from "@openpolicy/vue";
+import { OpenPolicy, PrivacyPolicy } from "@policystack/vue";
 
 export default {
 	components: { OpenPolicy, PrivacyPolicy },

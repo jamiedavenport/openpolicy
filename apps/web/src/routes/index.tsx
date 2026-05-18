@@ -16,7 +16,7 @@ import { highlight } from "../lib/shiki";
 import { getStars } from "../lib/github-stars";
 import { pageMeta } from "../lib/seo";
 
-const HERO_SNIPPET = `import { defineConfig, LegalBases } from "@openpolicy/sdk";
+const HERO_SNIPPET = `import { defineConfig, LegalBases } from "@policystack/sdk";
 
 export default defineConfig({
   company: {
@@ -288,7 +288,7 @@ function Products({ stars }: { stars: { opencookies: number | null; openpolicy: 
 						slug="openpolicy"
 						title="Your policy as a typed config."
 						body="Define your privacy and cookie policy once in TypeScript. Render it as React components, or generate Markdown. Ships a shadcn-style consent banner."
-						tag="@openpolicy/react"
+						tag="@policystack/react"
 						stars={stars.openpolicy}
 					/>
 					<ProductCard
@@ -410,7 +410,7 @@ function ClaudeTerminal() {
 				<p className="mt-5 text-white/50">
 					React + Vite detected. I’ll wire up{" "}
 					<span className="text-white/80">@opencookies/react</span> for the banner and{" "}
-					<span className="text-white/80">@openpolicy/react</span> for the policy page.
+					<span className="text-white/80">@policystack/react</span> for the policy page.
 				</p>
 				<div className="mt-5 space-y-3 text-[0.78125rem]">
 					<TerminalStep
@@ -418,7 +418,7 @@ function ClaudeTerminal() {
 						result="added 2 packages in 1.4s"
 					/>
 					<TerminalStep
-						command="pnpm dlx @openpolicy/cli init"
+						command="pnpm dlx @policystack/cli init"
 						result="created src/openpolicy.ts"
 					/>
 				</div>

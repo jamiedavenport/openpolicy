@@ -1,6 +1,6 @@
 import { access, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
-import type { IssueCode } from "@openpolicy/core";
+import type { IssueCode } from "@policystack/core";
 import type { Plugin, ViteDevServer } from "vite";
 import { renderGenModule, type Scanned } from "./scanned";
 import { createSdkMatcher, type ResolveId } from "./sdk-resolver";
@@ -106,7 +106,7 @@ export type OpenPolicyOptions = {
 /**
  * Name of the generated module emitted next to the user's `openpolicy.ts`.
  * The user imports it explicitly; it carries the scanned values and the
- * `@openpolicy/sdk` type augmentation.
+ * `@policystack/sdk` type augmentation.
  */
 const GEN_FILENAME = "openpolicy.gen.ts";
 
@@ -138,7 +138,7 @@ async function findConfig(root: string): Promise<{ dir: string; file: string | n
  * Emits the on-disk `openpolicy.gen.ts` module next to the user's
  * `openpolicy.ts`. The module is imported explicitly by the config and carries
  * the scanned values (`dataCollected` / `thirdParties` / `cookies`) plus a
- * `declare module "@openpolicy/sdk"` augmentation of `ScannedCollectionKeys` /
+ * `declare module "@policystack/sdk"` augmentation of `ScannedCollectionKeys` /
  * `ScannedCookieKeys`, so `defineConfig` requires every scanned category to
  * have matching `data.context` (with `purpose`, `lawfulBasis`, `retention`,
  * and `provision`) and `cookies.context` entries. Commit the file — that
@@ -170,7 +170,7 @@ async function writeGenModule(targetDir: string, scanned: Scanned): Promise<void
 }
 
 /**
- * Vite plugin that scans source files for `@openpolicy/sdk` `collecting()`,
+ * Vite plugin that scans source files for `@policystack/sdk` `collecting()`,
  * `thirdParty()`, and `defineCookie()` calls at the start of each build and
  * emits the discovered data into an on-disk `openpolicy.gen.ts` module next
  * to the user's `openpolicy.ts`.
@@ -179,7 +179,7 @@ async function writeGenModule(targetDir: string, scanned: Scanned): Promise<void
  * so the scanned data is an ordinary part of the consumer's own source — no
  * virtual-module interception, no `optimizeDeps`/`ssr.noExternal` pins, and
  * HMR is normal file invalidation. The generated module also augments
- * `@openpolicy/sdk`'s `ScannedCollectionKeys` / `ScannedCookieKeys` so
+ * `@policystack/sdk`'s `ScannedCollectionKeys` / `ScannedCookieKeys` so
  * `defineConfig` still forces a sibling legal-context entry per scanned key.
  */
 export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
@@ -205,7 +205,7 @@ export function openPolicy(options: OpenPolicyOptions = {}): Plugin {
 	// Resolver-backed SDK matcher, built from `this.resolve` in `buildStart`.
 	// Defaults are the pure dual-scope predicate so an out-of-order or
 	// resolver-less call (test stubs, a dev rescan that somehow beats
-	// `buildStart`) still recognises direct `@openpolicy/sdk` /
+	// `buildStart`) still recognises direct `@policystack/sdk` /
 	// `@policystack/sdk` imports. Vite runs `buildStart` before the
 	// `configureServer` watcher fires, so dev rescans reuse the captured
 	// resolver matcher — no `PluginContext` is needed in `configureServer`.

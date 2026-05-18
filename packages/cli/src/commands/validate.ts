@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { type Issue, type OpenPolicyConfig, validate } from "@openpolicy/core";
+import { type Issue, type OpenPolicyConfig, validate } from "@policystack/core";
 import { bundleRequire } from "bundle-require";
 import { defineCommand } from "citty";
 import consola from "consola";
@@ -8,7 +8,7 @@ import { resolveStubPath } from "../utils/stub";
 
 /**
  * The machine-readable result of `openpolicy validate`. `issues` is the frozen
- * `Issue` shape from `@openpolicy/core` (Phase 2) verbatim — agents parse the
+ * `Issue` shape from `@policystack/core` (Phase 2) verbatim — agents parse the
  * stable `code`/`level` and branch on `ok` (which always tracks the exit code:
  * `ok === false` ⇔ exit 1). `loadError` is set instead of `issues` when the
  * config couldn't be loaded at all (missing file, TS syntax error, no default
@@ -27,7 +27,7 @@ export type ValidateResult = {
  * Loads the user's config via bundle-require and returns the merged config
  * surface — the flat {@link OpenPolicyConfig} that `defineConfig()` produces
  * (the §4.1 shared-config bridge, PS-23). This deliberately mirrors
- * `@openpolicy/vite`'s `loadAndValidateConfig` rather than importing it: the
+ * `@policystack/vite`'s `loadAndValidateConfig` rather than importing it: the
  * CLI must not depend on the bundler plugin (and its oxc-parser graph), and it
  * has no `strict`/`suppress` issue policy — that is intentionally a Vite-only
  * concern (PS-13). Load/parse errors are returned, not thrown, so the command

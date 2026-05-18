@@ -4,7 +4,7 @@ import {
 	type IssueCode,
 	JURISDICTION_IDS,
 	type JurisdictionId,
-} from "@openpolicy/core";
+} from "@policystack/core";
 import {
 	Compliance,
 	DataCategories,
@@ -13,8 +13,8 @@ import {
 	Providers,
 	renderLlmsTxt,
 	Retention,
-} from "@openpolicy/sdk";
-import { scan } from "@openpolicy/vite/consent";
+} from "@policystack/sdk";
+import { scan } from "@policystack/vite/consent";
 import { z } from "zod";
 import { resolveValidateResult } from "../commands/validate";
 import { getStubContents } from "../utils/stub";
@@ -117,7 +117,7 @@ export function registerTools(server: McpServer): void {
 		{
 			title: "List the SDK presets",
 			description:
-				"List the @openpolicy/sdk preset objects an agent can reference when authoring a config: data categories, lawful bases, retention periods, third-party providers, and compliance bundles. Categories in a real config are user-defined; these are the canonical examples (same set enumerated in llms.txt).",
+				"List the @policystack/sdk preset objects an agent can reference when authoring a config: data categories, lawful bases, retention periods, third-party providers, and compliance bundles. Categories in a real config are user-defined; these are the canonical examples (same set enumerated in llms.txt).",
 		},
 		async () =>
 			result({
@@ -147,7 +147,7 @@ export function registerTools(server: McpServer): void {
 		{
 			title: "Scan for un-consented cookie/vendor usage",
 			description:
-				"Statically scan a project's source for cookie writes and tracking-vendor usage that is NOT behind a consent gate. Returns { cookies, vendors, ungated } — `ungated` is the actionable list. Uses the same scanner as the @openpolicy/vite consent island.",
+				"Statically scan a project's source for cookie writes and tracking-vendor usage that is NOT behind a consent gate. Returns { cookies, vendors, ungated } — `ungated` is the actionable list. Uses the same scanner as the @policystack/vite consent island.",
 			inputSchema: {
 				cwd: z
 					.string()

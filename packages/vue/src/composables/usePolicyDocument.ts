@@ -8,7 +8,7 @@ import {
 	type OpenPolicyConfig,
 	type PolicyType,
 	type PrivacyPolicyConfig,
-} from "@openpolicy/core";
+} from "@policystack/core";
 import { computed, type ComputedRef, inject, type MaybeRefOrGetter, toValue } from "vue";
 import { OpenPolicyContextKey } from "../context";
 

@@ -1,13 +1,13 @@
-import type { OpenPolicyConfig } from "@openpolicy/core";
-import { isConsentGated } from "@openpolicy/core";
-import type { Category, OpenCookiesConfig } from "@openpolicy/core/consent";
+import type { OpenPolicyConfig } from "@policystack/core";
+import { isConsentGated } from "@policystack/core";
+import type { Category, OpenCookiesConfig } from "@policystack/core/consent";
 
 export type ToOpenCookiesConfigOptions = Omit<OpenCookiesConfig, "categories">;
 
 // The canonical home for these options is `OpenPolicyConfig.consent` — re-export
 // the type here so power users authoring the field import it alongside the
 // bridge that consumes it.
-export type { OpenPolicyConsentConfig } from "@openpolicy/core/consent";
+export type { OpenPolicyConsentConfig } from "@policystack/core/consent";
 
 // Derives an OpenCookiesConfig from the policy: categories + `locked` flags come
 // from `cookies.used`/`.context`, version/locale/canWithdraw from the policy.

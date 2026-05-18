@@ -6,7 +6,7 @@ import {
 	type Locale,
 	type OpenPolicyConfig,
 	type PrivacyPolicyConfig,
-} from "@openpolicy/core";
+} from "@policystack/core";
 import { useContext } from "react";
 import { OpenPolicyContext } from "../context";
 import { renderDocument } from "../render";

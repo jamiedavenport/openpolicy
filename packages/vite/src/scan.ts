@@ -56,7 +56,7 @@ export async function walkSources(
 	// folds per-file results in this order, so it fixes the array order of
 	// `dataCollected` labels and `thirdParties` in `openpolicy.gen.ts`, which
 	// in turn feeds `compilePolicy()`'s deterministic `version` hash
-	// (`@openpolicy/core` policy-version.ts sorts object keys but preserves
+	// (`@policystack/core` policy-version.ts sorts object keys but preserves
 	// array order). Removing this sort or changing the collation is a
 	// breaking change — keep it.
 	results.sort();

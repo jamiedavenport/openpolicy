@@ -15,7 +15,7 @@ OpenPolicy generates privacy policies and cookie policies from TypeScript config
 ## Get set up in one command
 
 ```sh
-bunx @openpolicy/cli init
+bunx @policystack/cli init
 ```
 
 The CLI installs the right packages for your stack, writes a starter `openpolicy.ts`, and prints a prompt you can paste into a coding agent (Claude Code, Cursor, etc.) to finish filling in your config from your codebase. See the [CLI page](/docs/openpolicy/cli).

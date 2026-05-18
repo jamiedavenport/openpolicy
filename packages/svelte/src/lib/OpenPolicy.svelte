@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { OpenPolicyConfig } from "@openpolicy/core";
+import type { OpenPolicyConfig } from "@policystack/core";
 import type { Snippet } from "svelte";
 import { setConfigContext } from "./context.svelte";
 

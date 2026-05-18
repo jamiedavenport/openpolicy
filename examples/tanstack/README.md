@@ -16,10 +16,10 @@ generate `src/openpolicy.gen.ts`).
   privacy + cookie policy documents _and_ derives the consent runtime
   (categories, locked vs. consent-gated, re-prompt on policy change).
 - **One provider for everything.** `__root.tsx` mounts a single
-  `<PolicyStackProvider>` from `@openpolicy/react/provider`. Because the
+  `<PolicyStackProvider>` from `@policystack/react/provider`. Because the
   config declares `cookies`, that same provider also mounts the consent
   store — no separate consent/cookies provider is wired.
-- **`@openpolicy/react` components** (`PrivacyPolicy`, `CookiePolicy`)
+- **`@policystack/react` components** (`PrivacyPolicy`, `CookiePolicy`)
   rendered directly as React components.
 - **Three styling approaches** across three routes:
   - **`/tailwind`** — policies styled with Tailwind utility classes

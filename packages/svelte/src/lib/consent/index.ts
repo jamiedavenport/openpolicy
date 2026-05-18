@@ -10,7 +10,7 @@ export type {
 	OpenCookiesConfig,
 	RepromptReason,
 	Route,
-} from "@openpolicy/core/consent";
+} from "@policystack/core/consent";
 export { default as ConsentGate } from "./ConsentGate.svelte";
 export {
 	CategoryRune,

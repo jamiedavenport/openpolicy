@@ -4,8 +4,8 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { Databuddy } from "@databuddy/sdk/react";
 import { OffstageProvider } from "@offstage/react";
 import { ArrowRightIcon, ArrowUpRightIcon } from "@phosphor-icons/react";
-import { ConsentGate } from "@openpolicy/react/consent";
-import { PolicyStackProvider } from "@openpolicy/react/provider";
+import { ConsentGate } from "@policystack/react/consent";
+import { PolicyStackProvider } from "@policystack/react/provider";
 
 import favicon from "../assets/favicon.svg?url";
 import appCss from "../styles.css?url";

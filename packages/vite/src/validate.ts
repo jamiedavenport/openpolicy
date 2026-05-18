@@ -1,4 +1,4 @@
-import { type Issue, type OpenPolicyConfig, validate } from "@openpolicy/core";
+import { type Issue, type OpenPolicyConfig, validate } from "@policystack/core";
 import { bundleRequire } from "bundle-require";
 import type { ScannerDiagnostic } from "./analyse";
 
@@ -37,7 +37,7 @@ export function applyIssuePolicy(issues: Issue[], policy: IssuePolicy): Issue[] 
 
 /**
  * Loads the user's `openpolicy.ts` via bundle-require, then runs the single
- * `validate()` exported from `@openpolicy/core` against the resolved config.
+ * `validate()` exported from `@policystack/core` against the resolved config.
  * The config imports its scanned values from the on-disk `./openpolicy.gen`
  * module, so bundle-require resolves them as ordinary relative source — no
  * interception shim is needed. The caller must have written `openpolicy.gen.ts`
@@ -61,7 +61,7 @@ export async function loadAndValidateConfig(
 	try {
 		const result = await bundleRequire({
 			filepath: args.configFile,
-			// Inline `@openpolicy/*` into the bundled config instead of
+			// Inline `@policystack/*` into the bundled config instead of
 			// externalising it. The config evaluates `defineConfig()` and the
 			// SDK's basis/provision helpers, so the SDK must be resolvable;
 			// bundle-require writes its output next to the config, and the

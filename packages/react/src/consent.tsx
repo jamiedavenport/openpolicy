@@ -11,7 +11,7 @@ import {
 	type OpenCookiesConfig,
 	type RepromptReason,
 	type Route,
-} from "@openpolicy/core/consent";
+} from "@policystack/core/consent";
 import {
 	createContext,
 	useCallback,

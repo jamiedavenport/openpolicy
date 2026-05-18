@@ -10,16 +10,16 @@ Install a ready-to-use policy component from the OpenPolicy shadcn registry. Thi
 
 ```sh
 # Privacy Policy
-bunx shadcn@latest add @openpolicy/privacy-policy
+bunx shadcn@latest add @policystack/privacy-policy
 
 # Cookie Policy
-bunx shadcn@latest add @openpolicy/cookie-policy
+bunx shadcn@latest add @policystack/cookie-policy
 ```
 
 Each command installs the component, a `policy-components.tsx` base renderer, and an `openpolicy.ts` starter config. Fill out the config then wrap your app with the `<OpenPolicy>` provider:
 
 ```tsx
-import { OpenPolicy } from "@openpolicy/react";
+import { OpenPolicy } from "@policystack/react";
 import openpolicy from "@/openpolicy";
 
 export default function RootLayout({ children }) {
@@ -42,13 +42,13 @@ export default function PrivacyPolicyPage() {
 Install the packages:
 
 ```sh
-bun add @openpolicy/react @openpolicy/sdk
+bun add @policystack/react @policystack/sdk
 ```
 
 Wrap your app with the provider, then render whichever components you need:
 
 ```tsx
-import { OpenPolicy, PrivacyPolicy, CookiePolicy } from "@openpolicy/react";
+import { OpenPolicy, PrivacyPolicy, CookiePolicy } from "@policystack/react";
 import openpolicy from "@/openpolicy";
 
 export function PrivacyPolicyPage() {
@@ -68,7 +68,7 @@ The components render unstyled by default. Pass a `components` prop to supply yo
 
 ```tsx
 import { Linking, Pressable, Text, View } from "react-native";
-import { PrivacyPolicy, type PolicyComponents } from "@openpolicy/react";
+import { PrivacyPolicy, type PolicyComponents } from "@policystack/react";
 import openpolicy from "./openpolicy";
 
 const components: PolicyComponents = {

@@ -14,7 +14,7 @@ import {
 import { formatCommand, runInstall } from "../utils/install";
 import { resolveStubPath, writeStub } from "../utils/stub";
 
-const SDK_PACKAGE = "@openpolicy/sdk";
+const SDK_PACKAGE = "@policystack/sdk";
 
 type InitArgs = {
 	cwd: string;

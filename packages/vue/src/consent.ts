@@ -24,7 +24,7 @@ import {
 	type OpenCookiesConfig,
 	type RepromptReason,
 	type Route,
-} from "@openpolicy/core/consent";
+} from "@policystack/core/consent";
 
 const StoreKey: InjectionKey<ConsentStore> = Symbol("opencookies-store");
 

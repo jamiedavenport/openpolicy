@@ -194,7 +194,7 @@ test("buildStart writes scanned categories to the gen module", async () => {
 	await touch(
 		"src/lib/db.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		export function createUser(name: string, email: string) {
 			return collecting("Account Information", { name, email }, {
 				name: "Name",
@@ -216,7 +216,7 @@ test("buildStart degrades gracefully when the gen module can't be written", asyn
 	await touch(
 		"src/lib/db.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("Account Information", v, { name: "Name" });
 		`,
 	);
@@ -244,7 +244,7 @@ test("dev rescan retries the write after a failure (in-memory state not advanced
 	await touch(
 		"src/a.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("A", v, { x: "X" });
 		`,
 	);
@@ -261,7 +261,7 @@ test("dev rescan retries the write after a failure (in-memory state not advanced
 	await touch(
 		"src/a.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("B", v, { y: "Y" });
 		`,
 	);
@@ -289,14 +289,14 @@ test("merges calls across multiple files", async () => {
 	await touch(
 		"src/a-users.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("Account Information", v, { a: "Name", b: "Email" });
 		`,
 	);
 	await touch(
 		"src/b-pages.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("Usage Data", v, { p: "Pages visited" });
 		collecting("Account Information", v, { c: "Phone" });
 		`,
@@ -315,14 +315,14 @@ test("ignores files outside the configured srcDir", async () => {
 	await touch(
 		"src/ok.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("In", v, { x: "X" });
 		`,
 	);
 	await touch(
 		"other/nope.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("Out", v, { x: "X" });
 		`,
 	);
@@ -337,7 +337,7 @@ test("respects a custom srcDir", async () => {
 	await touch(
 		"app/foo.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("Cat", v, { x: "X" });
 		`,
 	);
@@ -368,7 +368,7 @@ test("scans .tsx files by default", async () => {
 	await touch(
 		"src/Widget.tsx",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		export function Widget() {
 			collecting("Widget", v, { x: "X" });
 			return null;
@@ -403,7 +403,7 @@ test("dev watcher re-scans and rewrites the gen module when a tracked file chang
 	await touch(
 		"src/lib/db.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("Initial", v, { x: "X" });
 		`,
 	);
@@ -420,7 +420,7 @@ test("dev watcher re-scans and rewrites the gen module when a tracked file chang
 	await touch(
 		"src/lib/db.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("Initial", v, { x: "X" });
 		collecting("Added", v, { y: "Y" });
 		`,
@@ -444,7 +444,7 @@ test("dev watcher picks up newly-created source files", async () => {
 	await touch(
 		"src/new.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("Brand New", v, { z: "Z" });
 		`,
 	);
@@ -457,7 +457,7 @@ test("dev watcher drops categories when a file is deleted", async () => {
 	await touch(
 		"src/gone.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("Temporary", v, { x: "X" });
 		`,
 	);
@@ -510,7 +510,7 @@ test("dev watcher does not rewrite the gen module when the gen file itself chang
 	await touch(
 		"src/a.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("A", v, { x: "X" });
 		`,
 	);
@@ -531,7 +531,7 @@ test("dev watcher leaves the gen module unchanged when the scan output is unchan
 	await touch(
 		"src/a.ts",
 		`
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("A", v, { x: "X" });
 		`,
 	);
@@ -548,7 +548,7 @@ test("dev watcher leaves the gen module unchanged when the scan output is unchan
 		"src/a.ts",
 		`
 		// comment added
-		import { collecting } from "@openpolicy/sdk";
+		import { collecting } from "@policystack/sdk";
 		collecting("A", v, { x: "X" });
 		`,
 	);
@@ -565,7 +565,7 @@ test("thirdParty() calls are scanned and appear in the gen module thirdParties e
 	await touch(
 		"src/payments.ts",
 		`
-		import { thirdParty } from "@openpolicy/sdk";
+		import { thirdParty } from "@policystack/sdk";
 		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
 		`,
 	);
@@ -588,14 +588,14 @@ test("thirdParty() deduplication across files — same name in two files yields 
 	await touch(
 		"src/a-file.ts",
 		`
-		import { thirdParty } from "@openpolicy/sdk";
+		import { thirdParty } from "@policystack/sdk";
 		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
 		`,
 	);
 	await touch(
 		"src/b-file.ts",
 		`
-		import { thirdParty } from "@openpolicy/sdk";
+		import { thirdParty } from "@policystack/sdk";
 		thirdParty("Stripe", "Billing", "https://stripe.com/other");
 		`,
 	);
@@ -616,7 +616,7 @@ test("sharing() calls are scanned and appear in the gen module sharing export", 
 	await touch(
 		"src/payments.ts",
 		`
-		import { sharing } from "@openpolicy/sdk";
+		import { sharing } from "@policystack/sdk";
 		export const charge = (email: string) =>
 			fetch("/x", { body: JSON.stringify(sharing("Account Information", "Stripe", { email })) });
 		`,
@@ -640,14 +640,14 @@ test("sharing() dedup across files — same (key, recipient) in two files yields
 	await touch(
 		"src/a-file.ts",
 		`
-		import { sharing } from "@openpolicy/sdk";
+		import { sharing } from "@policystack/sdk";
 		sharing("Account Information", "Stripe", a);
 		`,
 	);
 	await touch(
 		"src/b-file.ts",
 		`
-		import { sharing } from "@openpolicy/sdk";
+		import { sharing } from "@policystack/sdk";
 		sharing("Account Information", "Stripe", b);
 		sharing("Usage Data", "PostHog", c);
 		`,
@@ -675,7 +675,7 @@ test("dev watcher triggers reload when thirdParty() call is added", async () => 
 	await touch(
 		"src/payments.ts",
 		`
-		import { thirdParty } from "@openpolicy/sdk";
+		import { thirdParty } from "@policystack/sdk";
 		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
 		`,
 	);
@@ -744,7 +744,7 @@ test("usePackageJson: manual thirdParty() call wins over auto-detected entry", a
 	await touch(
 		"src/payments.ts",
 		`
-		import { thirdParty } from "@openpolicy/sdk";
+		import { thirdParty } from "@policystack/sdk";
 		thirdParty("Stripe", "Custom billing purpose", "https://stripe.com/custom");
 		`,
 	);
@@ -763,7 +763,7 @@ test("usePackageJson: graceful when package.json is missing", async () => {
 	await touch(
 		"src/payments.ts",
 		`
-		import { thirdParty } from "@openpolicy/sdk";
+		import { thirdParty } from "@policystack/sdk";
 		thirdParty("Stripe", "Payments", "https://stripe.com/privacy");
 		`,
 	);
@@ -797,7 +797,7 @@ test("cookies: defineCookie() adds the category", async () => {
 	await touch(
 		"src/cookies.ts",
 		`
-		import { defineCookie } from "@openpolicy/sdk";
+		import { defineCookie } from "@policystack/sdk";
 		defineCookie("analytics");
 		defineCookie("marketing");
 		`,
@@ -839,7 +839,7 @@ test("cookies: usePackageJson + defineCookie unions categories", async () => {
 	await touch(
 		"src/cookies.ts",
 		`
-		import { defineCookie } from "@openpolicy/sdk";
+		import { defineCookie } from "@policystack/sdk";
 		defineCookie("marketing");
 		`,
 	);
@@ -874,7 +874,7 @@ test("cookies: dev watcher reloads when a cookie-relevant call is added", async 
 	await touch(
 		"src/x.ts",
 		`
-		import { defineCookie } from "@openpolicy/sdk";
+		import { defineCookie } from "@policystack/sdk";
 		defineCookie("analytics");
 		`,
 	);
@@ -908,7 +908,7 @@ function runConfigureServer(
 test("buildStart writes openpolicy.gen.ts with scanned keys", async () => {
 	await touch(
 		"src/a.ts",
-		`import { collecting } from "@openpolicy/sdk";\n` +
+		`import { collecting } from "@policystack/sdk";\n` +
 			`collecting("Account Information", v, { email: "Email" });\n` +
 			`collecting("Session Data", v, { ip: "IP" });\n`,
 	);
@@ -916,14 +916,14 @@ test("buildStart writes openpolicy.gen.ts with scanned keys", async () => {
 	await runPluginBuildStart(plugin, tmp);
 	const dts = await readFile(join(tmp, "openpolicy.gen.ts"), "utf8");
 	// Type augmentation.
-	expect(dts).toContain('declare module "@openpolicy/sdk"');
+	expect(dts).toContain('declare module "@policystack/sdk"');
 	expect(dts).toContain("interface ScannedCollectionKeys");
 	expect(dts).toContain('"Account Information": true');
 	expect(dts).toContain('"Session Data": true');
 	expect(dts).toContain("interface ScannedCookieKeys");
 	// First-class module: explicit type import, real value exports, no
 	// `export {}` stub, and no virtual-module body.
-	expect(dts).toContain('import type { ScannedCollectionKeys } from "@openpolicy/sdk"');
+	expect(dts).toContain('import type { ScannedCollectionKeys } from "@policystack/sdk"');
 	expect(dts).toContain("export const dataCollected:");
 	expect(dts).toContain("export const thirdParties:");
 	expect(dts).toContain("export const cookies:");
@@ -940,7 +940,7 @@ test("buildStart writes openpolicy.gen.ts with scanned keys", async () => {
 test("buildStart includes scanned cookie keys in ScannedCookieKeys", async () => {
 	await touch(
 		"src/cookies.ts",
-		`import { defineCookie } from "@openpolicy/sdk";\n` +
+		`import { defineCookie } from "@policystack/sdk";\n` +
 			`defineCookie("analytics");\n` +
 			`defineCookie("marketing");\n`,
 	);
@@ -965,7 +965,7 @@ test("buildStart emits openpolicy.gen.ts next to openpolicy.ts inside src/", asy
 	await touch("src/openpolicy.ts", "export default {} as const;\n");
 	await touch(
 		"src/a.ts",
-		`import { collecting } from "@openpolicy/sdk";\n` +
+		`import { collecting } from "@policystack/sdk";\n` +
 			`collecting("Account Information", v, { email: "Email" });\n`,
 	);
 	const plugin = openPolicy({ validate: false });
@@ -978,7 +978,7 @@ test("buildStart emits openpolicy.gen.ts next to openpolicy.ts inside src/lib/",
 	await touch("src/lib/openpolicy.ts", "export default {} as const;\n");
 	await touch(
 		"src/a.ts",
-		`import { collecting } from "@openpolicy/sdk";\n` +
+		`import { collecting } from "@policystack/sdk";\n` +
 			`collecting("Account Information", v, { email: "Email" });\n`,
 	);
 	const plugin = openPolicy({ validate: false });
@@ -1010,7 +1010,7 @@ test("vite dev (command: 'serve') does not abort via this.error even if config h
 test("validate:false still writes the gen module so scanned data still flows through", async () => {
 	await touch(
 		"src/lib/db.ts",
-		`import { collecting } from "@openpolicy/sdk";
+		`import { collecting } from "@policystack/sdk";
 		collecting("Account Information", v, { name: "Name" });`,
 	);
 	const plugin = openPolicy({ validate: false });
@@ -1034,8 +1034,8 @@ test("recognises an aliased SDK import end-to-end via the Vite resolver", async 
 	);
 
 	const plugin = openPolicy();
-	const sdkId = join(tmp, "node_modules/@openpolicy/sdk/dist/index.js");
-	const ctx = createPluginContext({ "@openpolicy/sdk": sdkId, "@/sdk": sdkId });
+	const sdkId = join(tmp, "node_modules/@policystack/sdk/dist/index.js");
+	const ctx = createPluginContext({ "@policystack/sdk": sdkId, "@/sdk": sdkId });
 	await runPluginBuildStart(plugin, tmp, { ctx });
 
 	expect((await readScanned(tmp)).dataCollected).toEqual({
@@ -1047,15 +1047,15 @@ test("an alias resolving elsewhere is NOT treated as the SDK", async () => {
 	await touch(
 		"src/lib/db.ts",
 		`
-		import { collecting } from "@openpolicy/sdk-fake";
+		import { collecting } from "@policystack/sdk-fake";
 		collecting("Should Not Appear", v, { x: "X" });
 		`,
 	);
 
 	const plugin = openPolicy();
 	const ctx = createPluginContext({
-		"@openpolicy/sdk": join(tmp, "node_modules/@openpolicy/sdk/dist/index.js"),
-		"@openpolicy/sdk-fake": join(tmp, "node_modules/@openpolicy/sdk-fake/index.js"),
+		"@policystack/sdk": join(tmp, "node_modules/@policystack/sdk/dist/index.js"),
+		"@policystack/sdk-fake": join(tmp, "node_modules/@policystack/sdk-fake/index.js"),
 	});
 	await runPluginBuildStart(plugin, tmp, { ctx });
 
@@ -1089,8 +1089,8 @@ test("dev rescan reuses the resolver matcher captured at buildStart", async () =
 	);
 
 	const plugin = openPolicy();
-	const sdkId = join(tmp, "node_modules/@openpolicy/sdk/dist/index.js");
-	const ctx = createPluginContext({ "@openpolicy/sdk": sdkId, "@/sdk": sdkId });
+	const sdkId = join(tmp, "node_modules/@policystack/sdk/dist/index.js");
+	const ctx = createPluginContext({ "@policystack/sdk": sdkId, "@/sdk": sdkId });
 	await runPluginBuildStart(plugin, tmp, { ctx });
 	expect((await readScanned(tmp)).dataCollected).toEqual({ Initial: ["X"] });
 

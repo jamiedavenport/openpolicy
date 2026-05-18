@@ -2,7 +2,7 @@ import type { PolicyExtractor } from "../../analyse";
 import type { Rule } from "../types";
 
 /**
- * The `@openpolicy/sdk` policy extraction (`collecting` / `thirdParty` /
+ * The `@policystack/sdk` policy extraction (`collecting` / `thirdParty` /
  * `defineCookie` / `sharing`) expressed as a rule in the one unified walk
  * (PS-25). It does not duplicate the algorithm: the per-file
  * {@link PolicyExtractor} owns it (shared with the legacy `extractFromParsed`

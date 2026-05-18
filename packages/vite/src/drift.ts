@@ -1,4 +1,4 @@
-import type { OpenPolicyConfig } from "@openpolicy/core";
+import type { OpenPolicyConfig } from "@policystack/core";
 import type { VendorHit } from "./consent/types";
 import { vendorById } from "./registry";
 import type { Scanned } from "./scanned";

@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
-import type { OpenPolicyConfig } from "@openpolicy/core";
-import type { ConsentRecord, StorageAdapter } from "@openpolicy/core/consent";
-import { toOpenCookiesConfig } from "@openpolicy/sdk/consent";
+import type { OpenPolicyConfig } from "@policystack/core";
+import type { ConsentRecord, StorageAdapter } from "@policystack/core/consent";
+import { toOpenCookiesConfig } from "@policystack/sdk/consent";
 import { act, cleanup, render, renderHook, screen } from "@testing-library/react";
 import { useContext, type ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
@@ -162,7 +162,7 @@ describe("PolicyStackProvider — consent store derived from the one config", ()
 	});
 });
 
-describe("deriveConsentConfig parity with @openpolicy/sdk toOpenCookiesConfig", () => {
+describe("deriveConsentConfig parity with @policystack/sdk toOpenCookiesConfig", () => {
 	const cases: Record<string, OpenPolicyConfig> = {
 		"no consent block": withCookies,
 		"with runtime knobs": {

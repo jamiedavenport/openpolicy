@@ -166,12 +166,12 @@ test("defineConfig derives consentMechanism from the cookie posture", () => {
 
 test("defineConfig seeds company from package.json; an explicit value wins", () => {
 	// cwd is packages/sdk under `vp run -r test`; its package.json name is
-	// "@openpolicy/sdk" and it has no homepage/author.
+	// "@policystack/sdk" and it has no homepage/author.
 	const seeded = defineConfig({
 		...fixture,
 		company: { legalName: "L Corp", address: "1 St", contact: { email: "e@x.com" } },
 	});
-	expect(seeded.company.name).toBe("@openpolicy/sdk");
+	expect(seeded.company.name).toBe("@policystack/sdk");
 	expect(seeded.company.legalName).toBe("L Corp");
 
 	expect(defineConfig(fixture).company.name).toBe("Acme Inc.");

@@ -139,7 +139,7 @@ function collectImportSources(program: AnyNode): string[] {
  *
  * `isSdkSpecifier` decides whether an import source is the SDK. It defaults
  * to {@link isCanonicalSdkSpecifier} (exact dual-scope match) so direct
- * `@openpolicy/sdk` / `@policystack/sdk` imports work with no resolver; the
+ * `@policystack/sdk` / `@policystack/sdk` imports work with no resolver; the
  * Vite plugin swaps in a resolver-backed predicate so import aliases also
  * resolve.
  */
@@ -189,7 +189,7 @@ export function extractFromParsed(
 }
 
 /**
- * The local names a module binds to each tracked `@openpolicy/sdk` export.
+ * The local names a module binds to each tracked `@policystack/sdk` export.
  * Resolved once per file by {@link collectSdkBindings} so the single unified
  * walk (PS-25) and the legacy {@link extractFromParsed} share one binding
  * pass instead of five.

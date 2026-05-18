@@ -1,17 +1,17 @@
-# `@openpolicy/cli`
+# `@policystack/cli`
 
 > Install [OpenPolicy](https://openpolicy.sh) into your project and print a setup prompt for your coding agent.
 
-One command installs `@openpolicy/sdk` plus the right framework integration for your stack (Vite / React / Vue), writes an `openpolicy.ts` stub, and prints a prompt you can paste into Claude Code, Cursor, or any other coding agent to finish setup by reading your codebase.
+One command installs `@policystack/sdk` plus the right framework integration for your stack (Vite / React / Vue), writes an `openpolicy.ts` stub, and prints a prompt you can paste into Claude Code, Cursor, or any other coding agent to finish setup by reading your codebase.
 
 ## Usage
 
 From the root of your project:
 
 ```sh
-bunx @openpolicy/cli init
-# or: npx @openpolicy/cli init
-# or: pnpm dlx @openpolicy/cli init
+bunx @policystack/cli init
+# or: npx @policystack/cli init
+# or: pnpm dlx @policystack/cli init
 ```
 
 That's it — the CLI detects your package manager from lockfiles, installs the right packages, scaffolds `src/openpolicy.ts` (or `openpolicy.ts` if you don't have a `src/` directory), and prints the agent prompt.
@@ -30,10 +30,10 @@ That's it — the CLI detects your package manager from lockfiles, installs the 
 
 ## What gets installed
 
-- `@openpolicy/sdk` — always
-- `@openpolicy/vite` (dev) — if `vite` is in your `package.json`
-- `@openpolicy/react` — if `react` is in your `package.json`
-- `@openpolicy/vue` — if `vue` is in your `package.json`
+- `@policystack/sdk` — always
+- `@policystack/vite` (dev) — if `vite` is in your `package.json`
+- `@policystack/react` — if `react` is in your `package.json`
+- `@policystack/vue` — if `vue` is in your `package.json`
 
 ## Documentation
 
@@ -43,4 +43,4 @@ That's it — the CLI detects your package manager from lockfiles, installs the 
 
 - [GitHub](https://github.com/jamiedavenport/openpolicy)
 - [openpolicy.sh](https://openpolicy.sh)
-- [npm](https://www.npmjs.com/package/@openpolicy/cli)
+- [npm](https://www.npmjs.com/package/@policystack/cli)

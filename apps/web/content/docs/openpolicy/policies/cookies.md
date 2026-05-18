@@ -10,7 +10,7 @@ Add cookie fields to your config — the cookie policy is auto-detected from the
 
 ```ts
 // openpolicy.ts
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@policystack/sdk";
 
 effectiveDate: "2026-01-01",
 jurisdictions: ["eu", "us-ca"],
@@ -46,7 +46,7 @@ The consent mechanism (banner / preference panel / withdrawal) is **derived** fr
 Then render it:
 
 ```tsx
-import { OpenPolicy, CookiePolicy } from "@openpolicy/react";
+import { OpenPolicy, CookiePolicy } from "@policystack/react";
 import openpolicy from "@/openpolicy";
 
 export function CookiePolicyPage() {

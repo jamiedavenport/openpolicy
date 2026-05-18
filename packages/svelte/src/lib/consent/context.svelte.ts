@@ -10,7 +10,7 @@ import {
 	type OpenCookiesConfig,
 	type RepromptReason,
 	type Route,
-} from "@openpolicy/core/consent";
+} from "@policystack/core/consent";
 import { getContext, onDestroy, setContext } from "svelte";
 
 const CONTEXT_KEY = Symbol("opencookies");

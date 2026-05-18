@@ -247,5 +247,5 @@ export function isOpenPolicyConfig(value: unknown): value is OpenPolicyConfig {
 // The stable public diagnostic codes and the `Issue` shape live in their own
 // module so the union can be *derived from* a runtime registry (PS-32) instead
 // of hand-maintained twice. Still frozen at 1.0 (§6); re-exported here so the
-// historical `@openpolicy/core` "./types" import path is unchanged (PS-11).
+// historical `@policystack/core` "./types" import path is unchanged (PS-11).
 export type { Issue, IssueCode } from "./issue-codes";

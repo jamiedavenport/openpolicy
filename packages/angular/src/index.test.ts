@@ -2,7 +2,7 @@
 import "zone.js";
 
 import { Injector, runInInjectionContext, type StaticProvider } from "@angular/core";
-import { createConsentStore, type Category, type ConsentStore } from "@openpolicy/core/consent";
+import { createConsentStore, type Category, type ConsentStore } from "@policystack/core/consent";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { ConsentService } from "./consent.service";
 import { injectCategory } from "./category";

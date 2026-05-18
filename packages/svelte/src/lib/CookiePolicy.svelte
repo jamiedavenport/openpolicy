@@ -1,6 +1,6 @@
 <script lang="ts">
-import type { CookiePolicyConfig, OpenPolicyConfig } from "@openpolicy/core";
-import { visit } from "@openpolicy/core";
+import type { CookiePolicyConfig, OpenPolicyConfig } from "@policystack/core";
+import { visit } from "@policystack/core";
 import { setOverridesContext } from "./context.svelte";
 import DefaultRoot from "./defaults/DefaultRoot.svelte";
 import { planVisitor } from "./plan";

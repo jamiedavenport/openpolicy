@@ -21,13 +21,13 @@ test("no framework → framework-generic wording, no react hard-coding", () => {
 	const out = buildAgentPrompt(base);
 	expect(out).toContain("ONE OpenPolicy provider for your");
 	expect(out).not.toContain("PolicyStackProvider");
-	expect(out).not.toContain("@openpolicy/react/provider");
+	expect(out).not.toContain("@policystack/react/provider");
 });
 
-test("react → PolicyStackProvider snippet from @openpolicy/react/provider", () => {
+test("react → PolicyStackProvider snippet from @policystack/react/provider", () => {
 	const out = buildAgentPrompt({ ...base, framework: "react" });
 	expect(out).toContain("PolicyStackProvider");
-	expect(out).toContain('from "@openpolicy/react/provider"');
+	expect(out).toContain('from "@policystack/react/provider"');
 	expect(out).toContain("<PolicyStackProvider config={config}>");
 	// import path is derived from the stub's basename
 	expect(out).toContain('import config from "./openpolicy"');
@@ -36,5 +36,5 @@ test("react → PolicyStackProvider snippet from @openpolicy/react/provider", ()
 test("non-react framework stays generic (no react import path)", () => {
 	const out = buildAgentPrompt({ ...base, framework: "vue" });
 	expect(out).toContain("ONE OpenPolicy provider for your");
-	expect(out).not.toContain("@openpolicy/react/provider");
+	expect(out).not.toContain("@policystack/react/provider");
 });

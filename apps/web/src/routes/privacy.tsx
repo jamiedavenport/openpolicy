@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PrivacyPolicy, type PolicyComponents } from "@openpolicy/react/policy";
+import { PrivacyPolicy, type PolicyComponents } from "@policystack/react/policy";
 import openpolicy from "../openpolicy";
 import { Highlight } from "../components/Highlight";
 import { pageMeta } from "../lib/seo";

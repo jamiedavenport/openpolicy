@@ -4,16 +4,16 @@ description: Install OpenPolicy and generate an agent prompt in one command
 product: openpolicy
 ---
 
-`@openpolicy/cli` sets up OpenPolicy in your project. Run it once — it installs the right packages for your stack, scaffolds a starter `openpolicy.ts`, and prints a prompt you can paste into a coding agent (Claude Code, Cursor, etc.) to finish filling in your config from your codebase.
+`@policystack/cli` sets up OpenPolicy in your project. Run it once — it installs the right packages for your stack, scaffolds a starter `openpolicy.ts`, and prints a prompt you can paste into a coding agent (Claude Code, Cursor, etc.) to finish filling in your config from your codebase.
 
 ## Run it
 
 From the root of your project:
 
 ```sh
-bunx @openpolicy/cli init
-# or: npx @openpolicy/cli init
-# or: pnpm dlx @openpolicy/cli init
+bunx @policystack/cli init
+# or: npx @policystack/cli init
+# or: pnpm dlx @policystack/cli init
 ```
 
 That's the whole flow. The CLI is meant for one-time setup — once it's done, uninstall or ignore it.
@@ -22,11 +22,11 @@ That's the whole flow. The CLI is meant for one-time setup — once it's done, u
 
 1. **Detects your package manager** from lockfiles (`bun.lock`, `pnpm-lock.yaml`, `yarn.lock`, `package-lock.json`) or the `packageManager` field in `package.json`. Falls back to `npm`.
 2. **Detects frameworks** by reading your `package.json` dependencies and installs the matching OpenPolicy integration:
-   - `vite` → `@openpolicy/vite` (devDependency)
-   - `react` → `@openpolicy/react`
-   - `vue` → `@openpolicy/vue`
-   - `svelte` → `@openpolicy/svelte`
-   - `@openpolicy/sdk` is always installed.
+   - `vite` → `@policystack/vite` (devDependency)
+   - `react` → `@policystack/react`
+   - `vue` → `@policystack/vue`
+   - `svelte` → `@policystack/svelte`
+   - `@policystack/sdk` is always installed.
 3. **Writes a starter `openpolicy.ts`** to `src/openpolicy.ts` if a `src/` directory exists, otherwise to the project root.
 4. **Prints an agent prompt** between delimiters so you can copy it into a coding agent and have the rest of your config filled in automatically from your codebase.
 

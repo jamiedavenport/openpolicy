@@ -28,7 +28,7 @@ The four skills then activate automatically when a task matches.
 ## The skills
 
 - **policystack-init** — scaffold PolicyStack in a project: run
-  `@openpolicy/cli init`, then wire `<PolicyStackProvider>` (it supplies both
+  `@policystack/cli init`, then wire `<PolicyStackProvider>` (it supplies both
   the policy context and the consent store from one config).
 - **policystack-audit** — the closed loop: run `openpolicy validate --json`,
   explain each issue code against the frozen 1.0 diagnostic surface, propose a
@@ -43,8 +43,8 @@ The four skills then activate automatically when a task matches.
 ## Why it can't drift
 
 Every enumeration a skill cites — jurisdiction ids, lawful bases, the issue
-codes `validate()` emits — is rendered from the live `@openpolicy/core` /
-`@openpolicy/sdk` tables at generation time and snapshotted with a drift test
+codes `validate()` emits — is rendered from the live `@policystack/core` /
+`@policystack/sdk` tables at generation time and snapshotted with a drift test
 that fails the build if the generated pack and the shipped files disagree. The
 same mechanism backs [`llms.txt`](/docs/openpolicy/cli). Removing or renaming a
 frozen code is a loud test failure, not a silently stale skill.

@@ -5,12 +5,12 @@ import type {
 	DataContextEntry,
 	OpenPolicyConfig,
 	ThirdParty,
-} from "@openpolicy/core";
+} from "@policystack/core";
 import {
 	computeCookieVersion,
 	computePrivacyVersion,
 	normalizeOpenPolicyConfig,
-} from "@openpolicy/core";
+} from "@policystack/core";
 import type { ScannedCollectionKeys, ScannedCookieKeys } from "./auto-collected";
 
 export type {
@@ -41,7 +41,7 @@ export type {
 	ProvisionRequirement,
 	ThirdParty,
 	TrackingTechnology,
-} from "@openpolicy/core";
+} from "@policystack/core";
 
 export {
 	computeCookieVersion,
@@ -52,8 +52,8 @@ export {
 	ISSUE_CATALOG,
 	Statutory,
 	Voluntary,
-} from "@openpolicy/core";
-export type { IssueExplanation } from "@openpolicy/core";
+} from "@policystack/core";
+export type { IssueExplanation } from "@policystack/core";
 
 export type {
 	ScannedCollectionKeys,
@@ -123,7 +123,7 @@ type OpenPolicyConfigWithGenerics<
  * The canonical config entrypoint. Pass scanned data as the optional second
  * argument — `import * as scanned from "./openpolicy.gen"` — instead of
  * spreading `...dataCollected` / `cookies` / `thirdParties` by hand. The
- * static `import` keeps the gen module's `declare module "@openpolicy/sdk"`
+ * static `import` keeps the gen module's `declare module "@policystack/sdk"`
  * augmentation reachable, so scanned categories are still type-required in
  * `data.context`. The returned config is normalized: `consentMechanism` is
  * derived from the cookie posture and `company.{name,url,contact.email}` are

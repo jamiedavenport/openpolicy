@@ -1,4 +1,4 @@
-import type { OpenPolicyConfig, PrivacyPolicyConfig } from "@openpolicy/core";
+import type { OpenPolicyConfig, PrivacyPolicyConfig } from "@policystack/core";
 import { type CSSProperties, defineComponent, h, type PropType } from "vue";
 import { usePolicyDocument } from "../composables/usePolicyDocument";
 import { DefaultRoot } from "../defaults";

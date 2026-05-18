@@ -9,7 +9,7 @@
 // are merged in by passing the module as defineConfig's second argument — no
 // hand-spreading. This file is also the project's scanner regression net —
 // keep the `openpolicy.gen` import.
-import { ContractPrerequisite, defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases } from "@policystack/sdk";
 import * as scanned from "./openpolicy.gen";
 
 export default defineConfig(

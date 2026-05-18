@@ -4,27 +4,27 @@ description: Setting up your openpolicy.ts config file
 product: openpolicy
 ---
 
-All policies are defined in a single config file using `defineConfig()` from `@openpolicy/sdk`. You can place it anywhere in your project.
+All policies are defined in a single config file using `defineConfig()` from `@policystack/sdk`. You can place it anywhere in your project.
 
 ## Install
 
-The fastest way is to run [`@openpolicy/cli`](/docs/openpolicy/cli), which installs `@openpolicy/sdk` plus the right framework integration for your stack and scaffolds a starter config:
+The fastest way is to run [`@policystack/cli`](/docs/openpolicy/cli), which installs `@policystack/sdk` plus the right framework integration for your stack and scaffolds a starter config:
 
 ```sh
-bunx @openpolicy/cli init
+bunx @policystack/cli init
 ```
 
 Or install manually:
 
 ```sh
-bun add @openpolicy/sdk
+bun add @policystack/sdk
 ```
 
 ## Create your config
 
 ```ts
 // openpolicy.ts
-import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@policystack/sdk";
 
 export default defineConfig({
 	company: {
@@ -134,7 +134,7 @@ automatedDecisionMaking: [
 
 Omitting the field entirely emits a validation warning under EU/UK jurisdictions. When at least one activity is listed, the rendered policy automatically appends the Article 22(3) right-to-human-review paragraph referencing `company.contact`.
 
-`data.collected` is a map of category label → fields. `data.context[category]` carries the per-category metadata: `purpose` (prose describing _why_ you process it — GDPR Article 13(1)(c)), `lawfulBasis` (the Article 6 basis), `retention` (how long you keep it), and `provision` (whether providing it is statutory, contractual, a contract-prerequisite, or voluntary, plus the consequences of failing to provide it — GDPR Article 13(2)(e)). The provision helpers `Statutory()`, `Contractual()`, `ContractPrerequisite()`, and `Voluntary()` from `@openpolicy/sdk` build the right shape from a consequences string. Every key in `data.collected` must appear in `data.context`; `defineConfig` enforces this at type-check time, and the `openPolicy()` Vite plugin re-validates it at build time (see [Build-time validation](#build-time-validation)). When auto-collect is enabled, the plugin also emits `openpolicy.gen.ts` alongside your config (check it in) so the same constraint applies to scanned `collecting()` categories even without running Vite first.
+`data.collected` is a map of category label → fields. `data.context[category]` carries the per-category metadata: `purpose` (prose describing _why_ you process it — GDPR Article 13(1)(c)), `lawfulBasis` (the Article 6 basis), `retention` (how long you keep it), and `provision` (whether providing it is statutory, contractual, a contract-prerequisite, or voluntary, plus the consequences of failing to provide it — GDPR Article 13(2)(e)). The provision helpers `Statutory()`, `Contractual()`, `ContractPrerequisite()`, and `Voluntary()` from `@policystack/sdk` build the right shape from a consequences string. Every key in `data.collected` must appear in `data.context`; `defineConfig` enforces this at type-check time, and the `openPolicy()` Vite plugin re-validates it at build time (see [Build-time validation](#build-time-validation)). When auto-collect is enabled, the plugin also emits `openpolicy.gen.ts` alongside your config (check it in) so the same constraint applies to scanned `collecting()` categories even without running Vite first.
 
 The user rights you're legally required to disclose (access, erasure, portability, etc.) are derived automatically from `jurisdictions` — declare `eu` or `uk` and you get the six GDPR rights, declare `us-ca` and you get the four CCPA rights, declare any combination and you get the union. There's no `userRights` field to set. See [Supported jurisdictions](/docs/openpolicy/references/jurisdictions) for the full list of codes.
 
@@ -160,13 +160,13 @@ defineConfig({
 });
 ```
 
-Explicit values always win over the auto-computed hash. Both helpers — `computePrivacyVersion(config)` and `computeCookieVersion(config)` — are also re-exported from `@openpolicy/sdk` for callers building configs without `defineConfig`.
+Explicit values always win over the auto-computed hash. Both helpers — `computePrivacyVersion(config)` and `computeCookieVersion(config)` — are also re-exported from `@policystack/sdk` for callers building configs without `defineConfig`.
 
 `cookieVersion` also feeds the OpenCookies bridge — see [Cookie banner](/docs/openpolicy/cookies/overview) — so a change to `cookies` (which also drives the derived consent mechanism) re-prompts consent automatically.
 
 ### Build-time validation
 
-The `openPolicy()` Vite plugin loads your resolved `openpolicy.ts` and runs every validator in `@openpolicy/core` against it on each build. It catches issues that TypeScript can't — missing GDPR lawful bases, retention periods, CCPA contact methods, DPO disclosures, and similar requirements that depend on `jurisdictions` rather than on the static shape of the config.
+The `openPolicy()` Vite plugin loads your resolved `openpolicy.ts` and runs every validator in `@policystack/core` against it on each build. It catches issues that TypeScript can't — missing GDPR lawful bases, retention periods, CCPA contact methods, DPO disclosures, and similar requirements that depend on `jurisdictions` rather than on the static shape of the config.
 
 In `vite build`, validation **errors** abort the build with a non-zero exit code and a list of `[openpolicy] code: message` lines. Warnings are surfaced via Rollup's warning channel and do not block. In `vite dev`, both errors and warnings stream to the dev-server logger and never crash HMR — fix them as you go and the next save replays validation.
 
@@ -181,4 +181,4 @@ openPolicy({ validate: false });
 
 ## Using AI
 
-The fastest way to fill out your config is to hand it to a coding agent. [`@openpolicy/cli`](/docs/openpolicy/cli) prints a ready-made prompt for this — run `bunx @openpolicy/cli init`, paste the prompt into Claude Code or Cursor, and the agent will fill in `data`, `thirdParties`, `jurisdictions`, and cookie usage from your codebase. Agents are good at this because the config is typed and the fields map directly to things already described in your dependencies, environment variables, data models, and existing legal copy.
+The fastest way to fill out your config is to hand it to a coding agent. [`@policystack/cli`](/docs/openpolicy/cli) prints a ready-made prompt for this — run `bunx @policystack/cli init`, paste the prompt into Claude Code or Cursor, and the agent will fill in `data`, `thirdParties`, `jurisdictions`, and cookie usage from your codebase. Agents are good at this because the config is typed and the fields map directly to things already described in your dependencies, environment variables, data models, and existing legal copy.

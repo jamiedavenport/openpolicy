@@ -8,8 +8,8 @@ import { runValidate, validateCommand } from "./validate";
 
 /**
  * Tmp dirs sit inside this package's own directory so `bundle-require`'s
- * esbuild pass can resolve `@openpolicy/sdk` (a `workspace:*` devDependency,
- * symlinked at `packages/cli/node_modules/@openpolicy/sdk`) from the bundled
+ * esbuild pass can resolve `@policystack/sdk` (a `workspace:*` devDependency,
+ * symlinked at `packages/cli/node_modules/@policystack/sdk`) from the bundled
  * config — same constraint as the Vite plugin's loader test.
  */
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -44,7 +44,7 @@ async function writeConfig(source: string): Promise<string> {
 }
 
 const VALID_CONFIG = `
-import { ContractPrerequisite, defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases } from "@policystack/sdk";
 
 export default defineConfig({
 	company: {

@@ -1,6 +1,6 @@
-import { CookiePolicy, PrivacyPolicy } from "@openpolicy/react/policy";
+import { CookiePolicy, PrivacyPolicy } from "@policystack/react/policy";
 import type { ReactNode } from "react";
-import type { Locale } from "@openpolicy/sdk";
+import type { Locale } from "@policystack/sdk";
 import { cn } from "@/lib/utils";
 
 const policyStyles = cn(

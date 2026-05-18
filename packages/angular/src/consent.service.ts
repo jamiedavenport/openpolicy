@@ -9,7 +9,7 @@ import type {
 	Jurisdiction,
 	RepromptReason,
 	Route,
-} from "@openpolicy/core/consent";
+} from "@policystack/core/consent";
 import { OPEN_COOKIES_STORE } from "./tokens";
 
 @Injectable({ providedIn: "root" })

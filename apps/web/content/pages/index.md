@@ -15,7 +15,7 @@ PolicyStack is built on the opposite premise: consent and policy are _infrastruc
 Each repo is independently useful and Apache-2.0 licensed. PolicyCloud sits on top when you want a hosted control plane.
 
 - **[OpenCookies](https://policystack.dev/opencookies.md)** — A headless consent state machine. Sub-4kb core with adapters for React, Vue, Solid, Svelte, and Angular. A Vite plugin flags ungated cookies at dev time. Integrations for GA, Meta Pixel, and more. (`@opencookies/react`)
-- **[OpenPolicy](https://policystack.dev/openpolicy.md)** — Your policy as a typed config. Define your privacy and cookie policy once in TypeScript. Render it as React components, or generate Markdown. Ships a shadcn-style consent banner. (`@openpolicy/react`)
+- **[OpenPolicy](https://policystack.dev/openpolicy.md)** — Your policy as a typed config. Define your privacy and cookie policy once in TypeScript. Render it as React components, or generate Markdown. Ships a shadcn-style consent banner. (`@policystack/react`)
 - **[PolicyCloud](https://policystack.dev/policycloud.md)** — The hosted control plane. Centralized policy versioning, audit trails, and consent analytics across every app in your stack. Optional. Plays nicely with the OSS pieces. (early access)
 
 ## Good DX that agents love

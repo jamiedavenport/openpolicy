@@ -1,4 +1,4 @@
-# `@openpolicy/sdk`
+# `@policystack/sdk`
 
 > TypeScript SDK for defining privacy and cookie policies as code.
 
@@ -9,8 +9,8 @@ Part of [OpenPolicy](https://openpolicy.sh) — a policy-as-code framework that 
 ## Install
 
 ```sh
-bun add @openpolicy/sdk
-# or: npm install @openpolicy/sdk
+bun add @policystack/sdk
+# or: npm install @policystack/sdk
 ```
 
 ## Usage
@@ -19,7 +19,7 @@ bun add @openpolicy/sdk
 
 ```ts
 // openpolicy.ts
-import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@policystack/sdk";
 
 export default defineConfig({
 	company: {
@@ -61,7 +61,7 @@ export default defineConfig({
 
 ```ts
 // openpolicy.ts
-import { defineConfig, LegalBases } from "@openpolicy/sdk";
+import { defineConfig, LegalBases } from "@policystack/sdk";
 
 export default defineConfig({
 	company: {
@@ -87,10 +87,10 @@ export default defineConfig({
 
 The SDK exports types and helper functions for _defining_ policies. To render them in your app, pair it with one of:
 
-- **[`@openpolicy/react`](https://docs.openpolicy.sh)** — `<PrivacyPolicy />` / `<CookiePolicy />` components for React
-- **[`@openpolicy/vue`](https://docs.openpolicy.sh)** — Vue 3 components
-- **[`@openpolicy/vite`](https://docs.openpolicy.sh)** — Vite plugin that scans source for `collecting()` / `thirdParty()` annotations at build time
-- **[`@openpolicy/cli`](https://docs.openpolicy.sh/cli)** — one-command project setup: installs the right packages, scaffolds a config, and prints a prompt for your coding agent
+- **[`@policystack/react`](https://docs.openpolicy.sh)** — `<PrivacyPolicy />` / `<CookiePolicy />` components for React
+- **[`@policystack/vue`](https://docs.openpolicy.sh)** — Vue 3 components
+- **[`@policystack/vite`](https://docs.openpolicy.sh)** — Vite plugin that scans source for `collecting()` / `thirdParty()` annotations at build time
+- **[`@policystack/cli`](https://docs.openpolicy.sh/cli)** — one-command project setup: installs the right packages, scaffolds a config, and prints a prompt for your coding agent
 
 ## Documentation
 
@@ -111,4 +111,4 @@ For Claude Code, install the PolicyStack skill pack — guided procedures for se
 
 - [GitHub](https://github.com/jamiedavenport/openpolicy)
 - [openpolicy.sh](https://openpolicy.sh)
-- [npm](https://www.npmjs.com/package/@openpolicy/sdk)
+- [npm](https://www.npmjs.com/package/@policystack/sdk)

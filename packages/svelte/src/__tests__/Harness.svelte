@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ConsentExpr, ConsentStore, OpenCookiesConfig } from "@openpolicy/core/consent";
+  import type { ConsentExpr, ConsentStore, OpenCookiesConfig } from "@policystack/core/consent";
   import ConsentGate from "../lib/consent/ConsentGate.svelte";
   import { getCategory, getConsent, setOpenCookiesContext } from "../lib/consent/context.svelte";
 

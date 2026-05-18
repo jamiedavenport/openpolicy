@@ -4,8 +4,8 @@ import type {
 	ConsentStore,
 	OpenCookiesConfig,
 	Route,
-} from "@openpolicy/core/consent";
-import { createConsentStore } from "@openpolicy/core/consent";
+} from "@policystack/core/consent";
+import { createConsentStore } from "@policystack/core/consent";
 import { readable, type Readable } from "svelte/store";
 
 export type ConsentStoreReadable = Readable<ConsentState> & {

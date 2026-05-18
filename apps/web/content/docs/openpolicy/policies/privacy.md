@@ -10,7 +10,7 @@ Add the `data` block to your config — the privacy policy is auto-detected from
 
 ```ts
 // openpolicy.ts
-import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@policystack/sdk";
 
 effectiveDate: "2026-01-01",
 jurisdictions: ["eu", "us-ca"],
@@ -49,7 +49,7 @@ Set `automatedDecisionMaking: []` to declare that you don't use automated decisi
 Then render it:
 
 ```tsx
-import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
+import { OpenPolicy, PrivacyPolicy } from "@policystack/react";
 import openpolicy from "@/openpolicy";
 
 export function PrivacyPolicyPage() {

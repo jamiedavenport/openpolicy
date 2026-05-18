@@ -7,7 +7,7 @@ import { Sponsor } from "../components/Sponsor";
 import { highlight } from "../lib/shiki";
 import { pageMeta } from "../lib/seo";
 
-const HERO_SNIPPET = `import { OpenPolicy, PrivacyPolicy } from "@openpolicy/react";
+const HERO_SNIPPET = `import { OpenPolicy, PrivacyPolicy } from "@policystack/react";
 import openpolicy from "@/openpolicy";
 
 export function PrivacyPolicyPage() {
@@ -18,9 +18,9 @@ export function PrivacyPolicyPage() {
   );
 }`;
 
-const INSTALL_SNIPPET = `pnpm dlx @openpolicy/cli init`;
+const INSTALL_SNIPPET = `pnpm dlx @policystack/cli init`;
 
-const USE_SNIPPET = `import { defineConfig } from "@openpolicy/sdk";
+const USE_SNIPPET = `import { defineConfig } from "@policystack/sdk";
 
 export default defineConfig({
   company: { name: "Acme, Inc." },
@@ -140,14 +140,14 @@ function OpenPolicy() {
 		<>
 			<ProductHero
 				slug="openpolicy"
-				version="@openpolicy/react@0.0.30"
+				version="@policystack/react@0.0.30"
 				title={
 					<>
 						Your privacy policy, <Highlight>as a typed config.</Highlight>
 					</>
 				}
 				body="Define your policy once in TypeScript. Render it as React components, generate Markdown, ship a consent banner — all driven from the same source of truth."
-				primary={{ label: "pnpm dlx @openpolicy/cli init", href: "#install", icon: "arrow-right" }}
+				primary={{ label: "pnpm dlx @policystack/cli init", href: "#install", icon: "arrow-right" }}
 				secondary={{
 					label: "github",
 					href: "https://github.com/jamiedavenport/openpolicy",

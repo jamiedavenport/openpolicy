@@ -1,4 +1,4 @@
-import type { JurisdictionResolver } from "@openpolicy/core/consent";
+import type { JurisdictionResolver } from "@policystack/core/consent";
 import { expect, test } from "vite-plus/test";
 import type { OpenPolicyConfig } from "./index";
 import { toOpenCookiesConfig, type OpenPolicyConsentConfig } from "./consent";

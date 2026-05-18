@@ -35,7 +35,7 @@ test("resolveStubPath honors --out override (absolute)", () => {
 
 test("getStubContents contains required defineConfig fields", () => {
 	const out = getStubContents("2026-04-22");
-	expect(out).toContain('import { defineConfig } from "@openpolicy/sdk"');
+	expect(out).toContain('import { defineConfig } from "@policystack/sdk"');
 	expect(out).toContain("export default defineConfig(");
 	expect(out).toContain('effectiveDate: "2026-04-22"');
 	expect(out).toContain("jurisdictions: []");

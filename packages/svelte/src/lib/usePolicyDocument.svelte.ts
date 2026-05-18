@@ -8,7 +8,7 @@ import {
 	type OpenPolicyConfig,
 	type PolicyType,
 	type PrivacyPolicyConfig,
-} from "@openpolicy/core";
+} from "@policystack/core";
 import { getConfigContext } from "./context.svelte";
 
 type ConfigInput = OpenPolicyConfig | PrivacyPolicyConfig | CookiePolicyConfig | undefined;

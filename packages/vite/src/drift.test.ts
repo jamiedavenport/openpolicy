@@ -1,4 +1,4 @@
-import type { OpenPolicyConfig } from "@openpolicy/core";
+import type { OpenPolicyConfig } from "@policystack/core";
 import { describe, expect, it } from "vite-plus/test";
 import type { VendorHit } from "./consent/types";
 import { applyDriftPolicy, crossCheck, type DriftFinding, formatDrift } from "./drift";

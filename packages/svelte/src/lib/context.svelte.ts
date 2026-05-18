@@ -1,4 +1,4 @@
-import type { OpenPolicyConfig } from "@openpolicy/core";
+import type { OpenPolicyConfig } from "@policystack/core";
 import { getContext, setContext } from "svelte";
 import type { PolicyComponents } from "./types";
 

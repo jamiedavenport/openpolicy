@@ -1,4 +1,4 @@
-import type { OpenPolicyConfig } from "@openpolicy/core";
+import type { OpenPolicyConfig } from "@policystack/core";
 import { createContext, type ReactNode } from "react";
 
 type OpenPolicyContextValue = {

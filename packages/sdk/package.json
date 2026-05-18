@@ -1,5 +1,5 @@
 {
-	"name": "@openpolicy/sdk",
+	"name": "@policystack/sdk",
 	"version": "0.0.34",
 	"description": "Public API for defining privacy policies with OpenPolicy",
 	"license": "Apache-2.0",
@@ -36,8 +36,8 @@
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"@openpolicy/core": "workspace:*",
-		"@openpolicy/tooling": "workspace:*",
+		"@policystack/core": "workspace:*",
+		"@policystack/tooling": "workspace:*",
 		"vite-plus": "catalog:"
 	}
 }

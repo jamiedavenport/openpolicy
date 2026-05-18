@@ -1,4 +1,4 @@
-import type { Issue, IssueCode } from "@openpolicy/core";
+import type { Issue, IssueCode } from "@policystack/core";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,8 +8,8 @@ import { applyIssuePolicy, loadAndValidateConfig } from "./validate";
 
 /**
  * Tmp dirs sit inside this package's own directory so that `bundle-require`'s
- * esbuild pass can resolve `@openpolicy/sdk` (a `workspace:*` devDependency,
- * symlinked at `packages/vite/node_modules/@openpolicy/sdk`) from the bundled
+ * esbuild pass can resolve `@policystack/sdk` (a `workspace:*` devDependency,
+ * symlinked at `packages/vite/node_modules/@policystack/sdk`) from the bundled
  * config. The workspace root doesn't have the SDK on its `node_modules` path
  * (pnpm doesn't hoist it), and `tmpdir()` would escape the workspace
  * entirely — either would make the SDK fail to resolve.
@@ -43,7 +43,7 @@ async function writeGen(scanned: Scanned): Promise<void> {
 }
 
 const VALID_CONFIG = `
-import { ContractPrerequisite, defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases } from "@policystack/sdk";
 
 export default defineConfig({
 	company: {
@@ -104,7 +104,7 @@ test("scanned data from the on-disk gen module flows into validators via spread"
 	// scanned-only category. The scanned key flows through `data.collected` as
 	// ordinary relative source, so the missing-context check fires.
 	const source = `
-import { ContractPrerequisite, defineConfig, LegalBases } from "@openpolicy/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases } from "@policystack/sdk";
 import { dataCollected } from "./openpolicy.gen";
 
 export default defineConfig({
