@@ -28,7 +28,7 @@ import { Providers } from "./providers";
  */
 const PLUGIN_VERSION = "1.0.0";
 
-const REPO = "https://github.com/jamiedavenport/openpolicy";
+const REPO = "https://github.com/jamiedavenport/policystack";
 
 /** A single generated file, path relative to the repository root. */
 export type SkillFile = { path: string; content: string };
@@ -93,20 +93,20 @@ npx @policystack/cli@latest init
 
 \`init\` detects the package manager and framework from \`package.json\`,
 installs \`@policystack/sdk\` plus the right framework integration, scaffolds a
-starter \`openpolicy.ts\` (\`src/openpolicy.ts\` when a \`src/\` directory
-exists, else the project root), writes \`openpolicy.llms.txt\` next to it, and
+starter \`policystack.ts\` (\`src/policystack.ts\` when a \`src/\` directory
+exists, else the project root), writes \`policystack.llms.txt\` next to it, and
 prints a setup prompt. Useful flags: \`--cwd\`, \`--pm\`, \`--skip-install\`,
 \`--dry-run\`, \`--yes\`, \`--out\`, \`--force\`.
 
 If \`init\` cannot run, install by hand: \`@policystack/sdk\` always, plus
 \`@policystack/vite\` and the framework package (\`@policystack/react\`, …).
 
-## 2. Fill in \`openpolicy.ts\`
+## 2. Fill in \`policystack.ts\`
 
-Read the generated \`openpolicy.llms.txt\` — it is the type-accurate SDK
+Read the generated \`policystack.llms.txt\` — it is the type-accurate SDK
 reference (jurisdiction ids, lawful bases, presets) for this exact version.
 The canonical, commented reference config is
-[\`examples/tanstack/src/openpolicy.ts\`](${REPO}/blob/v1/examples/tanstack/src/openpolicy.ts).
+[\`examples/tanstack/src/policystack.ts\`](${REPO}/blob/v1/examples/tanstack/src/policystack.ts).
 
 \`jurisdictions\` is required and non-empty. Valid ids (frozen at 1.0):
 ${jurisdictions}. Any unlisted \`us-<state>\` falls back to \`us\`. Pick the
@@ -120,7 +120,7 @@ policy context and the consent store (derived from the same config):
 
 \`\`\`tsx
 import { PolicyStackProvider } from "@policystack/react/provider";
-import config from "./openpolicy";
+import config from "./policystack";
 
 export function App({ children }: { children: React.ReactNode }) {
 	return <PolicyStackProvider config={config}>{children}</PolicyStackProvider>;
@@ -133,7 +133,7 @@ For non-React frameworks use that framework's \`@policystack/<fw>\` package.
 
 ## 4. Verify
 
-Run \`policystack-audit\` (\`openpolicy validate --json\`) and resolve every
+Run \`policystack-audit\` (\`policystack validate --json\`) and resolve every
 issue before shipping. Annotate real data flows with \`policystack-instrument\`
 so the policy reflects what the code actually does.
 `;
@@ -142,7 +142,7 @@ so the policy reflects what the code actually does.
 function auditSkill(): string {
 	return `${frontmatter(
 		"policystack-audit",
-		"Audit an openpolicy.ts config: run `openpolicy validate --json`, explain each issue code, propose a minimal config fix, then re-validate until clean. Use when a PolicyStack config has validation errors or warnings.",
+		"Audit a policystack.ts config: run `policystack validate --json`, explain each issue code, propose a minimal config fix, then re-validate until clean. Use when a PolicyStack config has validation errors or warnings.",
 	)}
 ${GENERATED_BANNER}
 
@@ -184,7 +184,7 @@ ${issueCodeRows()}
 
 ## 3. Propose a minimal fix
 
-For each issue, change only what the code requires in \`openpolicy.ts\` — do
+For each issue, change only what the code requires in \`policystack.ts\` — do
 not restyle or expand the config. \`error\`s must be resolved; \`warning\`s
 should be resolved or consciously accepted (e.g. \`data-collected-empty\` is
 correct for a brochure site). Never invent compliance facts (a lawful basis, a
@@ -201,7 +201,7 @@ accepted warnings, if any.
 function jurisdictionSkill(): string {
 	return `${frontmatter(
 		"policystack-jurisdiction",
-		"Explain the consent and policy-text posture (the §4.2 stance) implied by a set of declared PolicyStack `jurisdictions`. Use when choosing or reviewing the `jurisdictions` array in openpolicy.ts.",
+		"Explain the consent and policy-text posture (the §4.2 stance) implied by a set of declared PolicyStack `jurisdictions`. Use when choosing or reviewing the `jurisdictions` array in policystack.ts.",
 	)}
 ${GENERATED_BANNER}
 
@@ -300,7 +300,7 @@ for, in priority order:
    - Vendors: ${presetList(Object.keys(Providers), "Providers")}
    - Compliance bundles: ${presetList(Object.keys(Compliance), "Compliance")}
 3. Ensure every newly scanned category has a matching \`data.context\` /
-   \`cookies.context\` entry in \`openpolicy.ts\` (the typed config enforces
+   \`cookies.context\` entry in \`policystack.ts\` (the typed config enforces
    this).
 4. Run \`policystack-audit\` to confirm the config still validates.
 `;
