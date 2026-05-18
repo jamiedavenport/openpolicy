@@ -1,7 +1,7 @@
 {
 	"name": "@policystack/core",
 	"version": "0.0.34",
-	"description": "Core package for OpenPolicy",
+	"description": "Core package for PolicyStack",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",

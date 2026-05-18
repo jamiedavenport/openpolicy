@@ -1,6 +1,6 @@
 # `@policystack/cli`
 
-> Install [OpenPolicy](https://openpolicy.sh) into your project and print a setup prompt for your coding agent.
+> Install [PolicyStack](https://policystack.dev) into your project and print a setup prompt for your coding agent.
 
 One command installs `@policystack/sdk` plus the right framework integration for your stack (Vite / React / Vue), writes an `policystack.ts` stub, and prints a prompt you can paste into Claude Code, Cursor, or any other coding agent to finish setup by reading your codebase.
 
@@ -37,10 +37,10 @@ That's it — the CLI detects your package manager from lockfiles, installs the 
 
 ## Documentation
 
-[docs.openpolicy.sh](https://docs.openpolicy.sh)
+[policystack.dev/docs](https://policystack.dev/docs)
 
 ## Links
 
 - [GitHub](https://github.com/jamiedavenport/openpolicy)
-- [openpolicy.sh](https://openpolicy.sh)
+- [policystack.dev](https://policystack.dev)
 - [npm](https://www.npmjs.com/package/@policystack/cli)

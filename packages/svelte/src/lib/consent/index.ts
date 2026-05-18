@@ -17,6 +17,6 @@ export {
 	ConsentRune,
 	getCategory,
 	getConsent,
-	setOpenCookiesContext,
+	setPolicyStackConsentContext,
 	type SetContextOptions,
 } from "./context.svelte";

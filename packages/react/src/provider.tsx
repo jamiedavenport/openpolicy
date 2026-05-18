@@ -3,7 +3,7 @@
 import { isConsentGated, type PolicyStackConfig } from "@policystack/core";
 import type { Category, PolicyStackConsentConfig } from "@policystack/core/consent";
 import { useState, type ReactNode } from "react";
-import { OpenCookiesProvider } from "./consent";
+import { PolicyStackConsentProvider } from "./consent";
 import { PolicyStackContext } from "./context";
 
 // Local copy of the @policystack/sdk `toPolicyStackConsentConfig` derivation, narrowed
@@ -68,13 +68,13 @@ export type PolicyStackProviderProps = {
 export function PolicyStackProvider({ config, children }: PolicyStackProviderProps) {
 	// Derive once per provider instance. Each SSR request mounts its own
 	// provider, so the consent store never leaks across requests — same
-	// rationale as OpenCookiesProvider's own useState store memoization.
+	// rationale as PolicyStackConsentProvider's own useState store memoization.
 	const [consentConfig] = useState<PolicyStackConsentConfig>(() => deriveConsentConfig(config));
 
 	return (
 		<PolicyStackContext.Provider value={{ config }}>
 			{consentConfig.categories.length > 0 ? (
-				<OpenCookiesProvider config={consentConfig}>{children}</OpenCookiesProvider>
+				<PolicyStackConsentProvider config={consentConfig}>{children}</PolicyStackConsentProvider>
 			) : (
 				children
 			)}

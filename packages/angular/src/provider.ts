@@ -4,16 +4,18 @@ import {
 	type ConsentStore,
 	type PolicyStackConsentConfig,
 } from "@policystack/core/consent";
-import { OPEN_COOKIES_STORE } from "./tokens";
+import { POLICYSTACK_CONSENT_STORE } from "./tokens";
 
-export type ProvideOpenCookiesOptions =
+export type ProvidePolicyStackConsentOptions =
 	| { config: PolicyStackConsentConfig; store?: undefined }
 	| { store: ConsentStore; config?: undefined };
 
-export function provideOpenCookies(options: ProvideOpenCookiesOptions): EnvironmentProviders {
+export function providePolicyStackConsent(
+	options: ProvidePolicyStackConsentOptions,
+): EnvironmentProviders {
 	return makeEnvironmentProviders([
 		{
-			provide: OPEN_COOKIES_STORE,
+			provide: POLICYSTACK_CONSENT_STORE,
 			useFactory: () => (options.store ? options.store : createConsentStore(options.config)),
 		},
 	]);

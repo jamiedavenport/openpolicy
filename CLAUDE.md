@@ -35,11 +35,11 @@ Packages are still published under the `@policystack/*` scope (the `@policystack
 rename is planned, not yet done).
 
 - `packages/core` — `@policystack/core`: compilation engine **and** the consent
-  runtime (exposed via the `./consent` subpath; OpenCookies was folded in here).
+  runtime (exposed via the `./consent` subpath; PolicyStack Consent was folded in here).
 - `packages/sdk` — `@policystack/sdk`: public API (`defineConfig()`), incl. the
   `renderLlmsTxt()` generator.
 - `packages/cli` — `@policystack/cli`: install/configure CLI.
-- `packages/vite` — `@policystack/vite`: Vite plugin (`openPolicy()`); also hosts
+- `packages/vite` — `@policystack/vite`: Vite plugin (`policyStack()`); also hosts
   the opt-in consent scanner.
 - `packages/react` / `vue` / `svelte` / `angular` / `solid` — per-framework
   components & hooks; each splits `./policy` and `./consent` subpath exports
@@ -49,10 +49,10 @@ rename is planned, not yet done).
 - `packages/renderers` — `@policystack/renderers`: shared policy render layer.
 - `tooling/tsconfig` — `@policystack/tooling`: shared TS base config (`./base`).
 - `apps/web` — the PolicyStack site (policystack.dev); dogfoods `@policystack/{react,sdk}`.
-- `apps/www` — stub redirecting the old OpenPolicy site.
+- `apps/www` — stub redirecting the old PolicyStack site.
 - `examples/tanstack` — example app (the sole SDK example).
 
-OpenCookies (consent) and the policystack site were separate projects; both are
+PolicyStack Consent (consent) and the policystack site were separate projects; both are
 now merged in-repo (consent → `@policystack/core/consent`, site → `apps/web`).
 
 ## Important Notes

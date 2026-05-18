@@ -1,7 +1,7 @@
 {
 	"name": "@policystack/cli",
 	"version": "0.0.34",
-	"description": "CLI to install OpenPolicy and print a setup prompt for coding agents",
+	"description": "CLI to install PolicyStack and print a setup prompt for coding agents",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",

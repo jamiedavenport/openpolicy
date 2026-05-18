@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
-import { OpenCookiesError } from "./errors";
+import { PolicyStackConsentError } from "./errors";
 import { evaluate } from "./expr";
 import { createConsentStore } from "./store";
 import type {
@@ -158,15 +158,15 @@ describe("evaluate", () => {
 			vi.restoreAllMocks();
 		});
 
-		it("throws OpenCookiesError by default", () => {
+		it("throws PolicyStackConsentError by default", () => {
 			const state = withDecisions({});
 			try {
 				evaluate("ghost", state);
 				expect.unreachable("should have thrown");
 			} catch (err) {
-				expect(err).toBeInstanceOf(OpenCookiesError);
-				expect((err as OpenCookiesError).code).toBe("UNKNOWN_CATEGORY");
-				expect((err as OpenCookiesError).message).toContain("ghost");
+				expect(err).toBeInstanceOf(PolicyStackConsentError);
+				expect((err as PolicyStackConsentError).code).toBe("UNKNOWN_CATEGORY");
+				expect((err as PolicyStackConsentError).message).toContain("ghost");
 			}
 		});
 
@@ -229,6 +229,6 @@ describe("store.has", () => {
 
 	it("throws by default on unknown category via has()", () => {
 		const store = createConsentStore({ categories: baseCategories });
-		expect(() => store.has("ghost")).toThrow(OpenCookiesError);
+		expect(() => store.has("ghost")).toThrow(PolicyStackConsentError);
 	});
 });

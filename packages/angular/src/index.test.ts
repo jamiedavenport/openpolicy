@@ -6,8 +6,8 @@ import { createConsentStore, type Category, type ConsentStore } from "@policysta
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { ConsentService } from "./consent.service";
 import { injectCategory } from "./category";
-import { provideOpenCookies } from "./provider";
-import { OPEN_COOKIES_STORE } from "./tokens";
+import { providePolicyStackConsent } from "./provider";
+import { POLICYSTACK_CONSENT_STORE } from "./tokens";
 
 const baseCategories: Category[] = [
 	{ key: "essential", label: "Essential", locked: true },
@@ -21,21 +21,21 @@ afterEach(() => {
 
 function injectorWithStore(store: ConsentStore): Injector {
 	const providers: StaticProvider[] = [
-		{ provide: OPEN_COOKIES_STORE, useValue: store },
+		{ provide: POLICYSTACK_CONSENT_STORE, useValue: store },
 		{ provide: ConsentService, useClass: ConsentService, deps: [] },
 	];
 	return Injector.create({ providers });
 }
 
-describe("provideOpenCookies", () => {
+describe("providePolicyStackConsent", () => {
 	it("returns EnvironmentProviders without invoking the factory", () => {
-		const result = provideOpenCookies({ config: { categories: baseCategories } });
+		const result = providePolicyStackConsent({ config: { categories: baseCategories } });
 		expect(result).toBeDefined();
 	});
 
 	it("accepts a pre-created store", () => {
 		const store = createConsentStore({ categories: baseCategories });
-		const result = provideOpenCookies({ store });
+		const result = providePolicyStackConsent({ store });
 		expect(result).toBeDefined();
 	});
 });

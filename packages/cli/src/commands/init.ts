@@ -140,7 +140,7 @@ export async function runInit(args: InitArgs): Promise<void> {
 	);
 
 	consola.warn(
-		"PolicyStack generates policy documents from your config — it does not provide legal advice. Have a lawyer review your policies before publication. https://openpolicy.sh/legal-notice",
+		"PolicyStack generates policy documents from your config — it does not provide legal advice. Have a lawyer review your policies before publication. https://policystack.dev/legal-notice",
 	);
 }
 

@@ -30,7 +30,7 @@ type Bound = {
 const Ctx = createContext<Bound | null>(null);
 
 const NOT_PROVIDED_MESSAGE =
-	"useConsent / useCategory / ConsentGate must be used inside <OpenCookiesProvider>";
+	"useConsent / useCategory / ConsentGate must be used inside <PolicyStackConsentProvider>";
 
 function useBound(): Bound {
 	const ctx = useContext(Ctx);
@@ -38,12 +38,12 @@ function useBound(): Bound {
 	return ctx;
 }
 
-export type OpenCookiesProviderProps = (
+export type PolicyStackConsentProviderProps = (
 	| { config: PolicyStackConsentConfig; store?: undefined }
 	| { store: ConsentStore; config?: undefined }
 ) & { children?: JSX.Element };
 
-export function OpenCookiesProvider(props: OpenCookiesProviderProps): JSX.Element {
+export function PolicyStackConsentProvider(props: PolicyStackConsentProviderProps): JSX.Element {
 	const store = props.store ?? createConsentStore(props.config!);
 	const [state, setState] = createSignal<ConsentState>(store.getState(), { equals: false });
 	const unsubscribe = store.subscribe(setState);

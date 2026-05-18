@@ -77,7 +77,7 @@ export type PolicyStackOptions = {
 	suppress?: (IssueCode | DriftCode)[];
 
 	/**
-	 * Opt-in OpenCookies consent scanner (folded in by PS-19). When this key
+	 * Opt-in PolicyStack Consent consent scanner (folded in by PS-19). When this key
 	 * is present, the same plugin also runs a *separate* oxc walk that flags
 	 * ungated cookie writes / tracking-vendor usage. Omit it entirely to skip
 	 * the consent scan — existing policy behaviour is unaffected.
@@ -196,7 +196,7 @@ export function policyStack(options: PolicyStackOptions = {}): Plugin {
 	let resolvedConfigDir: string;
 	let resolvedConfigFile: string | null = null;
 	let resolvedCommand: "build" | "serve" = "build";
-	// Opt-in OpenCookies consent scanner (PS-19). Stays null unless
+	// Opt-in PolicyStack Consent consent scanner (PS-19). Stays null unless
 	// `options.consent` is set, so existing policy-only users see no change.
 	let consentLogger: Logger | null = null;
 	let consentMode: Mode = "warn";
@@ -420,7 +420,7 @@ export function policyStack(options: PolicyStackOptions = {}): Plugin {
 					}
 				}
 			}
-			// Co-located OpenCookies consent reporting (PS-19 → PS-25: now from
+			// Co-located PolicyStack Consent consent reporting (PS-19 → PS-25: now from
 			// the same unified walk). Runs *after* policy validation, so a
 			// policy `this.error()` abort still short-circuits it. Reports
 			// through Vite's logger; only `buildEnd` fails the build.
@@ -453,7 +453,7 @@ export function policyStack(options: PolicyStackOptions = {}): Plugin {
 							});
 						}
 					} catch (error) {
-						server.config.logger.error(`[opencookies] consent rescan failed: ${error}`);
+						server.config.logger.error(`[policystack] consent rescan failed: ${error}`);
 					}
 				}
 				const tracked = isTrackedSource(file);
@@ -491,7 +491,7 @@ export function policyStack(options: PolicyStackOptions = {}): Plugin {
 			const loc = formatHitLocation(first.hit, resolvedRoot);
 			const summary = formatUngated(first, resolvedRoot);
 			const more = result.ungated.length > 1 ? ` (+${result.ungated.length - 1} more)` : "";
-			throw new Error(`[opencookies] ungated finding at ${loc}${more}\n${summary}`);
+			throw new Error(`[policystack] ungated finding at ${loc}${more}\n${summary}`);
 		},
 	};
 }

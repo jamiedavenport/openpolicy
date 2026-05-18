@@ -1,6 +1,6 @@
 # `@policystack/core`
 
-> Compilation engine for [OpenPolicy](https://openpolicy.sh) policy documents.
+> Compilation engine for [PolicyStack](https://policystack.dev) policy documents.
 
 This is an internal package used by `@policystack/sdk`, `@policystack/vite`, and `@policystack/cli`. You generally do not need to install or import it directly.
 
@@ -42,5 +42,5 @@ for (const result of results) {
 ## Links
 
 - [GitHub](https://github.com/jamiedavenport/openpolicy)
-- [openpolicy.sh](https://openpolicy.sh)
+- [policystack.dev](https://policystack.dev)
 - [npm](https://www.npmjs.com/package/@policystack/core)

@@ -114,12 +114,12 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 
 						<div className="flex items-center gap-3">
 							<a
-								href="https://openpolicy.sh"
+								href="https://policystack.dev"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-sm text-muted-foreground hover:text-foreground transition-colors"
 							>
-								openpolicy.sh
+								policystack.dev
 							</a>
 							<a
 								href="https://github.com/jamiedavenport/openpolicy"
@@ -141,7 +141,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 						<span>
 							Built with{" "}
 							<a
-								href="https://openpolicy.sh"
+								href="https://policystack.dev"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="hover:text-foreground transition-colors underline underline-offset-2"

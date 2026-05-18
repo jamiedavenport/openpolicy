@@ -1,7 +1,7 @@
 {
 	"name": "@policystack/angular",
 	"version": "0.0.34",
-	"description": "Angular consent service and components for OpenPolicy",
+	"description": "Angular consent service and components for PolicyStack",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",

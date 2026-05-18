@@ -50,7 +50,7 @@ export function toPolicyStackConsentConfig(
 	// individual trigger via `options.triggers`.
 	const triggers = { policyVersionChanged: true, ...options?.triggers };
 	// PS-26: one shared Locale — the policy's canonical Locale flows into the
-	// OpenCookies config so policy text and consent UI agree. An explicit
+	// PolicyStack Consent config so policy text and consent UI agree. An explicit
 	// options.locale still wins (same override convention as policyVersion).
 	const locale = options?.locale ?? policy.locale;
 	return {

@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
 import { policyStack } from "../index";
 
 // Proves PS-19's core invariant: ONE plugin object carries both rule sets.
-// The OpenCookies consent scan is folded into the same `policyStack()` plugin
+// The PolicyStack Consent consent scan is folded into the same `policyStack()` plugin
 // (no second exported plugin) and is opt-in via the `consent` option.
 
 type AnyFn = (...args: unknown[]) => unknown;

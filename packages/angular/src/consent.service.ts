@@ -10,11 +10,11 @@ import type {
 	RepromptReason,
 	Route,
 } from "@policystack/core/consent";
-import { OPEN_COOKIES_STORE } from "./tokens";
+import { POLICYSTACK_CONSENT_STORE } from "./tokens";
 
 @Injectable({ providedIn: "root" })
 export class ConsentService {
-	private readonly store: ConsentStore = inject(OPEN_COOKIES_STORE);
+	private readonly store: ConsentStore = inject(POLICYSTACK_CONSENT_STORE);
 	private readonly _state = signal<ConsentState>(this.store.getState());
 
 	readonly state: Signal<ConsentState> = this._state.asReadonly();

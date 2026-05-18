@@ -1,4 +1,4 @@
-export { OpenCookiesError } from "./errors";
+export { PolicyStackConsentError } from "./errors";
 export type { PolicyStackConsentErrorCode } from "./errors";
 export { evaluate } from "./expr";
 export { GPC_LEGALLY_REQUIRED_JURISDICTIONS, applyGPC, gpcApplies, readGPCSignal } from "./gpc";

@@ -187,11 +187,11 @@ export function createConsentStore(config: PolicyStackConsentConfig): ConsentSto
 			const result = config.adapter.write(record);
 			if (isPromise(result)) {
 				result.catch((err) => {
-					console.warn("[opencookies] adapter.write failed:", err);
+					console.warn("[policystack] adapter.write failed:", err);
 				});
 			}
 		} catch (err) {
-			console.warn("[opencookies] adapter.write failed:", err);
+			console.warn("[policystack] adapter.write failed:", err);
 		}
 	}
 
@@ -374,7 +374,7 @@ function isPromise<T>(value: unknown): value is Promise<T> {
 }
 
 function warnResolverError(err: unknown): void {
-	console.warn("[opencookies] jurisdiction resolver failed:", err);
+	console.warn("[policystack] jurisdiction resolver failed:", err);
 }
 
 type InitialRecord = {
@@ -388,14 +388,14 @@ function readSync(config: PolicyStackConsentConfig, locale: string): InitialReco
 	try {
 		result = config.adapter.read();
 	} catch (err) {
-		console.warn("[opencookies] adapter.read failed:", err);
+		console.warn("[policystack] adapter.read failed:", err);
 		return { value: null, pending: null };
 	}
 	if (isPromise(result)) {
 		const pending = result
 			.then((raw) => fromUnknown(raw, locale))
 			.catch((err) => {
-				console.warn("[opencookies] adapter.read failed:", err);
+				console.warn("[policystack] adapter.read failed:", err);
 				return null;
 			});
 		return { value: null, pending };

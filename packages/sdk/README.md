@@ -2,9 +2,9 @@
 
 > TypeScript SDK for defining privacy and cookie policies as code.
 
-Part of [OpenPolicy](https://openpolicy.sh) — a policy-as-code framework that compiles legal agreements from TypeScript at build time.
+Part of [PolicyStack](https://policystack.dev) — a policy-as-code framework that compiles legal agreements from TypeScript at build time.
 
-> **Not legal advice.** OpenPolicy generates policy documents from your config. It does not provide legal advice. Have a lawyer review your policies before publication. See the [legal notice](https://openpolicy.sh/legal-notice).
+> **Not legal advice.** PolicyStack generates policy documents from your config. It does not provide legal advice. Have a lawyer review your policies before publication. See the [legal notice](https://policystack.dev/legal-notice).
 
 ## Install
 
@@ -87,14 +87,14 @@ export default defineConfig({
 
 The SDK exports types and helper functions for _defining_ policies. To render them in your app, pair it with one of:
 
-- **[`@policystack/react`](https://docs.openpolicy.sh)** — `<PrivacyPolicy />` / `<CookiePolicy />` components for React
-- **[`@policystack/vue`](https://docs.openpolicy.sh)** — Vue 3 components
-- **[`@policystack/vite`](https://docs.openpolicy.sh)** — Vite plugin that scans source for `collecting()` / `thirdParty()` annotations at build time
-- **[`@policystack/cli`](https://docs.openpolicy.sh/cli)** — one-command project setup: installs the right packages, scaffolds a config, and prints a prompt for your coding agent
+- **[`@policystack/react`](https://policystack.dev/docs)** — `<PrivacyPolicy />` / `<CookiePolicy />` components for React
+- **[`@policystack/vue`](https://policystack.dev/docs)** — Vue 3 components
+- **[`@policystack/vite`](https://policystack.dev/docs)** — Vite plugin that scans source for `collecting()` / `thirdParty()` annotations at build time
+- **[`@policystack/cli`](https://policystack.dev/docs/cli)** — one-command project setup: installs the right packages, scaffolds a config, and prints a prompt for your coding agent
 
 ## Documentation
 
-Full field reference and guides: [openpolicy.sh/docs](https://openpolicy.sh/docs)
+Full field reference and guides: [policystack.dev/docs](https://policystack.dev/docs)
 
 ## AI Agents
 
@@ -110,5 +110,5 @@ For Claude Code, install the PolicyStack skill pack — guided procedures for se
 ## Links
 
 - [GitHub](https://github.com/jamiedavenport/openpolicy)
-- [openpolicy.sh](https://openpolicy.sh)
+- [policystack.dev](https://policystack.dev)
 - [npm](https://www.npmjs.com/package/@policystack/sdk)

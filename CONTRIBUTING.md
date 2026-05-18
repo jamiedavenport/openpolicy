@@ -1,4 +1,4 @@
-# Contributing to OpenPolicy
+# Contributing to PolicyStack
 
 ## Setup
 

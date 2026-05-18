@@ -7,7 +7,7 @@ import { isConsentGated } from "./types";
 
 /**
  * The single validator over the flat, public {@link PolicyStackConfig} — the
- * shape users write via `defineConfig()` and the shape PolicyCloud (§9)
+ * shape users write via `defineConfig()` and the shape PolicyStack Cloud (§9)
  * receives. `consentMechanism` is {@link deriveConsentMechanism | derived}
  * from the cookie posture at entry so the consent checks always see the
  * effective value, never an author's hand-written one. Seeding (`company.*`

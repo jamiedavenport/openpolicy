@@ -13,10 +13,10 @@ import {
 } from "@policystack/core/consent";
 import { getContext, onDestroy, setContext } from "svelte";
 
-const CONTEXT_KEY = Symbol("opencookies");
+const CONTEXT_KEY = Symbol("policystack-consent");
 
 const NOT_PROVIDED =
-	"getConsent / getCategory / <ConsentGate> must be used inside a component tree where setOpenCookiesContext({ config }) was called";
+	"getConsent / getCategory / <ConsentGate> must be used inside a component tree where setPolicyStackConsentContext({ config }) was called";
 
 export class ConsentRune {
 	#store: ConsentStore;
@@ -108,7 +108,7 @@ export type SetContextOptions =
 	| { config: PolicyStackConsentConfig; store?: undefined }
 	| { store: ConsentStore; config?: undefined };
 
-export function setOpenCookiesContext(options: SetContextOptions): ConsentRune {
+export function setPolicyStackConsentContext(options: SetContextOptions): ConsentRune {
 	const store = options.store ?? createConsentStore(options.config);
 	const rune = new ConsentRune(store);
 	const unsubscribe = store.subscribe((next) => rune._setState(next));

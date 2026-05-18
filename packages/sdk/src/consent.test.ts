@@ -187,7 +187,7 @@ test("options.triggers merges over the policyVersionChanged default", () => {
 	expect(config.triggers?.jurisdictionChanged).toBe(true);
 });
 
-test("carries policy.locale into the OpenCookies config (one shared Locale)", () => {
+test("carries policy.locale into the PolicyStack Consent config (one shared Locale)", () => {
 	const config = toPolicyStackConsentConfig({ ...policy, locale: "fr" });
 	expect(config.locale).toBe("fr");
 });

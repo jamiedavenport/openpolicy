@@ -1,14 +1,14 @@
-[![OpenPolicy](./images/banner.png)](https://openpolicy.sh)
+[![PolicyStack](./images/banner.png)](https://policystack.dev)
 
 # Overview
 
-OpenPolicy turns TypeScript config files into privacy and cookie policies. Define your policy once and render it directly as React components. Includes a consent-aware cookie banner powered by a shadcn registry component.
+PolicyStack turns TypeScript config files into privacy and cookie policies. Define your policy once and render it directly as React components. Includes a consent-aware cookie banner powered by a shadcn registry component.
 
-- [Homepage](https://openpolicy.sh)
-- [Blog](https://openpolicy.sh/blog)
-- [Documentation](https://docs.openpolicy.sh)
+- [Homepage](https://policystack.dev)
+- [Blog](https://policystack.dev/blog)
+- [Documentation](https://policystack.dev/docs)
 
-> **Not legal advice.** OpenPolicy generates policy documents from your config. It does not provide legal advice. Have a lawyer review your policies before publication. See the [legal notice](https://openpolicy.sh/legal-notice).
+> **Not legal advice.** PolicyStack generates policy documents from your config. It does not provide legal advice. Have a lawyer review your policies before publication. See the [legal notice](https://policystack.dev/legal-notice).
 
 # Contributors
 

@@ -1,6 +1,6 @@
 # `@policystack/vite`
 
-> Vite plugin that scans source files for [OpenPolicy](https://openpolicy.sh) `collecting()`, `thirdParty()`, `defineCookie()`, and `sharing()` calls and populates the SDK's auto-collected registry at build time.
+> Vite plugin that scans source files for [PolicyStack](https://policystack.dev) `collecting()`, `thirdParty()`, `defineCookie()`, and `sharing()` calls and populates the SDK's auto-collected registry at build time.
 
 At `buildStart` the plugin walks your `srcDir`, extracts every `collecting()` / `thirdParty()` / `defineCookie()` / `sharing()` call from `@policystack/sdk`, and emits the merged result (`dataCollected` / `thirdParties` / `cookies` / `sharing`) into the on-disk `policystack.gen.ts` your config imports. `sharing(key, recipient, value)` marks personal data _leaving_ to a third party at the egress point — the data-flow edge that feeds the CCPA/CPRA sell/share posture, distinct from `thirdParty()` which only declares that a vendor exists.
 
@@ -17,10 +17,10 @@ bun add @policystack/sdk
 ```ts
 // vite.config.ts
 import { defineConfig } from "vite";
-import { openPolicy } from "@policystack/vite";
+import { policyStack } from "@policystack/vite";
 
 export default defineConfig({
-	plugins: [openPolicy()],
+	plugins: [policyStack()],
 });
 ```
 
@@ -42,7 +42,7 @@ Astro users: add it the same way under `vite.plugins` in `astro.config.mjs`.
 
 When `validate` is `true`, the plugin runs the single `validate()` from
 `@policystack/core` against your resolved config after every scan and reports
-each [`IssueCode`](https://docs.openpolicy.sh) once:
+each [`IssueCode`](https://policystack.dev/docs) once:
 
 - In **`vite build`**, errors abort the build (`PluginContext.error`); warnings
   are reported (`PluginContext.warn`) but never block.
@@ -62,7 +62,7 @@ in this order:
    but still never crash HMR.
 
 ```ts
-openPolicy({
+policyStack({
 	strict: true, // warnings now fail `vite build`
 	suppress: ["company-dpo-undeclared"], // …except this one, which we accept
 });
@@ -70,10 +70,10 @@ openPolicy({
 
 ## Documentation
 
-[openpolicy.sh/docs](https://docs.openpolicy.sh)
+[policystack.dev/docs](https://policystack.dev/docs)
 
 ## Links
 
 - [GitHub](https://github.com/jamiedavenport/openpolicy)
-- [openpolicy.sh](https://openpolicy.sh)
+- [policystack.dev](https://policystack.dev)
 - [npm](https://www.npmjs.com/package/@policystack/vite)
