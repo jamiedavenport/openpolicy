@@ -1,5 +1,6 @@
+import { isJurisdictionId, type JurisdictionId } from "../../jurisdiction-id";
 import type { Locale } from "../../types";
-import type { ConsentRecord, ConsentRecordSource, ConsentState, Jurisdiction } from "../types";
+import type { ConsentRecord, ConsentRecordSource, ConsentState } from "../types";
 
 const RECORD_SOURCES: ReadonlySet<ConsentRecordSource> = new Set([
 	"banner",
@@ -84,8 +85,13 @@ function isDecisions(value: unknown): value is Record<string, boolean> {
 	return true;
 }
 
-function isJurisdiction(value: unknown): value is Jurisdiction {
-	return typeof value === "string" && value.length > 0;
+// Validate against the canonical closed union. A legacy stored record written
+// in the pre-canonical uppercase form ("EEA", "US-CA") no longer matches, so
+// its jurisdiction reads back as null — informational only; the
+// `jurisdictionChanged` reprompt trigger needs both sides non-null, so this
+// does not spuriously re-prompt an upgrading visitor (decisions are preserved).
+function isJurisdiction(value: unknown): value is JurisdictionId {
+	return typeof value === "string" && isJurisdictionId(value);
 }
 
 function isRecordSource(value: unknown): value is ConsentRecordSource {
