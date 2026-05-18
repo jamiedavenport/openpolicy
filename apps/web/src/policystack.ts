@@ -7,7 +7,7 @@ export default defineConfig({
 		name: "PolicyStack",
 		legalName: "PolicyStack Ltd",
 		address: "86-90 Paul Street, London, EC2A 4NE, United Kingdom",
-		contact: { email: "jamie@openpolicy.sh" },
+		contact: { email: "jamie@policystack.dev" },
 	},
 	effectiveDate: "2026-05-12",
 	jurisdictions: ["eea", "uk", "us-ca"],

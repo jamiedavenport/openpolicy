@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PrivacyPolicy, type PolicyComponents } from "@policystack/react/policy";
-import openpolicy from "../policystack";
+import policy from "../policystack";
 import { Highlight } from "../components/Highlight";
 import { pageMeta } from "../lib/seo";
 
@@ -106,7 +106,7 @@ function Privacy() {
 			<section>
 				<div className="mx-auto max-w-6xl px-8 py-16 md:py-24">
 					<article className="max-w-[72ch]">
-						<PrivacyPolicy config={openpolicy} components={policyComponents} />
+						<PrivacyPolicy config={policy} components={policyComponents} />
 					</article>
 				</div>
 			</section>

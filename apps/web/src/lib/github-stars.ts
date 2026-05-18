@@ -1,10 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 
-export type StarKey = "opencookies" | "openpolicy";
+export type StarKey = "consent" | "policy";
 
 const REPOS: Record<StarKey, string> = {
-	opencookies: "jamiedavenport/opencookies",
-	openpolicy: "jamiedavenport/openpolicy",
+	consent: "jamiedavenport/opencookies",
+	policy: "jamiedavenport/openpolicy",
 };
 
 async function request(repo: string, withAuth: boolean): Promise<Response> {
