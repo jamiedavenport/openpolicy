@@ -15,6 +15,15 @@ import { Sponsor } from "../components/Sponsor";
 import { highlight } from "../lib/shiki";
 import { getStars } from "../lib/github-stars";
 import { pageMeta } from "../lib/seo";
+import auvia from "../assets/auvia.svg?url";
+import planily from "../assets/planily.svg?url";
+import virentis from "../assets/virentis.svg?url";
+
+const LOGOS: Array<{ name: string; src: string; href: string }> = [
+	{ name: "Auvia", src: auvia, href: "https://www.auvia.io/" },
+	{ name: "Planily", src: planily, href: "https://planily.co.uk/" },
+	{ name: "Virentis", src: virentis, href: "https://www.virentis.uk/" },
+];
 
 const HERO_SNIPPET = `import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@policystack/sdk";
 
@@ -83,6 +92,7 @@ function Home() {
 	return (
 		<>
 			<Hero heroHtml={heroHtml} />
+			<UsedBy />
 			<Thesis />
 			<Products stars={stars} />
 			<ForAgents />
@@ -142,6 +152,50 @@ function Hero({ heroHtml }: { heroHtml: string }) {
 					<div className="min-w-0 md:h-112">
 						<BrowserPreview />
 					</div>
+				</div>
+			</div>
+		</section>
+	);
+}
+
+function LogoLink({
+	name,
+	src,
+	href,
+	className,
+}: {
+	name: string;
+	src: string;
+	href: string;
+	className?: string;
+}) {
+	return (
+		<a
+			href={href}
+			target="_blank"
+			rel="noopener noreferrer"
+			className="inline-flex shrink-0 opacity-80 transition hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+		>
+			<img src={src} alt={name} className={`w-auto grayscale ${className ?? "h-6 md:h-7"}`} />
+		</a>
+	);
+}
+
+function UsedBy() {
+	return (
+		<section className="border-b-2 border-black">
+			<div className="mx-auto max-w-6xl px-8 py-10 md:py-12">
+				<div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between md:gap-12">
+					<p className="shrink-0 text-xs tracking-wide text-mute uppercase">
+						Used by teams in production
+					</p>
+					<ul role="list" className="flex flex-wrap items-center gap-x-10 gap-y-6 md:justify-end">
+						{LOGOS.map((l) => (
+							<li key={l.name}>
+								<LogoLink name={l.name} src={l.src} href={l.href} />
+							</li>
+						))}
+					</ul>
 				</div>
 			</div>
 		</section>
