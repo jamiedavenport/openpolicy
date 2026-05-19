@@ -1,10 +1,6 @@
 import { expect, test } from "vite-plus/test";
-import {
-	compileCookiePolicy,
-	compilePrivacyPolicy,
-	isPolicyStackConfig,
-	shouldEmit,
-} from "./index";
+import { compileCookiePolicy, compilePrivacyPolicy, isPolicyStackConfig } from "./index";
+import { shouldEmit } from "./emit";
 import type { PolicyStackConfig } from "./types";
 
 const company = {

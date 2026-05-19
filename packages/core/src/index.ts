@@ -28,39 +28,15 @@ export type {
 	// `ProvenanceCode` (a different axis: why-a-node-exists, not diagnostics)
 	// stays internal to ./documents — nothing outside core consumes it.
 } from "./documents";
-export {
-	AST_VERSION,
-	bold,
-	cell,
-	headerCell,
-	headerRow,
-	heading,
-	italic,
-	li,
-	link,
-	ol,
-	p,
-	row,
-	section,
-	table,
-	text,
-	ul,
-	visit,
-} from "./documents";
+export { AST_VERSION, visit } from "./documents";
 export type {
 	ConsentModel,
 	JurisdictionCapability,
 	JurisdictionId,
 	JurisdictionTable,
 } from "./jurisdiction-id";
-export {
-	consentModelFor,
-	isJurisdictionId,
-	JURISDICTION_IDS,
-	JURISDICTION_TABLE,
-	resolveJurisdiction,
-} from "./jurisdiction-id";
-export { ISSUE_CODE_IDS, ISSUE_CODES } from "./issue-codes";
+export { isJurisdictionId, JURISDICTION_IDS, JURISDICTION_TABLE } from "./jurisdiction-id";
+export { ISSUE_CODES } from "./issue-codes";
 export type { IssueEntry } from "./issue-codes";
 export { CONTAINER_SLOTS, SLOT_NAMES } from "./slots";
 export type { ContainerSlotName, SlotName, SlotNodes } from "./slots";
@@ -69,7 +45,6 @@ export type {
 	AutomatedDecisionMaking,
 	ChildrenConfig,
 	CompanyConfig,
-	CompileOptions,
 	ConsentMechanism,
 	Contact,
 	CookieContext,
@@ -88,7 +63,6 @@ export type {
 	LegalBasis,
 	Locale,
 	PolicyStackConfig,
-	OutputFormat,
 	PolicyCategory,
 	ProvisionBasis,
 	ProvisionRequirement,
@@ -101,12 +75,11 @@ export { Contractual, ContractPrerequisite, Statutory, Voluntary } from "./provi
 export { computeCookieVersion, computePrivacyVersion } from "./policy-version";
 export { deriveUserRights } from "./user-rights";
 export { validate } from "./validate";
-export { deriveConsentMechanism, normalizePolicyStackConfig, seedCompany } from "./normalize";
+export { normalizePolicyStackConfig } from "./normalize";
 export { ISSUE_CATALOG } from "./issue-catalog";
 export type { IssueExplanation } from "./issue-catalog";
 export { createT, isLocale, LOCALES } from "./i18n";
 export type { Dictionary, T } from "./i18n";
-export { shouldEmit } from "./emit";
 
 import { AST_VERSION, compileCookieDocument, compilePrivacyDocument } from "./documents";
 import type { Document } from "./documents";

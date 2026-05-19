@@ -4,7 +4,6 @@ import type {
 	DocumentSection,
 	HeadingNode,
 	InlineNode,
-	ItalicNode,
 	LinkNode,
 	ListItemNode,
 	ListNode,
@@ -42,11 +41,6 @@ export const bold = (value: string, context?: NodeContext): BoldNode => ({
 	value,
 	...(context && { context }),
 });
-export const italic = (value: string, context?: NodeContext): ItalicNode => ({
-	type: "italic",
-	value,
-	...(context && { context }),
-});
 export const link = (href: string, value: string, context?: NodeContext): LinkNode => ({
 	type: "link",
 	href,
@@ -68,12 +62,6 @@ export const li = (
 });
 export const ul = (items: ListItemNode[], context?: NodeContext): ListNode => ({
 	type: "list",
-	items,
-	...(context && { context }),
-});
-export const ol = (items: ListItemNode[], context?: NodeContext): ListNode => ({
-	type: "list",
-	ordered: true,
 	items,
 	...(context && { context }),
 });

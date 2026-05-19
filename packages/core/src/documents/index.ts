@@ -1,22 +1,5 @@
 export { compileCookieDocument } from "./cookie";
 export { compilePrivacyDocument } from "./privacy";
-export {
-	bold,
-	cell,
-	headerCell,
-	headerRow,
-	heading,
-	italic,
-	li,
-	link,
-	ol,
-	p,
-	row,
-	section,
-	table,
-	text,
-	ul,
-} from "./helpers";
 export { AST_VERSION } from "./types";
 export type {
 	BoldNode,
