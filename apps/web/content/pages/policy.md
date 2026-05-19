@@ -20,7 +20,7 @@ export function PrivacyPolicyPage() {
 
 ## What you get
 
-- **Typed config** — `definePolicy()` gives you autocomplete and type errors when something is missing or stale.
+- **Typed config** — `defineConfig()` gives you autocomplete and type errors when something is missing or stale.
 - **React renderer** — Drop-in components for the policy page, individual sections, and per-purpose data tables.
 - **Markdown export** — Generate a static `.md` version for your repo, your docs site, or for the agents to consume.
 - **Multilingual** — Render the same config in French, German, Dutch, or Spanish. The `locale` prop lets one config emit multiple languages side-by-side.
@@ -58,14 +58,30 @@ Pass `locale` to `defineConfig` and the ~125 strings Policy emits — headings, 
 | Spanish | `es` |
 
 ```ts
-import { defineConfig } from "@policystack/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases } from "@policystack/sdk";
 
 export default defineConfig({
-	company: { name: "Acme, Inc." },
-	jurisdictions: ["eu", "fr"],
+	company: {
+		name: "Acme, Inc.",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA",
+		contact: { email: "privacy@acme.com" },
+	},
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["eea"],
 	locale: "fr",
 	data: {
-		/* ... */
+		collected: {
+			"Account Information": ["Name", "Email"],
+		},
+		context: {
+			"Account Information": {
+				purpose: "To authenticate users and send service notifications.",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot operate your account."),
+			},
+		},
 	},
 });
 ```
@@ -81,14 +97,28 @@ pnpm dlx @policystack/cli init
 ```
 
 ```ts
-import { defineConfig } from "@policystack/sdk";
+import { ContractPrerequisite, defineConfig, LegalBases } from "@policystack/sdk";
 
 export default defineConfig({
-	company: { name: "Acme, Inc." },
-	jurisdictions: ["eu", "us-ca"],
+	company: {
+		name: "Acme, Inc.",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA",
+		contact: { email: "privacy@acme.com" },
+	},
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["eea", "us-ca"],
 	data: {
 		collected: {
 			"Account Information": ["Name", "Email"],
+		},
+		context: {
+			"Account Information": {
+				purpose: "To authenticate users and send service notifications.",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot operate your account."),
+			},
 		},
 	},
 });

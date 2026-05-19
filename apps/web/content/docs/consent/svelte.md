@@ -9,7 +9,7 @@ Svelte adapter for Consent. Runes-first for Svelte 5; ships a `Readable<ConsentS
 ## Install
 
 ```sh
-bun add @policystack/core/consent @policystack/svelte/consent
+bun add @policystack/core @policystack/svelte
 ```
 
 Peer dependencies: `svelte >= 4`.

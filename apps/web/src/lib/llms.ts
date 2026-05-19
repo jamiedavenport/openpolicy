@@ -81,13 +81,13 @@ export function renderLlmsTxt() {
 	const lines = [
 		"# PolicyStack",
 		"",
-		"> Open-source primitives for privacy and consent. PolicyStack turns your privacy and cookie policy into a typed TypeScript config that renders as React components or Markdown. PolicyStack Consent is a sub-4kb headless cookie-consent state machine with adapters for React, Vue, Solid, Svelte, and Angular. PolicyStack Cloud is the hosted control plane on top — policy versioning, audit trails, and consent analytics.",
+		"> Open-source primitives for privacy and consent. Policy turns your privacy and cookie policy into a typed TypeScript config that renders as React components or Markdown. Consent is a sub-4kb headless cookie-consent state machine with adapters for React, Vue, Solid, Svelte, and Angular. Cloud is the hosted control plane on top — policy versioning, audit trails, and consent analytics.",
 		"",
 		"## Products",
 		"",
-		`- [PolicyStack](${SITE}/policy.md): TypeScript-defined privacy policies, rendered with framework-native components`,
-		`- [PolicyStack Consent](${SITE}/consent.md): Sub-4kb headless cookie-consent state machine`,
-		`- [PolicyStack Cloud](${SITE}/cloud.md): Hosted policy versioning and consent analytics (early access)`,
+		`- [Policy](${SITE}/policy.md): TypeScript-defined privacy policies, rendered with framework-native components`,
+		`- [Consent](${SITE}/consent.md): Sub-4kb headless cookie-consent state machine`,
+		`- [Cloud](${SITE}/cloud.md): Hosted policy versioning and consent analytics (early access)`,
 		"",
 		"## SDK",
 		"",
@@ -99,18 +99,18 @@ export function renderLlmsTxt() {
 
 	if (indexDoc) {
 		lines.push(
-			`- [Documentation home](${SITE}/docs.md): ${indexDoc.description ?? "Reference for PolicyStack and PolicyStack Consent"}`,
+			`- [Documentation home](${SITE}/docs.md): ${indexDoc.description ?? "Reference for Policy and Consent"}`,
 		);
 	}
 	lines.push("");
 
 	if (policyDocs.length) {
-		lines.push("### PolicyStack docs", "");
+		lines.push("### Policy docs", "");
 		for (const doc of policyDocs) lines.push(formatDocLink(doc));
 		lines.push("");
 	}
 	if (consentDocs.length) {
-		lines.push("### PolicyStack Consent docs", "");
+		lines.push("### Consent docs", "");
 		for (const doc of consentDocs) lines.push(formatDocLink(doc));
 		lines.push("");
 	}

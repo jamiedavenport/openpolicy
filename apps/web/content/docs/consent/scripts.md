@@ -11,7 +11,7 @@ Each integration is its own subpath export, so only the ones you import end up i
 ## Install
 
 ```sh
-npm install @policystack/core/consent @policystack/scripts
+npm install @policystack/core @policystack/scripts
 ```
 
 ## Usage

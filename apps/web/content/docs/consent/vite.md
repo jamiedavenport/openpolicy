@@ -9,42 +9,40 @@ Vite plugin for Consent. Runs `@policystack/vite` against your source on dev sta
 ## Install
 
 ```sh
-bun add -D @policystack/vite @policystack/vite @policystack/core/consent
+bun add -D @policystack/vite
 ```
 
 ## Usage
 
+`@policystack/vite` exports a single `policyStack()` plugin that serves both products. The cookie scanner is opt-in via the `consent` option — pass it and the plugin scans your source for ungated cookie writes and vendor scripts in addition to its policy duties:
+
 ```ts
 // vite.config.ts
 import { defineConfig } from "vite";
-import { openCookies } from "@policystack/vite";
+import { policyStack } from "@policystack/vite";
 
 export default defineConfig({
 	plugins: [
-		openCookies({
-			config: {
-				categories: [
-					{ key: "necessary", label: "Necessary", locked: true },
-					{ key: "analytics", label: "Analytics" },
-					{ key: "marketing", label: "Marketing" },
-				],
-			},
+		policyStack({
+			consent: { mode: "warn" },
 		}),
 	],
 });
 ```
 
+The categories the scanner checks against are derived from the `cookies` block of your `policystack.ts` — there is no separate categories array to maintain here.
+
 ## Options
 
-| Option     | Type                         | Default                             | Description                                                                                                                                     |
-| ---------- | ---------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `config`   | `PolicyStackConsentConfig`   | required                            | The runtime consent config used at runtime. The plugin uses `categories[].key` to know which categories are covered when `autoSync` is enabled. |
-| `mode`     | `"warn" \| "error" \| "off"` | `"warn"` in dev, `"error"` in build | Controls how findings are reported. `error` causes `vite build` to fail when ungated findings remain. `off` skips scanning entirely.            |
-| `include`  | `string[]`                   | scanner default                     | Forwarded to the scanner.                                                                                                                       |
-| `exclude`  | `string[]`                   | scanner default                     | Forwarded to the scanner.                                                                                                                       |
-| `rules`    | `Rule[]`                     | `defaultRules`                      | Override the rule set.                                                                                                                          |
-| `vendors`  | `VendorRegistry`             | `defaultVendors`                    | Override the vendor registry.                                                                                                                   |
-| `autoSync` | `boolean`                    | `false`                             | When true, prints a copy-pasteable list of vendor categories that are missing from your `config.categories`.                                    |
+These are the keys of the plugin's `consent` option:
+
+| Option    | Type                         | Default                             | Description                                                                                                                 |
+| --------- | ---------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `mode`    | `"warn" \| "error" \| "off"` | `"warn"` in dev, `"error"` in build | Controls how findings are reported. `error` causes `vite build` to fail when ungated findings remain. `off` skips scanning. |
+| `include` | `string[]`                   | scanner default                     | Glob(s) of files to scan.                                                                                                   |
+| `exclude` | `string[]`                   | scanner default                     | Glob(s) to exclude from the scan.                                                                                           |
+
+For custom rules or a custom vendor registry, call the scanner library directly — see [`@policystack/vite/consent`](/docs/consent/scanner).
 
 ## Modes
 
@@ -59,7 +57,7 @@ Each ungated finding is printed as:
 ```
 [policystack] ungated google-analytics (analytics) call via global at src/app.tsx:12:3
   Rule: vendor-imports
-  Fix: wrap call sites in <ConsentGate category="…"> or guard with store.has("category")
+  Fix: wrap call sites in <ConsentGate requires="…"> or guard with store.has("category")
   Suppress: // consent-ignore-next-line
 ```
 
@@ -68,10 +66,6 @@ A summary line follows: `[policystack] N cookies, M vendors, K ungated`.
 ## HMR
 
 On every save, the plugin re-runs the scanner against the changed file only (no full project re-scan). Findings added or cleared by the edit are logged inline. The incremental path stays under 50 ms on typical files.
-
-## autoSync
-
-`autoSync: true` flags vendor categories your scan detected that are not yet declared in `config.categories`. The plugin prints a suggested snippet — it does not write to disk. Persisted sync (writing to your config file) is handled by `@policystack/cli`.
 
 ## Suppression
 
@@ -94,7 +88,7 @@ Compatible with Vite 5 and 6. Framework-agnostic — works with React, Vue, Svel
 
 ## See also
 
-- [`@policystack/vite`](/docs/consent/scanner) — underlying detection engine, suppression syntax, custom rules
+- [`@policystack/vite/consent`](/docs/consent/scanner) — underlying detection engine, suppression syntax, custom rules
 - [`@policystack/core/consent`](/docs/consent/core) — runtime store and `<ConsentGate>` / `has()` shapes the scanner looks for
 - [Framework adapters](../../#packages) — React, Vue, Solid, Svelte
 

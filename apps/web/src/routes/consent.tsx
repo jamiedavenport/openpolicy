@@ -24,7 +24,7 @@ export function App() {
   );
 }`;
 
-const INSTALL_SNIPPET = `pnpm add @policystack/core/consent @policystack/react/consent`;
+const INSTALL_SNIPPET = `pnpm add @policystack/core @policystack/react`;
 
 const USE_SNIPPET = `import { useConsent } from "@policystack/react/consent";
 
@@ -43,7 +43,7 @@ export const Route = createFileRoute("/consent")({
 	head: (ctx) =>
 		pageMeta(
 			{
-				title: "PolicyStack Consent — a headless consent state machine | PolicyStack",
+				title: "Consent — a headless consent state machine | PolicyStack",
 				description:
 					"Sub-4kb headless consent state machine with adapters for React, Vue, Solid, Svelte, and Angular. A Vite plugin flags ungated cookies at dev time.",
 				path: "/consent",
@@ -70,7 +70,7 @@ function ConsentPage() {
 		<>
 			<ProductHero
 				slug="consent"
-				version="sub-4kb · pre-1.0"
+				version="sub-4kb · v1.0"
 				title={
 					<>
 						A <Highlight>headless</Highlight> consent state machine.
@@ -78,7 +78,7 @@ function ConsentPage() {
 				}
 				body="Tiny core. Adapters for every major framework. A Vite plugin that yells at you when a script sets a cookie behind a category the user hasn’t accepted yet."
 				primary={{
-					label: "pnpm add @policystack/react/consent",
+					label: "pnpm add @policystack/core @policystack/react",
 					href: "#install",
 					icon: "arrow-right",
 				}}
@@ -142,7 +142,7 @@ function ConsentPage() {
 					{ tag: "bash", html: installHtml },
 					{ tag: "CookieBanner.tsx", html: useHtml },
 				]}
-				next={{ to: "/policy", label: "Already using PolicyStack? Wire them together" }}
+				next={{ to: "/policy", label: "Already using Policy? Wire them together" }}
 			/>
 
 			<Sponsor index="04" />

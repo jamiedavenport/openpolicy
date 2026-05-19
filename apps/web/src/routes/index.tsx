@@ -16,22 +16,44 @@ import { highlight } from "../lib/shiki";
 import { getStars } from "../lib/github-stars";
 import { pageMeta } from "../lib/seo";
 
-const HERO_SNIPPET = `import { defineConfig, LegalBases } from "@policystack/sdk";
+const HERO_SNIPPET = `import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@policystack/sdk";
 
 export default defineConfig({
   company: {
     name: "Acme, Inc.",
+    legalName: "Acme, Inc.",
+    address: "123 Main St, San Francisco, CA",
     contact: { email: "privacy@acme.com" },
   },
-  jurisdictions: ["eu", "us-ca"],
+  effectiveDate: "2026-01-01",
+  jurisdictions: ["eea", "us-ca"],
   data: {
     collected: {
       "Account Information": ["Name", "Email"],
       "Usage Data": ["Pages visited", "IP address"],
     },
+    context: {
+      "Account Information": {
+        purpose: "To authenticate users and send service notifications.",
+        lawfulBasis: LegalBases.Contract,
+        retention: "Until account deletion",
+        provision: ContractPrerequisite("We cannot operate your account."),
+      },
+      "Usage Data": {
+        purpose: "To understand product usage and improve the service.",
+        lawfulBasis: LegalBases.LegitimateInterests,
+        retention: "90 days",
+        provision: Voluntary("None — your service is unaffected."),
+      },
+    },
   },
   cookies: {
     used: { essential: true, analytics: true, marketing: true },
+    context: {
+      essential: { lawfulBasis: LegalBases.LegalObligation },
+      analytics: { lawfulBasis: LegalBases.Consent },
+      marketing: { lawfulBasis: LegalBases.Consent },
+    },
   },
 });`;
 
@@ -85,7 +107,7 @@ function Hero({ heroHtml }: { heroHtml: string }) {
 	return (
 		<section className="border-b-2 border-black">
 			<div className="mx-auto max-w-6xl px-8 pt-32 pb-32 md:pt-40 md:pb-40">
-				<SectionMarker index="00" label="open source · v0" />
+				<SectionMarker index="00" label="open source · v1" />
 				<h1 className="mt-12 max-w-[18ch] text-5xl font-medium tracking-tight text-balance md:text-7xl">
 					Privacy &amp; consent, <Highlight>as primitives.</Highlight>
 				</h1>
@@ -268,8 +290,8 @@ function Products({ stars }: { stars: { consent: number | null; policy: number |
 					Use one. Use <Highlight>all three.</Highlight>
 				</h2>
 				<p className="mt-8 max-w-[60ch] text-lg text-pretty text-mute">
-					Each repo is independently useful and Apache-2.0 licensed. PolicyStack Cloud sits on top
-					when you want a hosted control plane.
+					Each repo is independently useful and Apache-2.0 licensed. Cloud sits on top when you want
+					a hosted control plane.
 				</p>
 
 				<dl className="mt-20 grid border-2 border-black md:grid-cols-3">
@@ -288,7 +310,7 @@ function Products({ stars }: { stars: { consent: number | null; policy: number |
 						slug="policy"
 						title="Your policy as a typed config."
 						body="Define your privacy and cookie policy once in TypeScript. Render it as React components, or generate Markdown. Ships a shadcn-style consent banner."
-						tag="@policystack/react"
+						tag="@policystack/react/policy"
 						stars={stars.policy}
 					/>
 					<ProductCard
@@ -410,11 +432,11 @@ function ClaudeTerminal() {
 				<p className="mt-5 text-white/50">
 					React + Vite detected. I’ll wire up{" "}
 					<span className="text-white/80">@policystack/react/consent</span> for the banner and{" "}
-					<span className="text-white/80">@policystack/react</span> for the policy page.
+					<span className="text-white/80">@policystack/react/policy</span> for the policy page.
 				</p>
 				<div className="mt-5 space-y-3 text-[0.78125rem]">
 					<TerminalStep
-						command="pnpm add @policystack/core/consent @policystack/react/consent"
+						command="pnpm add @policystack/core @policystack/react"
 						result="added 2 packages in 1.4s"
 					/>
 					<TerminalStep
@@ -487,12 +509,12 @@ function Philosophy() {
 		{
 			n: "04",
 			title: "Tiny",
-			body: "PolicyStack Consent core ships under 4kb gzipped. PolicyStack renders zero JS by default.",
+			body: "Consent core ships under 4kb gzipped. Policy renders zero JS by default.",
 		},
 		{
 			n: "05",
 			title: "Open source",
-			body: "Apache-2.0 across the board. PolicyStack Cloud is the only commercial piece, and it’s optional.",
+			body: "Apache-2.0 across the board. Cloud is the only commercial piece, and it’s optional.",
 		},
 		{
 			n: "06",

@@ -4,30 +4,36 @@ description: The canonical list of jurisdiction codes Policy accepts and what ea
 product: policy
 ---
 
-Policy uses ISO-style region codes for the `jurisdictions` field in your `policystack.ts`. Every code in the list below is **type-valid** — TypeScript will accept it and the runtime validator won't reject it. Only some of them currently trigger **shipped content** (jurisdiction-specific policy sections and user rights); the rest are reserved for future releases.
+Policy uses lowercase-kebab region codes for the `jurisdictions` field in your `policystack.ts`. The set is a **frozen, eleven-member union** as of 1.0 — `JurisdictionId`. TypeScript accepts only these codes and the runtime validator rejects anything else; there is no second enum and no migration alias.
 
-There is no `"us"` code. US privacy law is state-level — pick the specific state codes that apply to your users (today: `"us-ca"` for California). There are also no regulation-name aliases like `"gdpr"` or `"ccpa"` — use the region code the regulation applies to.
+There are no regulation-name aliases like `"gdpr"` or `"ccpa"` — use the region code the regulation applies to. The code for the EU/EEA is `"eea"`, not `"eu"`: GDPR applies EEA-wide.
 
 ## Codes
 
-| Code    | Region          | Regulation(s)      | 0.1.0 content |
-| ------- | --------------- | ------------------ | ------------- |
-| `eu`    | European Union  | GDPR               | ✅ shipped    |
-| `uk`    | United Kingdom  | UK-GDPR + DPA 2018 | ✅ shipped    |
-| `us-ca` | California, USA | CCPA / CPRA        | ✅ shipped    |
-| `us-va` | Virginia, USA   | VCDPA              | reserved      |
-| `us-co` | Colorado, USA   | CPA                | reserved      |
-| `br`    | Brazil          | LGPD               | reserved      |
-| `ca`    | Canada          | PIPEDA             | reserved      |
-| `au`    | Australia       | Privacy Act 1988   | reserved      |
-| `jp`    | Japan           | APPI               | reserved      |
-| `sg`    | Singapore       | PDPA               | reserved      |
+Every code is **type-valid**. Each one resolves to one of two tiers:
 
-**Shipped** means the renderer adds a jurisdiction-specific supplement section to your policy and derives the relevant user rights. **Reserved** means the code is accepted (so you can declare your regulatory surface now without a breaking change later) but no content renders for it yet.
+- **`specific`** — hand-authored, jurisdiction-precise policy text and user rights.
+- **`equivalent`** — posture-correct (opt-in vs. opt-out) with parent-jurisdiction text, plus a suppressible `jurisdiction-generic-policy-text` validator warning so the honesty gap is visible. A legitimate, shippable tier — a member's tier may be upgraded post-1.0 without a breaking change.
 
-## What each shipped code adds
+| Code    | Region                  | Regulation(s)               | Tier         |
+| ------- | ----------------------- | --------------------------- | ------------ |
+| `eea`   | European Economic Area  | GDPR                        | `specific`   |
+| `uk`    | United Kingdom          | UK-GDPR + PECR              | `specific`   |
+| `us-ca` | California, USA         | CCPA / CPRA                 | `specific`   |
+| `ch`    | Switzerland             | revFADP                     | `equivalent` |
+| `br`    | Brazil                  | LGPD                        | `equivalent` |
+| `ca`    | Canada                  | PIPEDA (+ Quebec Law 25)    | `equivalent` |
+| `us`    | United States (federal) | Federal baseline, opt-out   | `equivalent` |
+| `us-co` | Colorado, USA           | CPA                         | `equivalent` |
+| `us-ct` | Connecticut, USA        | CTDPA                       | `equivalent` |
+| `us-va` | Virginia, USA           | VCDPA                       | `equivalent` |
+| `row`   | Rest of world           | Conservative opt-in default | `equivalent` |
 
-### `eu` — GDPR
+US privacy law is state-level. `"us"` is the federal opt-out baseline; pick the specific state codes that apply to your users (e.g. `"us-ca"` for California) for state-precise text. The US state codes inherit text and posture from `"us"` as their parent.
+
+## What each `specific` code adds
+
+### `eea` — GDPR
 
 - **Legal basis** section (Article 13)
 - **GDPR supplemental disclosures** (data controller, transfer safeguards, complaint rights)
@@ -51,17 +57,17 @@ There is no `"us"` code. US privacy law is state-level — pick the specific sta
 When multiple codes apply, their content is combined — user rights are deduplicated and ordered canonically, and each jurisdiction-specific supplement renders once. For example:
 
 ```ts
-jurisdictions: ["eu", "uk", "us-ca"],
+jurisdictions: ["eea", "uk", "us-ca"],
 ```
 
 produces a policy with GDPR, UK-GDPR, and CCPA supplements, plus the union of all three rights sets.
 
 ## Validation
 
-The runtime validator rejects any code that isn't on the list above with a helpful error:
+The runtime validator rejects any code that isn't a member of the union with a helpful error:
 
 ```
-Unknown jurisdiction "us" — valid codes: eu, uk, us-ca, us-va, us-co, br, ca, au, jp, sg
+Unknown jurisdiction "eu" — valid codes: eea, uk, ch, br, ca, us, us-ca, us-co, us-ct, us-va, row
 ```
 
-If you upgrade from an earlier release and see this error, replace `"us"` with the specific state code your users are in (today, `"us-ca"`) and replace `"ca"` with `"us-ca"` if you meant California.
+If you are upgrading from a pre-1.0 release, the common migration is `"eu"` → `"eea"`. The codes `"au"`, `"jp"`, and `"sg"` are not part of the 1.0 union and are rejected — declare `"row"` for a conservative opt-in fallback if you serve those regions.

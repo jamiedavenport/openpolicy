@@ -89,14 +89,14 @@ function CookieBanner() {
 
 ```ts
 // vite.config.ts
-import openCookies from "@policystack/vite";
+import { policyStack } from "@policystack/vite";
 
 export default {
-	plugins: [openCookies({ mode: "warn" })],
+	plugins: [policyStack({ consent: { mode: "warn" } })],
 };
 ```
 
-The plugin scans your code for cookie writes and known third-party vendors, and flags any that aren't behind a `ConsentGate` or `has()` check.
+One plugin covers both products. The opt-in `consent` option turns on the cookie scanner: it scans your code for cookie writes and known third-party vendors, and flags any that aren't behind a `ConsentGate` or `has()` check.
 
 ## Packages
 
@@ -113,7 +113,7 @@ The plugin scans your code for cookie writes and known third-party vendors, and 
 | [`@policystack/cli`](/docs/consent/cli)               | Terminal UI for scans and config sync _(scaffold)_                                                  |
 | [`@policystack/scripts`](/docs/consent/scripts)       | Pre-built script integrations: GA4, Meta Pixel, PostHog, Segment, GTM, Hotjar                       |
 
-Until a docs site lands, each package README is the canonical reference. Shared concepts (categories, GPC, jurisdiction, re-consent triggers, script gating, storage adapters) live in [`@policystack/core/consent`](/docs/consent/core); the framework adapters are thin wrappers over it.
+Shared concepts (categories, GPC, jurisdiction, re-consent triggers, script gating, storage adapters) live in [`@policystack/core/consent`](/docs/consent/core); the framework adapters are thin wrappers over it.
 
 ## Companion to Policy
 
@@ -121,7 +121,7 @@ Consent pairs with [Policy](https://policystack.dev) for the full privacy story:
 
 ## Status
 
-Pre-1.0 and under active development. APIs may change before v1. Track progress on the [roadmap](https://github.com/jamiedavenport/policystack/issues).
+Stable as of 1.0 — the public surface (the consent store, expressions, and the slot contract) is frozen, and changes follow semver. Track progress on the [roadmap](https://github.com/jamiedavenport/policystack/issues).
 
 ## License
 

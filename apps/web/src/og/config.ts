@@ -19,25 +19,25 @@ const config = {
 		title: "A headless consent state machine.",
 		description: "policystack.dev/consent",
 		type: "website",
-		eyebrow: "OPENCOOKIES",
+		eyebrow: "CONSENT",
 	}),
 
 	"/policy": () => ({
 		title: "Your privacy policy as a typed config.",
 		description: "policystack.dev/policy",
 		type: "website",
-		eyebrow: "POLICYSTACK",
+		eyebrow: "POLICY",
 	}),
 
 	"/cloud": () => ({
 		title: "The hosted control plane for your policies.",
 		description: "policystack.dev/cloud",
 		type: "website",
-		eyebrow: "POLICYCLOUD",
+		eyebrow: "CLOUD",
 	}),
 
 	"/docs": () => ({
-		title: "PolicyStack and PolicyStack Consent documentation.",
+		title: "Policy and Consent documentation.",
 		description: "policystack.dev/docs",
 		type: "website",
 		eyebrow: "DOCS",

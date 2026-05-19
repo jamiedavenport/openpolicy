@@ -34,7 +34,7 @@ export default defineConfig({
 		contact: { email: "privacy@acme.com" },
 	},
 	effectiveDate: "2026-01-01",
-	jurisdictions: ["eu", "us-ca"],
+	jurisdictions: ["eea", "us-ca"],
 	data: {
 		collected: {
 			"Account Information": ["Name", "Email address"],
@@ -116,7 +116,7 @@ company: {
 },
 ```
 
-Omitting `dpo` emits a validation warning when `jurisdictions` includes `eu` or `uk`.
+Omitting `dpo` emits a validation warning when `jurisdictions` includes `eea` or `uk`.
 
 ### Automated decision-making and profiling
 
@@ -136,7 +136,7 @@ Omitting the field entirely emits a validation warning under EU/UK jurisdictions
 
 `data.collected` is a map of category label → fields. `data.context[category]` carries the per-category metadata: `purpose` (prose describing _why_ you process it — GDPR Article 13(1)(c)), `lawfulBasis` (the Article 6 basis), `retention` (how long you keep it), and `provision` (whether providing it is statutory, contractual, a contract-prerequisite, or voluntary, plus the consequences of failing to provide it — GDPR Article 13(2)(e)). The provision helpers `Statutory()`, `Contractual()`, `ContractPrerequisite()`, and `Voluntary()` from `@policystack/sdk` build the right shape from a consequences string. Every key in `data.collected` must appear in `data.context`; `defineConfig` enforces this at type-check time, and the `policyStack()` Vite plugin re-validates it at build time (see [Build-time validation](#build-time-validation)). When auto-collect is enabled, the plugin also emits `policystack.gen.ts` alongside your config (check it in) so the same constraint applies to scanned `collecting()` categories even without running Vite first.
 
-The user rights you're legally required to disclose (access, erasure, portability, etc.) are derived automatically from `jurisdictions` — declare `eu` or `uk` and you get the six GDPR rights, declare `us-ca` and you get the four CCPA rights, declare any combination and you get the union. There's no `userRights` field to set. See [Supported jurisdictions](/docs/policy/references/jurisdictions) for the full list of codes.
+The user rights you're legally required to disclose (access, erasure, portability, etc.) are derived automatically from `jurisdictions` — declare `eea` or `uk` and you get the six GDPR rights, declare `us-ca` and you get the four CCPA rights, declare any combination and you get the union. There's no `userRights` field to set. See [Supported jurisdictions](/docs/policy/references/jurisdictions) for the full list of codes.
 
 ### Policy versions
 
