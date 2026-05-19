@@ -105,6 +105,10 @@ test("thirdParty is a no-op that returns undefined", () => {
 	expect(thirdParty("Stripe", "Payments", "https://stripe.com/privacy")).toBeUndefined();
 });
 
+test("thirdParty accepts an omitted policyUrl (it is optional)", () => {
+	expect(thirdParty("Internal Queue", "Background jobs")).toBeUndefined();
+});
+
 test("defineCookie is a no-op that returns undefined", () => {
 	expect(defineCookie("analytics")).toBeUndefined();
 	expect(defineCookie("marketing")).toBeUndefined();

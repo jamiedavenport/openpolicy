@@ -112,7 +112,7 @@ export function sharing<T>(_key: string, _recipient: string, value: T): T {
  * "who we work with" recipient list. Place it next to the vendor's
  * initialisation. No-op at runtime; scanned at build time.
  */
-export function thirdParty(_name: string, _purpose: string, _policyUrl: string): void {}
+export function thirdParty(_name: string, _purpose: string, _policyUrl?: string): void {}
 
 /**
  * Declares a consent category at its use site. No-op at runtime; scanned at

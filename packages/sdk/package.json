@@ -28,9 +28,8 @@
 	},
 	"scripts": {
 		"dev": "vp pack --watch",
-		"build": "vp pack && vp run gen:llms && vp run gen:skills",
-		"gen:llms": "node scripts/gen-llms.mjs",
-		"gen:skills": "node scripts/gen-skills.mjs",
+		"build": "vp pack && vp run gen",
+		"gen": "node scripts/gen.mjs",
 		"check-types": "tsc --noEmit",
 		"test": "vp test"
 	},
