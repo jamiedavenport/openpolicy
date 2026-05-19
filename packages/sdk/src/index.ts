@@ -57,13 +57,11 @@ export type {
 	ScannedCookieKeys,
 	ScannedSharingKeys,
 } from "./auto-collected";
-export { Compliance } from "./compliance";
-export { DataCategories, LegalBases, Retention } from "./data";
 export { describeJurisdiction, describeLawfulBasis } from "./describe";
 export type { JurisdictionDescription, LawfulBasisDescription } from "./describe";
 export { renderLlmsTxt } from "./llms";
 export { collecting, defineCookie, Ignore, sharing, thirdParty } from "./markers";
-export { Providers } from "./providers";
+export { Compliance, DataCategories, LegalBases, Providers, Retention } from "./presets";
 export { renderSkillPack } from "./skills";
 export type { SkillFile } from "./skills";
 

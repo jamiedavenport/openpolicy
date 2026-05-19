@@ -7,7 +7,7 @@ import { renderSkillPack } from "./skills";
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, "..", "..", "..");
 
-test("the shipped plugin tree is in sync with renderSkillPack() — run `vp run gen:skills`", () => {
+test("the shipped plugin tree is in sync with renderSkillPack() — run `vp run gen`", () => {
 	for (const { path, content } of renderSkillPack()) {
 		expect(readFileSync(join(repoRoot, path), "utf8"), `${path} is stale`).toBe(content);
 	}

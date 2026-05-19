@@ -7,7 +7,7 @@ import { renderLlmsTxt } from "./llms";
 const here = dirname(fileURLToPath(import.meta.url));
 const shipped = join(here, "..", "llms.txt");
 
-test("shipped llms.txt is in sync with renderLlmsTxt() — run `vp run gen:llms`", () => {
+test("shipped llms.txt is in sync with renderLlmsTxt() — run `vp run gen`", () => {
 	expect(readFileSync(shipped, "utf8")).toBe(renderLlmsTxt());
 });
 

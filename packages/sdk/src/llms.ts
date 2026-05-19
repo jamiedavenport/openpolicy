@@ -1,8 +1,6 @@
 import { LAWFUL_BASIS_CONSENT_GATED, type LegalBasis, LOCALES } from "@policystack/core";
-import { Compliance } from "./compliance";
-import { DataCategories, LegalBases, Retention } from "./data";
 import { describeLawfulBasis, jurisdictionSummaryLines } from "./describe";
-import { Providers } from "./providers";
+import { Compliance, DataCategories, LegalBases, Providers, Retention } from "./presets";
 
 /**
  * The canonical `llms.txt` SDK reference, **generated from the live SDK and
@@ -10,7 +8,7 @@ import { Providers } from "./providers";
  *
  * One source of truth, shipped three ways:
  *   1. `@policystack/sdk` ships `llms.txt` (this function, snapshotted by
- *      `scripts/gen-llms.mjs`; guarded by `llms.test.ts`).
+ *      `scripts/gen.mjs`; guarded by `llms.test.ts`).
  *   2. `apps/web` serves it at `/sdk.txt` by calling this function.
  *   3. The CLI writes it into the user's project on `init` and points the
  *      agent prompt at that local file.
@@ -197,7 +195,7 @@ Static-analysis markers (return their value unchanged; scanned at build time):
   use \`Ignore\` as a label to exclude a field
 - \`sharing(key, recipient, value)\` — record a data-egress edge (the CCPA
   sell/share signal), wrap the outbound payload
-- \`thirdParty(name, purpose, policyUrl)\` — declare a vendor exists
+- \`thirdParty(name, purpose, policyUrl?)\` — declare a vendor exists
 - \`defineCookie(category)\` — declare a consent category at its use site
 
 Presets (optional convenience — plain objects/strings, spread or reference):
