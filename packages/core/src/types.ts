@@ -5,10 +5,6 @@ import type { JurisdictionId } from "./jurisdiction-id";
 // value import would break it.
 import type { PolicyStackConsentOptions } from "./consent/types";
 
-export type OutputFormat = "markdown" | "html" | "pdf";
-
-export type CompileOptions = { formats: OutputFormat[] };
-
 export type PolicyCategory = "privacy" | "cookie";
 
 // Languages PolicyStack knows how to emit. User-supplied strings (company name,

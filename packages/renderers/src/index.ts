@@ -1,10 +1,11 @@
-import type {
-	CompileOptions,
-	OutputFormat,
-	PolicyStackConfig,
-	PolicyType,
-} from "@policystack/core";
+import type { PolicyStackConfig, PolicyType } from "@policystack/core";
 import { compileCookiePolicy, compilePrivacyPolicy } from "@policystack/core";
+
+// Output-format selection lives here, not in core: core compiles to an AST
+// (`Document | null`) and never produces formatted output — turning the AST
+// into markdown/html/pdf is exclusively this package's concern.
+export type OutputFormat = "markdown" | "html" | "pdf";
+export type CompileOptions = { formats: OutputFormat[] };
 
 export { renderHTML } from "./html";
 export { renderMarkdown } from "./markdown";
