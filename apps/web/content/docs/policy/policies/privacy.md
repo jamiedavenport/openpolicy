@@ -13,7 +13,7 @@ Add the `data` block to your config — the privacy policy is auto-detected from
 import { ContractPrerequisite, defineConfig, LegalBases, Voluntary } from "@policystack/sdk";
 
 effectiveDate: "2026-01-01",
-jurisdictions: ["eu", "us-ca"],
+jurisdictions: ["eea", "us-ca"],
 data: {
   collected: {
     "Account Information": ["Name", "Email address"],

@@ -21,14 +21,28 @@ export function PrivacyPolicyPage() {
 
 const INSTALL_SNIPPET = `pnpm dlx @policystack/cli init`;
 
-const USE_SNIPPET = `import { defineConfig } from "@policystack/sdk";
+const USE_SNIPPET = `import { ContractPrerequisite, defineConfig, LegalBases } from "@policystack/sdk";
 
 export default defineConfig({
-  company: { name: "Acme, Inc." },
-  jurisdictions: ["eu", "us-ca"],
+  company: {
+    name: "Acme, Inc.",
+    legalName: "Acme, Inc.",
+    address: "123 Main St, San Francisco, CA",
+    contact: { email: "privacy@acme.com" },
+  },
+  effectiveDate: "2026-01-01",
+  jurisdictions: ["eea", "us-ca"],
   data: {
     collected: {
       "Account Information": ["Name", "Email"],
+    },
+    context: {
+      "Account Information": {
+        purpose: "To authenticate users and send service notifications.",
+        lawfulBasis: LegalBases.Contract,
+        retention: "Until account deletion",
+        provision: ContractPrerequisite("We cannot operate your account."),
+      },
     },
   },
 });`;
@@ -114,7 +128,7 @@ export const Route = createFileRoute("/policy")({
 	head: (ctx) =>
 		pageMeta(
 			{
-				title: "PolicyStack — your privacy policy as a typed config | PolicyStack",
+				title: "Policy — your privacy policy as a typed config | PolicyStack",
 				description:
 					"Define your privacy and cookie policy once in TypeScript. Render it as React components, generate Markdown, ship a consent banner — all from one source of truth.",
 				path: "/policy",
@@ -141,7 +155,7 @@ function PolicyStack() {
 		<>
 			<ProductHero
 				slug="policy"
-				version="@policystack/react@0.0.30"
+				version="@policystack/react@1.0.0"
 				title={
 					<>
 						Your privacy policy, <Highlight>as a typed config.</Highlight>
@@ -170,7 +184,7 @@ function PolicyStack() {
 					{
 						n: "01",
 						title: "Typed config",
-						body: "definePolicy() gives you autocomplete and type errors when something is missing or stale.",
+						body: "defineConfig() gives you autocomplete and type errors when something is missing or stale.",
 					},
 					{
 						n: "02",
@@ -209,7 +223,7 @@ function PolicyStack() {
 					{ tag: "bash", html: installHtml },
 					{ tag: "policystack.ts", html: useHtml },
 				]}
-				next={{ to: "/consent", label: "Pair it with PolicyStack Consent for consent state" }}
+				next={{ to: "/consent", label: "Pair it with consent management" }}
 			/>
 
 			<Sponsor index="04" />
@@ -365,7 +379,7 @@ function Comparison({ index, rows }: { index: string; rows: ComparisonRow[] }) {
 									Feature
 								</th>
 								<th className="border-l-2 border-black bg-yellow-300/30 px-5 py-4 text-xs font-medium tracking-wide text-ink uppercase">
-									PolicyStack
+									Policy
 								</th>
 								{competitors.map((c) => (
 									<th
@@ -401,8 +415,8 @@ function Comparison({ index, rows }: { index: string; rows: ComparisonRow[] }) {
 				</div>
 
 				<p className="mt-10 max-w-[60ch] text-sm text-pretty text-mute">
-					GDPR and CCPA coverage is the floor — PolicyStack is not legal advice and is not a
-					replacement for counsel on high-stakes matters.
+					GDPR and CCPA coverage is the floor — Policy is not legal advice and is not a replacement
+					for counsel on high-stakes matters.
 				</p>
 			</div>
 		</section>

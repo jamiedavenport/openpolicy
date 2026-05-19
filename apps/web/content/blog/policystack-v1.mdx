@@ -3,7 +3,7 @@ title: "OpenPolicy and OpenCookies are now PolicyStack 1.0"
 excerpt: "Two projects became one. `@openpolicy/*` and `@opencookies/*` are now `@policystack/*` — one install, one typed config, one provider. 1.0 freezes the public surface: the Document AST, the validator, the jurisdiction table, and the slot contract are stable, and semver finally means something."
 date: "2026-05-19"
 tag: release
-upNext: "PolicyStack Cloud — the optional hosted control plane that sits on top of the OSS pieces."
+upNext: "Cloud — the optional hosted control plane that sits on top of the OSS pieces."
 ---
 
 For most of the last year there were two projects. OpenPolicy compiled a typed config into a privacy policy and a cookie policy. OpenCookies was a headless consent state machine that gated the cookies those policies described. They were designed to fit together, shared a worldview, and shipped on separate version lines anyway — two scopes, two install lines, two configs you had to keep from drifting apart by hand.
@@ -14,9 +14,9 @@ For most of the last year there were two projects. OpenPolicy compiled a typed c
 
 The rename is the visible part. `@openpolicy/*` and `@opencookies/*` are gone; everything ships under `@policystack/*`. The site moved from openpolicy.sh to [policystack.dev](https://policystack.dev). What used to be two projects is now three building blocks under one roof:
 
-- **[PolicyStack](/docs/policy)** — your privacy and cookie policy as a typed config, rendered as components or Markdown.
-- **[PolicyStack Consent](/docs/consent)** — the headless consent state machine. Sub-4kb core, adapters for React, Vue, Solid, Svelte, and Angular, a Vite plugin that fails the build on an ungated cookie.
-- **PolicyStack Cloud** — an optional hosted control plane for versioning, audit trails, and consent analytics across every app in your stack. It sits on top of the OSS pieces; you never need it to use them.
+- **[Policy](/docs/policy)** — your privacy and cookie policy as a typed config, rendered as components or Markdown.
+- **[Consent](/docs/consent)** — the headless consent state machine. Sub-4kb core, adapters for React, Vue, Solid, Svelte, and Angular, a Vite plugin that fails the build on an ungated cookie.
+- **Cloud** — an optional hosted control plane for versioning, audit trails, and consent analytics across every app in your stack. It sits on top of the OSS pieces; you never need it to use them.
 
 Everything except Cloud stays Apache-2.0.
 
@@ -30,7 +30,12 @@ The bigger change is structural. OpenCookies folded into `@policystack/core` as 
 import { defineConfig, LegalBases, ContractPrerequisite, Voluntary } from "@policystack/sdk";
 
 export default defineConfig({
-	company: { name: "Acme, Inc.", contact: { email: "privacy@acme.com" } },
+	company: {
+		name: "Acme, Inc.",
+		legalName: "Acme, Inc.",
+		address: "123 Main St, San Francisco, CA",
+		contact: { email: "privacy@acme.com" },
+	},
 	effectiveDate: "2026-01-01",
 	jurisdictions: ["eea", "uk"],
 	data: {
@@ -58,6 +63,7 @@ export default defineConfig({
 		context: {
 			essential: { lawfulBasis: LegalBases.LegalObligation },
 			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
 		},
 	},
 });
@@ -117,8 +123,8 @@ Unchanged at 1.0 and not changing: PolicyStack generates documents and manages c
 
 ## Where to go next
 
-- **[PolicyStack docs](/docs/policy)** — the SDK, the renderer, the Markdown export, the CLI.
-- **[PolicyStack Consent docs](/docs/consent)** — the headless core, storage adapters, script gating, and the framework adapters (React, Vue, Solid, Svelte, Angular).
+- **[Policy docs](/docs/policy)** — the SDK, the renderer, the Markdown export, the CLI.
+- **[Consent docs](/docs/consent)** — the headless core, storage adapters, script gating, and the framework adapters (React, Vue, Solid, Svelte, Angular).
 - **[Quick start](/docs/policy/cli)** — `bunx @policystack/cli init` installs the right packages for your stack, writes a starter `policystack.ts`, and prints a prompt you can hand to a coding agent.
 - **[GitHub](https://github.com/jamiedavenport/policystack)** — Apache-2.0. The `v1` branch is the 1.0 line. Issues and PRs welcome.
 

@@ -9,7 +9,7 @@ Angular 18+ adapter for Consent. Bridges [`@policystack/core/consent`](/docs/con
 ## Install
 
 ```sh
-pnpm add @policystack/core/consent @policystack/angular
+pnpm add @policystack/core @policystack/angular
 ```
 
 Peer dependencies: `@angular/core >= 18`, `@angular/common >= 18`.
@@ -20,7 +20,7 @@ Register the provider once at the root of your standalone application:
 
 ```ts
 import { bootstrapApplication } from "@angular/platform-browser";
-import { providePolicyStackConsent } from "@policystack/angular";
+import { providePolicyStackConsent } from "@policystack/angular/consent";
 import { localStorageAdapter } from "@policystack/core/consent/storage/local-storage";
 import { AppComponent } from "./app.component";
 
@@ -57,7 +57,7 @@ Inject `ConsentService` anywhere to read consent state via signals and trigger a
 
 ```ts
 import { Component, inject } from "@angular/core";
-import { ConsentService } from "@policystack/angular";
+import { ConsentService } from "@policystack/angular/consent";
 
 @Component({
 	selector: "app-banner",
@@ -87,7 +87,7 @@ Granular per-category access. Must be called inside an injection context (e.g. a
 
 ```ts
 import { Component } from "@angular/core";
-import { injectCategory } from "@policystack/angular";
+import { injectCategory } from "@policystack/angular/consent";
 
 @Component({
 	selector: "category-row",
@@ -110,7 +110,7 @@ Structural directive that conditionally renders content based on a consent expre
 
 ```ts
 import { Component } from "@angular/core";
-import { ConsentGate } from "@policystack/angular";
+import { ConsentGate } from "@policystack/angular/consent";
 import { ChartComponent } from "./chart.component";
 import { EnablePromptComponent } from "./enable-prompt.component";
 

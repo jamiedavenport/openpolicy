@@ -11,7 +11,7 @@ If you're using a framework, install one of the adapters instead and read this f
 ## Install
 
 ```sh
-bun add @policystack/core/consent
+bun add @policystack/core
 ```
 
 ## Quick start

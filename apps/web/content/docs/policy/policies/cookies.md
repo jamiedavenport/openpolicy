@@ -13,7 +13,7 @@ Add cookie fields to your config — the cookie policy is auto-detected from the
 import { defineConfig, LegalBases } from "@policystack/sdk";
 
 effectiveDate: "2026-01-01",
-jurisdictions: ["eu", "us-ca"],
+jurisdictions: ["eea", "us-ca"],
 cookies: {
   used: {
     essential: true,

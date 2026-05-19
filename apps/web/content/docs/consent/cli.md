@@ -6,7 +6,7 @@ product: consent
 
 Terminal entry point for Consent. Wraps [`@policystack/vite`](/docs/consent/scanner) for one-off scans, config init, and writing back vendor-category suggestions that the [Vite plugin](/docs/consent/vite) only prints.
 
-> Status: scaffold. The package and `consent` bin are reserved; the implementation is in flight. For build-time scanning today, use [`@policystack/vite`](/docs/consent/vite) — same scanner, integrated with HMR and `vite build`.
+> Status: the `@policystack/cli` package ships with a `policystack` bin (`init`, `validate`, `mcp`); the consent-specific scan/sync commands below are still in flight. For build-time scanning today, use [`@policystack/vite`](/docs/consent/vite) — same scanner, integrated with HMR and `vite build`.
 
 ## Install
 
@@ -17,14 +17,13 @@ bun add -D @policystack/cli
 ## Usage
 
 ```sh
-consent --help
+policystack --help
 ```
 
 ## Planned commands
 
-- `consent scan` — run the scanner against a project, print findings.
-- `consent init` — scaffold a starter `cookies.config.ts` with the categories the scanner detected.
-- `consent sync` — apply the vendor-category suggestions the Vite plugin prints when `autoSync: true`, writing them to your config file.
+- `policystack scan` — run the scanner against a project, print findings.
+- `policystack sync` — apply the vendor-category suggestions the scanner detects, writing them to your `policystack.ts`.
 
 Track progress in the repo issues.
 

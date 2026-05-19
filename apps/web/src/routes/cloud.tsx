@@ -8,9 +8,9 @@ export const Route = createFileRoute("/cloud")({
 	head: (ctx) =>
 		pageMeta(
 			{
-				title: "PolicyStack Cloud — the hosted control plane for your policies | PolicyStack",
+				title: "Cloud — the hosted control plane for your policies | PolicyStack",
 				description:
-					"Centralized policy versioning, audit trails, and consent analytics across every app in your stack. The hosted control plane on top of PolicyStack and PolicyStack Consent.",
+					"Centralized policy versioning, audit trails, and consent analytics across every app in your stack. The hosted control plane on top of Policy and Consent.",
 				path: "/cloud",
 			},
 			ctx,
@@ -143,11 +143,11 @@ function Capabilities() {
 					<span>capabilities</span>
 				</div>
 				<h2 className="mt-12 max-w-[28ch] text-3xl font-medium tracking-tight text-balance md:text-4xl">
-					What PolicyStack Cloud adds <Highlight>on top.</Highlight>
+					What Cloud adds <Highlight>on top.</Highlight>
 				</h2>
 				<p className="mt-8 max-w-[60ch] text-lg text-pretty text-mute">
-					The open-source pieces are still doing the work. PolicyStack Cloud is the place to see
-					them, version them, and prove what happened.
+					The open-source pieces are still doing the work. Cloud is the place to see them, version
+					them, and prove what happened.
 				</p>
 
 				<dl className="mt-20 grid border-2 border-black md:grid-cols-2">
@@ -195,7 +195,7 @@ function Pricing() {
 						name="open source"
 						price="$0"
 						blurb="Self-hosted. Apache-2.0. Yours forever."
-						features={["PolicyStack", "PolicyStack Consent", "Vite plugin", "CLI"]}
+						features={["Policy", "Consent", "Vite plugin", "CLI"]}
 						position="first"
 					/>
 					<Tier
@@ -285,7 +285,7 @@ function Waitlist() {
 				<div className="mt-16 grid gap-16 md:grid-cols-[1fr_1fr] md:items-end">
 					<div>
 						<h2 className="max-w-[22ch] text-3xl font-medium tracking-tight text-balance md:text-4xl">
-							See PolicyStack Cloud <Highlight>in action.</Highlight>
+							See Cloud <Highlight>in action.</Highlight>
 						</h2>
 						<p className="mt-8 max-w-[50ch] text-pretty text-mute">
 							We’re onboarding design partners through Q3 2026. Book a 30-minute call and we’ll walk

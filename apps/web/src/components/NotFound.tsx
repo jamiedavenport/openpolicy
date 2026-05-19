@@ -34,9 +34,9 @@ const PRODUCTS = [
 
 const QUICK_LINKS = [
 	{ to: "/", label: "Home", hint: "the whole stack" },
-	{ to: "/policy", label: "PolicyStack", hint: "policy-as-code" },
-	{ to: "/consent", label: "PolicyStack Consent", hint: "consent state machine" },
-	{ to: "/cloud", label: "PolicyStack Cloud", hint: "hosted control plane" },
+	{ to: "/policy", label: "Policy", hint: "policy-as-code" },
+	{ to: "/consent", label: "Consent", hint: "consent state machine" },
+	{ to: "/cloud", label: "Cloud", hint: "hosted control plane" },
 	{ to: "/docs", label: "Documentation", hint: "guides and reference" },
 	{ to: "/blog", label: "Blog", hint: "notes and releases" },
 ] as const;
@@ -94,9 +94,8 @@ function Hero() {
 
 				<p className="mt-12 max-w-[60ch] text-lg text-pretty text-mute">
 					The page you wanted isn&rsquo;t here. If you followed a link from policystack.dev, that
-					site folded into PolicyStack &mdash; everything PolicyStack lives under this roof now,
-					alongside PolicyStack Consent and PolicyStack Cloud. Otherwise, it&rsquo;s probably a typo
-					or a stale link.
+					site folded into PolicyStack &mdash; everything Policy lives under this roof now,
+					alongside Consent and Cloud. Otherwise, it&rsquo;s probably a typo or a stale link.
 				</p>
 
 				<div className="mt-12 max-w-xl border-2 border-black">

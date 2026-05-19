@@ -1,5 +1,5 @@
 ---
-title: "@policystack/vite"
+title: "@policystack/vite/consent"
 description: "Static AST detection of cookie writes and vendor scripts"
 product: consent
 ---
@@ -19,7 +19,7 @@ bun add -D @policystack/vite
 ## Usage
 
 ```ts
-import { scan } from "@policystack/vite";
+import { scan } from "@policystack/vite/consent";
 
 const result = await scan({ cwd: process.cwd() });
 console.log(result.cookies); // Cookie[]
@@ -90,7 +90,7 @@ is what enforces consent. See [Consent core] for the runtime story.
 ## Custom rules
 
 ```ts
-import { defineRule, scan, defaultRules } from "@policystack/vite";
+import { defineRule, scan, defaultRules } from "@policystack/vite/consent";
 
 const banPlausible = defineRule({
 	name: "plausible-import",

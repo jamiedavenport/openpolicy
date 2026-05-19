@@ -209,9 +209,9 @@ function SiteFooter() {
 				<FooterCol
 					title="open source"
 					links={[
-						{ to: "/consent", label: "PolicyStack Consent" },
-						{ to: "/policy", label: "PolicyStack" },
-						{ to: "/cloud", label: "PolicyStack Cloud" },
+						{ to: "/consent", label: "Consent" },
+						{ to: "/policy", label: "Policy" },
+						{ to: "/cloud", label: "Cloud" },
 					]}
 				/>
 				<FooterCol
