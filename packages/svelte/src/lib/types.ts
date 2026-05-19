@@ -1,31 +1,18 @@
-import type {
-	BoldNode,
-	DocumentSection,
-	HeadingNode,
-	ItalicNode,
-	LinkNode,
-	ListNode,
-	ParagraphNode,
-	TableCellNode,
-	TableNode,
-	TableRowNode,
-	TextNode,
-} from "@openpolicy/core";
+import type { ContainerSlotName, SlotNodes } from "@policystack/core";
 import type { Snippet } from "svelte";
 
-export type PolicyOverrides = {
-	section?: Snippet<[{ section: DocumentSection; children: Snippet }]>;
-	heading?: Snippet<[{ node: HeadingNode }]>;
-	paragraph?: Snippet<[{ node: ParagraphNode; children: Snippet }]>;
-	list?: Snippet<[{ node: ListNode; children: Snippet }]>;
-	table?: Snippet<[{ node: TableNode; children: Snippet }]>;
-	tableHeader?: Snippet<[{ children: Snippet }]>;
-	tableBody?: Snippet<[{ children: Snippet }]>;
-	tableRow?: Snippet<[{ node: TableRowNode; children: Snippet }]>;
-	tableHead?: Snippet<[{ node: TableCellNode; children: Snippet }]>;
-	tableCell?: Snippet<[{ node: TableCellNode; children: Snippet }]>;
-	text?: Snippet<[{ node: TextNode }]>;
-	bold?: Snippet<[{ node: BoldNode }]>;
-	italic?: Snippet<[{ node: ItalicNode }]>;
-	link?: Snippet<[{ node: LinkNode }]>;
+// Per-slot snippet argument, derived from the canonical core contract: every
+// slot receives its `node`; container slots additionally receive a `children`
+// snippet for the rendered child nodes.
+type SlotArg<K extends keyof SlotNodes> = { node: SlotNodes[K] } & (K extends ContainerSlotName
+	? { children: Snippet }
+	: unknown);
+
+/**
+ * The Svelte snippet-override map. One optional snippet per canonical slot
+ * (PS-15 §2.4) — keys and node payloads are the single source of truth in
+ * `@policystack/core`; this type only adapts them to Svelte `Snippet`s.
+ */
+export type PolicyComponents = {
+	[K in keyof SlotNodes]?: Snippet<[SlotArg<K>]>;
 };

@@ -1,78 +1,74 @@
-import {
-	expandOpenPolicyConfig,
-	type OpenPolicyConfig,
-	validateCookiePolicy,
-	validateOpenPolicyConfig,
-	validatePrivacyPolicy,
-	type ValidationIssue,
-} from "@openpolicy/core";
+import { type Issue, type PolicyStackConfig, validate } from "@policystack/core";
 import { bundleRequire } from "bundle-require";
-import type { Plugin as EsbuildPlugin } from "esbuild";
-import {
-	AUTO_COLLECTED_SPECIFIER,
-	renderAutoCollectedSource,
-	type Scanned,
-	SDK_PATH_PATTERN,
-} from "./scanned";
+import type { ScannerDiagnostic } from "./analyse";
 
 export type ValidatedConfig = {
-	config: OpenPolicyConfig | null;
-	issues: ValidationIssue[];
+	config: PolicyStackConfig | null;
+	issues: Issue[];
 	loadError: Error | null;
 };
 
 /**
- * Esbuild plugin that intercepts `@openpolicy/sdk`'s internal `./auto-collected`
- * import and serves the live scanned values. Mirrors the Vite plugin's
- * `resolveId`/`load` pair so validation sees the same merged config the
- * consumer's bundle does.
+ * The Vite plugin's `strict` / `suppress` issue policy (PS-13). `validate()`
+ * itself stays pure and frozen; promotion/suppression is applied here, in the
+ * one OSS consumer of `validate()`.
  */
-function autoCollectedShimPlugin(scanned: Scanned): EsbuildPlugin {
-	return {
-		name: "openpolicy-auto-collected-shim",
-		setup(build) {
-			build.onResolve({ filter: AUTO_COLLECTED_SPECIFIER }, (args) => {
-				if (!args.importer || !SDK_PATH_PATTERN.test(args.importer)) return null;
-				return {
-					path: args.path,
-					namespace: "openpolicy-virtual",
-				};
-			});
-			build.onLoad({ filter: /.*/, namespace: "openpolicy-virtual" }, () => ({
-				contents: renderAutoCollectedSource(scanned),
-				loader: "js",
-			}));
-		},
-	};
+export type IssuePolicy = {
+	strict?: boolean;
+	// `string` not `IssueCode`: the same suppress list also carries PS-25
+	// `DriftCode`s. A drift code simply never matches an `Issue.code`, so it
+	// is an inert no-op here — keeping one shared list (and decoupling
+	// validate.ts from drift.ts).
+	suppress?: readonly string[];
+};
+
+/**
+ * Applies the {@link IssuePolicy} to a raw `validate()` result. Order matters:
+ * `suppress` drops every issue whose `code` matches FIRST (any level), then
+ * `strict` promotes the remaining warnings to errors — so a suppressed code is
+ * never promoted. Pure; an absent/empty policy is the identity transform.
+ */
+export function applyIssuePolicy(issues: Issue[], policy: IssuePolicy): Issue[] {
+	const suppressed = new Set<string>(policy.suppress ?? []);
+	const kept = suppressed.size > 0 ? issues.filter((i) => !suppressed.has(i.code)) : issues;
+	if (!policy.strict) return kept;
+	return kept.map((i) => (i.level === "warning" ? { ...i, level: "error" } : i));
 }
 
 /**
- * Loads the user's `openpolicy.ts` via bundle-require with the scanned values
- * shimmed into `@openpolicy/sdk`'s sentinels, then runs every validator
- * exported from `@openpolicy/core` against the resolved config. Issues are
- * deduped by `code + message` because the SDK-shape validator overlaps with
- * the post-expansion privacy/cookie validators on required-field checks.
+ * Loads the user's `policystack.ts` via bundle-require, then runs the single
+ * `validate()` exported from `@policystack/core` against the resolved config.
+ * The config imports its scanned values from the on-disk `./policystack.gen`
+ * module, so bundle-require resolves them as ordinary relative source — no
+ * interception shim is needed. The caller must have written `policystack.gen.ts`
+ * (via `writeGenModule`) before calling this. `validate()` operates on the
+ * flat config and emits each code at most once, so no dedupe pass is needed.
+ * The raw result is then run through {@link applyIssuePolicy} with the caller's
+ * `strict` / `suppress` options. `loadError` is independent of the policy —
+ * suppression never silences a config load/parse failure.
  *
  * Bundle-require errors (TS syntax errors, missing imports, runtime throws in
  * the user's config module) are surfaced as `loadError` rather than thrown so
  * the caller can decide whether to forward — TS errors should already be
  * caught by the user's type-check pipeline; we don't want to double-report.
  */
-export async function loadAndValidateConfig(args: {
-	configFile: string;
-	scanned: Scanned;
-}): Promise<ValidatedConfig> {
-	let mod: { default?: OpenPolicyConfig };
+export async function loadAndValidateConfig(
+	args: {
+		configFile: string;
+	} & IssuePolicy,
+): Promise<ValidatedConfig> {
+	let mod: { default?: PolicyStackConfig };
 	try {
 		const result = await bundleRequire({
 			filepath: args.configFile,
-			// Walk into `@openpolicy/sdk` (and its bundled `@openpolicy/core`)
-			// so esbuild sees the SDK's internal `./auto-collected.js` import
-			// and the shim plugin can intercept it. Without this override
-			// bundle-require externalises every non-relative specifier and
-			// our shim never fires — Node would resolve `./auto-collected.js`
-			// to the SDK's empty fallback at runtime.
-			notExternal: [/^@openpolicy\//],
+			// Inline `@policystack/*` into the bundled config instead of
+			// externalising it. The config evaluates `defineConfig()` and the
+			// SDK's basis/provision helpers, so the SDK must be resolvable;
+			// bundle-require writes its output next to the config, and the
+			// SDK is a workspace package that isn't present in every ambient
+			// `node_modules` (pnpm doesn't hoist it to the workspace root), so
+			// an externalised import would fail to resolve at runtime.
+			notExternal: [/^@policystack\//],
 			esbuildOptions: {
 				platform: "node",
 				// Esbuild prints to stderr by default. Silence it — we surface
@@ -80,10 +76,9 @@ export async function loadAndValidateConfig(args: {
 				// report. Otherwise every config syntax error produces noisy
 				// output even when the caller wants to suppress it.
 				logLevel: "silent",
-				plugins: [autoCollectedShimPlugin(args.scanned)],
 			},
 		});
-		mod = result.mod as { default?: OpenPolicyConfig };
+		mod = result.mod as { default?: PolicyStackConfig };
 	} catch (err) {
 		return {
 			config: null,
@@ -101,33 +96,29 @@ export async function loadAndValidateConfig(args: {
 		};
 	}
 
-	const issues: ValidationIssue[] = [];
-	issues.push(...validateOpenPolicyConfig(config));
-	for (const input of expandOpenPolicyConfig(config)) {
-		if (input.type === "privacy") issues.push(...validatePrivacyPolicy(input));
-		else issues.push(...validateCookiePolicy(input));
-	}
-
-	const seen = new Set<string>();
-	const deduped: ValidationIssue[] = [];
-	for (const issue of issues) {
-		const key = `${issue.code}::${issue.message}`;
-		if (seen.has(key)) continue;
-		seen.add(key);
-		deduped.push(issue);
-	}
-
 	return {
 		config,
-		issues: deduped,
+		issues: applyIssuePolicy(validate(config), {
+			strict: args.strict,
+			suppress: args.suppress,
+		}),
 		loadError: null,
 	};
 }
 
 /**
- * Formats a validation issue for terminal output. Prefixes with `[openpolicy]`
+ * Formats a validation issue for terminal output. Prefixes with `[policystack]`
  * so users can grep the build log for our messages.
  */
-export function formatIssue(issue: ValidationIssue): string {
-	return `[openpolicy] ${issue.code}: ${issue.message}`;
+export function formatIssue(issue: Issue): string {
+	return `[policystack] ${issue.code}: ${issue.message}`;
+}
+
+/**
+ * Formats a located scanner diagnostic for terminal output as
+ * `[policystack] file:line:col code: message` — same greppable prefix as
+ * {@link formatIssue}, with a clickable `file:line:col` location.
+ */
+export function formatScannerDiagnostic(d: ScannerDiagnostic): string {
+	return `[policystack] ${d.file}:${d.line}:${d.column} ${d.code}: ${d.message}`;
 }

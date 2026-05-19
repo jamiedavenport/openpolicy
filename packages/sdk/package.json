@@ -1,21 +1,18 @@
 {
-	"name": "@openpolicy/sdk",
-	"version": "0.0.34",
-	"description": "Public API for defining privacy policies with OpenPolicy",
-	"keywords": [
-		"tanstack-intent"
-	],
+	"name": "@policystack/sdk",
+	"version": "1.0.0",
+	"description": "Public API for defining privacy policies with PolicyStack",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/jamiedavenport/openpolicy",
+		"url": "https://github.com/jamiedavenport/policystack",
 		"directory": "packages/sdk"
 	},
 	"files": [
 		"dist",
+		"llms.txt",
 		"README.md",
-		"NOTICE.md",
-		"skills"
+		"NOTICE.md"
 	],
 	"type": "module",
 	"exports": {
@@ -23,31 +20,23 @@
 			"import": "./dist/index.js",
 			"types": "./dist/index.d.ts"
 		},
-		"./opencookies": {
-			"import": "./dist/opencookies.js",
-			"types": "./dist/opencookies.d.ts"
-		}
+		"./consent": {
+			"import": "./dist/consent.js",
+			"types": "./dist/consent.d.ts"
+		},
+		"./llms.txt": "./llms.txt"
 	},
 	"scripts": {
 		"dev": "vp pack --watch",
-		"build": "vp pack",
+		"build": "vp pack && vp run gen",
+		"gen": "node scripts/gen.mjs",
 		"check-types": "tsc --noEmit",
 		"test": "vp test"
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"@opencookies/core": "^0.0.2",
-		"@openpolicy/core": "workspace:*",
-		"@openpolicy/tooling": "workspace:*",
-		"@tanstack/intent": "^0.0.29",
+		"@policystack/core": "workspace:*",
+		"@policystack/tooling": "workspace:*",
 		"vite-plus": "catalog:"
-	},
-	"peerDependencies": {
-		"@opencookies/core": "*"
-	},
-	"peerDependenciesMeta": {
-		"@opencookies/core": {
-			"optional": true
-		}
 	}
 }

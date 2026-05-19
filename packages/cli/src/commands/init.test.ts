@@ -58,10 +58,10 @@ test("runInit dry-run with skip-install writes no files", async () => {
 		yes: true,
 		force: false,
 	});
-	expect(existsSync(join(dir, "openpolicy.ts"))).toBe(false);
+	expect(existsSync(join(dir, "policystack.ts"))).toBe(false);
 });
 
-test("runInit writes stub to openpolicy.ts at repo root when no src/", async () => {
+test("runInit writes stub to policystack.ts at repo root when no src/", async () => {
 	writeFileSync(join(dir, "package.json"), JSON.stringify({ name: "scratch" }));
 	await runInit({
 		cwd: dir,
@@ -70,5 +70,27 @@ test("runInit writes stub to openpolicy.ts at repo root when no src/", async () 
 		yes: true,
 		force: false,
 	});
-	expect(existsSync(join(dir, "openpolicy.ts"))).toBe(true);
+	expect(existsSync(join(dir, "policystack.ts"))).toBe(true);
+});
+
+test("runInit prints a react provider-wiring prompt when react is a dep", async () => {
+	writeFileSync(
+		join(dir, "package.json"),
+		JSON.stringify({ name: "scratch", dependencies: { react: "19.0.0" } }),
+	);
+	const orig = process.stdout.write;
+	const chunks: string[] = [];
+	process.stdout.write = ((chunk: string | Uint8Array) => {
+		chunks.push(typeof chunk === "string" ? chunk : Buffer.from(chunk).toString("utf8"));
+		return true;
+	}) as typeof process.stdout.write;
+	try {
+		await runInit({ cwd: dir, skipInstall: true, dryRun: true, yes: true, force: false });
+	} finally {
+		process.stdout.write = orig;
+	}
+	const out = chunks.join("");
+	expect(out).toContain("2. Wire the provider");
+	expect(out).toContain("<PolicyStack config={config}>");
+	expect(out).toContain("@policystack/react/provider");
 });

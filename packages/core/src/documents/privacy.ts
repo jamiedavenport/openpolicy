@@ -1,20 +1,28 @@
 import type { T } from "../i18n";
 import { formatDate } from "../i18n";
-import type { PrivacyPolicyConfig } from "../types";
+import { ESSENTIAL_ONLY_COOKIES, type PolicyStackConfig } from "../types";
+import { deriveUserRights } from "../user-rights";
 import { bold, cell, heading, li, link, p, row, section, table, ul } from "./helpers";
-import type { ContentNode, DocumentSection, InlineNode, ListItemNode, TableRowNode } from "./types";
+import type {
+	ComplianceReason,
+	ContentNode,
+	DocumentSection,
+	InlineNode,
+	ListItemNode,
+	TableRowNode,
+} from "./types";
 
-function versionSuffix(config: PrivacyPolicyConfig, t: T): string {
-	return config.version ? t.shared.versionSuffix({ version: config.version }) : "";
+function versionSuffix(config: PolicyStackConfig, t: T): string {
+	return config.privacyVersion ? t.shared.versionSuffix({ version: config.privacyVersion }) : "";
 }
 
-function buildIntroduction(config: PrivacyPolicyConfig, t: T): DocumentSection {
+function buildIntroduction(config: PolicyStackConfig, t: T): DocumentSection {
 	return section("introduction", [
 		heading(t.privacy.introduction.heading()),
 		p([
 			t.privacy.introduction.body({
 				companyName: config.company.name,
-				effectiveDate: formatDate(config.effectiveDate, config.locale),
+				effectiveDate: formatDate(config.effectiveDate, config.locale ?? "en"),
 				versionSuffix: versionSuffix(config, t),
 			}),
 		]),
@@ -22,11 +30,17 @@ function buildIntroduction(config: PrivacyPolicyConfig, t: T): DocumentSection {
 	]);
 }
 
-function buildChildrenPrivacy(config: PrivacyPolicyConfig, t: T): DocumentSection | null {
+function buildChildrenPrivacy(config: PolicyStackConfig, t: T): DocumentSection | null {
 	if (!config.children) return null;
 	const { underAge, noticeUrl } = config.children;
 	return section("children-privacy", [
-		heading(t.privacy.childrenPrivacy.heading(), { reason: "Required by COPPA" }),
+		heading(t.privacy.childrenPrivacy.heading(), {
+			reason: {
+				code: "children-privacy",
+				jurisdiction: "us",
+				citation: "Required by COPPA",
+			},
+		}),
 		p([t.privacy.childrenPrivacy.body({ underAge })]),
 		...(noticeUrl
 			? [
@@ -40,15 +54,15 @@ function buildChildrenPrivacy(config: PrivacyPolicyConfig, t: T): DocumentSectio
 	]);
 }
 
-function buildDataCollected(config: PrivacyPolicyConfig, t: T): DocumentSection {
+function buildDataCollected(config: PolicyStackConfig, t: T): DocumentSection {
 	const { collected, context } = config.data;
 	const includeLegalBasis =
-		config.jurisdictions.includes("eu") || config.jurisdictions.includes("uk");
+		config.jurisdictions.includes("eea") || config.jurisdictions.includes("uk");
 	const rows: TableRowNode[] = Object.entries(collected).map(([category, fields]) => {
 		const entry = context[category];
 		if (!entry?.purpose) {
 			throw new Error(
-				`OpenPolicy: data.collected["${category}"] has no matching entry in data.context. ` +
+				`PolicyStack: data.collected["${category}"] has no matching entry in data.context. ` +
 					"Every collected category must declare its processing purpose (GDPR Art. 13(1)(c)).",
 			);
 		}
@@ -65,9 +79,17 @@ function buildDataCollected(config: PrivacyPolicyConfig, t: T): DocumentSection 
 	const intro = includeLegalBasis
 		? t.privacy.dataCollected.intro.withGdpr()
 		: t.privacy.dataCollected.intro.withoutGdpr();
-	const reason = includeLegalBasis
-		? "Required by GDPR Article 13(1)(c) and Article 6"
-		: "Required by GDPR Article 13(1)(c)";
+	const reason: ComplianceReason = includeLegalBasis
+		? {
+				code: "data-collected",
+				jurisdiction: ["eea", "uk"],
+				citation: "Required by GDPR Article 13(1)(c) and Article 6",
+			}
+		: {
+				code: "data-collected",
+				jurisdiction: "eea",
+				citation: "Required by GDPR Article 13(1)(c)",
+			};
 	return section("data-collected", [
 		heading(t.privacy.dataCollected.heading(), { reason }),
 		p([intro]),
@@ -75,31 +97,41 @@ function buildDataCollected(config: PrivacyPolicyConfig, t: T): DocumentSection 
 	]);
 }
 
-function usesConsent(config: PrivacyPolicyConfig): boolean {
+function usesConsent(config: PolicyStackConfig): boolean {
 	if (Object.values(config.data.context).some((e) => e.lawfulBasis === "consent")) return true;
-	if (Object.values(config.cookies.context).some((e) => e.lawfulBasis === "consent")) return true;
+	if (Object.values(config.cookies?.context ?? {}).some((e) => e.lawfulBasis === "consent"))
+		return true;
 	return false;
 }
 
-function buildConsentWithdrawal(config: PrivacyPolicyConfig, t: T): DocumentSection | null {
-	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
+function buildConsentWithdrawal(config: PolicyStackConfig, t: T): DocumentSection | null {
+	if (!config.jurisdictions.includes("eea") && !config.jurisdictions.includes("uk")) return null;
 	if (!usesConsent(config)) return null;
 	return section("consent-withdrawal", [
 		heading(t.privacy.consentWithdrawal.heading(), {
-			reason: "Required by GDPR Article 7(3) and Article 13(2)(c)",
+			reason: {
+				code: "consent-withdrawal",
+				jurisdiction: ["eea", "uk"],
+				lawfulBasis: "consent",
+				citation: "Required by GDPR Article 7(3) and Article 13(2)(c)",
+			},
 		}),
 		p([t.privacy.consentWithdrawal.body({ contactEmail: config.company.contact.email })]),
 	]);
 }
 
-function buildAutomatedDecisionMaking(config: PrivacyPolicyConfig, t: T): DocumentSection | null {
-	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
+function buildAutomatedDecisionMaking(config: PolicyStackConfig, t: T): DocumentSection | null {
+	if (!config.jurisdictions.includes("eea") && !config.jurisdictions.includes("uk")) return null;
 	const decisions = config.automatedDecisionMaking;
 	if (decisions === undefined) return null;
 
 	const content: ContentNode[] = [
 		heading(t.privacy.automatedDecisionMaking.heading(), {
-			reason: "Required by GDPR and UK-GDPR Article 13(2)(f) and Article 22",
+			reason: {
+				code: "automated-decision-making",
+				jurisdiction: ["eea", "uk"],
+				citation: "Required by GDPR and UK-GDPR Article 13(2)(f) and Article 22",
+			},
 		}),
 	];
 
@@ -133,7 +165,7 @@ function buildAutomatedDecisionMaking(config: PrivacyPolicyConfig, t: T): Docume
 	return section("automated-decision-making", content);
 }
 
-function buildDataRetention(config: PrivacyPolicyConfig, t: T): DocumentSection {
+function buildDataRetention(config: PolicyStackConfig, t: T): DocumentSection {
 	const rows: TableRowNode[] = Object.entries(config.data.context).map(([category, entry]) =>
 		row([cell([bold(category)]), cell([entry.retention])]),
 	);
@@ -144,8 +176,8 @@ function buildDataRetention(config: PrivacyPolicyConfig, t: T): DocumentSection 
 	]);
 }
 
-function buildProvisionRequirement(config: PrivacyPolicyConfig, t: T): DocumentSection | null {
-	if (!config.jurisdictions.includes("eu") && !config.jurisdictions.includes("uk")) return null;
+function buildProvisionRequirement(config: PolicyStackConfig, t: T): DocumentSection | null {
+	if (!config.jurisdictions.includes("eea") && !config.jurisdictions.includes("uk")) return null;
 	const entries = Object.entries(config.data.context);
 	if (entries.length === 0) return null;
 	const rows: TableRowNode[] = entries.map(([category, entry]) => {
@@ -155,7 +187,11 @@ function buildProvisionRequirement(config: PrivacyPolicyConfig, t: T): DocumentS
 	});
 	return section("provision-requirement", [
 		heading(t.privacy.provisionRequirement.heading(), {
-			reason: "Required by GDPR and UK-GDPR Article 13(2)(e)",
+			reason: {
+				code: "provision-requirement",
+				jurisdiction: ["eea", "uk"],
+				citation: "Required by GDPR and UK-GDPR Article 13(2)(e)",
+			},
 		}),
 		p([t.privacy.provisionRequirement.body()]),
 		table(t.privacy.provisionRequirement.headers(), rows),
@@ -168,12 +204,13 @@ function cookieCategoryLabel(key: string, t: T): string {
 	return entry ? entry() : t.privacy.cookieCategoryFallback({ key });
 }
 
-function buildCookies(config: PrivacyPolicyConfig, t: T): DocumentSection {
+function buildCookies(config: PolicyStackConfig, t: T): DocumentSection {
+	const cookies = config.cookies ?? ESSENTIAL_ONLY_COOKIES;
 	const rows: TableRowNode[] = [];
-	for (const [key, enabled] of Object.entries(config.cookies.used)) {
+	for (const [key, enabled] of Object.entries(cookies.used)) {
 		if (!enabled) continue;
 		const label = cookieCategoryLabel(key, t);
-		const basis = config.cookies.context[key]?.lawfulBasis;
+		const basis = cookies.context[key]?.lawfulBasis;
 		rows.push(row([cell([label]), cell([basis ? t.shared.legalBasisLabels[basis]() : ""])]));
 	}
 
@@ -190,14 +227,15 @@ function buildCookies(config: PrivacyPolicyConfig, t: T): DocumentSection {
 	]);
 }
 
-function buildThirdParties(config: PrivacyPolicyConfig, t: T): DocumentSection {
-	if (config.thirdParties.length === 0) {
+function buildThirdParties(config: PolicyStackConfig, t: T): DocumentSection {
+	const thirdParties = config.thirdParties ?? [];
+	if (thirdParties.length === 0) {
 		return section("third-parties", [
 			heading(t.privacy.thirdParties.heading()),
 			p([t.privacy.thirdParties.empty()]),
 		]);
 	}
-	const rows: TableRowNode[] = config.thirdParties.map((tp) =>
+	const rows: TableRowNode[] = thirdParties.map((tp) =>
 		row([
 			cell([bold(tp.name)]),
 			cell([tp.purpose]),
@@ -211,9 +249,10 @@ function buildThirdParties(config: PrivacyPolicyConfig, t: T): DocumentSection {
 	]);
 }
 
-function buildUserRights(config: PrivacyPolicyConfig, t: T): DocumentSection | null {
-	if (config.userRights.length === 0) return null;
-	const items = config.userRights.map((right) => li([t.privacy.userRights.labels[right]()]));
+function buildUserRights(config: PolicyStackConfig, t: T): DocumentSection | null {
+	const userRights = deriveUserRights(config.jurisdictions);
+	if (userRights.length === 0) return null;
+	const items = userRights.map((right) => li([t.privacy.userRights.labels[right]()]));
 	return section("user-rights", [
 		heading(t.privacy.userRights.heading()),
 		p([t.privacy.userRights.intro()]),
@@ -221,7 +260,7 @@ function buildUserRights(config: PrivacyPolicyConfig, t: T): DocumentSection | n
 	]);
 }
 
-function dpoParagraph(config: PrivacyPolicyConfig, t: T): ContentNode {
+function dpoParagraph(config: PolicyStackConfig, t: T): ContentNode {
 	const { dpo } = config.company;
 	if (dpo && "email" in dpo) {
 		const parts: (string | InlineNode)[] = [bold(t.shared.contactLabels.dpo()), " "];
@@ -239,7 +278,7 @@ function dpoParagraph(config: PrivacyPolicyConfig, t: T): ContentNode {
 	return p([t.privacy.dpo.absentFallback()]);
 }
 
-function euRepresentativeParagraph(config: PrivacyPolicyConfig, t: T): ContentNode | null {
+function euRepresentativeParagraph(config: PolicyStackConfig, t: T): ContentNode | null {
 	const rep = config.company.euRepresentative;
 	if (!rep) return null;
 	const { prefix, suffix } = t.privacy.euRepresentative.body({
@@ -250,11 +289,15 @@ function euRepresentativeParagraph(config: PrivacyPolicyConfig, t: T): ContentNo
 	return p([prefix, bold(rep.name), suffix]);
 }
 
-function buildGdprSupplement(config: PrivacyPolicyConfig, t: T): DocumentSection | null {
-	if (!config.jurisdictions.includes("eu")) return null;
+function buildGdprSupplement(config: PolicyStackConfig, t: T): DocumentSection | null {
+	if (!config.jurisdictions.includes("eea")) return null;
 	const content: ContentNode[] = [
 		heading(t.privacy.gdprSupplement.heading(), {
-			reason: "Required by GDPR Article 13",
+			reason: {
+				code: "gdpr-supplement",
+				jurisdiction: "eea",
+				citation: "Required by GDPR Article 13",
+			},
 		}),
 		p([t.privacy.gdprSupplement.scope()]),
 		p([
@@ -288,11 +331,15 @@ function buildGdprSupplement(config: PrivacyPolicyConfig, t: T): DocumentSection
 	return section("gdpr-supplement", content);
 }
 
-function buildUkGdprSupplement(config: PrivacyPolicyConfig, t: T): DocumentSection | null {
+function buildUkGdprSupplement(config: PolicyStackConfig, t: T): DocumentSection | null {
 	if (!config.jurisdictions.includes("uk")) return null;
 	return section("uk-gdpr-supplement", [
 		heading(t.privacy.ukGdprSupplement.heading(), {
-			reason: "Required by the UK-GDPR and Data Protection Act 2018",
+			reason: {
+				code: "uk-gdpr-supplement",
+				jurisdiction: "uk",
+				citation: "Required by the UK-GDPR and Data Protection Act 2018",
+			},
 		}),
 		p([t.privacy.ukGdprSupplement.scope()]),
 		p([
@@ -312,7 +359,7 @@ function buildUkGdprSupplement(config: PrivacyPolicyConfig, t: T): DocumentSecti
 	]);
 }
 
-function buildCcpaSupplement(config: PrivacyPolicyConfig, t: T): DocumentSection | null {
+function buildCcpaSupplement(config: PolicyStackConfig, t: T): DocumentSection | null {
 	if (!config.jurisdictions.includes("us-ca")) return null;
 	const { email, phone } = config.company.contact;
 	const submissionMethods: ListItemNode[] = [
@@ -320,7 +367,13 @@ function buildCcpaSupplement(config: PrivacyPolicyConfig, t: T): DocumentSection
 	];
 	if (phone) submissionMethods.push(li([bold(t.shared.contactLabels.phone()), " ", phone]));
 	return section("ccpa-supplement", [
-		heading(t.privacy.ccpaSupplement.heading(), { reason: "Required by CCPA" }),
+		heading(t.privacy.ccpaSupplement.heading(), {
+			reason: {
+				code: "ccpa-supplement",
+				jurisdiction: "us-ca",
+				citation: "Required by CCPA",
+			},
+		}),
 		p([t.privacy.ccpaSupplement.intro()]),
 		ul([
 			li([t.privacy.ccpaSupplement.rights.know()]),
@@ -336,12 +389,15 @@ function buildCcpaSupplement(config: PrivacyPolicyConfig, t: T): DocumentSection
 	]);
 }
 
-function buildContact(config: PrivacyPolicyConfig, t: T): DocumentSection {
+function buildContact(config: PolicyStackConfig, t: T): DocumentSection {
 	const items = [
 		li([bold(t.shared.contactLabels.legalName()), " ", config.company.legalName]),
 		li([bold(t.shared.contactLabels.address()), " ", config.company.address]),
 		li([bold(t.shared.contactLabels.email()), " ", config.company.contact.email]),
 	];
+	if (config.company.url) {
+		items.push(li([bold(t.shared.contactLabels.url()), " ", config.company.url]));
+	}
 	if (config.company.contact.phone) {
 		items.push(li([bold(t.shared.contactLabels.phone()), " ", config.company.contact.phone]));
 	}
@@ -361,7 +417,7 @@ function buildContact(config: PrivacyPolicyConfig, t: T): DocumentSection {
 	]);
 }
 
-const SECTION_BUILDERS: ((config: PrivacyPolicyConfig, t: T) => DocumentSection | null)[] = [
+const SECTION_BUILDERS: ((config: PolicyStackConfig, t: T) => DocumentSection | null)[] = [
 	buildIntroduction,
 	buildChildrenPrivacy,
 	buildDataCollected,
@@ -378,11 +434,11 @@ const SECTION_BUILDERS: ((config: PrivacyPolicyConfig, t: T) => DocumentSection 
 	buildContact,
 ];
 
-export function compilePrivacyDocument(config: PrivacyPolicyConfig, t: T): DocumentSection[] {
+export function compilePrivacyDocument(config: PolicyStackConfig, t: T): DocumentSection[] {
 	if (Object.keys(config.data.collected).length === 0) {
 		throw new Error(
-			"OpenPolicy: cannot compile a privacy policy with no data collected. " +
-				"Populate `data.collected` in your config, or instrument `collecting()` calls and use the `openPolicy()` Vite plugin.",
+			"PolicyStack: cannot compile a privacy policy with no data collected. " +
+				"Populate `data.collected` in your config, or instrument `collecting()` calls and use the `policyStack()` Vite plugin.",
 		);
 	}
 	return SECTION_BUILDERS.map((builder) => builder(config, t)).filter(

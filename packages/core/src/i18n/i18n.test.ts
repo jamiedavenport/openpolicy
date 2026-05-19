@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
-import { compile } from "../documents";
-import type { Locale, PolicyInput } from "../types";
+import { compilePrivacyPolicy } from "../index";
+import type { Locale, PolicyStackConfig } from "../types";
 import { de } from "./de";
 import { en } from "./en";
 import { es } from "./es";
@@ -18,6 +18,36 @@ test("createT returns the English dictionary for 'en'", () => {
 test("createT falls back to English for an unknown locale", () => {
 	const t = createT("xx" as Locale);
 	expect(t.privacy.introduction.heading()).toBe("Introduction");
+});
+
+const customDictionary: typeof en = {
+	...en,
+	privacy: {
+		...en.privacy,
+		introduction: {
+			...en.privacy.introduction,
+			heading: () => "CUSTOM_INTRO_HEADING_XYZ",
+		},
+	},
+};
+
+test("createT returns a caller-supplied dictionary verbatim (full replacement)", () => {
+	expect(createT("en", customDictionary).privacy.introduction.heading()).toBe(
+		"CUSTOM_INTRO_HEADING_XYZ",
+	);
+	// The locale argument is irrelevant to string content once a custom
+	// dictionary is supplied — it is used verbatim regardless of locale.
+	expect(createT("fr", customDictionary).privacy.introduction.heading()).toBe(
+		"CUSTOM_INTRO_HEADING_XYZ",
+	);
+});
+
+test("compile uses a custom dictionary for emitted strings; locale still drives dates", () => {
+	const doc = compilePrivacyPolicy(buildPrivacyConfig("fr"), customDictionary);
+	const blob = JSON.stringify(doc);
+	expect(blob).toContain("CUSTOM_INTRO_HEADING_XYZ");
+	// `locale: "fr"` still governs date formatting independently of the dictionary.
+	expect(blob).toContain("1 janvier 2026");
 });
 
 test("isLocale accepts registered locales and rejects others", () => {
@@ -192,9 +222,8 @@ const NON_EN_CANARIES: LocaleCanary[] = [
 	},
 ];
 
-function buildPrivacyInput(locale: Locale): PolicyInput {
+function buildPrivacyConfig(locale: Locale): PolicyStackConfig {
 	return {
-		type: "privacy",
 		effectiveDate: "2026-01-01",
 		locale,
 		company: {
@@ -222,14 +251,13 @@ function buildPrivacyInput(locale: Locale): PolicyInput {
 			context: { essential: { lawfulBasis: "legal_obligation" } },
 		},
 		thirdParties: [],
-		userRights: ["access", "rectification", "erasure"],
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 	};
 }
 
 for (const { locale, mustContain } of NON_EN_CANARIES) {
 	test(`${locale} privacy document compiles without English leakage`, () => {
-		const doc = compile(buildPrivacyInput(locale));
+		const doc = compilePrivacyPolicy(buildPrivacyConfig(locale));
 		const blob = JSON.stringify(doc);
 		for (const phrase of ENGLISH_CANARIES) {
 			expect(blob, `${locale}: unexpected English phrase "${phrase}"`).not.toContain(phrase);

@@ -1,5 +1,6 @@
 import type {
 	BoldNode,
+	Document,
 	DocumentSection,
 	HeadingNode,
 	ItalicNode,
@@ -9,14 +10,27 @@ import type {
 	Node,
 	ParagraphNode,
 	TableCellNode,
+	TableHeaderCellNode,
+	TableHeaderRowNode,
 	TableNode,
 	TableRowNode,
 	TextNode,
-} from "@openpolicy/core";
-import type { CSSProperties, ReactNode } from "react";
+	UnknownNode,
+	Visitor,
+} from "@policystack/core";
+import { visit } from "@policystack/core";
+import { type CSSProperties, Fragment, type ReactNode } from "react";
 import type { PolicyComponents } from "../types";
 
-export function DefaultRoot({ children, style }: { children: ReactNode; style?: unknown }) {
+export function DefaultRoot({
+	node: _node,
+	children,
+	style,
+}: {
+	node: Document;
+	children: ReactNode;
+	style?: unknown;
+}) {
 	return (
 		<div data-op-policy style={style as CSSProperties | undefined}>
 			{children}
@@ -46,19 +60,19 @@ export function DefaultLink({ node }: { node: LinkNode }) {
 	return <a href={node.href}>{node.value}</a>;
 }
 
-export function DefaultSection({
-	section,
-	children,
-}: {
-	section: DocumentSection;
-	children: ReactNode;
-}) {
+// Forward-compat no-op: an unrecognized future block-level node is degraded to
+// `UnknownNode` by an older reader and renders as nothing (ADR 0001).
+export function DefaultUnknown({ node: _node }: { node: UnknownNode }) {
+	return null;
+}
+
+export function DefaultSection({ node, children }: { node: DocumentSection; children: ReactNode }) {
 	return (
 		<section
 			data-op-section
-			id={section.id}
-			{...(section.context?.reason && {
-				"data-op-reason": section.context.reason,
+			id={node.id}
+			{...(node.context?.reason?.code && {
+				"data-op-reason": node.context.reason.code,
 			})}
 		>
 			{children}
@@ -95,12 +109,34 @@ export function DefaultTable({ node: _node, children }: { node: TableNode; child
 	return <table data-op-table>{children}</table>;
 }
 
-export function DefaultTableHeader({ children }: { children: ReactNode }) {
-	return <thead data-op-table-header>{children}</thead>;
+// `<thead>` is a rendering detail owned by the default header-row component,
+// not a node/slot of its own — there is exactly one header row per table.
+export function DefaultTableHeaderRow({
+	node: _node,
+	children,
+}: {
+	node: TableHeaderRowNode;
+	children: ReactNode;
+}) {
+	return (
+		<thead data-op-table-header>
+			<tr data-op-table-row>{children}</tr>
+		</thead>
+	);
 }
 
-export function DefaultTableBody({ children }: { children: ReactNode }) {
-	return <tbody data-op-table-body>{children}</tbody>;
+export function DefaultTableHeaderCell({
+	node: _node,
+	children,
+}: {
+	node: TableHeaderCellNode;
+	children: ReactNode;
+}) {
+	return (
+		<th data-op-table-cell scope="col">
+			{children}
+		</th>
+	);
 }
 
 export function DefaultTableRow({
@@ -113,20 +149,6 @@ export function DefaultTableRow({
 	return <tr data-op-table-row>{children}</tr>;
 }
 
-export function DefaultTableHead({
-	node: _node,
-	children,
-}: {
-	node: TableCellNode;
-	children: ReactNode;
-}) {
-	return (
-		<th data-op-table-cell scope="col">
-			{children}
-		</th>
-	);
-}
-
 export function DefaultTableCell({
 	node: _node,
 	children,
@@ -137,106 +159,99 @@ export function DefaultTableCell({
 	return <td data-op-table-cell>{children}</td>;
 }
 
-export function renderNode(node: Node, components: PolicyComponents, key?: number): ReactNode {
-	switch (node.type) {
-		case "document":
-			return <>{node.sections.map((s, i) => renderNode(s, components, i))}</>;
+// A `Visitor<ReactNode>` built per render, closing over the canonical slot map
+// `components` (which the frozen `visit()` does not thread). Container arms own
+// their children: they map with an index and wrap each child in a keyed
+// `Fragment` — this replaces the `key` parameter the old hand-rolled walk
+// threaded. The `table` arm builds its whole subtree, so the row/cell arms are
+// exhaustiveness-only no-ops (ADR 0001 unifying principle).
+function buildVisitor(components: PolicyComponents): Visitor<ReactNode> {
+	const kids = (nodes: readonly Node[], v: (child: Node) => ReactNode): ReactNode[] =>
+		nodes.map((n, i) => <Fragment key={i}>{v(n)}</Fragment>);
 
-		case "section": {
+	return {
+		document: (node, v) => (
+			<>
+				{node.sections.map((s, i) => (
+					<Fragment key={i}>{v(s)}</Fragment>
+				))}
+			</>
+		),
+		section: (node, v) => {
 			const SectionComp = components.Section ?? DefaultSection;
-			return (
-				<SectionComp key={key} section={node}>
-					{node.content.map((n, i) => renderNode(n, components, i))}
-				</SectionComp>
-			);
-		}
-
-		case "heading": {
+			return <SectionComp node={node}>{kids(node.content, v)}</SectionComp>;
+		},
+		heading: (node) => {
 			const HeadingComp = components.Heading ?? DefaultHeading;
-			return <HeadingComp key={key} node={node} />;
-		}
-
-		case "paragraph": {
+			return <HeadingComp node={node} />;
+		},
+		paragraph: (node, v) => {
 			const ParagraphComp = components.Paragraph ?? DefaultParagraph;
-			return (
-				<ParagraphComp key={key} node={node}>
-					{node.children.map((n, i) => renderNode(n, components, i))}
-				</ParagraphComp>
-			);
-		}
-
-		case "list": {
+			return <ParagraphComp node={node}>{kids(node.children, v)}</ParagraphComp>;
+		},
+		list: (node, v) => {
 			const ListComp = components.List ?? DefaultList;
-			return (
-				<ListComp key={key} node={node}>
-					{node.items.map((item, i) => renderNode(item, components, i))}
-				</ListComp>
-			);
-		}
-
-		case "listItem": {
+			return <ListComp node={node}>{kids(node.items, v)}</ListComp>;
+		},
+		listItem: (node, v) => {
 			const ListItemComp = components.ListItem ?? DefaultListItem;
-			return (
-				<ListItemComp key={key} node={node}>
-					{node.children.map((n, i) => renderNode(n, components, i))}
-				</ListItemComp>
-			);
-		}
-
-		case "table": {
+			return <ListItemComp node={node}>{kids(node.children, v)}</ListItemComp>;
+		},
+		table: (node, v) => {
 			const TableComp = components.Table ?? DefaultTable;
-			const TableHeaderComp = components.TableHeader ?? DefaultTableHeader;
-			const TableBodyComp = components.TableBody ?? DefaultTableBody;
+			const TableHeaderRowComp = components.TableHeaderRow ?? DefaultTableHeaderRow;
+			const TableHeaderCellComp = components.TableHeaderCell ?? DefaultTableHeaderCell;
 			const TableRowComp = components.TableRow ?? DefaultTableRow;
-			const TableHeadComp = components.TableHead ?? DefaultTableHead;
 			const TableCellComp = components.TableCell ?? DefaultTableCell;
-			const renderCell = (
-				cell: TableCellNode,
-				cellKey: number,
-				Comp: typeof TableHeadComp | typeof TableCellComp,
-			) => (
-				<Comp key={cellKey} node={cell}>
-					{cell.children.map((n, i) => renderNode(n, components, i))}
-				</Comp>
-			);
-			const renderRow = (
-				row: TableRowNode,
-				rowKey: number | undefined,
-				CellComp: typeof TableHeadComp | typeof TableCellComp,
-			) => (
-				<TableRowComp key={rowKey} node={row}>
-					{row.cells.map((c, ci) => renderCell(c, ci, CellComp))}
-				</TableRowComp>
-			);
-			const headerRow = renderRow(node.header, undefined, TableHeadComp);
-			const bodyRows = node.rows.map((row, ri) => renderRow(row, ri, TableCellComp));
 			return (
-				<TableComp key={key} node={node}>
-					<TableHeaderComp>{headerRow}</TableHeaderComp>
-					<TableBodyComp>{bodyRows}</TableBodyComp>
+				<TableComp node={node}>
+					<TableHeaderRowComp node={node.header}>
+						{node.header.cells.map((cell, ci) => (
+							<TableHeaderCellComp key={ci} node={cell}>
+								{kids(cell.children, v)}
+							</TableHeaderCellComp>
+						))}
+					</TableHeaderRowComp>
+					{node.rows.map((row, ri) => (
+						<TableRowComp key={ri} node={row}>
+							{row.cells.map((cell, ci) => (
+								<TableCellComp key={ci} node={cell}>
+									{kids(cell.children, v)}
+								</TableCellComp>
+							))}
+						</TableRowComp>
+					))}
 				</TableComp>
 			);
-		}
-
-		case "tableRow":
-		case "tableCell":
-			return null;
-
-		case "text": {
+		},
+		// Owned by the `table` arm — present only for exhaustiveness.
+		tableRow: () => null,
+		tableCell: () => null,
+		tableHeaderRow: () => null,
+		tableHeaderCell: () => null,
+		unknown: (node) => {
+			const Comp = components.Unknown ?? DefaultUnknown;
+			return <Comp node={node} />;
+		},
+		text: (node) => {
 			const Comp = components.Text ?? DefaultText;
-			return <Comp key={key} node={node} />;
-		}
-		case "bold": {
+			return <Comp node={node} />;
+		},
+		bold: (node) => {
 			const Comp = components.Bold ?? DefaultBold;
-			return <Comp key={key} node={node} />;
-		}
-		case "italic": {
+			return <Comp node={node} />;
+		},
+		italic: (node) => {
 			const Comp = components.Italic ?? DefaultItalic;
-			return <Comp key={key} node={node} />;
-		}
-		case "link": {
+			return <Comp node={node} />;
+		},
+		link: (node) => {
 			const Comp = components.Link ?? DefaultLink;
-			return <Comp key={key} node={node} />;
-		}
-	}
+			return <Comp node={node} />;
+		},
+	};
+}
+
+export function renderNode(node: Node, components: PolicyComponents): ReactNode {
+	return visit(node, buildVisitor(components));
 }

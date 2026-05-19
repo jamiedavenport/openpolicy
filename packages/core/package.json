@@ -1,11 +1,11 @@
 {
-	"name": "@openpolicy/core",
-	"version": "0.0.34",
-	"description": "Core package for OpenPolicy",
+	"name": "@policystack/core",
+	"version": "1.0.0",
+	"description": "Core package for PolicyStack",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/jamiedavenport/openpolicy",
+		"url": "https://github.com/jamiedavenport/policystack",
 		"directory": "packages/core"
 	},
 	"files": [
@@ -19,7 +19,24 @@
 		".": {
 			"import": "./dist/index.js",
 			"types": "./dist/index.d.ts"
-		}
+		},
+		"./consent": {
+			"import": "./dist/consent/index.js",
+			"types": "./dist/consent/index.d.ts"
+		},
+		"./consent/storage/cookie": {
+			"import": "./dist/consent/storage/cookie.js",
+			"types": "./dist/consent/storage/cookie.d.ts"
+		},
+		"./consent/storage/local-storage": {
+			"import": "./dist/consent/storage/local-storage.js",
+			"types": "./dist/consent/storage/local-storage.d.ts"
+		},
+		"./consent/storage/server": {
+			"import": "./dist/consent/storage/server.js",
+			"types": "./dist/consent/storage/server.d.ts"
+		},
+		"./package.json": "./package.json"
 	},
 	"scripts": {
 		"dev": "vp pack --watch",
@@ -28,7 +45,8 @@
 		"test": "vp test"
 	},
 	"devDependencies": {
-		"@openpolicy/tooling": "workspace:*",
+		"@policystack/tooling": "workspace:*",
+		"happy-dom": "^15.11.7",
 		"vite-plus": "catalog:"
 	}
 }

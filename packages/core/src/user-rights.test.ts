@@ -1,8 +1,8 @@
 import { expect, test } from "vite-plus/test";
-import { compile } from "./documents";
-import type { OpenPolicyConfig, PolicyInput, UserRight } from "./types";
+import { compilePrivacyPolicy } from "./index";
+import type { PolicyStackConfig, UserRight } from "./types";
 import { deriveUserRights } from "./user-rights";
-import { validateOpenPolicyConfig } from "./validate-config";
+import { validate } from "./validate";
 
 const GDPR_RIGHTS: UserRight[] = [
 	"access",
@@ -13,8 +13,8 @@ const GDPR_RIGHTS: UserRight[] = [
 	"objection",
 ];
 
-test("deriveUserRights: EU-only returns the six GDPR rights in canonical order", () => {
-	expect(deriveUserRights(["eu"])).toEqual(GDPR_RIGHTS);
+test("deriveUserRights: EEA-only returns the six GDPR rights in canonical order", () => {
+	expect(deriveUserRights(["eea"])).toEqual(GDPR_RIGHTS);
 });
 
 test("deriveUserRights: UK-only returns the six GDPR rights (UK-GDPR parity)", () => {
@@ -30,7 +30,7 @@ test("deriveUserRights: US-CA-only returns the four CCPA rights in canonical ord
 	]);
 });
 
-test("deriveUserRights: EU+US-CA returns the union in canonical order regardless of input order", () => {
+test("deriveUserRights: EEA+US-CA returns the union in canonical order regardless of input order", () => {
 	const expected: UserRight[] = [
 		"access",
 		"rectification",
@@ -41,12 +41,12 @@ test("deriveUserRights: EU+US-CA returns the union in canonical order regardless
 		"opt_out_sale",
 		"non_discrimination",
 	];
-	expect(deriveUserRights(["eu", "us-ca"])).toEqual(expected);
-	expect(deriveUserRights(["us-ca", "eu"])).toEqual(expected);
+	expect(deriveUserRights(["eea", "us-ca"])).toEqual(expected);
+	expect(deriveUserRights(["us-ca", "eea"])).toEqual(expected);
 });
 
-test("deriveUserRights: EU dedupes with UK (both grant the same GDPR rights)", () => {
-	expect(deriveUserRights(["eu", "uk"])).toEqual(GDPR_RIGHTS);
+test("deriveUserRights: EEA dedupes with UK (both grant the same GDPR rights)", () => {
+	expect(deriveUserRights(["eea", "uk"])).toEqual(GDPR_RIGHTS);
 });
 
 test("deriveUserRights: a reserved jurisdiction with no shipped content returns an empty array", () => {
@@ -55,8 +55,7 @@ test("deriveUserRights: a reserved jurisdiction with no shipped content returns 
 });
 
 test("buildUserRights: privacy policy omits 'Your Rights' section when derivation is empty", () => {
-	const input: PolicyInput = {
-		type: "privacy",
+	const config: PolicyStackConfig = {
 		effectiveDate: "2026-01-01",
 		locale: "en",
 		company: {
@@ -88,16 +87,16 @@ test("buildUserRights: privacy policy omits 'Your Rights' section when derivatio
 			},
 		},
 		thirdParties: [],
-		userRights: [],
 		jurisdictions: ["ca"],
 	};
-	const document = compile(input);
-	const hasRightsSection = document.sections.some((s) => s.id === "user-rights");
+	const document = compilePrivacyPolicy(config);
+	expect(document).not.toBeNull();
+	const hasRightsSection = document?.sections.some((s) => s.id === "user-rights");
 	expect(hasRightsSection).toBe(false);
 });
 
-test("validateOpenPolicyConfig: emits no userRights-related issues", () => {
-	const config: OpenPolicyConfig = {
+test("validate: emits no userRights-related issues", () => {
+	const config: PolicyStackConfig = {
 		company: {
 			name: "Acme Inc.",
 			legalName: "Acme Corporation",
@@ -121,6 +120,6 @@ test("validateOpenPolicyConfig: emits no userRights-related issues", () => {
 			},
 		},
 	};
-	const issues = validateOpenPolicyConfig(config);
+	const issues = validate(config);
 	expect(issues.some((i) => i.message.toLowerCase().includes("userrights"))).toBe(false);
 });

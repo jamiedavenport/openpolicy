@@ -1,3 +1,6 @@
+# Claude Code (local agent state, worktrees — never part of CI)
+.claude
+
 # dependencies (bun install)
 node_modules
 
@@ -8,6 +11,9 @@ dist
 
 # code coverage
 coverage
+
+# validator test scratch dirs (cleaned in afterEach; guard against interrupted runs)
+.tmp-validate-*
 *.lcov
 
 # logs

@@ -1,7 +1,7 @@
 import { spawn as nodeSpawn } from "node:child_process";
 import type { PackageManager } from "./detect-pm";
 
-export type InstallOptions = {
+type InstallOptions = {
 	dev: boolean;
 	cwd: string;
 	dryRun?: boolean;

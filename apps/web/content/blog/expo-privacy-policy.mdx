@@ -1,0 +1,241 @@
+---
+title: "Ship a native privacy policy in your Expo app"
+excerpt: "Define your policy in TypeScript, render it with React Native primitives — no WebView, no markdown parser at runtime — and let Claude keep the third parties list honest as you add SDKs."
+date: "2026-05-07"
+tag: engineering
+---
+
+The privacy policy in a mobile app usually shows up as one of three things: a `WebView` pointing at the marketing site, a hardcoded markdown file rendered through `react-native-markdown-display`, or a single deeply-nested `<Text>` component a junior dev was asked to fix on a Friday. All three drift the moment you add an SDK, and none of them feel native — there's a flash of white, the scroll gestures are wrong, the typography doesn't match.
+
+PolicyStack Policy ships a different shape for this. The policy is a typed TypeScript config. The renderer walks a document tree and hands each node to a React component you provide — and on Expo / React Native, those components are just `View`, `Text`, and `Linking`. There is no WebView, no markdown parser at runtime, and no network. This post walks through the moving parts.
+
+## What you get on Expo
+
+Two packages, plus your own components:
+
+- **`@policystack/sdk`** — the config types and helpers (`defineConfig`, `LegalBases`, `Retention`, `Providers`, `Compliance`). Pure TypeScript; no native modules.
+- **`@policystack/react`** — `<PolicyStack>` and `<PrivacyPolicy>`. The renderer is platform-agnostic: it builds a document tree from your config and dispatches each node (`Section`, `Heading`, `Paragraph`, `Table`, `Link`, …) to a React component. On the web that component is a `<p>`. On Expo it's a `<Text>`. Same renderer, different leaves.
+- **A `PolicyComponents` map you write once.** Maybe 80 lines. It's the bridge from the document tree to React Native primitives, and it's the only file in this setup that's specific to mobile.
+
+The point is that the rendered policy is composed entirely of native components. No `WebView` cold-start, no JS markdown parser shipped to the device, no third-party SaaS embed. The policy text lives in your JS bundle and renders as fast as any other screen.
+
+## Install
+
+```bash file="terminal" tag="bash"
+bun add @policystack/sdk @policystack/react
+```
+
+That's it for runtime. There's no Expo config plugin to register, no native module to link, no `prebuild` step. If you're starting from scratch, `bunx @policystack/cli init` scaffolds the config and prints a prompt tuned for Claude Code that fills in the company details, jurisdictions, and known third parties from your `package.json`.
+
+## Define the policy
+
+The whole policy is one file at the project root. Here's a `policystack.ts`:
+
+```ts file="policystack.ts"
+import {
+	Compliance,
+	defineConfig,
+	LegalBases,
+	Providers,
+	Retention,
+	Voluntary,
+} from "@policystack/sdk";
+
+export default defineConfig({
+	company: {
+		name: "Expo Example",
+		legalName: "Expo Example, Inc.",
+		address: "1 Example Way, San Francisco, CA 94107, USA",
+		contact: { email: "privacy@example.com" },
+	},
+	effectiveDate: "2026-05-07",
+	jurisdictions: Compliance.GDPR.jurisdictions,
+	data: {
+		collected: {
+			"Account Information": ["Name", "Email address"],
+			"Usage Data": ["Pages visited", "Features used"],
+		},
+		context: {
+			"Account Information": {
+				purpose: "Create and manage your account.",
+				lawfulBasis: LegalBases.Contract,
+				retention: Retention.UntilAccountDeletion,
+				provision: Voluntary("You can use the app without an account."),
+			},
+			"Usage Data": {
+				purpose: "Understand how the app is used and improve it.",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: Retention.NinetyDays,
+				provision: Voluntary("You can opt out of analytics in app settings."),
+			},
+		},
+	},
+	thirdParties: [Providers.Sentry],
+});
+```
+
+A few helpers earn their keep here:
+
+- **`Compliance.GDPR.jurisdictions`** expands to the EU/EEA jurisdiction set so you don't have to remember which countries are in scope this year. There's a US-state equivalent for CCPA/CPRA.
+- **`LegalBases.Contract` / `LegalBases.LegitimateInterests`** are typed enums for the GDPR Article 6 bases. The renderer uses them to pick the right wording for the lawful-basis disclosure.
+- **`Retention.UntilAccountDeletion` / `Retention.NinetyDays`** are presets for the retention clause. You can pass a plain string if none of the presets fit.
+- **`Voluntary(reason)`** marks a data category as not required for service delivery. The wording the renderer produces ("you can use the app without...") matches the reason you pass.
+- **`Providers.Sentry`** is a built-in third-party entry — name, purpose, privacy URL all preset. The SDK ships entries for the SDKs you're most likely to be running (Sentry, PostHog, Stripe, Segment, etc.). Custom vendors take a literal object.
+
+That config is all the policy "content" the app needs. Everything else is presentation.
+
+## Map the document tree to React Native
+
+This is the only mobile-specific file. `<PrivacyPolicy>` accepts a `components` prop — for each node type the renderer might emit, you provide a component. Anything you don't override falls back to a sensible default. Here's the shape from `components/PolicyComponents.tsx`:
+
+```tsx file="components/PolicyComponents.tsx"
+import { Linking, StyleSheet, Text, View } from "react-native";
+import type { PolicyComponents } from "@policystack/react/policy";
+
+const HEADING_SIZES: Record<1 | 2 | 3 | 4 | 5 | 6, number> = {
+	1: 28,
+	2: 22,
+	3: 18,
+	4: 16,
+	5: 15,
+	6: 14,
+};
+
+const policyComponents: PolicyComponents = {
+	Root: ({ children }) => <View>{children}</View>,
+	Section: ({ children }) => <View style={styles.section}>{children}</View>,
+	Heading: ({ node }) => {
+		const level = (node.level ?? 2) as 1 | 2 | 3 | 4 | 5 | 6;
+		return (
+			<Text
+				style={[
+					styles.heading,
+					{ fontSize: HEADING_SIZES[level], marginTop: level <= 2 ? 20 : 14 },
+				]}
+			>
+				{node.value}
+			</Text>
+		);
+	},
+	Paragraph: ({ children }) => <Text style={styles.paragraph}>{children}</Text>,
+	// ...List, ListItem, Table, TableRow, TableCell, Bold, Italic, Text...
+	Link: ({ node }) => (
+		<Text
+			style={styles.link}
+			onPress={() => {
+				Linking.openURL(node.href).catch(() => {});
+			}}
+		>
+			{node.value}
+		</Text>
+	),
+};
+```
+
+Three details worth pulling out:
+
+**Tables become flexbox views.** The example's `Table` is a `View` with a 1px border, `TableRow` is `flexDirection: "row"`, and `TableCell` is a `Text` with `flex: 1`. RN doesn't have a `<table>` primitive, but the document tree gives you nested rows and cells in the same shape it would on the web — so a flex grid drops in cleanly.
+
+**Links use `Linking.openURL`.** The renderer doesn't know whether `<a>`, `<Pressable>` with a router, or `Linking.openURL` is the right choice — that's your call. The example opens the supervisory authority URL in the system browser, which is the correct behaviour for a privacy policy: external links should leave the app, not push a route.
+
+**Bullets and indentation are explicit.** RN doesn't render `<ul>`s natively, so `ListItem` becomes a row with a `\u2022` glyph in a fixed-width column on the left and the content flexed on the right. Five lines of code, perfectly aligned wrap.
+
+The full overridable surface is `Root`, `Section`, `Heading`, `Paragraph`, `List`, `ListItem`, `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell`, `Text`, `Bold`, `Italic`, `Link`. You don't have to override all of them — start with `Heading`, `Paragraph`, and `Link`, ship it, fill in the rest as the design needs them.
+
+## Mount the screen
+
+The screen itself is a thin wrapper. It owns the `SafeAreaView`, the `ScrollView`, and the page title; everything below the title comes from the renderer. From `screens/PrivacyPolicyScreen.tsx`:
+
+```tsx file="screens/PrivacyPolicyScreen.tsx"
+import { PolicyStack } from "@policystack/react/provider";
+import { PrivacyPolicy } from "@policystack/react/policy";
+import { SafeAreaView, ScrollView, StyleSheet, Text } from "react-native";
+import config from "../policystack";
+import policyComponents from "../components/PolicyComponents";
+
+export default function PrivacyPolicyScreen() {
+	return (
+		<SafeAreaView style={styles.safe}>
+			<ScrollView contentContainerStyle={styles.content}>
+				<Text style={styles.title}>Privacy Policy</Text>
+				<PolicyStack config={config}>
+					<PrivacyPolicy components={policyComponents} />
+				</PolicyStack>
+			</ScrollView>
+		</SafeAreaView>
+	);
+}
+```
+
+Two things to note. First, `<PolicyStack>` is the single context provider — every `<PrivacyPolicy>` (or `<CookiePolicy>`, when you add one) below it reads the same compiled document tree, so you can split the policy across screens or tabs without recomputing. Second, `ScrollView` is fine for the lengths a real policy ends up at; if you stretch into the kind of policy that's tens of thousands of words, you'd swap in a `FlatList` reading the document tree's top-level sections, but that's a known optimisation rather than a starting point.
+
+Wire the screen into `App.tsx` like any other route:
+
+```tsx file="App.tsx"
+import { StatusBar } from "expo-status-bar";
+import PrivacyPolicyScreen from "./screens/PrivacyPolicyScreen";
+
+export default function App() {
+	return (
+		<>
+			<PrivacyPolicyScreen />
+			<StatusBar style="auto" />
+		</>
+	);
+}
+```
+
+For an app with navigation, the screen drops into Expo Router or React Navigation unchanged — it's just a regular React component.
+
+## Why this is fast
+
+Three things make the rendered policy feel native instead of bolted on:
+
+- **No WebView.** A `WebView` for the legal page is a few hundred milliseconds of cold-start, a separate process, broken accessibility, and gesture handlers that fight your `ScrollView`. Native components share the same render tree as the rest of the app — the policy scrolls with the same physics, accessibility traversal works, system text scaling is honoured.
+- **No runtime parser.** The config compiles to a typed document tree at build time. There's no markdown parser, no MDX runtime, no AST construction on the device. The renderer is a `switch` over node types that returns your components.
+- **Ships in the JS bundle.** The compiled tree is part of your JS bundle, so the policy screen renders on the first frame after navigation. No fetch, no skeleton, no flash. And because EAS Update can ship JS-only patches, fixing a clause doesn't require an App Store review — push the bundle, the new policy is live.
+
+The net effect: the privacy policy screen is the same kind of artifact as any other screen in the app, performance-wise. Which is the point — it should be.
+
+## Keep it honest with Claude
+
+The hardest part of a code-first policy isn't the initial setup. It's the inevitable drift the day you add a new SDK and forget to declare it. On Expo this happens fast — `expo-application`, `@sentry/react-native`, `posthog-react-native`, `@stripe/stripe-react-native`, an analytics SDK from a vendor your growth team picked last week — and each one is a third party that probably belongs in `thirdParties`.
+
+The shape that works: hand the maintenance to your coding agent on a schedule. A prompt that's been working for me:
+
+```text file="prompt to claude code" tag="bash"
+Read policystack.ts and package.json. Compare the dependencies in
+package.json against thirdParties in policystack.ts.
+
+For any new SDK in package.json that's likely a third party data
+recipient (analytics, error tracking, payments, push, ads, attribution),
+add it to thirdParties — prefer the Providers.* preset from
+@policystack/sdk if one exists, otherwise add a literal entry with name,
+purpose, and privacyUrl.
+
+Bump effectiveDate to today only if you actually changed thirdParties
+or the data block. Don't touch anything else.
+```
+
+Three things make this work in practice:
+
+- **The config is typed.** Claude gets an immediate signal when an entry is shaped wrong — no `Providers.SentryReactNative` (it's just `Providers.Sentry`), no missing required fields. The agent iterates against the type checker.
+- **`@policystack/react` ships a Claude Code Skill.** Once installed, the `render-policies` skill is auto-discovered, so Claude knows the renderer API and the `Providers` registry without you pasting docs into the conversation.
+- **The diff is small and reviewable.** Because the policy is one file with a stable structure, an "add Sentry to thirdParties" change is two lines in PR review, not a redline against a Google Doc. You glance, approve, ship.
+
+Run that prompt as part of your weekly housekeeping — or wire it into a CI check that opens a PR when `package.json` changes — and the policy stays in sync with the code without anyone manually remembering to do it.
+
+## Why this beats the alternatives
+
+Compared to the three things mobile apps usually do:
+
+- **vs. a `WebView` pointing at the marketing site.** No cold-start, no flash, no offline failure mode, no parallel design system. Accessibility works. The user can copy text, the system font scales, screen readers traverse it. The policy is in the bundle, so it works on a flight.
+- **vs. a hardcoded markdown file.** No drift between the config (which the legal team can read) and the rendered text (which the user sees). No third-party markdown library shipped to the device. Type-checked structure means a missing required field fails CI, not a quarterly audit.
+- **vs. hand-written `<Text>` components.** Sections, headings, lists, tables, and links all share styling automatically. Adding GDPR rights or CCPA disclosures is a `jurisdictions` flag, not a copy-paste of someone else's policy.
+
+## Where to go next
+
+You've got a typed policy compiled into your bundle, rendered with native components, and a workflow for keeping it accurate as the app grows. A few adjacent pieces:
+
+- **[Policy docs](/docs/policy)** — the rest of the renderer surface (cookie policy, per-section overrides, Markdown export for your docs site).
+- **[Ship a privacy policy with your TanStack app](/blog/tanstack-privacy-policy)** — the same primitives applied to the web side. If you ship both an app and a web app, the same `policystack.ts` drives both — one source of truth, two sets of leaf components.

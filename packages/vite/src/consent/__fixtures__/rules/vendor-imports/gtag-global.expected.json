@@ -1,0 +1,7 @@
+{
+  "cookies": [],
+  "vendors": [
+    { "vendor": "google-analytics", "category": "analytics", "via": "global", "line": 4 }
+  ],
+  "ungated": []
+}

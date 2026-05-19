@@ -1,5 +1,45 @@
+import type { JurisdictionId } from "../jurisdiction-id";
+import type { LegalBasis } from "../types";
+
+/**
+ * The closed set of provenance codes a section builder stamps onto a node's
+ * {@link ComplianceReason} — *why* that node was emitted. This is a distinct
+ * axis from the validator's diagnostic `IssueCode` (issue-codes.ts): a
+ * provenance code traces emitted document structure, a diagnostic code flags a
+ * config problem. Module-local frozen list: it exists only to derive the
+ * `ProvenanceCode` union so a builder typo is a compile error — nothing
+ * enumerates it at runtime (unlike `ISSUE_CODES`), so it stays internal.
+ */
+const PROVENANCE_CODES = [
+	"automated-decision-making",
+	"ccpa-supplement",
+	"children-privacy",
+	"consent-withdrawal",
+	"cookie-jurisdiction-eu-uk",
+	"data-collected",
+	"gdpr-supplement",
+	"provision-requirement",
+	"uk-gdpr-supplement",
+] as const;
+
+/** A stable, machine-keyable reason a node exists. Derived from {@link PROVENANCE_CODES}. */
+export type ProvenanceCode = (typeof PROVENANCE_CODES)[number];
+
+/**
+ * A typed, machine-readable trace of *why* a node exists — the compliance
+ * differentiator the hosted diff/audit layer keys off. This is a first-class
+ * field, not a free-string side-channel: `code` is stable and machine-keyable,
+ * `citation` carries the verbatim legal article text for render/audit display.
+ */
+export type ComplianceReason = {
+	code: ProvenanceCode;
+	jurisdiction?: JurisdictionId | readonly JurisdictionId[];
+	lawfulBasis?: LegalBasis;
+	citation?: string; // verbatim legal article text — display only
+};
+
 export type NodeContext = {
-	reason?: string;
+	reason?: ComplianceReason;
 };
 
 // Inline nodes
@@ -46,18 +86,48 @@ export type TableCellNode = {
 	children: InlineNode[];
 	context?: NodeContext;
 };
+// Header cells/rows are distinct discriminated variants — not a structural
+// `header: boolean` flag — so every renderer's visitor is total and exhaustively
+// type-checked with no internal header/body branch (ADR 0001, taxonomy).
+export type TableHeaderCellNode = {
+	type: "tableHeaderCell";
+	children: InlineNode[];
+	context?: NodeContext;
+};
 export type TableRowNode = {
 	type: "tableRow";
 	cells: TableCellNode[];
 	context?: NodeContext;
 };
+export type TableHeaderRowNode = {
+	type: "tableHeaderRow";
+	cells: TableHeaderCellNode[];
+	context?: NodeContext;
+};
 export type TableNode = {
 	type: "table";
-	header: TableRowNode;
+	header: TableHeaderRowNode;
 	rows: TableRowNode[];
 	context?: NodeContext;
 };
-export type ContentNode = HeadingNode | ParagraphNode | ListNode | TableNode;
+
+/**
+ * Forward-compat escape hatch. A reader on an older `astVersion` that meets a
+ * node `type` it does not recognize represents it as an `UnknownNode`; every
+ * renderer renders it as a no-op. This is what lets the frozen `Node` union
+ * gain block-level variants in a *minor* release without a major bump — semver
+ * locks the union at 1.0, so the seam is designed in now (ADR 0001).
+ */
+export type UnknownNode = {
+	type: "unknown";
+	raw?: unknown;
+	context?: NodeContext;
+};
+
+// Block-level content. `UnknownNode` is admitted here (not in the inline union):
+// post-1.0 growth is at block granularity, and section content is where an
+// older reader degrades an unrecognized node.
+export type ContentNode = HeadingNode | ParagraphNode | ListNode | TableNode | UnknownNode;
 
 // A single section of a document
 export type DocumentSection = {
@@ -69,9 +139,14 @@ export type DocumentSection = {
 
 export type PolicyType = "privacy" | "cookie";
 
-// The top-level document
+/** Current Document AST schema version. Bump on any additive union change. */
+export const AST_VERSION = 1;
+
+// The top-level document. Privacy and cookie are always two separate roots
+// discriminated by `policyType`; they are never merged (Decision 12, ADR 0001).
 export type Document = {
 	type: "document";
+	astVersion: number;
 	policyType: PolicyType;
 	sections: DocumentSection[];
 	context?: NodeContext;
@@ -84,5 +159,7 @@ export type Node =
 	| ContentNode
 	| ListItemNode
 	| TableRowNode
+	| TableHeaderRowNode
 	| TableCellNode
+	| TableHeaderCellNode
 	| InlineNode;

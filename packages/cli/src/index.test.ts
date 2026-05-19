@@ -7,15 +7,15 @@ test("run is a function", () => {
 });
 
 test("mainCommand has correct name", () => {
-	expect((mainCommand.meta as CommandMeta)?.name).toBe("openpolicy");
+	expect((mainCommand.meta as CommandMeta)?.name).toBe("policystack");
 });
 
 test("mainCommand has init subcommand", () => {
 	expect(typeof (mainCommand.subCommands as SubCommandsDef)?.init).toBe("function");
 });
 
-test("mainCommand no longer exposes generate/validate", () => {
+test("mainCommand exposes validate (the agent-loop surface) but not generate", () => {
 	const subs = mainCommand.subCommands as SubCommandsDef;
+	expect(typeof subs?.validate).toBe("function");
 	expect(subs?.generate).toBeUndefined();
-	expect(subs?.validate).toBeUndefined();
 });

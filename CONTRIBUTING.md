@@ -1,10 +1,10 @@
-# Contributing to OpenPolicy
+# Contributing to PolicyStack
 
 ## Setup
 
 ```bash
-git clone https://github.com/jamiedavenport/openpolicy
-cd openpolicy
+git clone https://github.com/jamiedavenport/policystack
+cd policystack
 corepack enable      # picks up the pnpm version pinned in package.json
 pnpm install
 vp config
@@ -19,14 +19,22 @@ vp config
 
 This is a pnpm monorepo (workspaces declared in `pnpm-workspace.yaml`):
 
-| Package            | Description                                     |
-| ------------------ | ----------------------------------------------- |
-| `packages/sdk`     | `@openpolicy/sdk` — public API (`defineConfig`) |
-| `packages/core`    | `@openpolicy/core` — compilation engine         |
-| `packages/vite`    | `@openpolicy/vite` — Vite plugin                |
-| `packages/cli`     | `@openpolicy/cli` — CLI tool                    |
-| `apps/docs`        | Documentation site (Next.js + Fumadocs)         |
-| `tooling/tsconfig` | Shared TypeScript base config                   |
+| Package              | Description                                                              |
+| -------------------- | ------------------------------------------------------------------------ |
+| `packages/sdk`       | `@policystack/sdk` — public API (`defineConfig`, `renderLlmsTxt`)        |
+| `packages/core`      | `@policystack/core` — compilation engine + consent runtime (`./consent`) |
+| `packages/vite`      | `@policystack/vite` — Vite plugin + opt-in consent scanner               |
+| `packages/cli`       | `@policystack/cli` — install/configure CLI                               |
+| `packages/renderers` | `@policystack/renderers` — shared Markdown/HTML/PDF render layer         |
+| `packages/scripts`   | `@policystack/scripts` — consent-gated third-party script loaders        |
+| `packages/react`     | `@policystack/react` — `./policy` / `./consent` / `./provider`           |
+| `packages/vue`       | `@policystack/vue` — `./policy` / `./consent`                            |
+| `packages/svelte`    | `@policystack/svelte` — `./policy` / `./consent`                         |
+| `packages/solid`     | `@policystack/solid` — `./consent` (source-only)                         |
+| `packages/angular`   | `@policystack/angular` — `./consent`                                     |
+| `apps/web`           | policystack.dev — marketing + docs site (TanStack Start)                 |
+| `apps/www`           | openpolicy.sh redirect shim (Vercel `redirects` only)                    |
+| `tooling/tsconfig`   | `@policystack/tooling` — shared TypeScript base config                   |
 
 ## Development Workflow
 
@@ -41,18 +49,18 @@ vp run -r check-types
 vp run -r build
 ```
 
-### Working on `@openpolicy/core`
+### Working on `@policystack/core`
 
 `core`'s `package.json` exports point to `./dist/` (not `./src/`). After changing source files in `packages/core`, rebuild it before other packages will pick up the changes:
 
 ```bash
-pnpm --filter @openpolicy/core run build
+pnpm --filter @policystack/core run build
 ```
 
 ### Running the CLI locally
 
 ```bash
-pnpm --filter @openpolicy/cli exec tsx src/cli.ts --help
+pnpm --filter @policystack/cli exec tsx src/cli.ts --help
 ```
 
 ## Architecture
@@ -60,18 +68,19 @@ pnpm --filter @openpolicy/cli exec tsx src/cli.ts --help
 ### Core compilation pipeline
 
 ```
-PolicyInput → compilePolicy() → section builders → PolicySection[] → renderer → string
+PolicyStackConfig → compilePrivacyPolicy()/compileCookiePolicy() → section builders → DocumentSection[] → renderer → string
 ```
 
-- **Section builders** are functions `(config) => PolicySection | null`. Returning `null` omits the section.
-- **`PolicyInput`** is a discriminated union: `{ type: "privacy" } & PrivacyPolicyConfig | { type: "cookie" } & CookiePolicyConfig`.
-- **Renderers** in `packages/core/src/renderers/` produce Markdown or HTML output.
+- **`PolicyStackConfig`** is the single, flat public config. There is no intermediate per-document projection — the section builders read it directly and derive values (`userRights`, `consentMechanism`, the per-document `version`) at their point of use.
+- **Section builders** are functions `(config: PolicyStackConfig, t) => DocumentSection | null`. Returning `null` omits the section.
+- **`compilePrivacyPolicy` / `compileCookiePolicy`** gate emission via `shouldEmit()` and return `Document | null`.
+- **Renderers** (`@policystack/renderers`) turn the `Document` tree into Markdown, HTML, or PDF.
 
 ### Adding a new section
 
 1. Add a builder function in `packages/core/src/documents/privacy.ts` or `documents/cookie.ts`.
-2. Register it in the relevant `compile*Document()` function.
-3. Add fields to `PrivacyPolicyConfig` or `CookiePolicyConfig` in `types.ts`.
+2. Register it in the relevant `compile*Document()` `SECTION_BUILDERS` array.
+3. Add any new fields to `PolicyStackConfig` in `types.ts`.
 4. Write tests in `packages/core/src/*.test.ts`.
 
 ## Testing
@@ -81,7 +90,7 @@ PolicyInput → compilePolicy() → section builders → PolicySection[] → ren
 vp test
 
 # Single package
-pnpm --filter @openpolicy/core run test
+pnpm --filter @policystack/core run test
 ```
 
 Tests use Vitest via Vite+. Import test utilities from `vite-plus/test` (not `vitest`):
@@ -120,7 +129,7 @@ This repo uses [Changesets](https://github.com/changesets/changesets) for versio
 
 4. Once merged, the GitHub Actions workflow automatically opens a "Version Packages" PR. Merging that PR publishes the updated packages to NPM. `pnpm publish` rewrites `workspace:*` references to the real published version on the way out.
 
-Publishable packages: `@openpolicy/sdk`, `@openpolicy/core`, `@openpolicy/vite`, `@openpolicy/cli`, `@openpolicy/react`, `@openpolicy/vue`, `@openpolicy/svelte`.
+Publishable packages (one `fixed` Changesets group — they version and publish together): `@policystack/sdk`, `@policystack/core`, `@policystack/vite`, `@policystack/cli`, `@policystack/react`, `@policystack/vue`, `@policystack/svelte`, `@policystack/solid`, `@policystack/angular`, `@policystack/renderers`, `@policystack/scripts`.
 
 ## Pull Requests
 

@@ -1,20 +1,20 @@
 <script lang="ts">
-import type { DocumentSection } from "@openpolicy/core";
+import type { DocumentSection } from "@policystack/core";
 import type { Snippet } from "svelte";
 
 let {
-	section,
+	node,
 	children,
 }: {
-	section: DocumentSection;
+	node: DocumentSection;
 	children: Snippet;
 } = $props();
 </script>
 
 <section
 	data-op-section=""
-	id={section.id}
-	data-op-reason={section.context?.reason}
+	id={node.id}
+	data-op-reason={node.context?.reason?.code}
 >
 	{@render children()}
 </section>

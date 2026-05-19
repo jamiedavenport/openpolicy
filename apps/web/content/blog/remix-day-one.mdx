@@ -1,0 +1,273 @@
+---
+title: "Ship a Remix 3 app with consent before your first user"
+excerpt: "Remix 3 is in beta and most consent tooling was built for the React era. PolicyStack is headless primitives, so it works with Remix's server-first, non-React runtime out of the box. One TypeScript config drives the cookie banner, the privacy policy, and the cookie policy."
+date: "2026-05-12"
+tag: engineering
+---
+
+Remix 3 is the first version of Remix that isn't React. The runtime is its own component model — server-first, web-APIs-everywhere, with a single small hydration primitive (`clientEntry`) for the bits that need to run in the browser. The framework is in beta. Most of the privacy and consent tooling out there was built for the React era and is going to need adapters before it works here.
+
+The right time to wire consent into a new app is before there are users to ask. Remix 3's beta window is exactly that window: you're starting clean, the auditor isn't on the calendar yet, and the choice between "consent as code" and "consent as a third-party iframe" is still open. PolicyStack happens to fit the new runtime well — its building blocks, Consent and Policy, ship no UI of their own. They're primitives. Remix 3 is a primitives-shaped framework. This post walks through wiring them in.
+
+## What Remix 3 changes
+
+If you're coming from Remix 2 (or any of the React meta-frameworks), three things matter for a consent integration:
+
+- **Components are not React.** `remix/ui` exports a `RemixNode`, a `Handle`, and the JSX it accepts is its own runtime. There is no React reconciler, no `useState`, no `useEffect`. A pre-built React banner from your old consent vendor doesn't compile here.
+- **Server-rendering is the default; hydration is opt-in.** A route handler returns a `Response`. The HTML is streamed. There is no client JS unless you explicitly mount a `clientEntry` component, and each one is hydrated independently — closer to an island than a SPA.
+- **Browser assets are allow-listed.** `createAssetServer({ allow: [...] })` declares which files are reachable from the client. Anything outside the allow-list 404s, which means accidental client imports of server-only modules fail at the boundary instead of leaking secrets.
+
+The shape that falls out: most of your app is HTML produced on the server with no client JS. The few interactive things — a cookie banner, a settings dropdown — are isolated `clientEntry` modules. That's a great shape for consent, because the policy pages have nothing to hydrate and the banner is a small, contained island.
+
+## Install
+
+Two runtime packages plus the policy SDK:
+
+```bash file="terminal" tag="bash"
+pnpm add @policystack/core @policystack/sdk
+```
+
+`@policystack/sdk` is the typed config builder. `@policystack/core` compiles the config into a framework-agnostic Document AST that you walk with whatever component model you've got, and its `./consent` subpath is the consent state machine — categories, decisions, jurisdiction resolution, GPC, persistence. No framework adapter required, because Remix 3 isn't on the adapter list and doesn't need to be: the state machine subscribes to changes, you call `handle.update()`, the rest is your code.
+
+## One config, three surfaces
+
+The point of doing this once on day one is that the privacy policy, the cookie policy, and the banner's categories all come from the same source. Put it under `app/data/`:
+
+```ts file="app/data/policystack.ts"
+import { ContractPrerequisite, LegalBases, Voluntary, defineConfig } from "@policystack/sdk";
+
+export const policy = defineConfig({
+	company: {
+		name: "Acme",
+		legalName: "Acme Ltd",
+		address: "1 Demo Lane, London, UK",
+		contact: { email: "privacy@acme.com" },
+	},
+	effectiveDate: "2026-05-12",
+	jurisdictions: ["eea", "uk"],
+	data: {
+		collected: {
+			"Account Information": ["Name", "Email address"],
+			"Usage Data": ["Pages visited", "IP address"],
+		},
+		context: {
+			"Account Information": {
+				purpose: "To authenticate users and send service notifications.",
+				lawfulBasis: LegalBases.Contract,
+				retention: "Until account deletion",
+				provision: ContractPrerequisite("We cannot operate your account."),
+			},
+			"Usage Data": {
+				purpose: "To understand product usage and improve the service.",
+				lawfulBasis: LegalBases.LegitimateInterests,
+				retention: "90 days",
+				provision: Voluntary("None — your service is unaffected."),
+			},
+		},
+	},
+	thirdParties: [],
+	cookies: {
+		used: { essential: true, analytics: true, marketing: false },
+		context: {
+			essential: { lawfulBasis: LegalBases.LegalObligation },
+			analytics: { lawfulBasis: LegalBases.Consent },
+			marketing: { lawfulBasis: LegalBases.Consent },
+		},
+	},
+});
+```
+
+This is the only file you edit when something changes. Add an SDK that drops a third-party cookie? It goes in `thirdParties`. Change retention on usage data? You change one line. The banner's category list and both policy documents update from the same config.
+
+## Server-render the policy pages
+
+`@policystack/core` exposes two compiler functions — `compilePrivacyPolicy` and `compileCookiePolicy` — that produce a Document AST. Compile once at module load, then hand the result to a server component that walks the tree:
+
+```tsx file="app/controllers/privacy.tsx"
+import { compilePrivacyPolicy } from "@policystack/core";
+import type { BuildAction } from "remix/fetch-router";
+
+import { policy } from "../data/policystack.ts";
+import type { routes } from "../routes.ts";
+import { Layout } from "../ui/layout.tsx";
+import { PolicyDocument } from "../ui/policy-document.tsx";
+import { render } from "../utils/render.tsx";
+
+const privacyDoc = compilePrivacyPolicy(policy);
+if (!privacyDoc) throw new Error("No privacy policy configured");
+
+export const privacy: BuildAction<"GET", typeof routes.privacy> = {
+	handler({ request }) {
+		return render(
+			<Layout title="Privacy Policy">
+				<PolicyDocument doc={privacyDoc} />
+			</Layout>,
+			request,
+		);
+	},
+};
+```
+
+The cookie policy is the same controller with `compileCookiePolicy` instead. Both run server-only — no `clientEntry`, no hydration, no client JS for the document content.
+
+`PolicyDocument` is the framework-specific bit. Because the AST is plain data (`Document → DocumentSection → ContentNode → InlineNode`), the walker is short and reads like a stand-alone HTML transformer:
+
+```tsx file="app/ui/policy-document.tsx"
+import type { ContentNode, Document, InlineNode, ListNode, TableNode } from "@policystack/core";
+import { css, type Handle, type RemixNode } from "remix/ui";
+
+export function PolicyDocument(handle: Handle<{ doc: Document }>) {
+	return () => (
+		<article mix={css({ maxWidth: "42rem", margin: "2rem auto", lineHeight: 1.6 })}>
+			{handle.props.doc.sections.map((section) => (
+				<section id={section.id}>{section.content.map(renderContent)}</section>
+			))}
+		</article>
+	);
+}
+
+function renderContent(node: ContentNode): RemixNode {
+	switch (node.type) {
+		case "heading": {
+			const Tag = `h${node.level ?? 2}` as "h1" | "h2" | "h3";
+			return <Tag>{node.value}</Tag>;
+		}
+		case "paragraph":
+			return <p>{node.children.map(renderInline)}</p>;
+		case "list":
+			return renderList(node);
+		case "table":
+			return renderTable(node);
+	}
+}
+
+function renderInline(node: InlineNode): RemixNode {
+	switch (node.type) {
+		case "text":
+			return node.value;
+		case "bold":
+			return <strong>{node.value}</strong>;
+		case "italic":
+			return <em>{node.value}</em>;
+		case "link":
+			return <a href={node.href}>{node.value}</a>;
+	}
+}
+```
+
+(The full version handles lists and tables; same pattern.)
+
+What you get is a privacy policy and a cookie policy that render with zero client JS, that are typed end to end, and that change in PR review when the underlying config changes. Add a new third party to `thirdParties`, the disclosure shows up on the next deploy. Delete a data category, the section disappears. No vendor dashboard. No "the marketing page says one thing and the legal page says another."
+
+## Hydrate the cookie banner with `clientEntry`
+
+The banner is the one piece that has to run on the client — visitor clicks "Accept all," the store updates, the banner re-renders, and on the next page load the analytics SDKs are allowed to load. In Remix 3 that's a single `clientEntry` module that wraps a `@policystack/core/consent` store:
+
+```tsx file="app/ui/cookie-banner.tsx"
+import { createConsentStore, timezoneResolver, type ConsentStore } from "@policystack/core/consent";
+import { localStorageAdapter } from "@policystack/core/consent/storage/local-storage";
+import { clientEntry, css, on, type Handle } from "remix/ui";
+
+import { policy } from "../data/policystack.ts";
+
+export const CookieBanner = clientEntry(import.meta.url, function CookieBanner(handle: Handle) {
+	let store: ConsentStore | null = null;
+
+	if (typeof window !== "undefined") {
+		store = createConsentStore({
+			...policy,
+			consent: {
+				adapter: localStorageAdapter(),
+				jurisdictionResolver: timezoneResolver(),
+			},
+		});
+		let unsubscribe = store.subscribe(() => handle.update());
+		handle.signal.addEventListener("abort", unsubscribe);
+	}
+
+	return () => {
+		let route = store?.getState().route;
+		if (route !== "cookie") return <div data-cookie-banner hidden />;
+		return (
+			<div
+				role="dialog"
+				aria-label="Cookie consent"
+				mix={css({
+					/* ... */
+				})}
+			>
+				<p>We use cookies to improve your experience.</p>
+				<button mix={on("click", () => store?.acceptAll())}>Accept all</button>
+				<button mix={on("click", () => store?.acceptNecessary())}>Necessary only</button>
+			</div>
+		);
+	};
+});
+```
+
+Three things worth pointing at:
+
+- **`createConsentStore(policy)`** derives the consent categories — `essential`, `analytics`, `marketing` — directly from the config's `cookies` block. There's no separate conversion step: you hand the store the same config object the policy pages compile from, plus a `consent` block for the runtime-only knobs (storage adapter, jurisdiction resolver). The cookie policy's category list and the banner's category list cannot drift apart, because they're computed from the same source — and now there isn't even a bridge call between them to get out of sync. A `marketing: true` flip in `app/data/policystack.ts` adds the marketing checkbox to the banner _and_ the marketing disclosure to the cookie policy on the same deploy.
+- **`handle.update()`** is Remix 3's "tell the framework to re-render this entry." We pass it to the store's `subscribe` callback so the banner re-renders on every state change. `handle.signal` is an `AbortSignal` for the lifetime of the entry — we register the `unsubscribe` against it, so when the framework tears the banner down (navigation, replacement, server hand-off), the subscription goes with it. No leaks, no manual lifecycle.
+- **The `typeof window` guard** is the Remix 3-shaped equivalent of "only touch localStorage in the browser." `clientEntry` modules also run on the server during the initial render so the framework knows what to ship; the store gets constructed only when `window` exists.
+
+## Mount it once in the layout
+
+The banner sits in the shared layout, so every page gets it:
+
+```tsx file="app/ui/layout.tsx"
+import type { RemixNode } from "remix/ui";
+
+import { CookieBanner } from "./cookie-banner.tsx";
+import { Document } from "./document.tsx";
+
+export function Layout() {
+	return ({ title, children }: { title?: string; children?: RemixNode }) => (
+		<Document title={title}>
+			<header>{/* nav */}</header>
+			<main>{children}</main>
+			<CookieBanner />
+		</Document>
+	);
+}
+```
+
+That's it. The banner is one entry, hydrated independently. The policy pages stay zero-JS. Everything else in the layout — header, nav, main content — renders on the server.
+
+## The asset allow-list is a privacy boundary
+
+Remix 3's asset server has a deliberate allow-list for what files the browser can load. In a consent-aware app, that's not just hygiene — it's a useful enforcement boundary:
+
+```ts file="app/assets.ts"
+import { createAssetServer } from "remix/assets";
+
+export const assets = createAssetServer({
+	basePath: "/assets",
+	rootDir: process.cwd(),
+	fileMap: {
+		"app/*path": "app/*path",
+		"node_modules/*path": "node_modules/*path",
+	},
+	allow: ["app/assets/**", "app/data/**", "app/ui/cookie-banner.tsx", "node_modules/**"],
+	deny: ["app/**/*.server.*"],
+});
+```
+
+`app/ui/cookie-banner.tsx` is explicitly allow-listed because it's the only UI module a client needs to load. Add an analytics SDK wrapper? You add it to `allow` consciously, with a PR that reviews against the consent config. Forget? It 404s in dev. Compared to the React-meta-framework default of "the bundler ships whatever you import," this is a real constraint on what can fire without consent.
+
+## Why now
+
+Most apps add consent under pressure. An audit is coming, a customer asks for a DPA, marketing wants to ship a Hotjar replay and legal pings the engineering lead. The result is a consent banner glued onto an architecture that didn't expect it: a runtime third-party iframe, hand-rolled `if (consent)` checks scattered across files, a privacy page that's a Markdown file someone hasn't edited in two years.
+
+Remix 3 in beta is a chance to flip that order. The framework is small enough that you can read it end to end in an afternoon. The consent state has somewhere obvious to live (`@policystack/core/consent`, mounted as a `clientEntry`). The policy has somewhere obvious to live (one typed config, compiled to two server-rendered pages). The asset allow-list gives you a place to fail loud if something forgets to ask. There is no React-shaped vendor SDK to bolt on, because PolicyStack is headless primitives, not a vendor widget — which is exactly the shape Remix 3 wants.
+
+The bet PolicyStack makes is that privacy and consent want to look like everything else in your repo: typed, diffable, testable, owned by engineering rather than a vendor dashboard. That bet pays off the most when the app is small. A Remix 3 app, three weeks into existence, with one config file driving the banner and both policies, is the cheapest version of "we did this right" you'll ever own.
+
+## Where to go next
+
+- **[Policy](/policy)** — the policy-as-code half. Docs at [/docs/policy](/docs/policy) cover the SDK, the renderer, and the Markdown export.
+- **[Consent](/consent)** — the consent state machine. Docs at [/docs/consent](/docs/consent) cover the core, the storage adapters, the script gating helpers, and the framework adapters that already exist (React, Vue, Solid, Svelte, Angular — Remix 3 didn't need one).
+- **The canonical end-to-end example** is the TanStack app at [jamiedavenport/policystack/examples/tanstack](https://github.com/jamiedavenport/policystack/tree/v1/examples/tanstack) — a different framework, but the same one-config-drives-everything wiring shown here.
+- **[Open source](https://github.com/jamiedavenport/policystack)** — Apache-2.0, 1.0, frozen surface. Issues and PRs welcome. A Remix 3 adapter is the kind of thing that fits in a weekend.
+
+The framework is early. PolicyStack is headless primitives — and "primitives" happens to be exactly what gets you a clean privacy story before the launch announcement.

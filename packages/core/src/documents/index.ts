@@ -1,44 +1,9 @@
-import { createT } from "../i18n";
-import type { PolicyInput } from "../types";
-import { compileCookieDocument } from "./cookie";
-import { compilePrivacyDocument } from "./privacy";
-import type { Document } from "./types";
-
-export function compile(input: PolicyInput): Document {
-	const t = createT(input.locale);
-	if (input.type === "privacy") {
-		const { type: _, ...config } = input;
-		return {
-			type: "document",
-			policyType: "privacy",
-			sections: compilePrivacyDocument(config, t),
-		};
-	}
-	const { type: _, ...config } = input;
-	return {
-		type: "document",
-		policyType: "cookie",
-		sections: compileCookieDocument(config, t),
-	};
-}
-
-export {
-	bold,
-	cell,
-	heading,
-	italic,
-	li,
-	link,
-	ol,
-	p,
-	row,
-	section,
-	table,
-	text,
-	ul,
-} from "./helpers";
+export { compileCookieDocument } from "./cookie";
+export { compilePrivacyDocument } from "./privacy";
+export { AST_VERSION } from "./types";
 export type {
 	BoldNode,
+	ComplianceReason,
 	ContentNode,
 	Document,
 	DocumentSection,
@@ -53,7 +18,12 @@ export type {
 	ParagraphNode,
 	PolicyType,
 	TableCellNode,
+	TableHeaderCellNode,
+	TableHeaderRowNode,
 	TableNode,
 	TableRowNode,
 	TextNode,
+	UnknownNode,
 } from "./types";
+export { visit } from "./visit";
+export type { Visitor } from "./visit";

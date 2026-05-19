@@ -1,0 +1,60 @@
+{
+	"name": "@policystack/scripts",
+	"version": "1.0.0",
+	"description": "Consent-gated third-party tag loaders for PolicyStack (GA4, Meta Pixel, PostHog, …)",
+	"license": "Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jamiedavenport/policystack",
+		"directory": "packages/scripts"
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"NOTICE.md"
+	],
+	"type": "module",
+	"sideEffects": false,
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		},
+		"./ga4": {
+			"import": "./dist/ga4.js",
+			"types": "./dist/ga4.d.ts"
+		},
+		"./google-tag-manager": {
+			"import": "./dist/google-tag-manager.js",
+			"types": "./dist/google-tag-manager.d.ts"
+		},
+		"./hotjar": {
+			"import": "./dist/hotjar.js",
+			"types": "./dist/hotjar.d.ts"
+		},
+		"./meta-pixel": {
+			"import": "./dist/meta-pixel.js",
+			"types": "./dist/meta-pixel.d.ts"
+		},
+		"./posthog": {
+			"import": "./dist/posthog.js",
+			"types": "./dist/posthog.d.ts"
+		},
+		"./segment": {
+			"import": "./dist/segment.js",
+			"types": "./dist/segment.d.ts"
+		},
+		"./package.json": "./package.json"
+	},
+	"scripts": {
+		"dev": "vp pack --watch",
+		"build": "vp pack",
+		"check-types": "tsc --noEmit",
+		"test": "vp test"
+	},
+	"devDependencies": {
+		"@policystack/core": "workspace:*",
+		"happy-dom": "^15.0.0",
+		"vite-plus": "catalog:"
+	}
+}

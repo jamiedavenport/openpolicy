@@ -1,26 +1,17 @@
-export type OutputFormat = "markdown" | "html" | "pdf";
-
-export type CompileOptions = { formats: OutputFormat[] };
+import type { JurisdictionId } from "./jurisdiction-id";
+// MUST stay `import type` — it is erased to zero JS, so the `.` (compiler)
+// bundle never pulls the consent runtime. See packages/core/vite.config.ts:
+// `.` ⊥ `./consent` is the deliberate tree-shake split. Promoting this to a
+// value import would break it.
+import type { PolicyStackConsentOptions } from "./consent/types";
 
 export type PolicyCategory = "privacy" | "cookie";
 
-// Languages OpenPolicy knows how to emit. User-supplied strings (company name,
+// Languages PolicyStack knows how to emit. User-supplied strings (company name,
 // purposes, retention text, etc.) pass through untouched in whatever language
-// the caller wrote them — this union only governs the strings OpenPolicy itself
+// the caller wrote them — this union only governs the strings PolicyStack itself
 // emits (headings, boilerplate, lookup-table labels).
 export type Locale = "en" | "fr" | "de" | "nl" | "es";
-
-export type Jurisdiction =
-	| "eu" //    European Union — GDPR
-	| "uk" //    United Kingdom — UK-GDPR + Data Protection Act 2018
-	| "us-ca" // California, USA — CCPA / CPRA
-	| "us-va" // Virginia, USA — VCDPA (reserved; no gated content in 0.1.0)
-	| "us-co" // Colorado, USA — CPA (reserved; no gated content in 0.1.0)
-	| "br" //    Brazil — LGPD (reserved; no gated content in 0.1.0)
-	| "ca" //    Canada — PIPEDA (reserved; no gated content in 0.1.0)
-	| "au" //    Australia — Privacy Act 1988 (reserved; no gated content in 0.1.0)
-	| "jp" //    Japan — APPI (reserved; no gated content in 0.1.0)
-	| "sg"; //   Singapore — PDPA (reserved; no gated content in 0.1.0)
 
 export type UserRight =
 	| "access"
@@ -39,6 +30,28 @@ export type LegalBasis =
 	| "vital_interests"
 	| "public_task"
 	| "legitimate_interests";
+
+// The explicit shared-config bridge (§4.1): a total, compiler-checked mapping
+// from every Article 6 lawful basis to whether a category built on it is
+// consent-gated. `Record<LegalBasis, …>` makes omitting a basis a type error,
+// so this is a reviewable table rather than a lossy string heuristic. Only
+// `consent` is gated; every other basis is a standing legal ground that does
+// not require (and cannot be revoked by) a consent decision.
+export const LAWFUL_BASIS_CONSENT_GATED: Record<LegalBasis, boolean> = {
+	consent: true,
+	contract: false,
+	legal_obligation: false,
+	vital_interests: false,
+	public_task: false,
+	legitimate_interests: false,
+};
+
+// A missing basis is treated as gated — the privacy-safe default for a config
+// the bridge may run before validation (validate() hard-errors a missing basis
+// via `cookie-lawful-basis-missing`).
+export function isConsentGated(basis: LegalBasis | undefined): boolean {
+	return basis == null ? true : LAWFUL_BASIS_CONSENT_GATED[basis];
+}
 
 // GDPR Art. 13(2)(f) requires disclosing each automated-decision-making
 // or profiling activity (Art. 22) — the existence, the logic involved,
@@ -73,6 +86,9 @@ export type CompanyConfig = {
 	name: string;
 	legalName: string;
 	address: string;
+	// Public website. Optional; seeded from package.json `homepage` when
+	// omitted. Rendered in the contact section of both policies.
+	url?: string;
 	contact: Contact;
 	dpo?: Dpo;
 	euRepresentative?: EuRepresentative;
@@ -136,6 +152,14 @@ export type CookiePolicyCookies = {
 	context: CookieContext;
 };
 
+// The strictly-necessary-only fallback used when a privacy/cookie policy is
+// compiled from a config that declared no `cookies` block. One definition,
+// shared by both document builders.
+export const ESSENTIAL_ONLY_COOKIES: CookiePolicyCookies = {
+	used: { essential: true },
+	context: {},
+};
+
 export type TrackingTechnology = string;
 
 export type ConsentMechanism = {
@@ -144,51 +168,19 @@ export type ConsentMechanism = {
 	canWithdraw: boolean;
 };
 
-// Internal type consumed by section builders via PolicyInput.
-// Produced by expandOpenPolicyConfig() — not part of the public API.
-export type PrivacyPolicyConfig = {
-	effectiveDate: EffectiveDate;
-	locale: Locale;
-	company: CompanyConfig;
-	data: DataConfig;
-	cookies: CookiePolicyCookies;
-	thirdParties: ThirdParty[];
-	userRights: UserRight[];
-	jurisdictions: Jurisdiction[];
-	children?: ChildrenConfig;
-	automatedDecisionMaking?: AutomatedDecisionMaking;
-	version?: string;
-};
-
-// Internal type consumed by section builders via PolicyInput.
-// Produced by expandOpenPolicyConfig() — not part of the public API.
-export type CookiePolicyConfig = {
-	effectiveDate: EffectiveDate;
-	locale: Locale;
-	company: CompanyConfig;
-	cookies: CookiePolicyCookies;
-	thirdParties: ThirdParty[];
-	trackingTechnologies?: TrackingTechnology[];
-	consentMechanism?: ConsentMechanism;
-	jurisdictions: Jurisdiction[];
-	version?: string;
-};
-
-export type PolicyInput =
-	| ({ type: "privacy" } & PrivacyPolicyConfig)
-	| ({ type: "cookie" } & CookiePolicyConfig);
-
 // Public config passed to defineConfig(). All fields live at the top level.
-export type OpenPolicyConfig = {
+export type PolicyStackConfig = {
 	company: CompanyConfig;
 	effectiveDate: EffectiveDate;
-	jurisdictions: Jurisdiction[];
+	jurisdictions: JurisdictionId[];
 
-	// Language for OpenPolicy-emitted strings. Defaults to "en" when omitted.
+	// Language for PolicyStack-emitted strings. Defaults to "en" when omitted.
 	locale?: Locale;
 
-	// Data handling — feeds the privacy policy.
-	data?: DataConfig;
+	// Data handling — feeds the privacy policy. Required: every config must
+	// declare its data posture. An empty `data.collected` is valid (e.g. a
+	// plain landing page) but surfaces a `data-collected-empty` warning.
+	data: DataConfig;
 	children?: ChildrenConfig;
 	thirdParties?: ThirdParty[];
 	automatedDecisionMaking?: AutomatedDecisionMaking;
@@ -197,6 +189,15 @@ export type OpenPolicyConfig = {
 	cookies?: CookiePolicyCookies;
 	trackingTechnologies?: TrackingTechnology[];
 	consentMechanism?: ConsentMechanism;
+
+	// Runtime-only consent knobs (storage adapter, jurisdiction resolver, GPC,
+	// triggers, …). Authored here so policy + consent are ONE config; the
+	// consent banner's category data is derived from `cookies`, not duplicated
+	// here. Excluded from the version hash by construction (policy-version.ts
+	// hashes an explicit field allowlist) so swapping an adapter never churns
+	// privacyVersion/cookieVersion, and ignored by validate()/compile/llms —
+	// this is runtime wiring, not document content.
+	consent?: PolicyStackConsentOptions;
 
 	// Explicit opt-out. Omit to auto-detect based on which fields are present.
 	policies?: PolicyCategory[];
@@ -207,14 +208,14 @@ export type OpenPolicyConfig = {
 	cookieVersion?: string;
 };
 
-export function isOpenPolicyConfig(value: unknown): value is OpenPolicyConfig {
+export function isPolicyStackConfig(value: unknown): value is PolicyStackConfig {
 	if (value === null || typeof value !== "object") return false;
 	const obj = value as Record<string, unknown>;
 	return "company" in obj && "effectiveDate" in obj && !("type" in obj);
 }
 
-export type ValidationIssue = {
-	code: string;
-	level: "error" | "warning";
-	message: string;
-};
+// The stable public diagnostic codes and the `Issue` shape live in their own
+// module so the union can be *derived from* a runtime registry (PS-32) instead
+// of hand-maintained twice. Still frozen at 1.0 (§6); re-exported here so the
+// historical `@policystack/core` "./types" import path is unchanged (PS-11).
+export type { Issue, IssueCode } from "./issue-codes";

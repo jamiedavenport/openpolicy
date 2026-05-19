@@ -1,8 +1,8 @@
 import { expect, test } from "vite-plus/test";
-import type { OpenPolicyConfig } from "./index";
+import type { PolicyStackConfig } from "./index";
 import { defineConfig } from "./index";
 
-const fixture: OpenPolicyConfig = {
+const fixture: PolicyStackConfig = {
 	company: {
 		name: "Acme Inc.",
 		legalName: "Acme Corporation",
@@ -36,13 +36,15 @@ const fixture: OpenPolicyConfig = {
 	thirdParties: [],
 };
 
-test("defineConfig preserves all input fields", () => {
+test("defineConfig preserves input fields (company seeded, consent derived)", () => {
 	const result = defineConfig(fixture);
-	expect(result.company).toBe(fixture.company);
 	expect(result.effectiveDate).toBe(fixture.effectiveDate);
 	expect(result.jurisdictions).toEqual(fixture.jurisdictions);
-	expect(result.data).toBe(fixture.data);
-	expect(result.cookies).toBe(fixture.cookies);
+	expect(result.data).toEqual(fixture.data);
+	expect(result.cookies).toEqual(fixture.cookies);
+	// company is seeded (explicit values kept), consentMechanism is derived.
+	expect(result.company.name).toBe("Acme Inc.");
+	expect(result.company.contact.email).toBe("privacy@acme.com");
 });
 
 test("defineConfig populates privacyVersion and cookieVersion", () => {
@@ -51,12 +53,14 @@ test("defineConfig populates privacyVersion and cookieVersion", () => {
 	expect(result.cookieVersion).toMatch(/^[0-9a-f]{8}$/);
 });
 
-test("defineConfig omits privacyVersion when no privacy fields present", () => {
+test("defineConfig omits privacyVersion when privacy is excluded via policies", () => {
 	const result = defineConfig({
 		company: fixture.company,
 		effectiveDate: "2026-01-01",
 		jurisdictions: ["ca"],
+		data: fixture.data,
 		cookies: fixture.cookies,
+		policies: ["cookie"],
 	});
 	expect(result.privacyVersion).toBeUndefined();
 	expect(result.cookieVersion).toMatch(/^[0-9a-f]{8}$/);
@@ -97,11 +101,87 @@ test("defineConfig versions are stable across key reordering", () => {
 	expect(b.cookieVersion).toBe(a.cookieVersion);
 });
 
+test("defineConfig merges the scanned module passed as the second argument", () => {
+	const scanned = {
+		dataCollected: { "Scanned Cat": ["field"] },
+		cookies: { essential: true as const, analytics: true },
+		thirdParties: [{ name: "Stripe", purpose: "Payments", policyUrl: "https://stripe.com" }],
+	};
+	const result = defineConfig(
+		{
+			company: fixture.company,
+			effectiveDate: "2026-01-01",
+			jurisdictions: ["ca"],
+			data: {
+				collected: { Manual: ["x"] },
+				context: { Manual: fixture.data.context["Account Information"] as never },
+			},
+			cookies: {
+				context: {
+					essential: { lawfulBasis: "legal_obligation" },
+					analytics: { lawfulBasis: "consent" },
+				},
+			},
+		},
+		scanned,
+	);
+	// manual keys win on collision; scanned fills the rest.
+	expect(result.data.collected).toEqual({ "Scanned Cat": ["field"], Manual: ["x"] });
+	expect(result.cookies?.used).toEqual({ essential: true, analytics: true });
+	expect(result.thirdParties).toEqual(scanned.thirdParties);
+});
+
+test("defineConfig derives consentMechanism from the cookie posture", () => {
+	const gated = defineConfig({
+		company: fixture.company,
+		effectiveDate: "2026-01-01",
+		jurisdictions: ["eea"],
+		data: fixture.data,
+		cookies: {
+			used: { essential: true, analytics: true },
+			context: {
+				essential: { lawfulBasis: "legal_obligation" },
+				analytics: { lawfulBasis: "consent" },
+			},
+		},
+	});
+	expect(gated.consentMechanism).toEqual({
+		hasBanner: true,
+		hasPreferencePanel: true,
+		canWithdraw: true,
+	});
+
+	const essentialOnly = defineConfig({
+		company: fixture.company,
+		effectiveDate: "2026-01-01",
+		jurisdictions: ["ca"],
+		data: fixture.data,
+		cookies: {
+			used: { essential: true },
+			context: { essential: { lawfulBasis: "legal_obligation" } },
+		},
+	});
+	expect(essentialOnly.consentMechanism).toBeUndefined();
+});
+
+test("defineConfig seeds company from package.json; an explicit value wins", () => {
+	// cwd is packages/sdk under `vp run -r test`; its package.json name is
+	// "@policystack/sdk" and it has no homepage/author.
+	const seeded = defineConfig({
+		...fixture,
+		company: { legalName: "L Corp", address: "1 St", contact: { email: "e@x.com" } },
+	});
+	expect(seeded.company.name).toBe("@policystack/sdk");
+	expect(seeded.company.legalName).toBe("L Corp");
+
+	expect(defineConfig(fixture).company.name).toBe("Acme Inc.");
+});
+
 test("defineConfig rejects data context missing entries for every collected category", () => {
 	defineConfig({
 		company: fixture.company,
 		effectiveDate: "2026-01-01",
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
 		data: {
 			collected: { "Account Information": ["Email"] },
 			// @ts-expect-error — missing "Account Information" in context
@@ -115,7 +195,8 @@ test("defineConfig rejects cookies.context without entry for every used cookie",
 	defineConfig({
 		company: fixture.company,
 		effectiveDate: "2026-01-01",
-		jurisdictions: ["eu"],
+		jurisdictions: ["eea"],
+		data: fixture.data,
 		cookies: {
 			used: { essential: true, analytics: true },
 			// @ts-expect-error — missing "analytics" in context

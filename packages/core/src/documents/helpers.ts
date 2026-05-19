@@ -4,13 +4,14 @@ import type {
 	DocumentSection,
 	HeadingNode,
 	InlineNode,
-	ItalicNode,
 	LinkNode,
 	ListItemNode,
 	ListNode,
 	NodeContext,
 	ParagraphNode,
 	TableCellNode,
+	TableHeaderCellNode,
+	TableHeaderRowNode,
 	TableNode,
 	TableRowNode,
 	TextNode,
@@ -40,11 +41,6 @@ export const bold = (value: string, context?: NodeContext): BoldNode => ({
 	value,
 	...(context && { context }),
 });
-export const italic = (value: string, context?: NodeContext): ItalicNode => ({
-	type: "italic",
-	value,
-	...(context && { context }),
-});
 export const link = (href: string, value: string, context?: NodeContext): LinkNode => ({
 	type: "link",
 	href,
@@ -69,12 +65,6 @@ export const ul = (items: ListItemNode[], context?: NodeContext): ListNode => ({
 	items,
 	...(context && { context }),
 });
-export const ol = (items: ListItemNode[], context?: NodeContext): ListNode => ({
-	type: "list",
-	ordered: true,
-	items,
-	...(context && { context }),
-});
 export const cell = (children: (string | InlineNode)[], context?: NodeContext): TableCellNode => ({
 	type: "tableCell",
 	children: children.map((c) => (typeof c === "string" ? text(c) : c)),
@@ -85,13 +75,29 @@ export const row = (cells: TableCellNode[], context?: NodeContext): TableRowNode
 	cells,
 	...(context && { context }),
 });
+export const headerCell = (
+	children: (string | InlineNode)[],
+	context?: NodeContext,
+): TableHeaderCellNode => ({
+	type: "tableHeaderCell",
+	children: children.map((c) => (typeof c === "string" ? text(c) : c)),
+	...(context && { context }),
+});
+export const headerRow = (
+	cells: TableHeaderCellNode[],
+	context?: NodeContext,
+): TableHeaderRowNode => ({
+	type: "tableHeaderRow",
+	cells,
+	...(context && { context }),
+});
 export const table = (
 	headerLabels: (string | InlineNode)[],
 	rows: TableRowNode[],
 	context?: NodeContext,
 ): TableNode => ({
 	type: "table",
-	header: row(headerLabels.map((l) => cell([l]))),
+	header: headerRow(headerLabels.map((l) => headerCell([l]))),
 	rows,
 	...(context && { context }),
 });

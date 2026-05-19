@@ -1,0 +1,57 @@
+{
+	"name": "@policystack/angular",
+	"version": "1.0.0",
+	"description": "Angular consent service and components for PolicyStack",
+	"license": "Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jamiedavenport/policystack",
+		"directory": "packages/angular"
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"NOTICE.md"
+	],
+	"type": "module",
+	"sideEffects": false,
+	"exports": {
+		"./consent": {
+			"types": "./dist/types/policystack-angular.d.ts",
+			"default": "./dist/fesm2022/policystack-angular.mjs"
+		}
+	},
+	"publishConfig": {
+		"exports": {
+			"./consent": {
+				"types": "./dist/types/policystack-angular.d.ts",
+				"default": "./dist/fesm2022/policystack-angular.mjs"
+			}
+		}
+	},
+	"scripts": {
+		"dev": "ng-packagr -p ng-package.json -c tsconfig.lib.json --watch",
+		"build": "ng-packagr -p ng-package.json -c tsconfig.lib.json",
+		"check-types": "tsc --noEmit",
+		"test": "vp test"
+	},
+	"dependencies": {
+		"tslib": "^2.6.0"
+	},
+	"devDependencies": {
+		"@angular/common": "^21.0.0",
+		"@angular/compiler": "^21.0.0",
+		"@angular/compiler-cli": "^21.0.0",
+		"@angular/core": "^21.0.0",
+		"@policystack/core": "workspace:*",
+		"happy-dom": "^15.0.0",
+		"ng-packagr": "^21.0.0",
+		"rxjs": "^7.8.0",
+		"vite-plus": "catalog:",
+		"zone.js": "~0.15.0"
+	},
+	"peerDependencies": {
+		"@angular/common": ">=20.0.0",
+		"@angular/core": ">=20.0.0"
+	}
+}

@@ -1,8 +1,8 @@
-# `@openpolicy/core`
+# `@policystack/core`
 
-> Compilation engine for [OpenPolicy](https://openpolicy.sh) policy documents.
+> Compilation engine for [PolicyStack](https://policystack.dev) policy documents.
 
-This is an internal package used by `@openpolicy/sdk`, `@openpolicy/vite`, and `@openpolicy/cli`. You generally do not need to install or import it directly.
+This is an internal package used by `@policystack/sdk`, `@policystack/vite`, and `@policystack/cli`. You generally do not need to install or import it directly.
 
 ## What it does
 
@@ -13,15 +13,34 @@ This is an internal package used by `@openpolicy/sdk`, `@openpolicy/vite`, and `
 
 ## Direct usage
 
-If you're building a custom integration (e.g. a framework plugin not covered by the official packages), you can use `compilePolicy` directly. It returns the rendered output in memory — the caller decides what to do with it (inject into a page, send over the wire, write to disk, etc.).
+If you're building a custom integration (e.g. a framework plugin not covered by the official packages), compile the document tree from a `PolicyStackConfig` with `compilePrivacyPolicy` / `compileCookiePolicy` (each returns a `Document` tree, or `null` when that policy is not emitted):
 
 ```ts
-import { compilePolicy } from "@openpolicy/core";
+import { compilePrivacyPolicy } from "@policystack/core";
+
+const doc = compilePrivacyPolicy({
+	effectiveDate: "2026-01-01",
+	jurisdictions: ["eea"],
+	company: {
+		name: "Acme",
+		legalName: "Acme, Inc.",
+		address: "...",
+		contact: { email: "privacy@acme.com" },
+	},
+	// ... rest of config
+});
+// doc is a Document AST you can render however you like, or null.
+```
+
+To render straight to strings/PDF in memory, use `compilePolicy` from `@policystack/renderers` — it takes the same flat config plus the policy type, and the caller decides what to do with the output (inject into a page, send over the wire, write to disk, etc.):
+
+```ts
+import { compilePolicy } from "@policystack/renderers";
 
 const results = await compilePolicy(
 	{
-		type: "privacy",
 		effectiveDate: "2026-01-01",
+		jurisdictions: ["eea"],
 		company: {
 			name: "Acme",
 			legalName: "Acme, Inc.",
@@ -30,6 +49,7 @@ const results = await compilePolicy(
 		},
 		// ... rest of config
 	},
+	"privacy",
 	{ formats: ["markdown", "html", "pdf"] },
 );
 
@@ -41,6 +61,6 @@ for (const result of results) {
 
 ## Links
 
-- [GitHub](https://github.com/jamiedavenport/openpolicy)
-- [openpolicy.sh](https://openpolicy.sh)
-- [npm](https://www.npmjs.com/package/@openpolicy/core)
+- [GitHub](https://github.com/jamiedavenport/policystack)
+- [policystack.dev](https://policystack.dev)
+- [npm](https://www.npmjs.com/package/@policystack/core)

@@ -1,41 +1,52 @@
 <script lang="ts">
-import type { OpenPolicyConfig, PrivacyPolicyConfig } from "@openpolicy/core";
+import type { PolicyStackConfig } from "@policystack/core";
+import { visit } from "@policystack/core";
 import { setOverridesContext } from "./context.svelte";
+import DefaultRoot from "./defaults/DefaultRoot.svelte";
+import { planVisitor } from "./plan";
 import RenderNode from "./RenderNode.svelte";
-import type { PolicyOverrides } from "./types";
+import type { PolicyComponents } from "./types";
 import { resolveDocument } from "./usePolicyDocument.svelte";
 
 type Props = {
-	config?: OpenPolicyConfig | PrivacyPolicyConfig;
+	config?: PolicyStackConfig;
 	style?: string;
-} & PolicyOverrides;
+} & PolicyComponents;
 
 const props: Props = $props();
 
 const doc = $derived(resolveDocument("privacy", props.config));
+const plan = $derived(doc ? visit(doc, planVisitor) : null);
 
 const overrides = $derived({
-	section: props.section,
-	heading: props.heading,
-	paragraph: props.paragraph,
-	list: props.list,
-	table: props.table,
-	tableHeader: props.tableHeader,
-	tableBody: props.tableBody,
-	tableRow: props.tableRow,
-	tableHead: props.tableHead,
-	tableCell: props.tableCell,
-	text: props.text,
-	bold: props.bold,
-	italic: props.italic,
-	link: props.link,
-}) satisfies PolicyOverrides;
+	Root: props.Root,
+	Section: props.Section,
+	Heading: props.Heading,
+	Paragraph: props.Paragraph,
+	List: props.List,
+	ListItem: props.ListItem,
+	Table: props.Table,
+	TableHeaderRow: props.TableHeaderRow,
+	TableHeaderCell: props.TableHeaderCell,
+	TableRow: props.TableRow,
+	TableCell: props.TableCell,
+	Text: props.Text,
+	Bold: props.Bold,
+	Italic: props.Italic,
+	Link: props.Link,
+	Unknown: props.Unknown,
+}) satisfies PolicyComponents;
 
 setOverridesContext(() => overrides);
 </script>
 
-{#if doc}
-	<div data-op-policy="" style={props.style}>
-		<RenderNode node={doc} />
-	</div>
+{#if doc && plan}
+	{#snippet rootChildren()}
+		<RenderNode {plan} />
+	{/snippet}
+	{#if props.Root}
+		{@render props.Root({ node: doc, children: rootChildren })}
+	{:else}
+		<DefaultRoot node={doc} style={props.style}>{@render rootChildren()}</DefaultRoot>
+	{/if}
 {/if}

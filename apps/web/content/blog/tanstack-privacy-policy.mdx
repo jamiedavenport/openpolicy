@@ -1,0 +1,232 @@
+---
+title: "Ship a privacy policy with your TanStack app"
+excerpt: "Define your policy in TypeScript, let the Vite plugin compile it at build time, and render it on a route alongside the rest of your app."
+date: "2026-05-04"
+tag: engineering
+---
+
+The privacy policy is usually the last thing anyone wants to think about. You ship a TanStack app, paste a template into `/privacy`, and forget about it. Six months later you've added Stripe, swapped analytics, started collecting onboarding answers — and the page still says what it said on day one.
+
+PolicyStack Policy fixes this by treating the policy like any other piece of your app: a TypeScript config, a React renderer, and a Vite plugin that keeps the two honest. This post walks through wiring it into a TanStack Start project end-to-end.
+
+## The fast path: let your coding agent do it
+
+Before you read the rest of this, the genuinely fastest way to get Policy into a TanStack app is to let Claude Code, Cursor, or whatever coding agent you use do the wiring for you. Run:
+
+```bash file="terminal" tag="bash"
+bunx @policystack/cli init
+```
+
+The CLI installs the right packages for your stack, scaffolds a `policystack.ts`, and prints a prompt tuned for coding agents — paste it into Claude Code and it'll fill in the company details, infer your jurisdictions, declare the third parties from your `package.json`, and add a `/privacy` route in seconds. `@policystack/react` also ships a Claude Code Skill (`render-policies`) that the agent picks up automatically once installed, so it knows the renderer API without you explaining it.
+
+If you'd rather understand each piece before handing it off — or you're working in an editor without an agent — the rest of this post walks through the same setup by hand.
+
+## Install
+
+```bash file="terminal" tag="bash"
+bun add @policystack/sdk @policystack/react
+bun add -D @policystack/vite
+```
+
+The SDK gives you the config types and helpers. `@policystack/react` renders the config straight into your component tree. The Vite plugin scans your codebase for things you should be declaring (more on this below).
+
+## Wire up the Vite plugin
+
+Add `policyStack` to your plugin list. The order matters — it has to come **before** `tanstackStart()` so it runs against your raw source:
+
+```ts file="vite.config.ts"
+import { policyStack } from "@policystack/vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import tsConfigPaths from "vite-tsconfig-paths";
+
+export default defineConfig({
+	plugins: [
+		tsConfigPaths(),
+		policyStack({ srcDir: "./src", thirdParties: { usePackageJson: true } }),
+		tanstackStart(),
+		viteReact(),
+	],
+});
+```
+
+On first dev run the plugin scaffolds a `policystack.ts` at the project root if you don't already have one, plus the generated `policystack.gen` module it writes the scan results into. From there it watches your source for the auto-collect markers we'll get to in a minute.
+
+## Define the policy
+
+The config is a single `defineConfig()` call. You hand-author the policy in the first argument; the Vite plugin scans your source for the auto-collect markers (more on those below) and emits a typed `./policystack.gen` module that you pass as the **second** argument. Anything the scan finds merges into the config automatically:
+
+```ts file="policystack.ts"
+import { ContractPrerequisite, defineConfig, LegalBases } from "@policystack/sdk";
+import * as scanned from "./policystack.gen";
+
+export default defineConfig(
+	{
+		company: {
+			name: "Acme Inc.",
+			legalName: "Acme Corporation",
+			address: "123 Main St, Springfield, USA",
+			contact: { email: "privacy@acme.com" },
+		},
+		effectiveDate: "2026-05-04",
+		jurisdictions: ["eea", "us-ca"],
+		data: {
+			collected: {
+				"Usage Data": ["Pages visited", "Browser type", "IP address"],
+			},
+			context: {
+				"Account Information": {
+					purpose: "To authenticate users and send service notifications",
+					lawfulBasis: LegalBases.Contract,
+					retention: "Until account deletion",
+					provision: ContractPrerequisite("We cannot create or operate your account."),
+				},
+				"Usage Data": {
+					purpose: "To understand product usage and improve the service",
+					lawfulBasis: LegalBases.LegitimateInterests,
+					retention: "90 days",
+					provision: ContractPrerequisite("We cannot deliver or secure the service."),
+				},
+			},
+		},
+		cookies: {
+			// Hand-declare the essential cookie; scanned cookies (analytics,
+			// marketing, …) are merged in from the `scanned` module below.
+			used: { essential: true },
+			context: {
+				essential: { lawfulBasis: LegalBases.LegalObligation },
+			},
+		},
+		trackingTechnologies: ["web beacons", "local storage"],
+		children: { underAge: 16, noticeUrl: "https://acme.com/parental-notice" },
+		automatedDecisionMaking: [],
+	},
+	scanned,
+);
+```
+
+`LegalBases`, `ContractPrerequisite`, and the other helpers exist mostly so the config typechecks against the GDPR vocabulary — you don't have to remember whether "legitimate interests" is one word or two. Anything you want to declare by hand goes in the first argument; anything the plugin collects from your code arrives via the `scanned` module in the second. (`company.name`, `company.url`, and `company.contact.email` are seeded from your `package.json` when you leave them out, so the hand-authored block above is only what you want to override.)
+
+The `jurisdictions` field is what unlocks region-specific clauses. `"eea"` adds the GDPR-mandated sections — Article 13/14 information requirements, the data subject rights block (access, rectification, erasure, portability, objection), the lawful basis disclosures, the supervisory authority notice. `"us-ca"` does the same for CCPA/CPRA — categories of personal information, the right to know, the right to delete, the "Do Not Sell or Share" notice. You list the jurisdictions you actually serve, and the renderer composes the right document. The full list of supported regions lives in the [docs](https://policystack.dev/docs/policy/references).
+
+## Render it on a route
+
+`@policystack/react` reads the config directly. Wrap the policy in `<PolicyStack>` with your config, then drop in `<PrivacyPolicy />` — it picks up everything from the `data` block automatically:
+
+```tsx file="src/routes/privacy.tsx"
+import { createFileRoute } from "@tanstack/react-router";
+import { PolicyStack } from "@policystack/react/provider";
+import { PrivacyPolicy } from "@policystack/react/policy";
+import config from "@/policystack";
+
+export const Route = createFileRoute("/privacy")({
+	component: PrivacyPolicyPage,
+});
+
+function PrivacyPolicyPage() {
+	return (
+		<PolicyStack config={config}>
+			<PrivacyPolicy />
+		</PolicyStack>
+	);
+}
+```
+
+That's it. The policy is now part of your app: it ships in the same bundle, it follows the same deploy pipeline, and it renders with the rest of your routes — no embed snippet, no flash of unstyled content, no third-party script.
+
+## Style it like the rest of your app
+
+`<PrivacyPolicy>` accepts a `components` prop that lets you swap in your own React component for any node in the document tree:
+
+```tsx file="src/routes/privacy.tsx"
+import { createFileRoute } from "@tanstack/react-router";
+import { PolicyStack } from "@policystack/react/provider";
+import { PrivacyPolicy, type PolicyComponents } from "@policystack/react/policy";
+import config from "@/policystack";
+
+const components: PolicyComponents = {
+	Heading: ({ node }) => {
+		const Tag = `h${node.level ?? 2}` as const;
+		return <Tag className="mt-12 text-2xl font-medium tracking-tight text-ink">{node.value}</Tag>;
+	},
+	Paragraph: ({ children }) => <p className="mt-4 text-pretty text-mute">{children}</p>,
+	Link: ({ node }) => (
+		<a
+			href={node.href}
+			className="underline decoration-mute underline-offset-4 hover:decoration-ink"
+		>
+			{node.value}
+		</a>
+	),
+};
+
+export const Route = createFileRoute("/privacy")({
+	component: PrivacyPolicyPage,
+});
+
+function PrivacyPolicyPage() {
+	return (
+		<PolicyStack config={config}>
+			<PrivacyPolicy components={components} />
+		</PolicyStack>
+	);
+}
+```
+
+Anything you don't override falls back to the default renderer, so you can replace just the headings on Monday and worry about table styling next sprint. The full set of overridable nodes — `Root`, `Section`, `Heading`, `Paragraph`, `List`, `ListItem`, `Table` (and its cell parts), `Link`, `Bold`, `Italic`, `Text` — covers the document tree the compiler produces. Each section also carries a plain-English `reason` you can surface as a subtitle or tooltip in your `Section` override, so the policy reads like product copy instead of a wall of legalese.
+
+## Let your code update the policy for you
+
+The hardest part of a code-first policy isn't the initial setup — it's keeping it accurate. You add a Sentry SDK and forget to declare the third party. You start collecting an extra field on signup and the policy still lists three. The auto-collect features close that gap by letting the Vite plugin learn from your code directly and feed the result into the `scanned` module you passed as the second argument to `defineConfig`.
+
+**Annotate data writes at the source.** Wrap the values you persist with `collecting()` and the plugin picks up the category and field labels at build time, then writes them into `policystack.gen` so they merge into `data.collected`:
+
+```ts file="src/lib/users.ts"
+import { collecting } from "@policystack/sdk";
+
+export async function createUser(name: string, email: string) {
+	return db
+		.insert(users)
+		.values(
+			collecting("Account Information", { name, email }, { name: "Name", email: "Email address" }),
+		);
+}
+```
+
+`collecting()` returns its second argument unchanged, so it has zero runtime cost — it's a static marker for the plugin to read, the same way TypeScript decorators get stripped at compile time.
+
+**Declare third parties at their initialization sites.** Same pattern, applied to SDK setup — these calls feed the same scanned `policystack.gen` module:
+
+```ts file="src/lib/analytics.ts"
+import { thirdParty } from "@policystack/sdk";
+import { PostHog } from "posthog-js";
+
+thirdParty("PostHog", "Product analytics", "https://posthog.com/privacy");
+
+export const posthog = new PostHog(process.env.POSTHOG_KEY);
+```
+
+**Or skip the annotation entirely for known SDKs.** That `usePackageJson: true` flag in the Vite config tells the plugin to scan your dependencies against a built-in registry — Stripe, Sentry, Vercel, PostHog, DataDog, and dozens of others auto-populate the third parties list. You only annotate the ones the registry doesn't know about. Explicit annotations always win over auto-detected entries, so you can override anything that ships with the wrong defaults.
+
+The point: the policy stays in sync with the code because the code is the source of truth for what data is moving and where it's going.
+
+## Why this beats a static page
+
+Once the policy lives in your repo, it inherits everything you already get for free with code:
+
+- **Type-checked structure.** Missing required fields fail the build, not an audit.
+- **Git history.** `git blame` on a clause tells you which PR changed it, when, and why.
+- **PR review.** Policy changes go through the same review as the rest of the diff. No more "I'll update the legal page next sprint."
+- **Same deploy pipeline.** The policy ships with the feature it describes, in the same release.
+
+The static-page version of all of this is a Notion doc and a calendar reminder.
+
+## Where to go next
+
+What you've got now is a privacy policy that lives in your repo, updates with your code, and renders in your design system. Two adjacent blocks of PolicyStack turn that into proper PR-level enforcement instead of trust-the-author:
+
+- **[Consent](/consent)** — a sub-4kb headless consent state machine with adapters for React, Vue, Solid, Svelte, and Angular. Its Vite plugin flags any cookie that gets set without consent at dev time, so a missing gate fails the build and the PR — not your next audit.
+- **[Cloud](/cloud)** — the hosted control plane on top of Policy and Consent. Every policy change runs through versioning, audit trails, and a PR bot that surfaces missing fields, jurisdiction mismatches, and clauses that need legal sign-off before merge.
+
+Or browse the [TanStack example](https://github.com/jamiedavenport/policystack/tree/v1/examples/tanstack) for a working end-to-end project.

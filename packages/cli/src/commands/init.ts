@@ -2,8 +2,9 @@ import { existsSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { defineCommand } from "citty";
 import consola from "consola";
-import { AGENT_PROMPT } from "../prompt";
+import { buildAgentPrompt } from "../prompt";
 import { detectIntegrations, type Integration } from "../utils/detect-integrations";
+import { resolveLlmsPath, writeLlms } from "../utils/llms";
 import {
 	detectPackageManager,
 	type PackageManager,
@@ -13,9 +14,9 @@ import {
 import { formatCommand, runInstall } from "../utils/install";
 import { resolveStubPath, writeStub } from "../utils/stub";
 
-const SDK_PACKAGE = "@openpolicy/sdk";
+const SDK_PACKAGE = "@policystack/sdk";
 
-export type InitArgs = {
+type InitArgs = {
 	cwd: string;
 	pm?: string;
 	skipInstall: boolean;
@@ -25,10 +26,10 @@ export type InitArgs = {
 	force: boolean;
 };
 
-function printPrompt() {
+function printPrompt(prompt: string) {
 	const top = "─── Copy the prompt below into your coding agent ───";
 	const bottom = "─── End of prompt ───";
-	process.stdout.write(`\n${top}\n\n${AGENT_PROMPT}\n${bottom}\n\n`);
+	process.stdout.write(`\n${top}\n\n${prompt}\n${bottom}\n\n`);
 }
 
 function summarize(
@@ -65,7 +66,7 @@ export async function runInit(args: InitArgs): Promise<void> {
 	}
 
 	consola.box(
-		"Welcome to OpenPolicy\nInstalling packages and preparing a setup prompt for your coding agent.",
+		"Welcome to PolicyStack\nInstalling packages and preparing a setup prompt for your coding agent.",
 	);
 
 	const pm = args.pm ? toPackageManager(args.pm as PackageManagerName) : detectPackageManager(cwd);
@@ -73,6 +74,12 @@ export async function runInit(args: InitArgs): Promise<void> {
 	const integrations = detectIntegrations(cwd);
 	const prodDeps = [SDK_PACKAGE, ...integrations.filter((i) => !i.dev).map((i) => i.pkg)];
 	const devDeps = integrations.filter((i) => i.dev).map((i) => i.pkg);
+
+	// The single UI framework drives the provider-wiring snippet in the prompt
+	// (the `vite` integration is a bundler entry, not a UI framework).
+	const framework = (["react", "vue", "svelte"] as const).find((f) =>
+		integrations.some((i) => i.trigger === f),
+	);
 
 	const plan = [
 		{ deps: prodDeps, dev: false },
@@ -109,26 +116,31 @@ export async function runInit(args: InitArgs): Promise<void> {
 		}
 	}
 
+	const llmsPath = resolveLlmsPath(stubPath);
+	const stubRel = relative(cwd, stubPath) || stubPath;
+	const llmsRel = relative(cwd, llmsPath) || llmsPath;
+
 	if (args.dryRun) {
 		consola.info("Dry run — no files written.");
 	} else {
-		const result = await writeStub(stubPath, args.force);
-		const rel = relative(cwd, result.path) || result.path;
-		if (result.written) {
-			consola.success(`Created ${rel}`);
+		const stub = await writeStub(stubPath, args.force);
+		if (stub.written) {
+			consola.success(`Created ${stubRel}`);
 		} else {
-			consola.info(`Kept existing ${rel}`);
+			consola.info(`Kept existing ${stubRel}`);
 		}
+		const llms = await writeLlms(llmsPath);
+		consola.success(`${llms.written ? "Created" : "Updated"} ${llmsRel}`);
 	}
 
-	printPrompt();
+	printPrompt(buildAgentPrompt({ stubRel, llmsRel, framework }));
 
 	consola.success(
 		"Paste the prompt above into your coding agent (Claude Code, Cursor, etc.) to finish setup.",
 	);
 
 	consola.warn(
-		"OpenPolicy generates policy documents from your config — it does not provide legal advice. Have a lawyer review your policies before publication. https://openpolicy.sh/legal-notice",
+		"PolicyStack generates policy documents from your config — it does not provide legal advice. Have a lawyer review your policies before publication. https://policystack.dev/legal-notice",
 	);
 }
 
@@ -136,7 +148,7 @@ export const initCommand = defineCommand({
 	meta: {
 		name: "init",
 		description:
-			"Install OpenPolicy into the current project and print a setup prompt for coding agents",
+			"Install PolicyStack into the current project and print a setup prompt for coding agents",
 	},
 	args: {
 		cwd: {
@@ -167,7 +179,7 @@ export const initCommand = defineCommand({
 		out: {
 			type: "string",
 			description:
-				"Output path for the openpolicy.ts stub (defaults to src/openpolicy.ts if src/ exists)",
+				"Output path for the policystack.ts stub (defaults to src/policystack.ts if src/ exists)",
 		},
 		force: {
 			type: "boolean",

@@ -1,25 +1,18 @@
-import type { OpenPolicyConfig } from "@openpolicy/core";
-import { defineComponent, type InjectionKey, type PropType, provide, type Ref, toRef } from "vue";
+import type { PolicyStackConfig } from "@policystack/core";
+import type { ConsentStore } from "@policystack/core/consent";
+import type { InjectionKey, Ref } from "vue";
 
-export type OpenPolicyContextValue = {
-	config: Ref<OpenPolicyConfig>;
+// The single PolicyStack injection. `<PolicyStack>` (the one provider, at
+// `@policystack/vue/provider`) populates both halves from one
+// `PolicyStackConfig`:
+//   - `config` is read by the policy components (`@policystack/vue/policy`).
+//   - `store` is read by the consent composables (`@policystack/vue/consent`);
+//     it is `null` for a policy-only config (no cookie categories), which makes
+//     the consent composables throw their "use inside <PolicyStack>" guard.
+export type PolicyStackContextValue = {
+	config: Ref<PolicyStackConfig>;
+	store: ConsentStore | null;
 };
 
-export const OpenPolicyContextKey: InjectionKey<OpenPolicyContextValue> =
-	Symbol("OpenPolicyContext");
-
-export const OpenPolicy = defineComponent({
-	name: "OpenPolicy",
-	props: {
-		config: {
-			type: Object as PropType<OpenPolicyConfig>,
-			required: true,
-		},
-	},
-	setup(props, { slots }) {
-		provide(OpenPolicyContextKey, {
-			config: toRef(props, "config"),
-		});
-		return () => slots.default?.();
-	},
-});
+export const PolicyStackContextKey: InjectionKey<PolicyStackContextValue> =
+	Symbol("PolicyStackContext");

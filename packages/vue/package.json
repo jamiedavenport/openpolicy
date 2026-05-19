@@ -1,11 +1,11 @@
 {
-	"name": "@openpolicy/vue",
-	"version": "0.0.34",
-	"description": "Vue components for OpenPolicy",
+	"name": "@policystack/vue",
+	"version": "1.0.0",
+	"description": "Vue components for PolicyStack",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/jamiedavenport/openpolicy",
+		"url": "https://github.com/jamiedavenport/policystack",
 		"directory": "packages/vue"
 	},
 	"files": [
@@ -14,18 +14,33 @@
 		"NOTICE.md"
 	],
 	"type": "module",
+	"sideEffects": false,
 	"exports": {
-		".": {
-			"import": "./dist/index.js",
-			"types": "./dist/index.d.ts"
-		}
+		"./policy": {
+			"import": "./dist/policy.js",
+			"types": "./dist/policy.d.ts"
+		},
+		"./consent": {
+			"import": "./dist/consent.js",
+			"types": "./dist/consent.d.ts"
+		},
+		"./provider": {
+			"import": "./dist/provider.js",
+			"types": "./dist/provider.d.ts"
+		},
+		"./package.json": "./package.json"
 	},
 	"publishConfig": {
 		"exports": {
-			".": {
-				"import": "./dist/index.js",
-				"types": "./dist/index.d.ts"
-			}
+			"./policy": {
+				"import": "./dist/policy.js",
+				"types": "./dist/policy.d.ts"
+			},
+			"./consent": {
+				"import": "./dist/consent.js",
+				"types": "./dist/consent.d.ts"
+			},
+			"./package.json": "./package.json"
 		}
 	},
 	"scripts": {
@@ -34,10 +49,11 @@
 		"check-types": "tsc --noEmit",
 		"test": "vp test"
 	},
-	"dependencies": {},
 	"devDependencies": {
-		"@openpolicy/core": "workspace:*",
-		"@openpolicy/tooling": "workspace:*",
+		"@policystack/core": "workspace:*",
+		"@policystack/tooling": "workspace:*",
+		"@vue/test-utils": "^2.4.10",
+		"happy-dom": "^15.11.7",
 		"vite-plus": "catalog:",
 		"vue": "^3.5.0"
 	},

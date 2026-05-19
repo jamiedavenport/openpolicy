@@ -1,8 +1,9 @@
-import type { OpenPolicyConfig, PrivacyPolicyConfig } from "@openpolicy/core";
+import type { PolicyStackConfig, SlotName } from "@policystack/core";
 import { render } from "svelte/server";
 import { expect, test } from "vite-plus/test";
 import CookiePolicy from "./lib/CookiePolicy.svelte";
 import PrivacyPolicy from "./lib/PrivacyPolicy.svelte";
+import type { PolicyComponents } from "./lib/types";
 import { compileDocument } from "./lib/usePolicyDocument.svelte";
 
 const company = {
@@ -12,7 +13,7 @@ const company = {
 	contact: { email: "privacy@acme.com" },
 };
 
-const privacyConfig: PrivacyPolicyConfig = {
+const privacyConfig: PolicyStackConfig = {
 	effectiveDate: "2026-01-01",
 	locale: "en",
 	company,
@@ -39,7 +40,6 @@ const privacyConfig: PrivacyPolicyConfig = {
 		},
 	},
 	thirdParties: [],
-	userRights: ["access", "erasure"],
 	jurisdictions: ["ca"],
 };
 
@@ -54,8 +54,8 @@ test("compileDocument returns null when config is undefined", () => {
 	expect(compileDocument("privacy", undefined)).toBeNull();
 });
 
-test("compileDocument expands an OpenPolicyConfig and picks the right policy", () => {
-	const openConfig: OpenPolicyConfig = {
+test("compileDocument expands a PolicyStackConfig and picks the right policy", () => {
+	const openConfig: PolicyStackConfig = {
 		company,
 		effectiveDate: "2026-01-01",
 		jurisdictions: ["ca"],
@@ -76,8 +76,8 @@ test("PrivacyPolicy SSR-renders a data-op-policy wrapper with sections", () => {
 	expect(body).toContain("<h2");
 });
 
-test("CookiePolicy SSR-renders the cookie policy from an OpenPolicyConfig", () => {
-	const openConfig: OpenPolicyConfig = {
+test("CookiePolicy SSR-renders the cookie policy from a PolicyStackConfig", () => {
+	const openConfig: PolicyStackConfig = {
 		company,
 		effectiveDate: "2026-01-01",
 		jurisdictions: ["ca"],
@@ -88,3 +88,14 @@ test("CookiePolicy SSR-renders the cookie policy from an OpenPolicyConfig", () =
 	const { body } = render(CookiePolicy, { props: { config: openConfig } });
 	expect(body).toContain('data-op-policy=""');
 });
+
+// PS-15 (§2.4) drift guard: the Svelte override map must expose exactly the
+// canonical slot set from `@policystack/core`. If this framework's keys ever
+// diverge, `_keysAreCanonical` collapses to `never` and `vp check` fails.
+type KeysAreCanonical = [keyof PolicyComponents] extends [SlotName]
+	? [SlotName] extends [keyof PolicyComponents]
+		? true
+		: never
+	: never;
+const _keysAreCanonical: KeysAreCanonical = true;
+void _keysAreCanonical;

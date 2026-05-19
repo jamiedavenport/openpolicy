@@ -1,11 +1,5 @@
-import type {
-	Document,
-	InlineNode,
-	ListItemNode,
-	ListNode,
-	TableNode,
-	TableRowNode,
-} from "@openpolicy/core";
+import type { Document, Visitor } from "@policystack/core";
+import { visit } from "@policystack/core";
 
 function escapeHtml(str: string): string {
 	return str
@@ -15,63 +9,37 @@ function escapeHtml(str: string): string {
 		.replace(/"/g, "&quot;");
 }
 
-function renderInline(node: InlineNode): string {
-	switch (node.type) {
-		case "text":
-			return escapeHtml(node.value);
-		case "bold":
-			return `<strong>${escapeHtml(node.value)}</strong>`;
-		case "italic":
-			return `<em>${escapeHtml(node.value)}</em>`;
-		case "link":
-			return `<a href="${escapeHtml(node.href)}">${escapeHtml(node.value)}</a>`;
-	}
-}
-
-function renderListItem(item: ListItemNode): string {
-	const content = item.children
-		.map((child) => (child.type === "list" ? renderList(child) : renderInline(child as InlineNode)))
-		.join("");
-	return `<li>${content}</li>`;
-}
-
-function renderList(node: ListNode): string {
-	const tag = node.ordered ? "ol" : "ul";
-	const items = node.items.map(renderListItem).join("");
-	return `<${tag}>${items}</${tag}>`;
-}
-
-function renderRowCells(row: TableRowNode, tag: "th" | "td"): string {
-	return row.cells.map((c) => `<${tag}>${c.children.map(renderInline).join("")}</${tag}>`).join("");
-}
-
-function renderTable(node: TableNode): string {
-	const head = `<thead><tr>${renderRowCells(node.header, "th")}</tr></thead>`;
-	const body = `<tbody>${node.rows
-		.map((r) => `<tr>${renderRowCells(r, "td")}</tr>`)
-		.join("")}</tbody>`;
-	return `<table>${head}${body}</table>`;
-}
+// One visitor map consumed by the shared core `visit()` — no hand-rolled walk.
+// Every arm does real work except the forward-compat `unknown` no-op (ADR 0001);
+// HTML nests structurally, so list/table children recurse through `v` rather
+// than being owned by a parent arm.
+const htmlVisitor: Visitor<string> = {
+	document: (node, v) => node.sections.map(v).join("\n"),
+	section: (node, v) => node.content.map(v).join("\n"),
+	heading: (node) => {
+		const level = node.level ?? 2;
+		return `<h${level}>${escapeHtml(node.value)}</h${level}>`;
+	},
+	paragraph: (node, v) => `<p>${node.children.map(v).join("")}</p>`,
+	list: (node, v) => {
+		const tag = node.ordered ? "ol" : "ul";
+		return `<${tag}>${node.items.map(v).join("")}</${tag}>`;
+	},
+	listItem: (node, v) => `<li>${node.children.map(v).join("")}</li>`,
+	table: (node, v) =>
+		`<table><thead>${v(node.header)}</thead><tbody>${node.rows.map(v).join("")}</tbody></table>`,
+	tableHeaderRow: (node, v) => `<tr>${node.cells.map(v).join("")}</tr>`,
+	tableRow: (node, v) => `<tr>${node.cells.map(v).join("")}</tr>`,
+	tableHeaderCell: (node, v) => `<th>${node.children.map(v).join("")}</th>`,
+	tableCell: (node, v) => `<td>${node.children.map(v).join("")}</td>`,
+	text: (node) => escapeHtml(node.value),
+	bold: (node) => `<strong>${escapeHtml(node.value)}</strong>`,
+	italic: (node) => `<em>${escapeHtml(node.value)}</em>`,
+	link: (node) => `<a href="${escapeHtml(node.href)}">${escapeHtml(node.value)}</a>`,
+	// forward-compat: unrecognized node renders as nothing (ADR 0001)
+	unknown: () => "",
+};
 
 export function renderHTML(doc: Document): string {
-	return doc.sections
-		.map((section) => {
-			// biome-ignore lint/suspicious/useIterableCallbackReturn: typed
-			const blocks = section.content.map((node) => {
-				switch (node.type) {
-					case "heading": {
-						const level = node.level ?? 2;
-						return `<h${level}>${escapeHtml(node.value)}</h${level}>`;
-					}
-					case "paragraph":
-						return `<p>${node.children.map(renderInline).join("")}</p>`;
-					case "list":
-						return renderList(node);
-					case "table":
-						return renderTable(node);
-				}
-			});
-			return blocks.join("\n");
-		})
-		.join("\n");
+	return visit(doc, htmlVisitor);
 }
