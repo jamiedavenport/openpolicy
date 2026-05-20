@@ -1,5 +1,13 @@
 # @policystack/core
 
+## 1.1.0
+
+### Minor Changes
+
+- af99991: Add `"signup"` to the `ConsentRecordSource` union so consent captured during
+  account signup can be distinguished from banner, preferences, API, and import
+  sources in `ConsentRecord.source`.
+
 ## 1.0.1
 
 ### Patch Changes

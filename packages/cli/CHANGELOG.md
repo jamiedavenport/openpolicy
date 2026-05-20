@@ -1,5 +1,11 @@
 # @policystack/cli
 
+## 1.1.0
+
+### Patch Changes
+
+- @policystack/vite@1.1.0
+
 ## 1.0.1
 
 ### Patch Changes
