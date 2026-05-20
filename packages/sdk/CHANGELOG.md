@@ -1,5 +1,7 @@
 # @policystack/sdk
 
+## 1.1.0
+
 ## 1.0.1
 
 ## Unreleased (1.0 / PolicyStack — PS-30)
